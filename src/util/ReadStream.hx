@@ -104,7 +104,7 @@ class ReadStream {
 				continue;
 			}
 			if (ch == "%") {
-				if (i > start) 					break  // percent sign starts new token  ;
+				if (i > start) 					break;  // percent sign starts new token  ;
 				isArg = true;
 			}  // example: 'touching %m?' (question mark after arg starts a new token) vs. 'loud?' (doesn't)    // certain punctuation marks following an argument start a new token  
 			

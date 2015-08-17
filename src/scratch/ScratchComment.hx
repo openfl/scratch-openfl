@@ -19,15 +19,15 @@
 
 package scratch;
 
-import scratch.Graphics;
-import scratch.IconButton;
-import scratch.Menu;
-import scratch.ResizeableFrame;
-import scratch.ScriptsPane;
-import scratch.Shape;
-import scratch.Sprite;
-import scratch.TextField;
-import scratch.TextFormat;
+//import scratch.Graphics;
+//import scratch.IconButton;
+//import scratch.Menu;
+//import scratch.ResizeableFrame;
+//import scratch.ScriptsPane;
+//import scratch.Shape;
+//import scratch.Sprite;
+//import scratch.TextField;
+//import scratch.TextFormat;
 
 import flash.display.*;
 import flash.events.MouseEvent;
@@ -159,11 +159,11 @@ class ScratchComment extends Sprite {
 			frame.showResizer();
 			frame.setColor(bodyColor);
 			frame.setWidthHeight(expandedSize.x, expandedSize.y);
-			if (parent) 				parent.addChild(this)  // go to front  ;
+			if (parent) 				parent.addChild(this);  // go to front  ;
 			fixLayout();
 		}
 		else {
-			if (stage && stage.focus == contents) 				stage.focus = null  // give up focus  ;
+			if (stage && stage.focus == contents) 				stage.focus = null;  // give up focus  ;
 			expandedSize = new Point(frame.w, frame.h);
 			updateTitleText();
 			frame.hideResizer();
@@ -181,7 +181,7 @@ class ScratchComment extends Sprite {
 		var i : Int = s.indexOf("\r");
 		if (i > -1) 			s = s.substring(0, i);
 		i = s.indexOf("\n");
-		if (i > -1) 			s = s.substring(0, i)  // the entire first line fits or out of space    // Keep adding letters to the title until either  ;
+		if (i > -1) 			s = s.substring(0, i);  // the entire first line fits or out of space    // Keep adding letters to the title until either  ;
 		
 		
 		

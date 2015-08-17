@@ -25,23 +25,23 @@
 
 package ui.parts;
 
-import ui.parts.Bitmap;
-import ui.parts.EditableLabel;
-import ui.parts.Graphics;
-import ui.parts.IconButton;
-import ui.parts.Matrix;
-import ui.parts.MediaPane;
-import ui.parts.Menu;
-import ui.parts.Point;
-import ui.parts.Scratch;
-import ui.parts.ScratchObj;
-import ui.parts.ScratchSound;
-import ui.parts.ScrollFrame;
-import ui.parts.Shape;
-import ui.parts.Sprite;
-import ui.parts.TextField;
-import ui.parts.TextFormat;
-import ui.parts.UIPart;
+//import ui.parts.Bitmap;
+//import ui.parts.EditableLabel;
+//import ui.parts.Graphics;
+//import ui.parts.IconButton;
+//import ui.parts.Matrix;
+//import ui.parts.MediaPane;
+//import ui.parts.Menu;
+//import ui.parts.Point;
+//import ui.parts.Scratch;
+//import ui.parts.ScratchObj;
+//import ui.parts.ScratchSound;
+//import ui.parts.ScrollFrame;
+//import ui.parts.Shape;
+//import ui.parts.Sprite;
+//import ui.parts.TextField;
+//import ui.parts.TextFormat;
+//import ui.parts.UIPart;
 
 import flash.display.*;
 import flash.events.KeyboardEvent;

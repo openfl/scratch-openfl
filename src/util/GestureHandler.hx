@@ -48,20 +48,20 @@
 
 package util;
 
-import nme.errors.Error;
-import util.Block;
-import util.DropShadowFilter;
-import util.GlowFilter;
-import util.Menu;
-import util.Point;
-import util.Rectangle;
-import util.Scratch;
-import util.ScratchComment;
-import util.ScratchSprite;
-import util.ScrollFrame;
-import util.Sprite;
-import util.Stage;
-import util.TalkBubble;
+//import nme.errors.Error;
+//import util.Block;
+//import util.DropShadowFilter;
+//import util.GlowFilter;
+//import util.Menu;
+//import util.Point;
+//import util.Rectangle;
+//import util.Scratch;
+//import util.ScratchComment;
+//import util.ScratchSprite;
+//import util.ScrollFrame;
+//import util.Sprite;
+//import util.Stage;
+//import util.TalkBubble;
 
 import flash.display.*;
 import flash.events.MouseEvent;
@@ -177,7 +177,7 @@ class GestureHandler {
 		try{var menu : Menu = menuTarget.menu(new MouseEvent("right click"));
 		}		catch (e : Error){ };
 		if (menu) 			menu.showOnStage(stage, x, y);
-		if (!isChrome) 			Menu.removeMenusFrom(stage)  // hack: clear menuJustCreated because there's no rightMouseUp  ;
+		if (!isChrome) 			Menu.removeMenusFrom(stage);  // hack: clear menuJustCreated because there's no rightMouseUp  ;
 	}
 	
 	private function findTargetFor(property : String, obj : Dynamic, x : Int, y : Int) : DisplayObject{
@@ -404,7 +404,7 @@ class GestureHandler {
 		var i : Int = uiLayer.numChildren - 1;
 		while (i > 0){
 			var o : DisplayObject = try cast(uiLayer.getChildAt(i), DisplayObject) catch(e:Dynamic) null;
-			if (Std.is(o, Bitmap)) 				break  // hit the paint layer of the stage; no more elments  ;
+			if (Std.is(o, Bitmap)) 				break;  // hit the paint layer of the stage; no more elments  ;
 			if (o.visible && o.hitTestPoint(globalX, globalY, true)) {
 				if (app.isIn3D) 					app.stagePane.visible = false;
 				return o;
@@ -415,7 +415,7 @@ class GestureHandler {
 			i = app.stagePane.numChildren - 1;
 			while (i > 0){
 				o = try cast(app.stagePane.getChildAt(i), DisplayObject) catch(e:Dynamic) null;
-				if (Std.is(o, Bitmap)) 					break  // hit the paint layer of the stage; no more elments  ;
+				if (Std.is(o, Bitmap)) 					break;  // hit the paint layer of the stage; no more elments  ;
 				if (o.visible && o.hitTestPoint(globalX, globalY, true)) {
 					if (app.isIn3D) 						app.stagePane.visible = false;
 					return o;
@@ -443,8 +443,8 @@ class GestureHandler {
 		if (!(Lambda.has(mouseTarget, "objToGrab"))) 			return;
 		if (!app.editMode) {
 			if (app.loadInProgress) 				return;
-			if ((Std.is(mouseTarget, ScratchSprite)) && !cast((mouseTarget), ScratchSprite).isDraggable) 				return  // don't drag locked sprites in presentation mode  ;
-			if ((Std.is(mouseTarget, Watcher)) || (Std.is(mouseTarget, ListWatcher))) 				return  // don't drag watchers in presentation mode  ;
+			if ((Std.is(mouseTarget, ScratchSprite)) && !cast((mouseTarget), ScratchSprite).isDraggable) 				return;  // don't drag locked sprites in presentation mode  ;
+			if ((Std.is(mouseTarget, Watcher)) || (Std.is(mouseTarget, ListWatcher))) 				return;  // don't drag watchers in presentation mode  ;
 		}
 		grab(mouseTarget, evt);
 		gesture = "drag";
@@ -497,9 +497,9 @@ class GestureHandler {
 			return;
 		}
 		if (t != null && Lambda.has(t, "handleTool")) 			t.handleTool(CursorTool.tool, evt);
-		if (isGrowShrink && (Std.is(t, Block) && t.isInPalette || Std.is(t, ImageCanvas))) 			return  // grow/shrink sticky for scripting area  ;
+		if (isGrowShrink && (Std.is(t, Block) && t.isInPalette || Std.is(t, ImageCanvas))) 			return;  // grow/shrink sticky for scripting area  ;
 		
-		if (!evt.shiftKey) 			app.clearTool()  // don't clear if shift pressed  ;
+		if (!evt.shiftKey) 			app.clearTool();  // don't clear if shift pressed  ;
 	}
 	
 	private function grab(obj : Dynamic, evt : MouseEvent) : Void{
@@ -508,8 +508,8 @@ class GestureHandler {
 		
 		var globalP : Point = obj.localToGlobal(new Point(0, 0));  // record the original object's global position  
 		obj = obj.objToGrab((evt != null) ? evt : new MouseEvent(""));  // can return the original object, a new object, or null  
-		if (obj == null) 			return  // not grabbable  ;
-		if (obj.parent) 			globalP = obj.localToGlobal(new Point(0, 0))  // update position if not a copy  ;
+		if (obj == null) 			return;  // not grabbable  ;
+		if (obj.parent) 			globalP = obj.localToGlobal(new Point(0, 0));  // update position if not a copy  ;
 		
 		originalParent = obj.parent;  // parent is null if objToGrab() returns a new object  
 		originalPosition = new Point(obj.x, obj.y);

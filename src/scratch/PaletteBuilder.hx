@@ -23,7 +23,7 @@
 // PaletteBuilder generates the contents of the blocks palette for a given
 // category, including the blocks, buttons, and watcher toggle boxes.
 
-package scratch {
+package scratch;
 import blocks.*;
 
 import extensions.*;
@@ -43,12 +43,12 @@ import ui.parts.UIPart;
 
 import uiwidgets.*;
 
-public class PaletteBuilder {
+class PaletteBuilder {
 
-	protected var app:Scratch;
-	protected var nextY:int;
+	private var app:Scratch;
+	private var nextY:Int;
 
-	public function PaletteBuilder(app:Scratch) {
+	public function new(app:Scratch) {
 		this.app = app;
 	}
 
@@ -60,7 +60,7 @@ public class PaletteBuilder {
 			'New Block', 'Add an Extension'];
 	}
 
-	public function showBlocksForCategory(selectedCategory:int, scrollToOrigin:Boolean, shiftKey:Boolean = false):void {
+	public function showBlocksForCategory(selectedCategory:Int, scrollToOrigin:Boolean, shiftKey:Boolean = false):Void {
 		if (app.palette == null) return;
 		app.palette.clear(scrollToOrigin);
 		nextY = 7;
@@ -69,7 +69,7 @@ public class PaletteBuilder {
 		if (selectedCategory == Specs.myBlocksCategory) return showMyBlocksPalette(shiftKey);
 
 		var catName:String = Specs.categories[selectedCategory][1];
-		var catColor:int = Specs.blockColor(selectedCategory);
+		var catColor:Int = Specs.blockColor(selectedCategory);
 		if (app.viewedObj() && app.viewedObj().isStage) {
 			// The stage has different blocks for some categories:
 			var stageSpecific:Array = ['Control', 'Looks', 'Motion', 'Pen', 'Sensing'];
@@ -85,12 +85,12 @@ public class PaletteBuilder {
 		updateCheckboxes();
 	}
 
-	private function addBlocksForCategory(category:int, catColor:int):void {
-		var cmdCount:int;
+	private function addBlocksForCategory(category:Int, catColor:Int):Void {
+		var cmdCount:Int;
 		var targetObj:ScratchObj = app.viewedObj();
-		for each (var spec:Array in Specs.commands) {
+		for (spec in Specs.commands) {
 			if ((spec.length > 3) && (spec[2] == category)) {
-				var blockColor:int = (app.interp.isImplemented(spec[3])) ? catColor : 0x505050;
+				var blockColor:Int = (app.interp.isImplemented(spec[3])) ? catColor : 0x505050;
 				var defaultArgs:Array = targetObj.defaultArgsFor(spec[3], spec.slice(4));
 				var label:String = spec[0];
 				if (targetObj.isStage && spec[3] == 'whenClicked') label = 'when Stage clicked';
@@ -106,7 +106,7 @@ public class PaletteBuilder {
 		}
 	}
 
-	protected function addItem(o:DisplayObject, hasCheckbox:Boolean = false):void {
+	private function addItem(o:DisplayObject, hasCheckbox:Boolean = false):Void {
 		o.x = hasCheckbox ? 23 : 6;
 		o.y = nextY;
 		app.palette.addChild(o);
@@ -124,14 +124,14 @@ public class PaletteBuilder {
 		return t;
 	}
 
-	private function showMyBlocksPalette(shiftKey:Boolean):void {
+	private function showMyBlocksPalette(shiftKey:Boolean):Void {
 		// show creation button, hat, and call blocks
-		var catColor:int = Specs.blockColor(Specs.procedureColor);
+		var catColor:Int = Specs.blockColor(Specs.procedureColor);
 		addItem(new Button(Translator.map('Make a Block'), makeNewBlock, false, '/help/studio/tips/blocks/make-a-block/'));
 		var definitions:Array = app.viewedObj().procedureDefinitions();
 		if (definitions.length > 0) {
 			nextY += 5;
-			for each (var proc:Block in definitions) {
+			for (proc in definitions) {
 				var b:Block = new Block(proc.spec, ' ', Specs.procedureColor, Specs.CALL, proc.defaultArgValues);
 				addItem(b);
 			}
@@ -139,7 +139,7 @@ public class PaletteBuilder {
 		}
 
 		addExtensionButtons();
-		for each (var ext:* in app.extensionManager.enabledExtensions()) {
+		for (ext in app.extensionManager.enabledExtensions()) {
 			addExtensionSeparator(ext);
 			addBlocksForExtension(ext);
 		}
@@ -147,28 +147,28 @@ public class PaletteBuilder {
 		updateCheckboxes();
 	}
 
-	protected function addExtensionButtons():void {
+	private function addExtensionButtons():Void {
 		addAddExtensionButton();
 		if (Scratch.app.isExtensionDevMode) {
-			var extensionDevManager:ExtensionDevManager = Scratch.app.extensionManager as ExtensionDevManager;
-			if (extensionDevManager) {
+			var extensionDevManager:ExtensionDevManager = cast (Scratch.app.extensionManager, ExtensionDevManager);
+			if (extensionDevManager != null) {
 				addItem(extensionDevManager.makeLoadExperimentalExtensionButton());
 			}
 		}
 	}
 
-	protected function addAddExtensionButton():void {
+	private function addAddExtensionButton():Void {
 		addItem(new Button(Translator.map('Add an Extension'), showAnExtension, false, '/help/studio/tips/blocks/add-an-extension/'));
 	}
 
-	private function showDataCategory():void {
-		var catColor:int = Specs.variableColor;
+	private function showDataCategory():Void {
+		var catColor:Int = Specs.variableColor;
 
 		// variable buttons, reporters, and set/change blocks
 		addItem(new Button(Translator.map('Make a Variable'), makeVariable));
 		var varNames:Array = app.runtime.allVarNames().sort();
 		if (varNames.length > 0) {
-			for each (var n:String in varNames) {
+			for (n in varNames) {
 				addVariableCheckbox(n, false);
 				addItem(new Block(n, 'r', catColor, Specs.GET_VAR), true);
 			}
@@ -183,7 +183,7 @@ public class PaletteBuilder {
 
 		var listNames:Array = app.runtime.allListNames().sort();
 		if (listNames.length > 0) {
-			for each (n in listNames) {
+			for (n in listNames) {
 				addVariableCheckbox(n, true);
 				addItem(new Block(n, 'r', catColor, Specs.GET_LIST), true);
 			}
@@ -193,13 +193,13 @@ public class PaletteBuilder {
 		updateCheckboxes();
 	}
 
-	protected function createVar(name:String, varSettings:VariableSettings):* {
+	private function createVar(name:String, varSettings:VariableSettings):Dynamic {
 		var obj:ScratchObj = (varSettings.isLocal) ? app.viewedObj() : app.stageObj();
 		if (obj.hasName(name)) {
 			DialogBox.notify("Cannot Add", "That name is already in use.");
 			return;
 		}
-		var variable:* = (varSettings.isList ? obj.lookupOrCreateList(name) : obj.lookupOrCreateVar(name));
+		var variable:Dynamic = (varSettings.isList ? obj.lookupOrCreateList(name) : obj.lookupOrCreateVar(name));
 
 		app.runtime.showVarOrListFor(name, varSettings.isList, obj);
 		app.setSaveNeeded();
@@ -207,9 +207,9 @@ public class PaletteBuilder {
 		return variable;
 	}
 
-	private function makeVariable():void {
-		function makeVar2():void {
-			var n:String = d.getField('Variable name').replace(/^\s+|\s+$/g, '');
+	private function makeVariable():Void {
+		function makeVar2():Void {
+			var n:String = d.getField('Variable name').replace(~/^\s+|\s+$/g, '');
 			if (n.length == 0) return;
 
 			createVar(n, varSettings);
@@ -224,9 +224,9 @@ public class PaletteBuilder {
 		d.showOnStage(app.stage);
 	}
 
-	private function makeList():void {
-		function makeList2(d:DialogBox):void {
-			var n:String = d.getField('List name').replace(/^\s+|\s+$/g, '');
+	private function makeList():Void {
+		function makeList2(d:DialogBox):Void {
+			var n:String = d.getField('List name').replace(~/^\s+|\s+$/g, '');
 			if (n.length == 0) return;
 
 			createVar(n, varSettings);
@@ -241,13 +241,13 @@ public class PaletteBuilder {
 		d.showOnStage(app.stage);
 	}
 
-	protected function makeVarSettings(isList:Boolean, isStage:Boolean):VariableSettings {
+	private function makeVarSettings(isList:Boolean, isStage:Boolean):VariableSettings {
 		return new VariableSettings(isList, isStage);
 	}
 
-	private function makeNewBlock():void {
-		function addBlockHat(dialog:DialogBox):void {
-			var spec:String = specEditor.spec().replace(/^\s+|\s+$/g, '');
+	private function makeNewBlock():Void {
+		function addBlockHat(dialog:DialogBox):Void {
+			var spec:String = specEditor.spec().replace(~/^\s+|\s+$/g, '');
 			if (spec.length == 0) return;
 			var newHat:Block = new Block(spec, 'p', Specs.procedureColor, Specs.PROCEDURE_DEF);
 			newHat.parameterNames = specEditor.inputNames();
@@ -272,8 +272,8 @@ public class PaletteBuilder {
 		specEditor.setInitialFocus();
 	}
 
-	private function showAnExtension():void {
-		function addExt(ext:ScratchExtension):void {
+	private function showAnExtension():Void {
+		function addExt(ext:ScratchExtension):Void {
 			if (ext.isInternal) {
 				app.extensionManager.setEnabled(ext.name, true);
 			} else {
@@ -286,7 +286,7 @@ public class PaletteBuilder {
 		lib.open();
 	}
 
-	protected function addReporterCheckbox(block:Block):void {
+	private function addReporterCheckbox(block:Block):Void {
 		var b:IconButton = new IconButton(toggleWatcher, 'checkbox');
 		b.disableMouseover();
 		var targetObj:ScratchObj = isSpriteSpecific(block.op) ? app.viewedObj() : app.stagePane;
@@ -302,8 +302,8 @@ public class PaletteBuilder {
 		app.palette.addChild(b);
 	}
 
-	protected function isCheckboxReporter(op:String):Boolean {
-		const checkboxReporters:Array = [
+	private function isCheckboxReporter(op:String):Boolean {
+		var checkboxReporters:Array = [
 			'xpos', 'ypos', 'heading', 'costumeIndex', 'scale', 'volume', 'timeAndDate',
 			'backgroundIndex', 'sceneName', 'tempo', 'answer', 'timer', 'soundLevel', 'isLoud',
 			'sensor:', 'sensorPressed:', 'senseVideoMotion', 'xScroll', 'yScroll',
@@ -312,17 +312,17 @@ public class PaletteBuilder {
 	}
 
 	private function isSpriteSpecific(op:String):Boolean {
-		const spriteSpecific:Array = ['costumeIndex', 'xpos', 'ypos', 'heading', 'scale', 'volume'];
+		var spriteSpecific:Array = ['costumeIndex', 'xpos', 'ypos', 'heading', 'scale', 'volume'];
 		return spriteSpecific.indexOf(op) > -1;
 	}
 
-	private function getBlockArg(b:Block, i:int):String {
-		var arg:BlockArg = b.args[i] as BlockArg;
-		if (arg) return arg.argValue;
+	private function getBlockArg(b:Block, i:Int):String {
+		var arg:BlockArg = cast (b.args[i], BlockArg);
+		if (arg != null) return arg.argValue;
 		return '';
 	}
 
-	private function addVariableCheckbox(varName:String, isList:Boolean):void {
+	private function addVariableCheckbox(varName:String, isList:Boolean):Void {
 		var b:IconButton = new IconButton(toggleWatcher, 'checkbox');
 		b.disableMouseover();
 		var targetObj:ScratchObj = app.viewedObj();
@@ -342,8 +342,8 @@ public class PaletteBuilder {
 		app.palette.addChild(b);
 	}
 
-	private function toggleWatcher(b:IconButton):void {
-		var data:Object = b.clientData;
+	private function toggleWatcher(b:IconButton):Void {
+		var data:Dynamic = b.clientData;
 		if (data.block) {
 			switch (data.block.op) {
 				case 'senseVideoMotion':
@@ -361,26 +361,26 @@ public class PaletteBuilder {
 		app.setSaveNeeded();
 	}
 
-	private function updateCheckboxes():void {
-		for (var i:int = 0; i < app.palette.numChildren; i++) {
-			var b:IconButton = app.palette.getChildAt(i) as IconButton;
-			if (b && b.clientData) {
+	private function updateCheckboxes():Void {
+		for (i in 0...app.palette.numChildren) {
+			var b:IconButton = cast (app.palette.getChildAt(i), IconButton);
+			if (b != null && b.clientData) {
 				b.setOn(app.runtime.watcherShowing(b.clientData));
 			}
 		}
 	}
 
-	protected function getExtensionMenu(ext:ScratchExtension):Menu {
-		function showAbout():void {
+	private function getExtensionMenu(ext:ScratchExtension):Menu {
+		function showAbout():Void {
 			// Open in the tips window if the URL starts with /info/ and another tab otherwise
 			if (ext.url) {
-				if (ext.url.indexOf('/info/') === 0) app.showTip(ext.url);
-				else if (ext.url.indexOf('http') === 0) navigateToURL(new URLRequest(ext.url));
+				if (ext.url.indexOf('/info/') == 0) app.showTip(ext.url);
+				else if (ext.url.indexOf('http') == 0) navigateToURL(new URLRequest(ext.url));
 				else DialogBox.notify('Extensions', 'Unable to load about page: the URL given for extension "' + ext.name + '" is not formatted correctly.');
 			}
 		}
 
-		function hideExtension():void {
+		function hideExtension():Void {
 			app.extensionManager.setEnabled(ext.name, false);
 			app.updatePalette();
 		}
@@ -389,18 +389,18 @@ public class PaletteBuilder {
 		m.addItem(Translator.map('About') + ' ' + ext.name + ' ' + Translator.map('extension') + '...', showAbout, !!ext.url);
 		m.addItem('Remove extension blocks', hideExtension);
 
-		var extensionDevManager:ExtensionDevManager = Scratch.app.extensionManager as ExtensionDevManager;
+		var extensionDevManager:ExtensionDevManager = cast (Scratch.app.extensionManager, ExtensionDevManager);
 
-		if (!ext.isInternal && extensionDevManager) {
+		if (!ext.isInternal && extensionDevManager != null) {
 			m.addLine();
 			var localFileName:String = extensionDevManager.getLocalFileName(ext);
 			if (localFileName) {
 				if (extensionDevManager.isLocalExtensionDirty()) {
-					m.addItem('Load changes from ' + localFileName, function ():void {
+					m.addItem('Load changes from ' + localFileName, function ():Void {
 						extensionDevManager.loadLocalCode();
 					});
 				}
-				m.addItem('Disconnect from ' + localFileName, function ():void {
+				m.addItem('Disconnect from ' + localFileName, function ():Void {
 					extensionDevManager.stopWatchingExtensionFile();
 				});
 			}
@@ -409,10 +409,10 @@ public class PaletteBuilder {
 		return m;
 	}
 
-	protected const pwidth:int = 215;
+	private static inline var pwidth:Int = 215;
 
-	protected function addExtensionSeparator(ext:ScratchExtension):void {
-		function extensionMenu(ignore:*):void {
+	private function addExtensionSeparator(ext:ScratchExtension):Void {
+		function extensionMenu(ignore:Dynamic):Void {
 			var m:Menu = getExtensionMenu(ext);
 			m.showOnStage(app.stage);
 		}
@@ -427,7 +427,7 @@ public class PaletteBuilder {
 		addLineForExtensionTitle(titleButton, ext);
 
 		var indicator:IndicatorLight = new IndicatorLight(ext);
-		indicator.addEventListener(MouseEvent.CLICK, function (e:Event):void {
+		indicator.addEventListener(MouseEvent.CLICK, function (e:Event):Void {
 			Scratch.app.showTip('extensions');
 		}, false, 0, true);
 		app.extensionManager.updateIndicator(indicator, ext);
@@ -437,8 +437,8 @@ public class PaletteBuilder {
 
 		nextY += titleButton.height + 10;
 
-		var extensionDevManager:ExtensionDevManager = Scratch.app.extensionManager as ExtensionDevManager;
-		if (extensionDevManager) {
+		var extensionDevManager:ExtensionDevManager = cast (Scratch.app.extensionManager, ExtensionDevManager);
+		if (extensionDevManager != null) {
 			// Show if this extension is being updated by a file
 			var fileName:String = extensionDevManager.getLocalFileName(ext);
 			if (fileName) {
@@ -450,20 +450,20 @@ public class PaletteBuilder {
 		}
 	}
 
-	[Embed(source='../assets/reload.png')]
-	private static const reloadIcon:Class;
+	//[Embed(source='../assets/reload.png')]
+	@:bitmap("../assets/reload.png") private static inline var ReloadIcon:Class;
 
-	protected function addLineForExtensionTitle(titleButton:IconButton, ext:ScratchExtension):void {
-		var x:int = titleButton.width + 12;
-		var w:int = pwidth - x - 48;
-		var extensionDevManager:ExtensionDevManager = Scratch.app.extensionManager as ExtensionDevManager;
-		var dirty:Boolean = extensionDevManager && extensionDevManager.isLocalExtensionDirty(ext);
+	private function addLineForExtensionTitle(titleButton:IconButton, ext:ScratchExtension):Void {
+		var x:Int = titleButton.width + 12;
+		var w:Int = pwidth - x - 48;
+		var extensionDevManager:ExtensionDevManager = cast (Scratch.app.extensionManager, ExtensionDevManager);
+		var dirty:Bool = extensionDevManager != null && extensionDevManager.isLocalExtensionDirty(ext);
 		if (dirty)
 			w -= 15;
 		addLine(x, nextY + 9, w);
 
 		if (dirty) {
-			var reload:Bitmap = new reloadIcon();
+			var reload:Bitmap = new ReloadIcon();
 			reload.scaleX = 0.75;
 			reload.scaleY = 0.75;
 			var reloadBtn:Sprite = new Sprite();
@@ -476,25 +476,25 @@ public class PaletteBuilder {
 				direction: 'top'
 			});
 
-			reloadBtn.addEventListener(MouseEvent.MOUSE_DOWN, function (e:MouseEvent):void {
+			reloadBtn.addEventListener(MouseEvent.MOUSE_DOWN, function (e:MouseEvent):Void {
 				SimpleTooltips.hideAll();
 				extensionDevManager.loadLocalCode();
 			});
 
-			reloadBtn.addEventListener(MouseEvent.ROLL_OVER, function (e:MouseEvent):void {
+			reloadBtn.addEventListener(MouseEvent.ROLL_OVER, function (e:MouseEvent):Void {
 				reloadBtn.transform.colorTransform = new ColorTransform(2, 2, 2);
 			});
 
-			reloadBtn.addEventListener(MouseEvent.ROLL_OUT, function (e:MouseEvent):void {
+			reloadBtn.addEventListener(MouseEvent.ROLL_OUT, function (e:MouseEvent):Void {
 				reloadBtn.transform.colorTransform = new ColorTransform();
 			});
 		}
 	}
 
-	private function addBlocksForExtension(ext:ScratchExtension):void {
-		var blockColor:int = Specs.extensionsColor;
+	private function addBlocksForExtension(ext:ScratchExtension):Void {
+		var blockColor:Int = Specs.extensionsColor;
 		var opPrefix:String = ext.useScratchPrimitives ? '' : ext.name + '.';
-		for each (var spec:Array in ext.blockSpecs) {
+		for (spec in ext.blockSpecs) {
 			if (spec.length >= 3) {
 				var op:String = opPrefix + spec[2];
 				var defaultArgs:Array = spec.slice(3);
@@ -508,9 +508,9 @@ public class PaletteBuilder {
 		}
 	}
 
-	protected function addLine(x:int, y:int, w:int):void {
-		const light:int = 0xF2F2F2;
-		const dark:int = CSS.borderColor - 0x141414;
+	private function addLine(x:Int, y:Int, w:Int):Void {
+		var light:Int = 0xF2F2F2;
+		var dark:Int = CSS.borderColor - 0x141414;
 		var line:Shape = new Shape();
 		var g:Graphics = line.graphics;
 
@@ -526,5 +526,4 @@ public class PaletteBuilder {
 		app.palette.addChild(line);
 	}
 
-}
 }

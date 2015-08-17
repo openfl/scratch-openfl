@@ -57,13 +57,13 @@
 
 package interpreter;
 
-import interpreter.Block;
-import interpreter.Primitives;
-import interpreter.Scratch;
-import interpreter.ScratchObj;
-import interpreter.ScratchSprite;
-import interpreter.Thread;
-import interpreter.Variable;
+//import interpreter.Block;
+//import interpreter.Primitives;
+//import interpreter.Scratch;
+//import interpreter.ScratchObj;
+//import interpreter.ScratchSprite;
+//import interpreter.Thread;
+//import interpreter.Variable;
 
 import flash.utils.Dictionary;
 
@@ -305,7 +305,7 @@ class Interpreter {
 					else return;
 				}
 				else {
-					if (activeThread.block.op == Specs.CALL) 						activeThread.firstTime = true  // in case set false by call  ;
+					if (activeThread.block.op == Specs.CALL) 						activeThread.firstTime = true;  // in case set false by call  ;
 					activeThread.block = activeThread.block.nextBlock;
 				}
 			}
@@ -319,7 +319,7 @@ class Interpreter {
 	
 	/* Evaluation */
 	public function evalCmd(b : Block) : Dynamic{
-		if (b == null) 			return 0  // arg() and friends can pass null if arg index is out of range  ;
+		if (b == null) 			return 0;  // arg() and friends can pass null if arg index is out of range  ;
 		var op : String = b.op;
 		if (b.opFunction == null) {
 			if (op.indexOf(".") > -1) 				b.opFunction = app.extensionManager.primExtensionOp
@@ -377,7 +377,7 @@ class Interpreter {
 		var n : Float = ((Std.is(args[i], BlockArg))) ? 
 		Std.parseFloat(cast((args[i]), BlockArg).argValue) : Std.parseFloat(evalCmd(cast((args[i]), Block)));
 		
-		if (n != n) 			return 0  // return 0 if NaN (uses fast, inline test for NaN)  ;
+		if (n != n) 			return 0;  // return 0 if NaN (uses fast, inline test for NaN)  ;
 		return n;
 	}
 	
@@ -542,7 +542,7 @@ class Interpreter {
 			if (!(Std.is(arg(b, 0), String))) 				return;
 			var listArg : Dynamic = arg(b, 1);
 			if (Std.is(listArg, Array)) {
-				list = try cast(listArg, Array</*AS3HX WARNING no type*/>) catch(e:Dynamic) null;
+				list = try cast(listArg, Array<Dynamic>) catch(e:Dynamic) null;
 			}
 			if (Std.is(listArg, String)) {
 				var n : Float = Std.parseFloat(listArg);

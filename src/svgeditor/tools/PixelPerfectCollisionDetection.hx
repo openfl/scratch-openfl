@@ -102,7 +102,7 @@ class PixelPerfectCollisionDetection {
 				bm.x = debugSpr.width + 2;
 				debugSpr.addChild(bm);
 			}
-			if (intersection.width == 0) 				return null  //if(debugSpr) trace(intersection);  ;
+			if (intersection.width == 0) 				return null;  //if(debugSpr) trace(intersection);  ;
 			
 			intersection.offset(limits.left, limits.top);
 			return intersection;

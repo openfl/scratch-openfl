@@ -24,21 +24,21 @@
 
 package ui.parts;
 
-import ui.parts.BitmapData;
-import ui.parts.Graphics;
-import ui.parts.IconButton;
-import ui.parts.MediaLibrary;
-import ui.parts.Scratch;
-import ui.parts.ScratchCostume;
-import ui.parts.ScratchObj;
-import ui.parts.ScratchSprite;
-import ui.parts.ScrollFrame;
-import ui.parts.ScrollFrameContents;
-import ui.parts.Shape;
-import ui.parts.SpriteInfoPart;
-import ui.parts.TextField;
-import ui.parts.TextFormat;
-import ui.parts.UIPart;
+//import ui.parts.BitmapData;
+//import ui.parts.Graphics;
+//import ui.parts.IconButton;
+//import ui.parts.MediaLibrary;
+//import ui.parts.Scratch;
+//import ui.parts.ScratchCostume;
+//import ui.parts.ScratchObj;
+//import ui.parts.ScratchSprite;
+//import ui.parts.ScrollFrame;
+//import ui.parts.ScrollFrameContents;
+//import ui.parts.Shape;
+//import ui.parts.SpriteInfoPart;
+//import ui.parts.TextField;
+//import ui.parts.TextFormat;
+//import ui.parts.UIPart;
 
 import flash.display.*;
 import flash.text.*;
@@ -191,7 +191,7 @@ class LibraryPart extends UIPart {
 			g.endFill();
 		}
 		fixLayout();
-		if (app.viewedObj()) 			refresh()  // refresh, but not during initialization  ;
+		if (app.viewedObj()) 			refresh();  // refresh, but not during initialization  ;
 	}
 	
 	private function fixLayout() : Void{
@@ -431,19 +431,19 @@ class LibraryPart extends UIPart {
 				app.addNewSprite(spr);
 				return;
 			}
-			var list : Array<Dynamic> = try cast(costumeOrSprite, Array</*AS3HX WARNING no type*/>) catch(e:Dynamic) null;
+			var list : Array<Dynamic> = try cast(costumeOrSprite, Array<Dynamic>) catch(e:Dynamic) null;
 			if (list != null) {
 				var sprName : String = list[0].costumeName;
 				if (sprName.length > 3) 					sprName = sprName.substring(0, sprName.length - 2);
 				spr = new ScratchSprite(sprName);
 				for (c in list)spr.costumes.push(c);
-				if (spr.costumes.length > 1) 					spr.costumes.shift()  // remove default costume  ;
+				if (spr.costumes.length > 1) 					spr.costumes.shift();  // remove default costume  ;
 				spr.showCostumeNamed(list[0].costumeName);
 				app.addNewSprite(spr);
 			}
 		};
 		var lib : MediaLibrary = app.getMediaLibrary("sprite", addSprite);
-		if (fromComputer) 			lib.importFromDisk()
+		if (fromComputer) 			lib.importFromDisk();
 		else lib.open();
 	}
 	
@@ -482,7 +482,7 @@ class LibraryPart extends UIPart {
 			app.stagePane.costumes.push(c);
 			app.stagePane.showCostumeNamed(c.costumeName);
 		}
-		var list : Array<Dynamic> = try cast(costumeOrList, Array</*AS3HX WARNING no type*/>) catch(e:Dynamic) null;
+		var list : Array<Dynamic> = try cast(costumeOrList, Array<Dynamic>) catch(e:Dynamic) null;
 		if (list != null) {
 			for (c in list){
 				if (!c.baseLayerData) 					c.prepareToSave();

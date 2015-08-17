@@ -26,16 +26,16 @@
 
 package uiwidgets;
 
-import uiwidgets.BitmapData;
-import uiwidgets.Block;
-import uiwidgets.BlockShape;
-import uiwidgets.DisplayObject;
-import uiwidgets.Graphics;
-import uiwidgets.Scratch;
-import uiwidgets.ScratchComment;
-import uiwidgets.ScratchObj;
-import uiwidgets.ScrollFrameContents;
-import uiwidgets.Shape;
+//import uiwidgets.BitmapData;
+//import uiwidgets.Block;
+//import uiwidgets.BlockShape;
+//import uiwidgets.DisplayObject;
+//import uiwidgets.Graphics;
+//import uiwidgets.Scratch;
+//import uiwidgets.ScratchComment;
+//import uiwidgets.ScratchObj;
+//import uiwidgets.ScrollFrameContents;
+//import uiwidgets.Shape;
 
 import flash.display.*;
 import flash.events.MouseEvent;
@@ -378,7 +378,7 @@ class ScriptsPane extends ScrollFrameContents {
 		var menusThatAcceptReporters : Array<Dynamic> = [
 		"broadcast", "costume", "backdrop", "scene", "sound", 
 		"spriteOnly", "spriteOrMouse", "spriteOrStage", "touching"];
-		if (!droppedBlock.isReporter) 			return true  // dropping a command block  ;
+		if (!droppedBlock.isReporter) 			return true;  // dropping a command block  ;
 		if (Std.is(target, Block)) {
 			if (cast((target), Block).isEmbeddedInProcHat()) 				return false;
 			if (cast((target), Block).isEmbeddedParameter()) 				return false;
@@ -517,7 +517,7 @@ class ScriptsPane extends ScrollFrameContents {
 				topP.x + top.width + 15 : 
 				blockP.x + c.blockRef.base.width + 10;
 		c.y = blockP.y + (c.blockRef.base.substack1y() - 20) / 2;
-		if (c.blockRef.isHat) 			c.y = blockP.y + c.blockRef.base.substack1y() - 25  // draw connecting line  ;
+		if (c.blockRef.isHat) 			c.y = blockP.y + c.blockRef.base.substack1y() - 25;  // draw connecting line  ;
 		
 		
 		
@@ -580,7 +580,7 @@ class ScriptsPane extends ScrollFrameContents {
 					break;
 				}
 			}
-			if (!assigned) 				columns.push([b])  // create a new column for this stack  ;
+			if (!assigned) 				columns.push([b]);  // create a new column for this stack  ;
 		}
 		return columns;
 	}

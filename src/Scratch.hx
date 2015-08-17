@@ -23,6 +23,9 @@
 // This is the top-level application.
 
 package;
+
+import flash.errors.Error;
+
 import blocks.*;
 import flash.net.FileFilter;
 
@@ -83,7 +86,9 @@ class Scratch extends Sprite {
 	public var isSmallPlayer:Bool; // true when displaying as a scaled-down player (e.g. in search results)
 	public var stageIsContracted:Bool; // true when the stage is half size to give more space on small screens
 	public var isIn3D:Bool;
+	#if allow3d
 	public var render3D:DisplayObjectContainerIn3D;
+	#end
 	public var isArmCPU:Bool;
 	public var jsEnabled:Bool = false; // true when the SWF can talk to the webpage
 	public var ignoreResize:Bool = false; // If true, temporarily ignore resize events.
@@ -128,7 +133,7 @@ class Scratch extends Sprite {
 	private var scriptsPart:ScriptsPart;
 	public var imagesPart:ImagesPart;
 	public var soundsPart:SoundsPart;
-	public inline var tipsBarClosedWidth:Int = 17;
+	public inline static var tipsBarClosedWidth:Int = 17;
 
 	public function new() {
 		SVGTool.setStage(stage);
@@ -284,7 +289,7 @@ class Scratch extends Sprite {
 		sbxLoader.load(request);
 	}
 
-	private var pendingExtensionURLs:Array;
+	private var pendingExtensionURLs:Array<Dynamic>;
 	private function loadGithubURL(urlOrArray:Dynamic):Void {
 		if (!isExtensionDevMode) return;
 
@@ -419,7 +424,7 @@ class Scratch extends Sprite {
 	public function logException(e:Error):Void {
 	}
 
-	public function logMessage(msg:String, extra_data:Object = null):Void {
+	public function logMessage(msg:String, extra_data:Dynamic = null):Void {
 	}
 
 	public function loadProjectFailed():Void {
@@ -538,7 +543,7 @@ class Scratch extends Sprite {
 		}
 	}
 
-	public function strings():Array {
+	public function strings():Array<String> {
 		return [
 			'a copy of the project file on your computer.',
 			'Project not saved!', 'Save now', 'Not saved; project did not load.',
@@ -561,7 +566,7 @@ class Scratch extends Sprite {
 		return stagePart.projectName();
 	}
 
-	public function highlightSprites(sprites:Array):Void {
+	public function highlightSprites(sprites:Array<Sprite>):Void {
 		libraryPart.highlight(sprites);
 	}
 
@@ -594,7 +599,7 @@ class Scratch extends Sprite {
 		imagesPart.editor.enableTools(flag);
 	}
 	
-	public var usesUserNameBlock (get, set);
+	public var usesUserNameBlock (get, set):Bool;
 	
 	private function get_usesUserNameBlock():Bool {
 		return _usesUserNameBlock;
@@ -1105,13 +1110,13 @@ class Scratch extends Sprite {
 		createNewProjectAndThen();
 	}
 
-	private function createNewProjectScratchX(jsCallback:Array):Void {
+	private function createNewProjectScratchX(jsCallback:Array<Dynamic>):Void {
 		createNewProjectAndThen(function():Void {
 			externalCallArray(jsCallback);
 		});
 	}
 
-	private function saveProjectAndThen(postSaveAction:Function = null):Void {
+	private function saveProjectAndThen(postSaveAction:Dynamic = null):Void {
 		// Give the user a chance to save their project, if needed, then call postSaveAction.
 		function doNothing():Void {
 		}
@@ -1199,10 +1204,10 @@ class Scratch extends Sprite {
 	public function handleTool(tool:String, evt:MouseEvent):Void {
 	}
 
-	public function showBubble(text:String, x:Dynamic = null, y:Dynamic = null, width:Number = 0):Void {
+	public function showBubble(text:String, x:Null<Float> = null, y:Null<Float> = null, width:Float = 0):Void {
 		if (x == null) x = stage.mouseX;
 		if (y == null) y = stage.mouseY;
-		gh.showBubble(text, Number(x), Number(y), width);
+		gh.showBubble(text, x, y, width);
 	}
 
 	// -----------------------------
@@ -1459,7 +1464,7 @@ class Scratch extends Sprite {
 	}
 
 	// TODO: Remove / no longer used
-	private inline var frameRateGraphH:Int = 150;
+	private inline static var frameRateGraphH:Int = 150;
 	private var frameRateGraph:Shape;
 	private var nextFrameRateX:Int;
 	private var lastFrameTime:Int;
@@ -1546,7 +1551,7 @@ class Scratch extends Sprite {
 		return ExternalInterface.available;
 	}
 
-	macro public function externalCall(functionName:String, returnValueCallback:Function = null, args:Array<Expr>):Void {
+	macro public function externalCall(functionName:String, returnValueCallback:Dynamic = null, args:Array<Expr>):Void {
 		args.unshift(functionName);
 		var retVal:Dynamic = ExternalInterface.call.apply(ExternalInterface, args);
 		if (returnValueCallback != null) {
@@ -1554,13 +1559,13 @@ class Scratch extends Sprite {
 		}
 	}
 
-	public function addExternalCallback(functionName:String, closure:Function):Void {
+	public function addExternalCallback(functionName:String, closure:Dynamic):Void {
 		ExternalInterface.addCallback(functionName, closure);
 	}
 
 	// jsCallbackArray is: [functionName, arg1, arg2...] where args are optional.
 	// TODO: rewrite all versions of externalCall in terms of this
-	public function externalCallArray(jsCallbackArray:Array, returnValueCallback:Function = null):Void {
+	public function externalCallArray(jsCallbackArray:Array<Dynamic>, returnValueCallback:Function = null):Void {
 		var args:Array = jsCallbackArray.concat(); // clone
 		args.splice(1, 0, returnValueCallback);
 		externalCall.apply(this, args);

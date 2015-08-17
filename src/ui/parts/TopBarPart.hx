@@ -24,15 +24,15 @@
 
 package ui.parts;
 
-import ui.parts.Bitmap;
-import ui.parts.Button;
-import ui.parts.Graphics;
-import ui.parts.Scratch;
-import ui.parts.Shape;
-import ui.parts.Sprite;
-import ui.parts.TextField;
-import ui.parts.TextFormat;
-import ui.parts.UIPart;
+//import ui.parts.Bitmap;
+//import ui.parts.Button;
+//import ui.parts.Graphics;
+//import ui.parts.Scratch;
+//import ui.parts.Shape;
+//import ui.parts.Sprite;
+//import ui.parts.TextField;
+//import ui.parts.TextFormat;
+//import ui.parts.UIPart;
 
 import assets.Resources;
 

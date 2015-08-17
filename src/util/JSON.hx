@@ -28,7 +28,7 @@
 
 package util;
 
-import nme.errors.Error;
+//import nme.errors.Error;
 import util.ReadStream;
 
 import flash.display.BitmapData;
@@ -61,7 +61,7 @@ class JSON {
 	public static function escapeForJS(s : String) : String{
 		var ch : String;
 		var result : String = "";
-		for (i in ...s.length){
+		for (i in 0...s.length){
 			result += (ch = s.charAt(i));
 			if ("\\" == ch) 				result += "\\";
 		}
@@ -75,7 +75,7 @@ class JSON {
 	private function readValue() : Dynamic{
 		skipWhiteSpaceAndComments();
 		var ch : String = src.peek();
-		if (("0" <= ch) && (ch <= "9")) 			return readNumber()  // common case  ;
+		if (("0" <= ch) && (ch <= "9")) 			return readNumber();  // common case  ;
 		
 		switch (ch) {
 			case "\"":return readString();
@@ -235,8 +235,8 @@ class JSON {
 	private function readEscapedChar() : String{
 		var ch : String = src.next();
 		switch (ch) {
-			case "b":return "\b";
-			case "f":return "\f";
+			//case "b":return "\b";
+			//case "f":return "\f";
 			case "n":return "\n";
 			case "r":return "\r";
 			case "t":return "\t";
@@ -251,7 +251,7 @@ class JSON {
 			var lastPos : Int = src.pos();
 			src.skipWhiteSpace();
 			skipComment();
-			if (src.pos() == lastPos) 				break  // done  ;
+			if (src.pos() == lastPos) 				break;  // done  ;
 		}
 	}
 	
@@ -260,7 +260,7 @@ class JSON {
 		if ((src.peek() == "/") && (src.peek2() == "/")) {
 			src.skip(2);
 			while ((ch = src.next()) != "\n"){  // comments goes until the end of the line  
-				if (ch == "") 					return  // end of stream  ;
+				if (ch == "") 					return;  // end of stream  ;
 			}
 		}
 		if ((src.peek() == "/") && (src.peek2() == "*")) {
@@ -269,7 +269,7 @@ class JSON {
 			while (true){
 				ch = src.next();
 				if (ch == "") 					return  // end of stream  ;
-				if (lastWasAsterisk && (ch == "/")) 					return  // end of comment  ;
+				if (lastWasAsterisk && (ch == "/")) 					return;  // end of comment  ;
 				if (ch == "*") 					lastWasAsterisk = true;
 			}
 		}

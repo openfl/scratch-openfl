@@ -19,13 +19,13 @@
 
 package ui.media;
 
-import ui.media.MediaInfo;
-import ui.media.Scratch;
-import ui.media.ScratchCostume;
-import ui.media.ScratchObj;
-import ui.media.ScratchSound;
-import ui.media.ScrollFrame;
-import ui.media.ScrollFrameContents;
+//import ui.media.MediaInfo;
+//import ui.media.Scratch;
+//import ui.media.ScratchCostume;
+//import ui.media.ScratchObj;
+//import ui.media.ScratchSound;
+//import ui.media.ScrollFrame;
+//import ui.media.ScrollFrameContents;
 
 import flash.display.Sprite;
 import flash.geom.Point;

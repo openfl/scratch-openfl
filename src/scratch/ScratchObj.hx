@@ -25,14 +25,14 @@
 
 package scratch;
 
-import scratch.DisplayObject;
-import scratch.ListWatcher;
-import scratch.Scratch;
-import scratch.ScratchCostume;
-import scratch.ScratchSound;
-import scratch.ScratchStage;
-import scratch.Sprite;
-import scratch.Variable;
+//import scratch.DisplayObject;
+//import scratch.ListWatcher;
+//import scratch.Scratch;
+//import scratch.ScratchCostume;
+//import scratch.ScratchSound;
+//import scratch.ScratchStage;
+//import scratch.Sprite;
+//import scratch.Variable;
 
 import blocks.*;
 
@@ -45,8 +45,8 @@ import flash.utils.*;
 
 import interpreter.*;
 
-import scratch.ScratchComment;
-import scratch.ScratchSprite;
+//import scratch.ScratchComment;
+//import scratch.ScratchSprite;
 
 import translation.Translator;
 
@@ -153,7 +153,7 @@ private static var Pop : Class<Dynamic>;
 			existingNames.push(c.costumeName.toLowerCase());
 		}
 		var lcBaseName : String = baseName.toLowerCase();
-		if (Lambda.indexOf(existingNames, lcBaseName) < 0) 			return baseName  // basename is not already used  ;
+		if (Lambda.indexOf(existingNames, lcBaseName) < 0) 			return baseName;  // basename is not already used  ;
 		lcBaseName = withoutTrailingDigits(lcBaseName);
 		var i : Int = 2;
 		while (Lambda.indexOf(existingNames, lcBaseName + i) >= 0){i++;
@@ -169,7 +169,7 @@ private static var Pop : Class<Dynamic>;
 			existingNames.push(snd.soundName.toLowerCase());
 		}
 		var lcBaseName : String = baseName.toLowerCase();
-		if (Lambda.indexOf(existingNames, lcBaseName) < 0) 			return baseName  // basename is not already used  ;
+		if (Lambda.indexOf(existingNames, lcBaseName) < 0) 			return baseName;  // basename is not already used  ;
 		lcBaseName = withoutTrailingDigits(lcBaseName);
 		var i : Int = 2;
 		while (Lambda.indexOf(existingNames, lcBaseName + i) >= 0){i++;
@@ -368,12 +368,12 @@ private static var Pop : Class<Dynamic>;
 	}
 	
 	public function defaultVarName() : String{
-		if (variables.length > 0) 			return variables[variables.length - 1].name  // local var  ;
+		if (variables.length > 0) 			return variables[variables.length - 1].name;  // local var  ;
 		return (isStage) ? "" : Scratch.app.stagePane.defaultVarName();
 	}
 	
 	public function defaultListName() : String{
-		if (lists.length > 0) 			return lists[lists.length - 1].listName  // local list  ;
+		if (lists.length > 0) 			return lists[lists.length - 1].listName;  // local list  ;
 		return (isStage) ? "" : Scratch.app.stagePane.defaultListName();
 	}
 	
@@ -396,12 +396,12 @@ private static var Pop : Class<Dynamic>;
 		if (sounds.length == 0) 			return null;
 		if (as3hx.Compat.typeof((arg)) == "number") {
 			var i : Int = Math.round(arg - 1) % sounds.length;
-			if (i < 0) 				i += sounds.length  // ensure positive  ;
+			if (i < 0) 				i += sounds.length;  // ensure positive  ;
 			return sounds[i];
 		}
 		else if (as3hx.Compat.typeof((arg)) == "string") {
 			for (snd in sounds){
-				if (snd.soundName == arg) 					return snd  // arg matches a sound name  ;
+				if (snd.soundName == arg) 					return snd;  // arg matches a sound name  ;
 			}  // try converting string arg to a number  
 			
 			var n : Float = Std.parseFloat(arg);
@@ -636,7 +636,7 @@ private static var Pop : Class<Dynamic>;
 	}
 	
 	private function isNaNOrInfinity(n : Float) : Bool{
-		if (n != n) 			return true  // NaN  ;
+		if (n != n) 			return true;  // NaN  ;
 		if (n == Float.POSITIVE_INFINITY) 			return true;
 		if (n == Float.NEGATIVE_INFINITY) 			return true;
 		return false;

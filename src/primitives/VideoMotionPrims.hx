@@ -24,10 +24,10 @@
 
 package primitives;
 
-import primitives.BitmapData;
-import primitives.Matrix;
-import primitives.Rectangle;
-import primitives.Scratch;
+//import primitives.BitmapData;
+//import primitives.Matrix;
+//import primitives.Rectangle;
+//import primitives.Scratch;
 
 import flash.display.*;
 import flash.geom.*;

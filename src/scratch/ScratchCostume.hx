@@ -37,7 +37,7 @@
 // avoids the possible image degradation that might occur when repeatedly
 // converting to/from JPEG format.
 
-package scratch {
+package scratch;
 	import flash.display.*;
 	import flash.geom.*;
 	import flash.text.TextField;
@@ -48,83 +48,89 @@ package scratch {
 	import by.blooddy.crypto.image.PNG24Encoder;
 	import by.blooddy.crypto.image.PNGFilter;
 
-public class ScratchCostume {
+class ScratchCostume {
 
 	public var costumeName:String;
 	public var bitmap:BitmapData; // composite bitmap (base layer + text layer)
-	public var bitmapResolution:int = 1; // used for double or higher resolution costumes
-	public var rotationCenterX:int;
-	public var rotationCenterY:int;
+	public var bitmapResolution:Int = 1; // used for double or higher resolution costumes
+	public var rotationCenterX:Int;
+	public var rotationCenterY:Int;
 
 	public var baseLayerBitmap:BitmapData;
-	public var baseLayerID:int = -1;
+	public var baseLayerID:Int = -1;
 	public var baseLayerMD5:String;
 	private var __baseLayerData:ByteArray;
 
-	public static const WasEdited:int = -10; // special baseLayerID used to indicate costumes that have been edited
+	public static inline var WasEdited:Int = -10; // special baseLayerID used to indicate costumes that have been edited
 
 	public var svgRoot:SVGElement; // non-null for an SVG costume
-	public var svgLoading:Boolean; // true while loading bitmaps embedded in an SVG
+	public var svgLoading:Bool; // true while loading bitmaps embedded in an SVG
 	private var svgSprite:Sprite;
-	private var svgWidth:Number;
-	private var svgHeight:Number;
+	private var svgWidth:Float;
+	private var svgHeight:Float;
 
 	public var oldComposite:BitmapData; // composite bitmap from old Scratch file (used only during loading)
 
 	public var textLayerBitmap:BitmapData;
-	public var textLayerID:int = -1;
+	public var textLayerID:Int = -1;
 	public var textLayerMD5:String;
 	private var __textLayerData:ByteArray;
 
 	public var text:String;
 	public var textRect:Rectangle;
-	public var textColor:int;
+	public var textColor:Int;
 	public var fontName:String;
-	public var fontSize:int;
+	public var fontSize:Int;
 
 	// Undo support; not saved
 	public var undoList:Array = [];
-	public var undoListIndex:int;
+	public var undoListIndex:Int;
 
-	public function ScratchCostume(name:String, data:*, centerX:int = 99999, centerY:int = 99999, bmRes:int = 1) {
+	public function new(name:String, data:Dynamic, centerX:Int = 99999, centerY:Int = 99999, bmRes:Int = 1) {
 		costumeName = name;
 		rotationCenterX = centerX;
 		rotationCenterY = centerY;
 		if (data == null) {
 			rotationCenterX = rotationCenterY = 0;
-		} else if (data is BitmapData) {
+		} else if (Std.is (data, BitmapData)) {
 			bitmap = baseLayerBitmap = data;
 			bitmapResolution = bmRes;
 			if (centerX == 99999) rotationCenterX = bitmap.rect.width / 2;
 			if (centerY == 99999) rotationCenterY = bitmap.rect.height / 2;
 			prepareToSave();
-		} else if (data is ByteArray) {
+		} else if (Std.is (data, ByteArray)) {
 			setSVGData(data, (centerX == 99999));
 			prepareToSave();
 		}
 	}
+	
+	public var baseLayerData (get, set):ByteArray;
 
-	public function get baseLayerData():ByteArray {
+	private function get_baseLayerData():ByteArray {
 		return __baseLayerData;
 	}
 
-	public function set baseLayerData(data:ByteArray):void {
+	private function set_baseLayerData(data:ByteArray):ByteArray {
 		__baseLayerData = data;
 		baseLayerMD5 = null;
+		return data;
 	}
+	
+	public var textLayerData (get, set):ByteArray;
 
-	public function get textLayerData():ByteArray {
+	private function get_textLayerData():ByteArray {
 		return __textLayerData;
 	}
 
-	public function set textLayerData(data:ByteArray):void {
+	private function set_textLayerData(data:ByteArray):ByteArray {
 		__textLayerData = data;
 		textLayerMD5 = null;
+		return data;
 	}
 
 	public static function scaleForScratch(bm:BitmapData):BitmapData {
 		if ((bm.width <= 480) && (bm.height <= 360)) return bm;
-		var scale:Number = Math.min(480 / bm.width, 360 / bm.height);
+		var scale:Float = Math.min(480 / bm.width, 360 / bm.height);
 		var result:BitmapData = new BitmapData(scale * bm.width, scale * bm.height, true, 0);
 		var m:Matrix = new Matrix();
 		m.scale(scale, scale);
@@ -132,9 +138,9 @@ public class ScratchCostume {
 		return result;
 	}
 
-	public static function isSVGData(data:ByteArray):Boolean {
+	public static function isSVGData(data:ByteArray):Bool {
 		if (!data || (data.length < 10)) return false;
-		var oldPosition:int = data.position;
+		var oldPosition:Int = data.position;
 		data.position = 0;
 		var s:String = data.readUTFBytes(10);
 		data.position = oldPosition;
@@ -162,7 +168,7 @@ public class ScratchCostume {
 		return data;
 	}
 
-	public static function emptyBitmapCostume(costumeName:String, forBackdrop:Boolean):ScratchCostume {
+	public static function emptyBitmapCostume(costumeName:String, forBackdrop:Bool):ScratchCostume {
 		var bm:BitmapData = forBackdrop ?
 			new BitmapData(480, 360, true, 0xFFFFFFFF) :
 			new BitmapData(1, 1, true, 0);
@@ -170,7 +176,7 @@ public class ScratchCostume {
 		return result;
 	}
 
-	public function setBitmapData(bm:BitmapData, centerX:int, centerY:int):void {
+	public function setBitmapData(bm:BitmapData, centerX:Int, centerY:Int):Void {
 		clearOldCostume();
 		bitmap = baseLayerBitmap = bm;
 		baseLayerID = WasEdited;
@@ -184,9 +190,9 @@ public class ScratchCostume {
 		}
 	}
 
-	public function setSVGData(data:ByteArray, computeCenter:Boolean, fromEditor:Boolean = true):void {
+	public function setSVGData(data:ByteArray, computeCenter:Bool, fromEditor:Bool = true):Void {
 		// Initialize an SVG costume.
-		function refreshAfterImagesLoaded():void {
+		function refreshAfterImagesLoaded():Void {
 			svgSprite = new SVGDisplayRender().renderAsSprite(svgRoot, false, true);
 			if (Scratch.app && Scratch.app.viewedObj() && (Scratch.app.viewedObj().currentCostume() == thisC)) {
 				Scratch.app.viewedObj().updateCostume();
@@ -204,15 +210,15 @@ public class ScratchCostume {
 		importer.loadAllImages(refreshAfterImagesLoaded);
 	}
 
-	public function setSVGRoot(svg:SVGElement, computeCenter:Boolean):void {
+	public function setSVGRoot(svg:SVGElement, computeCenter:Bool):Void {
 		svgRoot = svg;
 		svgSprite = new SVGDisplayRender().renderAsSprite(svgRoot, false, true);
 		var r:Rectangle;
 		var viewBox:Array = svg.getAttribute('viewBox', '').split(' ');
 		if (viewBox.length == 4) r = new Rectangle(viewBox[0], viewBox[1], viewBox[2], viewBox[3]);
 		if (!r) {
-			var w:Number = svg.getAttribute('width', -1);
-			var h:Number = svg.getAttribute('height', -1);
+			var w:Float = svg.getAttribute('width', -1);
+			var h:Float = svg.getAttribute('height', -1);
 			if ((w >= 0) && (h >= 0)) r = new Rectangle(0, 0, w, h);
 		}
 		if (!r) r = svgSprite.getBounds(svgSprite);
@@ -224,7 +230,7 @@ public class ScratchCostume {
 		}
 	}
 
-	private function clearOldCostume():void {
+	private function clearOldCostume():Void {
 		bitmap = null;
 		baseLayerBitmap = null;
 		bitmapResolution = 1;
@@ -242,7 +248,7 @@ public class ScratchCostume {
 		textRect = null;
 	}
 
-	public function isBitmap():Boolean { return baseLayerBitmap != null }
+	public function isBitmap():Bool { return baseLayerBitmap != null; }
 
 	public function displayObj():DisplayObject {
 		if (svgRoot) {
@@ -255,7 +261,7 @@ public class ScratchCostume {
 		return bitmapObj;
 	}
 
-	private static var shapeDict:Object = {};
+	private static var shapeDict:Dynamic = {};
 	public function getShape():Shape {
 		if (!baseLayerMD5) prepareToSave();
 		var id:String = baseLayerMD5;
@@ -271,7 +277,7 @@ public class ScratchCostume {
 			if(pts.length) {
 				s.graphics.lineStyle(1);
 				s.graphics.moveTo(pts[pts.length-1].x, pts[pts.length-1].y);
-				for each(var pt:Point in pts)
+				for (pt in pts)
 					s.graphics.lineTo(pt.x, pt.y);
 			}
 
@@ -285,7 +291,7 @@ public class ScratchCostume {
 	/* > 0 ; counter clockwise order */
 	/* =0 ; C is on the line AB; */
 	/* <0 ; clockwise order; */
-	private function CCW(A:Point, B:Point, C:Point):Number {
+	private function CCW(A:Point, B:Point, C:Point):Float {
 		return ((B.x-A.x)*(C.y-A.y)-(B.y-A.y)*(C.x-A.x));
 	}
 
@@ -315,21 +321,21 @@ public class ScratchCostume {
 		m.scale(image.width / r.width, image.height / r.height);
 		image.draw(dispObj, m);
 
-		var L:Vector.<Point> = new Vector.<Point>(image.height); //stack of left-side hull;
-		var R:Vector.<Point> = new Vector.<Point>(image.height); //stack of right side hull;
-		//var H:Vector.<Point> = new Vector.<Point>();
+		var L:Vector<Point> = new Vector<Point>(image.height); //stack of left-side hull;
+		var R:Vector<Point> = new Vector<Point>(image.height); //stack of right side hull;
+		//var H:Vector<Point> = new Vector<Point>();
 		var H:Array = [];
-		var rr:int=-1, ll:int=-1;
+		var rr:Int=-1, ll:Int=-1;
 		var Q:Point = new Point();
-		var w:int = image.width;
-		var h:int = image.height;
-//		var minX:int = image.width;
-//		var minY:int = image.height;
-//		var maxX:int = 0;
-//		var maxY:int = 0;
-		var c:uint;
-		for(var y:int=0; y<h; ++y) {
-			for(var x:int=0; x<w; ++x){
+		var w:Int = image.width;
+		var h:Int = image.height;
+//		var minX:Int = image.width;
+//		var minY:Int = image.height;
+//		var maxX:Int = 0;
+//		var maxY:Int = 0;
+		var c:UInt;
+		for(y in 0...h) {
+			for(x in 0...w){
 				c = (image.getPixel32(x, y) >> 24) & 0xff;
 				if(c > 0) break;
 			}
@@ -348,8 +354,10 @@ public class ScratchCostume {
 //			maxX = Math.max(maxX, Q.x);
 //			maxY = Math.max(maxY, Q.y);
 			L[++ll] = Q.clone();
-			for(x=w-1; x>=0; --x) {//x=-1 never occurs;
+			x = w - 1;
+			while (x >= 0) {//x=-1 never occurs;
 				c = (image.getPixel32(x, y) >> 24) & 0xff;
+				--x;
 				if(c > 0) break;
 			}
 
@@ -366,11 +374,14 @@ public class ScratchCostume {
 		}
 
 		/* collect final results*/
-		for(var i:int=0; i<(ll+1); ++i)
+		for(i in 0...(ll+1))
 			H[i] = L[i]; //left part;
-
-		for(var j:int=rr; j>=0; --j)
+		
+		j = rr;
+		while (j>=0) {
 			H[i++] = R[j]; //right part;
+			j--;
+		}
 
 		R.length = L.length = 0;
 		image.dispose();
@@ -379,8 +390,8 @@ public class ScratchCostume {
 		return H;
 	}
 
-	public function width():Number { return svgRoot ? svgWidth : (bitmap ? bitmap.width / bitmapResolution : 0) }
-	public function height():Number { return svgRoot ? svgHeight : (bitmap ? bitmap.height / bitmapResolution : 0) }
+	public function width():Float { return svgRoot ? svgWidth : (bitmap ? bitmap.width / bitmapResolution : 0); }
+	public function height():Float { return svgRoot ? svgHeight : (bitmap ? bitmap.height / bitmapResolution : 0); }
 
 	public function duplicate():ScratchCostume {
 		// Return a copy of this costume.
@@ -425,18 +436,18 @@ public class ScratchCostume {
 		clone.scaleY = spr.scaleY;
 		clone.rotation = spr.rotation;
 
-		for(var i:int=0; i<spr.numChildren; ++i) {
+		for(i in 0...spr.numChildren) {
 			var dispObj:DisplayObject = spr.getChildAt(i);
-			if(dispObj is Sprite)
-				clone.addChild(cloneSprite(dispObj as Sprite));
-			else if(dispObj is Shape) {
+			if(Std.is (dispObj, Sprite))
+				clone.addChild(cloneSprite(cast (dispObj, Sprite)));
+			else if(Std.is (dispObj, Shape)) {
 				var shape:Shape = new Shape();
-				shape.graphics.copyFrom((dispObj as Shape).graphics);
+				shape.graphics.copyFrom(cast (dispObj, Shape).graphics);
 				shape.transform = dispObj.transform;
 				clone.addChild(shape);
 			}
-			else if(dispObj is Bitmap) {
-				var bm:Bitmap = new Bitmap((dispObj as Bitmap).bitmapData);
+			else if(Std.is (dispObj, Bitmap)) {
+				var bm:Bitmap = new Bitmap(cast (dispObj, Bitmap).bitmapData);
 				bm.x = dispObj.x;
 				bm.y = dispObj.y;
 				bm.scaleX = dispObj.scaleX;
@@ -445,16 +456,16 @@ public class ScratchCostume {
 				bm.alpha = dispObj.alpha;
 				clone.addChild(bm);
 			}
-			else if(dispObj is TextField) {
+			else if(Std.is (dispObj, TextField)) {
 				var tf:TextField = new TextField();
 				tf.selectable = false;
 				tf.mouseEnabled = false;
 				tf.tabEnabled = false;
-				tf.textColor = (dispObj as TextField).textColor;
-				tf.defaultTextFormat = (dispObj as TextField).defaultTextFormat;
-				tf.embedFonts = (dispObj as TextField).embedFonts;
-				tf.antiAliasType = (dispObj as TextField).antiAliasType;
-				tf.text = (dispObj as TextField).text;
+				tf.textColor = cast (dispObj, TextField).textColor;
+				tf.defaultTextFormat = cast (dispObj, TextField).defaultTextFormat;
+				tf.embedFonts = cast (dispObj, TextField).embedFonts;
+				tf.antiAliasType = cast (dispObj, TextField).antiAliasType;
+				tf.text = cast (dispObj, TextField).text;
 				tf.alpha = dispObj.alpha;
 				tf.width = tf.textWidth + 6;
 				tf.height = tf.textHeight + 4;
@@ -471,19 +482,19 @@ public class ScratchCostume {
 		return clone;
 	}
 
-	public function setSVGSprite(spr:Sprite):void {
+	public function setSVGSprite(spr:Sprite):Void {
 		svgSprite = spr;
 	}
 
-	public function thumbnail(w:int, h:int, forStage:Boolean):BitmapData {
+	public function thumbnail(w:Int, h:Int, forStage:Bool):BitmapData {
 		var dispObj:DisplayObject = displayObj();
 		var r:Rectangle = forStage ?
 			new Rectangle(0, 0, 480 * bitmapResolution, 360 * bitmapResolution) :
 			dispObj.getBounds(dispObj);
-		var centerX:Number = r.x + (r.width / 2);
-		var centerY:Number = r.y + (r.height / 2);
+		var centerX:Float = r.x + (r.width / 2);
+		var centerY:Float = r.y + (r.height / 2);
 		var bm:BitmapData = new BitmapData(w, h, true, 0x00FFFFFF); // transparent fill color
-		var scale:Number = Math.min(w / r.width, h / r.height);
+		var scale:Float = Math.min(w / r.width, h / r.height);
 		if (bitmap) scale = Math.min(1, scale);
 		var m:Matrix = new Matrix();
 		if (scale < 1 || !bitmap) m.scale(scale, scale); // don't scale up bitmaps
@@ -492,32 +503,31 @@ public class ScratchCostume {
 		return bm;
 	}
 
-	public function bitmapForEditor(forStage:Boolean):BitmapData {
+	public function bitmapForEditor(forStage:Bool):BitmapData {
 		// Return a double-resolution bitmap for use in the bitmap editor.
 		var dispObj:DisplayObject = displayObj();
 		var dispR:Rectangle = dispObj.getBounds(dispObj);
-		var w:int = Math.ceil(Math.max(1, dispR.width));
-		var h:int = Math.ceil(Math.max(1, dispR.height));
-		if (forStage) { w = 480 * bitmapResolution; h = 360 * bitmapResolution }
+		var w:Int = Math.ceil(Math.max(1, dispR.width));
+		var h:Int = Math.ceil(Math.max(1, dispR.height));
+		if (forStage) { w = 480 * bitmapResolution; h = 360 * bitmapResolution; }
 
-		var scale:Number = 2 / bitmapResolution;
-		var bgColor:int = forStage ? 0xFFFFFFFF : 0;
+		var scale:Float = 2 / bitmapResolution;
+		var bgColor:Int = forStage ? 0xFFFFFFFF : 0;
 		var bm:BitmapData = new BitmapData(scale * w, scale * h, true, bgColor);
 		var m:Matrix = new Matrix();
 		if (!forStage) m.translate(-dispR.x, -dispR.y);
 		m.scale(scale, scale);
 
-		if (SCRATCH::allow3d) {
+		#if allow3d
 			bm.drawWithQuality(dispObj, m, null, null, null, false, StageQuality.LOW);
-		}
-		else {
+		#else
 			Scratch.app.ignoreResize = true;
 			var oldQuality:String = Scratch.app.stage.quality;
 			Scratch.app.stage.quality = StageQuality.LOW;
 			bm.draw(dispObj, m);
 			Scratch.app.stage.quality = oldQuality;
 			Scratch.app.ignoreResize = false;
-		}
+		#end
 
 		return bm;
 	}
@@ -529,7 +539,7 @@ public class ScratchCostume {
 		return result;
 	}
 
-	public function writeJSON(json:util.JSON):void {
+	public function writeJSON(json:util.JSON):Void {
 		json.writeKeyValue('costumeName', costumeName);
 		json.writeKeyValue('baseLayerID', baseLayerID);
 		json.writeKeyValue('baseLayerMD5', baseLayerMD5);
@@ -547,7 +557,7 @@ public class ScratchCostume {
 		}
 	}
 
-	public function readJSON(jsonObj:Object):void {
+	public function readJSON(jsonObj:Dynamic):Void {
 		costumeName = jsonObj.costumeName;
 		baseLayerID = jsonObj.baseLayerID;
 		if (jsonObj.baseLayerID == undefined) {
@@ -559,7 +569,7 @@ public class ScratchCostume {
 		rotationCenterY = jsonObj.rotationCenterY;
 		text = jsonObj.text;
 		if (text != null) {
-			if (jsonObj.textRect is Array) {
+			if (Std.is (jsonObj.textRect, Array)) {
 				textRect = new Rectangle(jsonObj.textRect[0], jsonObj.textRect[1], jsonObj.textRect[2], jsonObj.textRect[3]);
 			}
 			textColor = jsonObj.textColor;
@@ -570,7 +580,7 @@ public class ScratchCostume {
 		}
 	}
 
-	public function prepareToSave():void {
+	public function prepareToSave():Void {
 		if (oldComposite) computeTextLayer();
 		if (baseLayerID == WasEdited) baseLayerMD5 = null; // costume was edited; recompute hash
 		baseLayerID = textLayerID = -1;
@@ -582,14 +592,14 @@ public class ScratchCostume {
 		}
 	}
 
-	private function computeTextLayer():void {
+	private function computeTextLayer():Void {
 		// When saving an old-format project, generate the text layer bitmap by subtracting
 		// the base layer bitmap from the composite bitmap. (The new costume format keeps
 		// the text layer bitmap only, rather than the entire composite image.)
 
 		if (oldComposite == null) return; // nothing to do
-		var diff:* = oldComposite.compare(baseLayerBitmap); // diff is 0 if oldComposite and baseLayerBitmap are identical
-		if (diff is BitmapData) {
+		var diff:Dynamic = oldComposite.compare(baseLayerBitmap); // diff is 0 if oldComposite and baseLayerBitmap are identical
+		if (Std.is (diff, BitmapData)) {
 			var stencil:BitmapData = new BitmapData(diff.width, diff.height, true, 0);
 			stencil.threshold(diff, diff.rect, new Point(0, 0), '!=', 0, 0xFF000000);
 			textLayerBitmap = new BitmapData(diff.width, diff.height, true, 0);
@@ -611,7 +621,7 @@ public class ScratchCostume {
 		return '.dat'; // generic data; should not happen
 	}
 
-	public function generateOrFindComposite(allCostumes:Array):void {
+	public function generateOrFindComposite(allCostumes:Array):Void {
 		// If this costume has a text layer bitmap, compute or find a composite bitmap.
 		// Since there can be multiple copies of the same costume, first try to find a
 		// costume with the same base and text layer bitmaps and share its composite
@@ -622,9 +632,9 @@ public class ScratchCostume {
 			bitmap = baseLayerBitmap;
 			return;
 		}
-		for each (var c:ScratchCostume in allCostumes) {
-			if ((c.baseLayerBitmap === baseLayerBitmap) &&
-				(c.textLayerBitmap === textLayerBitmap) &&
+		for (c in allCostumes) {
+			if ((c.baseLayerBitmap == baseLayerBitmap) &&
+				(c.textLayerBitmap == textLayerBitmap) &&
 				(c.bitmap != null)) {
 					bitmap = c.bitmap;
 					return;  // found a composite bitmap to share
@@ -635,4 +645,4 @@ public class ScratchCostume {
 		bitmap.draw(textLayerBitmap);
 	}
 
-}}
+}

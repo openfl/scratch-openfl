@@ -25,7 +25,7 @@
 // Note: All operations call the whenDone function with the result
 // if the operation succeeded or null if it failed.
 
-package util {
+package util;
 import by.blooddy.crypto.serialization.JSON;
 
 import flash.display.BitmapData;
@@ -47,11 +47,11 @@ import flash.utils.ByteArray;
 
 import mx.utils.URLUtil;
 
-public class Server implements IServer {
+class Server implements IServer {
 
-	protected var URLs:Object = {};
+	private var URLs:Dynamic = {};
 
-	public function Server() {
+	public function new() {
 		setDefaultURLs();
 
 		// Accept URL overrides from the flash variables
@@ -59,20 +59,20 @@ public class Server implements IServer {
 			var urlOverrides:String = Scratch.app.loaderInfo.parameters['urlOverrides'];
 			if (urlOverrides) overrideURLs(by.blooddy.crypto.serialization.JSON.decode(urlOverrides));
 		}
-		catch (e:*) {
+		catch (e:Dynamic) {
 		}
 	}
 
 	// No default URLs
-	protected function setDefaultURLs():void {}
+	private function setDefaultURLs():Void {}
 
-	public function overrideURLs(overrides:Object):void {
+	public function overrideURLs(overrides:Dynamic):Void {
 		var forceProtocol:String;
 		var swfURL:String = Scratch.app.loaderInfo.url;
 		if (swfURL && URLUtil.isHttpURL(swfURL)) { // "isHttpURL" is true if the protocol is either HTTP or HTTPS
 			forceProtocol = URLUtil.getProtocol(swfURL);
 		}
-		for (var name:String in overrides) {
+		for (name in overrides) {
 			if (overrides.hasOwnProperty(name)) {
 				var url:String = overrides[name];
 
@@ -85,7 +85,7 @@ public class Server implements IServer {
 		}
 	}
 
-	protected function getCdnStaticSiteURL():String {
+	private function getCdnStaticSiteURL():String {
 		return URLs.siteCdnPrefix + URLs.staticFiles;
 	}
 
@@ -95,7 +95,7 @@ public class Server implements IServer {
 
 	// This will be called with the HTTP status result from any callServer() that receives one, even when successful.
 	// The url and data parameters match those passed to callServer.
-	protected function onCallServerHttpStatus(url:String, data:*, event:HTTPStatusEvent):void {
+	private function onCallServerHttpStatus(url:String, data:Dynamic, event:HTTPStatusEvent):Void {
 		if (event.status < 200 || event.status > 299) {
 			Scratch.app.logMessage(event.toString());
 		}
@@ -103,7 +103,7 @@ public class Server implements IServer {
 
 	// This will be called if callServer encounters an error, before whenDone(null) is called.
 	// The url and data parameters match those passed to callServer.
-	protected function onCallServerError(url:String, data:*, event:ErrorEvent):void {
+	private function onCallServerError(url:String, data:Dynamic, event:ErrorEvent):Void {
 //			if(err.type != IOErrorEvent.IO_ERROR || url.indexOf('/backpack/') == -1) {
 //				if(data)
 //					Scratch.app.logMessage('Failed server request for '+url+' with data ['+data+']');
@@ -112,8 +112,8 @@ public class Server implements IServer {
 //			}
 		// We shouldn't have SecurityErrorEvents unless the crossdomain file failed to load
 		// Re-trying here should help project save failures but we'll need to add more code to re-try loading projects
-		if (event is SecurityErrorEvent) {
-			var urlPathStart:int = url.indexOf('/', 10);
+		if (Std.is (event, SecurityErrorEvent)) {
+			var urlPathStart:Int = url.indexOf('/', 10);
 			var policyFileURL:String = url.substr(0, urlPathStart) + '/crossdomain.xml?cb=' + Math.random();
 			Security.loadPolicyFile(policyFileURL);
 			Scratch.app.log('Reloading policy file from : ' + policyFileURL);
@@ -127,43 +127,43 @@ public class Server implements IServer {
 
 	// This will be called if callServer encounters an exception, before whenDone(null) is called.
 	// The url and data parameters match those passed to callServer.
-	protected function onCallServerException(url:String, data:*, exception:*):void {
-		if (exception is Error) {
+	private function onCallServerException(url:String, data:Dynamic, exception:Dynamic):Void {
+		if (Std.is (exception, Error)) {
 			Scratch.app.logException(exception);
 		}
 	}
 
 	// TODO: Maybe should have this or onCallServerError() but not both
-	public var callServerErrorInfo:Object; // only valid during a whenDone() call reporting failure.
+	public var callServerErrorInfo:Dynamic; // only valid during a whenDone() call reporting failure.
 
 	// Make a GET or POST request to the given URL (do a POST if the data is not null).
 	// The whenDone() function is called when the request is done, either with the
 	// data returned by the server or with a null argument if the request failed.
 	// The request includes site and session authentication headers.
-	protected function callServer(url:String, data:*, mimeType:String, whenDone:Function, queryParams:Object = null):URLLoader {
-		function addListeners():void {
+	private function callServer(url:String, data:Dynamic, mimeType:String, whenDone:Dynamic, queryParams:Dynamic = null):URLLoader {
+		function addListeners():Void {
 			loader.addEventListener(Event.COMPLETE, completeHandler);
 			loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler);
 			loader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
 			loader.addEventListener(HTTPStatusEvent.HTTP_STATUS, statusHandler);
 		}
 
-		function removeListeners():void {
+		function removeListeners():Void {
 			loader.removeEventListener(Event.COMPLETE, completeHandler);
 			loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler);
 			loader.removeEventListener(IOErrorEvent.IO_ERROR, errorHandler);
 			loader.removeEventListener(HTTPStatusEvent.HTTP_STATUS, statusHandler);
 		}
 
-		function completeHandler(event:Event):void {
+		function completeHandler(event:Event):Void {
 			removeListeners();
 			callServerErrorInfo = null;
 			whenDone(loader.data);
 		}
 
-		var httpStatus:int = 0;
+		var httpStatus:Int = 0;
 
-		function errorHandler(event:ErrorEvent):void {
+		function errorHandler(event:ErrorEvent):Void {
 			removeListeners();
 			onCallServerError(url, data, event);
 			callServerErrorInfo = {
@@ -175,13 +175,13 @@ public class Server implements IServer {
 			callServerErrorInfo = null;
 		}
 
-		function exceptionHandler(exception:*):void {
+		function exceptionHandler(exception:Dynamic):Void {
 			removeListeners();
 			onCallServerException(url, data, exception);
 			whenDone(null);
 		}
 
-		function statusHandler(e:HTTPStatusEvent):void {
+		function statusHandler(e:HTTPStatusEvent):Void {
 			httpStatus = e.status;
 			onCallServerHttpStatus(url, data, e);
 		}
@@ -196,14 +196,14 @@ public class Server implements IServer {
 			url += '?v=' + Scratch.versionString + '&_rnd=' + Math.random();
 			nextSeparator = '&';
 		}
-		for (var key:String in queryParams) {
+		for (key in queryParams) {
 			if (queryParams.hasOwnProperty(key)) {
 				url += nextSeparator + encodeURIComponent(key) + '=' + encodeURIComponent(queryParams[key]);
 				nextSeparator = '&';
 			}
 		}
 		var request:URLRequest = new URLRequest(url);
-		if (data) {
+		if (data != null) {
 			request.method = URLRequestMethod.POST;
 			request.data = data;
 
@@ -219,7 +219,7 @@ public class Server implements IServer {
 		try {
 			loader.load(request);
 		}
-		catch (e:*) {
+		catch (e:Dynamic) {
 			// Local sandbox exception?
 			exceptionHandler(e);
 		}
@@ -231,14 +231,14 @@ public class Server implements IServer {
 	}
 
 	// Make a simple GET. Uses the same callbacks as callServer().
-	public function serverGet(url:String, whenDone:Function):URLLoader {
+	public function serverGet(url:String, whenDone:Dynamic):URLLoader {
 		return callServer(url, null, null, whenDone);
 	}
 
 	// -----------------------------
 	// Asset API
 	//------------------------------
-	public function getAsset(md5:String, whenDone:Function):URLLoader {
+	public function getAsset(md5:String, whenDone:Dynamic):URLLoader {
 //		if (BackpackPart.localAssets[md5] && BackpackPart.localAssets[md5].length > 0) {
 //			whenDone(BackpackPart.localAssets[md5]);
 //			return null;
@@ -247,21 +247,21 @@ public class Server implements IServer {
 		return serverGet(url, whenDone);
 	}
 
-	public function getMediaLibrary(libraryType:String, whenDone:Function):URLLoader {
+	public function getMediaLibrary(libraryType:String, whenDone:Dynamic):URLLoader {
 		var url:String = getCdnStaticSiteURL() + 'medialibraries/' + libraryType + 'Library.json';
 		return serverGet(url, whenDone);
 	}
 
-	protected function downloadThumbnail(url:String, w:int, h:int, whenDone:Function):URLLoader {
-		function decodeImage(data:ByteArray):void {
+	private function downloadThumbnail(url:String, w:Int, h:Int, whenDone:Dynamic):URLLoader {
+		function decodeImage(data:ByteArray):Void {
 			if (!data || data.length == 0) return; // no data
 			var decoder:Loader = new Loader();
 			decoder.contentLoaderInfo.addEventListener(Event.COMPLETE, imageDecoded);
 			decoder.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, imageError);
 			try {
 				decoder.loadBytes(data);
-			} catch (e:*) {
-				if (e is Error) {
+			} catch (e:Dynamic) {
+				if (Std.is (e, Error)) {
 					Scratch.app.logException(e);
 				}
 				else {
@@ -270,11 +270,11 @@ public class Server implements IServer {
 			}
 		}
 
-		function imageError(e:IOErrorEvent):void {
+		function imageError(e:IOErrorEvent):Void {
 			Scratch.app.log('ServerOnline failed to decode image: ' + url);
 		}
 
-		function imageDecoded(e:Event):void {
+		function imageDecoded(e:Event):Void {
 			whenDone(makeThumbnail(e.target.content.bitmapData));
 		}
 
@@ -282,8 +282,8 @@ public class Server implements IServer {
 	}
 
 	private static function makeThumbnail(bm:BitmapData):BitmapData {
-		const tnWidth:int = 120;
-		const tnHeight:int = 90;
+		var tnWidth:Int = 120;
+		var tnHeight:Int = 90;
 		var result:BitmapData = new BitmapData(tnWidth, tnHeight, true, 0);
 		if ((bm.width == 0) || (bm.height == 0)) return result;
 		var scale:Number = Math.min(tnWidth / bm.width, tnHeight / bm.height);
@@ -294,7 +294,7 @@ public class Server implements IServer {
 		return result;
 	}
 
-	public function getThumbnail(idAndExt:String, w:int, h:int, whenDone:Function):URLLoader {
+	public function getThumbnail(idAndExt:String, w:Int, h:Int, whenDone:Dynamic):URLLoader {
 		var url:String = getCdnStaticSiteURL() + 'medialibrarythumbnails/' + idAndExt;
 		return downloadThumbnail(url, w, h, whenDone);
 	}
@@ -303,26 +303,25 @@ public class Server implements IServer {
 	// Translation Support
 	//------------------------------
 
-	public function getLanguageList(whenDone:Function):void {
+	public function getLanguageList(whenDone:Dynamic):Void {
 		serverGet('locale/lang_list.txt', whenDone);
 	}
 
-	public function getPOFile(lang:String, whenDone:Function):void {
+	public function getPOFile(lang:String, whenDone:Dynamic):Void {
 		serverGet('locale/' + lang + '.po', whenDone);
 	}
 
-	public function getSelectedLang(whenDone:Function):void {
+	public function getSelectedLang(whenDone:Dynamic):Void {
 		// Get the language setting.
 		var sharedObj:SharedObject = SharedObject.getLocal('Scratch');
 		if (sharedObj.data.lang) whenDone(sharedObj.data.lang);
 	}
 
-	public function setSelectedLang(lang:String):void {
+	public function setSelectedLang(lang:String):Void {
 		// Record the language setting.
 		var sharedObj:SharedObject = SharedObject.getLocal('Scratch');
 		if (lang == '') lang = 'en';
 		sharedObj.data.lang = lang;
 		sharedObj.flush();
 	}
-}
 }

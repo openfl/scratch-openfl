@@ -2,31 +2,32 @@
 <project version="2">
   <!-- Output SWF options -->
   <output>
-    <movie outputType="Application" />
+    <movie outputType="CustomBuild" />
     <movie input="" />
     <movie path="project.xml" />
     <movie fps="30" />
     <movie width="800" />
-    <movie height="600" />\
-    <movie version="3" />
+    <movie height="600" />
+    <movie version="1" />
     <movie minorVersion="0" />
-    <movie platform="NME" />
+    <movie platform="Lime" />
     <movie background="FFFFFF" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
-    <class path="c:\Development\Haxe\lime" />
-    <class path="Source" />
-    <class path="Export\windows\neko\haxe" />
+    <class path="D:\Development\Haxe\openfl" />
+    <class path="D:\Development\Haxe\lime" />
+    <class path="src" />
+    <class path="bin\flash\haxe" />
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="lime=1.0.0&#xA;tools=1.6.0&#xA;lime_native&#xA;no-compilation&#xA;windows&#xA;desktop" />
+    <option directives="openfl=3.3.0&#xA;lime=2.5.3&#xA;openfl-next&#xA;tools=2.5.3&#xA;no-compilation&#xA;revision=dev&#xA;openfl-flash&#xA;web" />
     <option flashStrict="False" />
     <option noInlineOnDebug="False" />
     <option mainClass="ApplicationMain" />
     <option enabledebug="False" />
-    <option additional="#--macro keep(&quot;Main&quot;)" />
+    <option additional="-swf-lib libs/as3corelib.swc&#xA;-swf-lib libs/blooddy_crypto.swc&#xA;-swf-version 11.2" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
@@ -36,16 +37,12 @@
   <compileTargets>
     <!-- example: <compile path="..." /> -->
   </compileTargets>
-  <!-- Assets to embed into the output SWF -->
-  <library>
-    <!-- example: <asset path="..." id="..." update="..." glyphs="..." mode="..." place="..." sharepoint="..." /> -->
-  </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand />
+  <preBuildCommand>"$(CompilerPath)/haxelib" run lime build "$(OutputFile)" $(TargetBuild) -$(BuildConfig) -Dfdb</preBuildCommand>
   <!-- Executed after build -->
   <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->

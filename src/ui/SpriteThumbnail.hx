@@ -19,19 +19,19 @@
 
 package ui;
 
-import ui.Bitmap;
-import ui.DisplayObject;
-import ui.Event;
-import ui.Graphics;
-import ui.IconButton;
-import ui.Menu;
-import ui.Scratch;
-import ui.ScratchCostume;
-import ui.ScratchSound;
-import ui.ScratchSprite;
-import ui.Shape;
-import ui.Sprite;
-import ui.TextField;
+//import ui.Bitmap;
+//import ui.DisplayObject;
+//import ui.Event;
+//import ui.Graphics;
+//import ui.IconButton;
+//import ui.Menu;
+//import ui.Scratch;
+//import ui.ScratchCostume;
+//import ui.ScratchSound;
+//import ui.ScratchSprite;
+//import ui.Shape;
+//import ui.Sprite;
+//import ui.TextField;
 
 import flash.display.*;
 import flash.events.*;
@@ -265,7 +265,7 @@ class SpriteThumbnail extends Sprite {
 		}
 		if (Std.is(obj, Block)) {
 			// copy a block/stack to this sprite
-			if (targetObj == app.viewedObj()) 				return false  // dropped on my own thumbnail; do nothing  ;
+			if (targetObj == app.viewedObj()) 				return false;  // dropped on my own thumbnail; do nothing  ;
 			var copy : Block = cast((obj), Block).duplicate(false, targetObj.isStage);
 			copy.x = app.scriptsPane.padding;
 			copy.y = app.scriptsPane.padding;

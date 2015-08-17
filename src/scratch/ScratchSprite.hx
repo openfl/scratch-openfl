@@ -23,7 +23,7 @@
 // A Scratch sprite object. State specific to sprites includes: position, direction,
 // rotation style, size, draggability, and pen state.
 
-package scratch {
+package scratch;
 	import flash.display.*;
 	import flash.events.*;
 import flash.filters.GlowFilter;
@@ -38,34 +38,34 @@ import flash.utils.*;
 	import util.*;
 	import watchers.ListWatcher;
 
-public class ScratchSprite extends ScratchObj {
+class ScratchSprite extends ScratchObj {
 
-	public var scratchX:Number;
-	public var scratchY:Number;
-	public var direction:Number = 90;
+	public var scratchX:Float;
+	public var scratchY:Float;
+	public var direction:Float = 90;
 	public var rotationStyle:String = 'normal'; // 'normal', 'leftRight', 'none'
 
-	public var isDraggable:Boolean = false;
-	public var indexInLibrary:int;
+	public var isDraggable:Bool = false;
+	public var indexInLibrary:Int;
 	public var bubble:TalkBubble;
 
-	public var penIsDown:Boolean;
-	public var penWidth:Number = 1;
-	public var penHue:Number = 120; // blue
-	public var penShade:Number = 50; // full brightness and saturation
-	public var penColorCache:Number = 0xFF;
+	public var penIsDown:Bool;
+	public var penWidth:Float = 1;
+	public var penHue:Float = 120; // blue
+	public var penShade:Float = 50; // full brightness and saturation
+	public var penColorCache:Float = 0xFF;
 
 	private var cachedBitmap:BitmapData;	// current costume, rotated & scaled
 	private var cachedBounds:Rectangle;		// bounds of non-transparent cachedBitmap in stage coords
 
-	public var localMotionAmount:int = -2;
-	public var localMotionDirection:int = -2;
-	public var localFrameNum:int;
+	public var localMotionAmount:Int = -2;
+	public var localMotionDirection:Int = -2;
+	public var localFrameNum:Int;
 
-	public var spriteInfo:Object = {};
+	public var spriteInfo:Dynamic = {};
 	private var geomShape:Shape;
 
-	public function ScratchSprite(name:String = 'Sprite1') {
+	public function new(name:String = 'Sprite1') {
 		objName = name;
 		filterPack = new FilterPack(this);
 		initMedia();
@@ -79,20 +79,20 @@ public class ScratchSprite extends ScratchObj {
 		setScratchXY(0, 0);
 	}
 
-	private function initMedia():void {
+	private function initMedia():Void {
 		var graySquare:BitmapData = new BitmapData(4, 4, true, 0x808080);
 		costumes.push(new ScratchCostume(Translator.map('costume1'), graySquare));
 		sounds.push(new ScratchSound(Translator.map('pop'), new Pop()));
 		sounds[0].prepareToSave();
 	}
 
-	public function setInitialCostume(c:ScratchCostume):void {
+	public function setInitialCostume(c:ScratchCostume):Void {
 		costumes = [c];
 		showCostume(0);
 	}
 
-	public function setRotationStyle(newRotationStyle:String):void {
-		var oldDir:Number = direction;
+	public function setRotationStyle(newRotationStyle:String):Void {
+		var oldDir:Float = direction;
 		setDirection(90);
 		if ('all around' == newRotationStyle) rotationStyle = 'normal';
 		if ('left-right' == newRotationStyle) rotationStyle = 'leftRight';
@@ -106,17 +106,17 @@ public class ScratchSprite extends ScratchObj {
 		return dup;
 	}
 
-	public function initFrom(spr:ScratchSprite, forClone:Boolean):void {
+	public function initFrom(spr:ScratchSprite, forClone:Bool):Void {
 		// Copy all the state from the given sprite. Used by both
 		// the clone block and duplicate().
-		var i:int;
+		var i:Int;
 
 		// Copy variables and lists.
-		for (i = 0; i < spr.variables.length; i++) {
+		for (i in 0...spr.variables.length) {
 			var v:Variable = spr.variables[i];
 			variables.push(new Variable(v.name, v.value));
 		}
-		for (i = 0; i < spr.lists.length; i++) {
+		for (i in 0...spr.lists.length) {
 			var lw:ListWatcher = spr.lists[i];
 			var lwDup:ListWatcher;
 			lists.push(lwDup = new ListWatcher(lw.listName, lw.contents.concat(), spr));
@@ -128,13 +128,13 @@ public class ScratchSprite extends ScratchObj {
 			scripts = spr.scripts;
 			sounds = spr.sounds;
 		} else {
-			for (i = 0; i < spr.scripts.length; i++) scripts.push(spr.scripts[i].duplicate(forClone));
+			for (i in 0...spr.scripts.length) scripts.push(spr.scripts[i].duplicate(forClone));
 			sounds = spr.sounds.concat();
 		}
 
 		// To support vector costumes, every sprite must have its own costume copies, even clones.
 		costumes = [];
-		for each (var c:ScratchCostume in spr.costumes) costumes.push(c.duplicate());
+		for (c in spr.costumes) costumes.push(c.duplicate());
 		currentCostumeIndex = spr.currentCostumeIndex;
 
 		objName = spr.objName;
@@ -164,14 +164,14 @@ public class ScratchSprite extends ScratchObj {
 		applyFilters();
 	}
 
-	override protected function updateImage():void {
+	override private function updateImage():Void {
 		// Make sure to update the shape
 		if(geomShape.parent) img.removeChild(geomShape);
 		super.updateImage();
 		if(bubble) updateBubble();
 	}
 
-	public function setScratchXY(newX:Number, newY:Number):void {
+	public function setScratchXY(newX:Float, newY:Float):Void {
 		scratchX = isFinite(newX) ? newX : newX > 0 ? 1e6 : -1e6;
 		scratchY = isFinite(newY) ? newY : newY > 0 ? 1e6 : -1e6;
 		x = 240 + Math.round(scratchX);
@@ -182,7 +182,7 @@ public class ScratchSprite extends ScratchObj {
 	static private var stageRect:Rectangle = new Rectangle(0, 0, 480, 360);
 	static private var emptyRect:Rectangle = new Rectangle(0, 0, 0, 0);
 	static private var edgeBox:Rectangle = new Rectangle(0, 0, 480, 360);
-	public function keepOnStage():void {
+	public function keepOnStage():Void {
 		var myBox:Rectangle;
 		if(width == 0 && height == 0) {
 			emptyRect.x = x;
@@ -200,7 +200,7 @@ public class ScratchSprite extends ScratchObj {
 
 		if(stageRect.containsRect(myBox)) return;
 
-		var inset:int = Math.min(18, Math.min(myBox.width, myBox.height) / 2);
+		var inset:Int = Math.min(18, Math.min(myBox.width, myBox.height) / 2);
 		edgeBox.x = edgeBox.y = inset;
 		inset += inset;
 		edgeBox.width = 480 - inset;
@@ -217,9 +217,9 @@ public class ScratchSprite extends ScratchObj {
 		setScratchXY(scratchX, scratchY);
 	}
 
-	public function setDirection(d:Number):void {
+	public function setDirection(d:Float):Void {
 		if ((d * 0) != 0) return; // d is +/-Infinity or NaN
-		var wasFlipped:Boolean = isCostumeFlipped();
+		var wasFlipped:Bool = isCostumeFlipped();
 		d = d % 360;
 		if (d < 0) d += 360;
 		direction = (d > 180) ? d - 360 : d;
@@ -237,49 +237,49 @@ public class ScratchSprite extends ScratchObj {
 			updateRenderDetails(1);
 	}
 
-	protected override function adjustForRotationCenter():void {
+	private override function adjustForRotationCenter():Void {
 		super.adjustForRotationCenter();
 		geomShape.scaleX = img.getChildAt(0).scaleX;
 	}
 
-	public function getSize():Number { return 100 * scaleX; }
+	public function getSize():Float { return 100 * scaleX; }
 
-	public function setSize(percent:Number):void {
-		var origW:int = img.width;
-		var origH:int = img.height;
-		var minScale:Number = Math.min(1, Math.max(5 / origW, 5 / origH));
-		var maxScale:Number = Math.min((1.5 * 480) / origW, (1.5 * 360) / origH);
+	public function setSize(percent:Float):Void {
+		var origW:Int = img.width;
+		var origH:Int = img.height;
+		var minScale:Float = Math.min(1, Math.max(5 / origW, 5 / origH));
+		var maxScale:Float = Math.min((1.5 * 480) / origW, (1.5 * 360) / origH);
 		scaleX = scaleY = Math.max(minScale, Math.min(percent / 100.0, maxScale));
 		clearCachedBitmap();
 		updateBubble();
 	}
 
-	public function setPenSize(n:Number):void {
+	public function setPenSize(n:Float):Void {
 		penWidth = Math.max(1, Math.min(Math.round(n), 255)); // 255 is the maximum line with supported by Flash
 	}
 
-	public function setPenColor(c:Number):void {
+	public function setPenColor(c:Float):Void {
 		var hsv:Array = Color.rgb2hsv(c);
 		penHue = (200 * hsv[0]) / 360 ;
 		penShade = 50 * hsv[2];  // not quite right; doesn't account for saturation
 		penColorCache = c;
 	}
 
-	public function setPenHue(n:Number):void {
+	public function setPenHue(n:Float):Void {
 		penHue = n % 200;
 		if (penHue < 0) penHue += 200;
 		updateCachedPenColor();
 	}
 
-	public function setPenShade(n:Number):void {
+	public function setPenShade(n:Float):Void {
 		penShade = n % 200;
 		if (penShade < 0) penShade += 200;
 		updateCachedPenColor();
 	}
 
-	private function updateCachedPenColor():void {
-		var c:int = Color.fromHSV((penHue * 180) / 100, 1, 1);
-		var shade:Number = (penShade > 100) ? 200 - penShade : penShade; // range 0..100
+	private function updateCachedPenColor():Void {
+		var c:Int = Color.fromHSV((penHue * 180) / 100, 1, 1);
+		var shade:Float = (penShade > 100) ? 200 - penShade : penShade; // range 0..100
 		if (shade < 50) {
 			penColorCache = Color.mixRGB(0, c, (10 + shade) / 60);
 		} else {
@@ -287,11 +287,11 @@ public class ScratchSprite extends ScratchObj {
 		}
 	}
 
-	public function isCostumeFlipped():Boolean {
+	public function isCostumeFlipped():Bool {
 		return (rotationStyle == 'leftRight') && (direction < 0);
 	}
 
-	public override function clearCachedBitmap():void {
+	public override function clearCachedBitmap():Void {
 		super.clearCachedBitmap();
 		cachedBitmap = null;
 		cachedBounds = null;
@@ -308,7 +308,7 @@ public class ScratchSprite extends ScratchObj {
 		}
 	}
 
-	public override function hitTestPoint(globalX:Number, globalY:Number, shapeFlag:Boolean = true):Boolean {
+	public override function hitTestPoint(globalX:Float, globalY:Float, shapeFlag:Bool = true):Bool {
 		if ((!visible) || (img.transform.colorTransform.alphaMultiplier == 0)) return false;
 		var p:Point = parent.globalToLocal(new Point(globalX, globalY));
 		var myRect:Rectangle = bounds();
@@ -336,7 +336,7 @@ public class ScratchSprite extends ScratchObj {
 
 //	private var testBM:Bitmap = new Bitmap();
 //	private var testSpr:Sprite = new Sprite();
-	public function bitmap(forTest:Boolean = false):BitmapData {
+	public function bitmap(forTest:Bool = false):BitmapData {
 		if (cachedBitmap != null && (!forTest || !Scratch.app.isIn3D))
 			return cachedBitmap;
 
@@ -350,7 +350,7 @@ public class ScratchSprite extends ScratchObj {
 
 		// returns true if caller should immediately return cachedBitmap
 		var self:ScratchSprite = this;
-		function bitmap2d():Boolean {
+		function bitmap2d():Bool {
 			if ((r.width == 0) || (r.height == 0)) { // empty costume: use an invisible 1x1 bitmap
 				cachedBitmap = new BitmapData(1, 1, true, 0);
 				cachedBounds = cachedBitmap.rect;
@@ -366,9 +366,9 @@ public class ScratchSprite extends ScratchObj {
 			return false;
 		}
 
-		if (SCRATCH::allow3d) {
+		#if allow3d
 			if (Scratch.app.isIn3D) {
-				var oldGhost:Number = filterPack.getFilterSetting('ghost');
+				var oldGhost:Float = filterPack.getFilterSetting('ghost');
 				filterPack.setFilter('ghost', 0);
 				updateEffectsFor3D();
 				var bm:BitmapData = Scratch.app.render3D.getRenderedChild(this, b.width * scaleX, b.height * scaleY);
@@ -404,10 +404,9 @@ public class ScratchSprite extends ScratchObj {
 			else {
 				if (bitmap2d()) return cachedBitmap;
 			}
-		}
-		else {
+		#else
 			if (bitmap2d()) return cachedBitmap;
-		}
+		#end
 
 		cachedBounds = cachedBitmap.rect;
 
@@ -431,7 +430,7 @@ public class ScratchSprite extends ScratchObj {
 		var p2:Point = m.transformPoint(new Point(r.right, r.top));
 		var p3:Point = m.transformPoint(new Point(r.left, r.bottom));
 		var p4:Point = m.transformPoint(r.bottomRight);
-		var xMin:Number, xMax:Number, yMin:Number, yMax:Number;
+		var xMin:Float, xMax:Float, yMin:Float, yMax:Float;
 		xMin = Math.min(p1.x, p2.x, p3.x, p4.x);
 		yMin = Math.min(p1.y, p2.y, p3.y, p4.y);
 		xMax = Math.max(p1.x, p2.x, p3.x, p4.x);
@@ -446,8 +445,8 @@ public class ScratchSprite extends ScratchObj {
 		if ('glideSecs:toX:y:elapsed:from:' == op) return [1, Math.round(scratchX), Math.round(scratchY)];
 		if ('setSizeTo:' == op) return [Math.round(getSize() * 10) / 10];
 		if ((['startScene', 'startSceneAndWait', 'whenSceneStarts'].indexOf(op)) > -1) {
-			var stg:ScratchStage = parent as ScratchStage;
-			if (stg) return [stg.costumes[stg.costumes.length - 1].costumeName];
+			var stg:ScratchStage = cast (parent, ScratchStage);
+			if (stg != null) return [stg.costumes[stg.costumes.length - 1].costumeName];
 		}
 		if ('senseVideoMotion' == op) return ['motion', 'this sprite'];
 		return super.defaultArgsFor(op, specDefaults);
@@ -455,7 +454,7 @@ public class ScratchSprite extends ScratchObj {
 
 	/* Dragging */
 
-	public function objToGrab(evt:MouseEvent):ScratchSprite { return this } // allow dragging
+	public function objToGrab(evt:MouseEvent):ScratchSprite { return this; } // allow dragging
 
 	/* Menu */
 
@@ -470,7 +469,7 @@ public class ScratchSprite extends ScratchObj {
 		return m;
 	}
 
-	public function handleTool(tool:String, evt:MouseEvent):void {
+	public function handleTool(tool:String, evt:MouseEvent):Void {
 		if (tool == 'copy') duplicateSprite(true);
 		if (tool == 'cut') deleteSprite();
 		if (tool == 'grow') growSprite();
@@ -478,10 +477,10 @@ public class ScratchSprite extends ScratchObj {
 		if (tool == 'help') Scratch.app.showTip('scratchUI');
 	}
 
-	private function growSprite():void { setSize(getSize() + 5); Scratch.app.updatePalette() }
-	private function shrinkSprite():void { setSize(getSize() - 5); Scratch.app.updatePalette() }
+	private function growSprite():Void { setSize(getSize() + 5); Scratch.app.updatePalette(); }
+	private function shrinkSprite():Void { setSize(getSize() - 5); Scratch.app.updatePalette(); }
 
-	public function duplicateSprite(grab:Boolean = false):void {
+	public function duplicateSprite(grab:Bool = false):Void {
 		var dup:ScratchSprite = duplicate();
 		dup.objName = unusedSpriteName(objName);
 		if (!grab) {
@@ -491,8 +490,8 @@ public class ScratchSprite extends ScratchObj {
 		}
 		if (parent != null) {
 			parent.addChild(dup);
-			var app:Scratch = root as Scratch;
-			if (app) {
+			var app:Scratch = cast (root, Scratch);
+			if (app != null) {
 				app.setSaveNeeded();
 				app.updateSpriteLibrary();
 				if (grab) app.gh.grabOnMouseUp(dup);
@@ -500,18 +499,18 @@ public class ScratchSprite extends ScratchObj {
 		}
 	}
 
-	public function showDetails():void {
+	public function showDetails():Void {
 		var app:Scratch = Scratch.app;
 		app.selectSprite(this);
 		app.libraryPart.showSpriteDetails(true);
 	}
 
 	public function unusedSpriteName(baseName:String):String {
-		var stg:ScratchStage = parent as ScratchStage;
-		return stg ? stg.unusedSpriteName(baseName) : baseName;
+		var stg:ScratchStage = cast (parent, ScratchStage);
+		return stg != null ? stg.unusedSpriteName(baseName) : baseName;
 	}
 
-	public function deleteSprite():void {
+	public function deleteSprite():Void {
 		if (parent != null) {
 			var app:Scratch = Scratch.app;
 			app.runtime.recordForUndelete(this, scratchX, scratchY, 0, app.stagePane);
@@ -531,7 +530,7 @@ public class ScratchSprite extends ScratchObj {
 					// Pick the sprite just before the deleted sprite in the sprite library to select next.
 					sprites.sortOn('indexInLibrary');
 					var nextSelection:ScratchSprite = sprites[0];
-					for each (var spr:ScratchSprite in sprites) {
+					for (spr in sprites) {
 						if (spr.indexInLibrary > this.indexInLibrary) break;
 						else nextSelection = spr;
 					}
@@ -546,8 +545,8 @@ public class ScratchSprite extends ScratchObj {
 		}
 	}
 
-	private function saveToLocalFile():void {
-		function success():void {
+	private function saveToLocalFile():Void {
+		function success():Void {
 			Scratch.app.log('sprite saved to file: ' + file.name);
 		}
 		var zipData:ByteArray = new ProjectIO(Scratch.app).encodeSpriteAsZipFile(copyToShare());
@@ -568,41 +567,41 @@ public class ScratchSprite extends ScratchObj {
 
 	/* talk/think bubble support */
 
-	public function showBubble(s:*, type:String, source:Object, isAsk:Boolean = false):void {
+	public function showBubble(s:Dynamic, type:String, source:Dynamic, isAsk:Bool = false):Void {
 		hideBubble();
 		if (s == null) s = 'NULL';
-		if (s is Number) {
+		if (Std.is (s, Float)) {
 			if ((Math.abs(s) >= 0.01) && (int(s) != s)) {
 				s = s.toFixed(2); // 2 digits after decimal point
 			} else {
-				s = s.toString();
+				s = Std.string (s);
 			}
 		}
-		if (!(s is String)) s = s.toString();
+		if (!(Std.is (s, String))) s = Std.string (s);
 		if (s.length == 0) return;
 		bubble = new TalkBubble(s, type, isAsk ? 'ask' : 'say', source);
 		parent.addChild(bubble);
 		updateBubble();
 	}
 
-	public function hideBubble():void {
+	public function hideBubble():Void {
 		if (bubble == null) return;
 		bubble.parent.removeChild(bubble);
 		bubble = null;
 	}
 
-	public function updateBubble():void {
+	public function updateBubble():Void {
 		if (bubble == null) return;
 		if (bubble.visible != visible) bubble.visible = visible;
 		if (!visible) return;
-		var pad:int = 3;
-		var stageL:int = pad;
-		var stageR:int = STAGEW - pad;
-		var stageH:int = STAGEH;
+		var pad:Int = 3;
+		var stageL:Int = pad;
+		var stageR:Int = STAGEW - pad;
+		var stageH:Int = STAGEH;
 		var r:Rectangle = bubbleRect();
 
 		// decide which side of the sprite the bubble should be on
-		var bubbleOnRight:Boolean = bubble.pointsLeft;
+		var bubbleOnRight:Bool = bubble.pointsLeft;
 		if (bubbleOnRight && ((r.x + r.width + bubble.width) > stageR)) bubbleOnRight = false;
 		if (!bubbleOnRight && ((r.x - bubble.width) < 0)) bubbleOnRight = true;
 
@@ -627,7 +626,7 @@ public class ScratchSprite extends ScratchObj {
 		// Answer a rectangle to be used for position a talk/think bubble, based on
 		// the bounds of the non-transparent pixels along the top edge of this sprite.
 		var myBM:BitmapData = bitmap();
-		var h:int = 8; // strip height
+		var h:Int = 8; // strip height
 
 		// compute bounds
 		var p:Point = Scratch.app.stagePane.globalToLocal(localToGlobal(new Point(0, 0)));
@@ -644,7 +643,7 @@ public class ScratchSprite extends ScratchObj {
 
 	/* Saving */
 
-	public override function writeJSON(json:util.JSON):void {
+	public override function writeJSON(json:util.JSON):Void {
 		super.writeJSON(json);
 		json.writeKeyValue('scratchX', scratchX);
 		json.writeKeyValue('scratchY', scratchY);
@@ -657,7 +656,7 @@ public class ScratchSprite extends ScratchObj {
 		json.writeKeyValue('spriteInfo', spriteInfo);
 	}
 
-	public override function readJSON(jsonObj:Object):void {
+	public override function readJSON(jsonObj:Dynamic):Void {
 		super.readJSON(jsonObj);
 		scratchX = jsonObj.scratchX;
 		scratchY = jsonObj.scratchY;
@@ -673,7 +672,7 @@ public class ScratchSprite extends ScratchObj {
 
 	public function getVisibleBounds(space:DisplayObject):Rectangle {
 		if(space == this) {
-			var rot:Number = rotation;
+			var rot:Float = rotation;
 			rotation = 0;
 		}
 
@@ -694,13 +693,13 @@ public class ScratchSprite extends ScratchObj {
 		return b;
 	}
 
-	public function prepareToDrag():void {
+	public function prepareToDrag():Void {
 		// Force rendering with PixelBender for a dragged sprite
 		applyFilters(true);
 	}
 
-	public override function stopDrag():void {
+	public override function stopDrag():Void {
 		super.stopDrag();
 		applyFilters();
 	}
-}}
+}

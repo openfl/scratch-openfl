@@ -19,12 +19,12 @@
 
 package ui;
 
-import ui.Bitmap;
-import ui.BitmapData;
-import ui.Button;
-import ui.DialogBox;
-import ui.Sprite;
-import ui.Video;
+//import ui.Bitmap;
+//import ui.BitmapData;
+//import ui.Button;
+//import ui.DialogBox;
+//import ui.Sprite;
+//import ui.Video;
 
 import flash.display.*;
 import flash.media.*;

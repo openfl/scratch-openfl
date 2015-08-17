@@ -73,7 +73,7 @@ class Color {
 		var b : Float = (rgb & 255) / 255;
 		x = Math.min(Math.min(r, g), b);
 		v = Math.max(Math.max(r, g), b);
-		if (x == v) 			return [0, 0, v]  // gray; hue arbitrarily reported as zero  ;
+		if (x == v) 			return [0, 0, v];  // gray; hue arbitrarily reported as zero  ;
 		f = ((r == x)) ? g - b : (((g == x)) ? b - r : r - g);
 		i = ((r == x)) ? 3 : (((g == x)) ? 5 : 1);
 		h = ((i - (f / (v - x))) * 60) % 360;

@@ -27,10 +27,10 @@
 
 package sound;
 
-import sound.Event;
-import sound.SampleDataEvent;
-import sound.Sound;
-import sound.SoundChannel;
+//import sound.Event;
+//import sound.SampleDataEvent;
+//import sound.Sound;
+//import sound.SoundChannel;
 
 import flash.events.*;
 import flash.media.*;
@@ -275,7 +275,7 @@ class ScratchSoundPlayer {
 			// compute next index
 			index += indexTable[code];
 			if (index > 88) 				index = 88;
-			if (index < 0) 				index = 0  // compute and output sample  ;
+			if (index < 0) 				index = 0;  // compute and output sample  ;
 			
 			sample += (((code & 8)) ? -delta : delta);
 			if (sample > 32767) 				sample = 32767;

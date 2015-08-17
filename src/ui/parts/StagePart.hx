@@ -26,19 +26,19 @@
 
 package ui.parts;
 
-import ui.parts.Bitmap;
-import ui.parts.EditableLabel;
-import ui.parts.Event;
-import ui.parts.Graphics;
-import ui.parts.IconButton;
-import ui.parts.Scratch;
-import ui.parts.ScratchStage;
-import ui.parts.Shape;
-import ui.parts.SoundTransform;
-import ui.parts.Sprite;
-import ui.parts.TextField;
-import ui.parts.TextFormat;
-import ui.parts.UIPart;
+//import ui.parts.Bitmap;
+//import ui.parts.EditableLabel;
+//import ui.parts.Event;
+//import ui.parts.Graphics;
+//import ui.parts.IconButton;
+//import ui.parts.Scratch;
+//import ui.parts.ScratchStage;
+//import ui.parts.Shape;
+//import ui.parts.SoundTransform;
+//import ui.parts.Sprite;
+//import ui.parts.TextField;
+//import ui.parts.TextFormat;
+//import ui.parts.UIPart;
 
 import flash.display.*;
 import flash.events.*;

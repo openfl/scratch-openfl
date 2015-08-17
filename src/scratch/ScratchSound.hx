@@ -28,37 +28,39 @@
 //
 // Note: 'mp3' format was removed during alpha test to avoid the need to support MP3 in the future.
 
-package scratch {
+package scratch;
 import by.blooddy.crypto.MD5;
 import flash.media.Sound;
 import flash.utils.*;
 import sound.*;
 import sound.mp3.MP3Loader;
 import util.*;
+import openfl.Vector;
 
-public class ScratchSound {
+class ScratchSound {
 
 	public var soundName:String = '';
-	public var soundID:int;
+	public var soundID:Int;
 	public var md5:String;
 	private var __soundData:ByteArray = new ByteArray();
 	public var format:String = '';
-	public var rate:int = 44100;
-	public var sampleCount:int;
-	public var sampleDataStart:int;
-	public var bitsPerSample:int; // primarily used for compressed Squeak sounds; not saved
+	public var rate:Int = 44100;
+	public var sampleCount:Int;
+	public var sampleDataStart:Int;
+	public var bitsPerSample:Int; // primarily used for compressed Squeak sounds; not saved
 
 	public var editorData:Object; // cache of data used by sound editor; not saved
-	public var channels:uint = 1;
-	private const WasEdited:int = -10; // special soundID used to indicate sounds that have been edited
-	SCRATCH::allow3d
+	public var channels:UInt = 1;
+	private inline var WasEdited:Int = -10; // special soundID used to indicate sounds that have been edited
+	#if allow3d
 	public var nativeSound:Sound;
-
+	#end
+	
 	// Undo support; not saved
 	public var undoList:Array = [];
-	public var undoListIndex:int;
+	public var undoListIndex:Int;
 
-	public function ScratchSound(name:String, sndData:ByteArray) {
+	public function new(name:String, sndData:ByteArray) {
 		this.soundName = name;
 		if (sndData != null) {
 			try {
@@ -75,28 +77,31 @@ public class ScratchSound {
 				channels = info.channels;
 				sampleDataStart = info.sampleDataStart;
 				reduceSizeIfNeeded(info.channels);
-			} catch (e:*) {
-				setSamples(new Vector.<int>(0), 22050);
+			} catch (e:Dynamic) {
+				setSamples(new Vector<Int>(0), 22050);
 			}
 		}
 	}
+	
+	public var soundData (get, set):ByteArray;
 
-	public function get soundData():ByteArray {
+	private function get_soundData():ByteArray {
 		return __soundData;
 	}
 
-	public function set soundData(data:ByteArray):void {
+	public function set_soundData(data:ByteArray):ByteArray {
 		__soundData = data;
 		md5 = null;
+		return data;
 	}
 
-	private function reduceSizeIfNeeded(channels:int):void {
+	private function reduceSizeIfNeeded(channels:Int):Void {
 		// Convert stereo to mono, downsample if rate > 32000, or both.
 		// Compress if data is over threshold and not already compressed.
-		const compressionThreshold:int = 30 * 44100; // about 30 seconds
+		var compressionThreshold:Int = 30 * 44100; // about 30 seconds
 		if (rate > 32000 || channels == 2 || format == 'float') {
-			var newRate:int = (rate > 32000) ? rate / 2 : rate;
-			var samples:Vector.<int> = WAVFile.extractSamples(soundData);
+			var newRate:Int = (rate > 32000) ? rate / 2 : rate;
+			var samples:Vector<Int> = WAVFile.extractSamples(soundData);
 			if (rate > 32000 || channels == 2)
 				samples = (channels == 2) ?
 					stereoToMono(samples, (newRate < rate)) :
@@ -109,10 +114,10 @@ public class ScratchSound {
 		}
 	}
 
-	private function stereoToMono(stereo:Vector.<int>, downsample:Boolean):Vector.<int> {
-		var mono:Vector.<int> = new Vector.<int>();
-		var skip:int = downsample ? 4 : 2;
-		var i:int = 0, end:int = stereo.length - 1;
+	private function stereoToMono(stereo:Vector<Int>, downsample:Boolean):Vector<Int> {
+		var mono:Vector<Int> = new Vector<Int>();
+		var skip:Int = downsample ? 4 : 2;
+		var i:Int = 0, end:Int = stereo.length - 1;
 		while (i < end) {
 			mono.push((stereo[i] + stereo[i + 1]) / 2);
 			i += skip;
@@ -120,16 +125,20 @@ public class ScratchSound {
 		return mono;
 	}
 
-	private function downsample(samples:Vector.<int>):Vector.<int> {
-		var result:Vector.<int> = new Vector.<int>();
-		for (var i:int = 0; i < samples.length; i += 2) result.push(samples[i]);
+	private function downsample(samples:Vector<Int>):Vector<Int> {
+		var result:Vector<Int> = new Vector<Int>();
+		var i = 0;
+		while (i < samples.length) {
+			result.push(samples[i]);
+			i += 2;
+		}
 		return result;
 	}
 
-	public function setSamples(samples:Vector.<int>, samplingRate:int, compress:Boolean = false):void {
+	public function setSamples(samples:Vector<Int>, samplingRate:Int, compress:Boolean = false):Void {
 		var data:ByteArray = new ByteArray();
 		data.endian = Endian.LITTLE_ENDIAN;
-		for (var i:int = 0; i < samples.length; i++) data.writeShort(samples[i]);
+		for (i in 0...samples.length) data.writeShort(samples[i]);
 		if (samples.length == 0) data.writeShort(0); // a WAV file must have at least one sample
 
 		soundID = WasEdited;
@@ -139,10 +148,10 @@ public class ScratchSound {
 		sampleCount = samples.length;
 	}
 
-	public function convertMP3IfNeeded():void {
+	public function convertMP3IfNeeded():Void {
 		// Support for converting MP3 format sounds in Scratch projects was removed during alpha test.
 		// If this is on old, MP3 formatted sound, convert it to WAV format. Otherwise, do nothing.
-		function whenDone(snd:ScratchSound):void {
+		function whenDone(snd:ScratchSound):Void {
 Scratch.app.log('Converting MP3 to WAV: ' + soundName);
 			md5 = null;
 			soundData = snd.soundData;
@@ -152,7 +161,7 @@ Scratch.app.log('Converting MP3 to WAV: ' + soundName);
 		}
 		if (format == 'mp3') {
 			if (soundData) MP3Loader.convertToScratchSound('', soundData, whenDone);
-			else setSamples(new Vector.<int>, 22050);
+			else setSamples(new Vector<Int> (), 22050);
 		}
 	}
 
@@ -171,13 +180,13 @@ Scratch.app.log('Converting MP3 to WAV: ' + soundName);
 		return dup;
 	}
 
-	public function getSamples():Vector.<int> {
+	public function getSamples():Vector<Int> {
 		if (format == 'squeak') prepareToSave(); // convert to WAV
 		if ((format == '') || (format == 'adpcm')) return WAVFile.extractSamples(soundData);
-		return new Vector.<int>(0); // dummy data
+		return new Vector<Int>(0); // dummy data
 	}
 
-	public function getLengthInMsec():Number { return (1000.0 * sampleCount) / rate};
+	public function getLengthInMsec():Number { return (1000.0 * sampleCount) / rate; };
 
 	public function toString():String {
 		var secs:Number = Math.ceil(getLengthInMsec() / 1000);
@@ -187,7 +196,7 @@ Scratch.app.log('Converting MP3 to WAV: ' + soundName);
 		return result;
 	}
 
-	public function prepareToSave():void {
+	public function prepareToSave():Void {
 		if (format == 'squeak') { // convert Squeak ADPCM to WAV ADPCM
 			var uncompressedData:ByteArray = new SqueakSoundDecoder(bitsPerSample).decode(soundData);
 			if (uncompressedData.length == 0) uncompressedData.writeShort(0); // a WAV file must have at least one sample
@@ -199,7 +208,7 @@ Scratch.app.log('Converting squeak sound to WAV ADPCM; sampleCount old: ' + samp
 			md5 = null;
 		}
 		reduceSizeIfNeeded(1); // downsample or compress to reduce size before saving
-		if (soundID == WasEdited) { md5 = null; soundID = -1 } // sound was edited; force md5 to be recomputed
+		if (soundID == WasEdited) { md5 = null; soundID = -1; } // sound was edited; force md5 to be recomputed
 		if (!md5) md5 = by.blooddy.crypto.MD5.hashBytes(soundData) + '.wav';
 	}
 
@@ -211,7 +220,7 @@ Scratch.app.log('Converting squeak sound to WAV ADPCM; sampleCount old: ' + samp
 		return (data.readUTFBytes(4) == 'WAVE');
 	}
 
-	public function writeJSON(json:util.JSON):void {
+	public function writeJSON(json:util.JSON):Void {
 		json.writeKeyValue('soundName', soundName);
 		json.writeKeyValue('soundID', soundID);
 		json.writeKeyValue('md5', md5);
@@ -220,7 +229,7 @@ Scratch.app.log('Converting squeak sound to WAV ADPCM; sampleCount old: ' + samp
 		json.writeKeyValue('format', format);
 	}
 
-	public function readJSON(jsonObj:Object):void {
+	public function readJSON(jsonObj:Dynamic):Void {
 		soundName = jsonObj.soundName;
 		soundID = jsonObj.soundID;
 		md5 = jsonObj.md5;
@@ -229,4 +238,4 @@ Scratch.app.log('Converting squeak sound to WAV ADPCM; sampleCount old: ' + samp
 		format = jsonObj.format;
 	}
 
-}}
+}

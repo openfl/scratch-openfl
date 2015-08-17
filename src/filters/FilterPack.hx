@@ -26,14 +26,14 @@
 
 package filters;
 
-import filters.FisheyeKernel;
-import filters.HSVKernel;
-import filters.MosaicKernel;
-import filters.PixelateKernel;
-import filters.ScratchObj;
-import filters.Shader;
-import filters.ShaderFilter;
-import filters.WhirlKernel;
+//import filters.FisheyeKernel;
+//import filters.HSVKernel;
+//import filters.MosaicKernel;
+//import filters.PixelateKernel;
+//import filters.ScratchObj;
+//import filters.Shader;
+//import filters.ShaderFilter;
+//import filters.WhirlKernel;
 
 import flash.display.*;
 import flash.filters.*;
