@@ -1,0 +1,257 @@
+/*
+ * Scratch Project Editor and Player
+ * Copyright (C) 2014 Massachusetts Institute of Technology
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
+package translation;
+
+
+import flash.events.Event;
+import flash.net.*;
+import flash.utils.ByteArray;
+import flash.utils.Dictionary;
+import blocks.Block;
+
+import mx.utils.StringUtil;
+
+import uiwidgets.Menu;
+import util.*;
+
+class Translator {
+	
+	public static var languages : Array<Dynamic> = [];  // contains pairs: [<language code>, <utf8 language name>]  
+	public static var currentLang : String = "en";
+	
+	public static var rightToLeft : Bool;
+	public static var rightToLeftMath : Bool;  // true only for Arabic  
+	
+	private static var font12 : Array<Dynamic> = ["fa", "he", "ja", "ja_HIRA", "zh_CN"];
+	private static var font13 : Array<Dynamic> = ["ar"];
+	
+	private static var dictionary : Dynamic = { };
+	
+	public static function initializeLanguageList() : Void{
+		// Get a list of language names for the languages menu from the server.
+		function saveLanguageList(data : String) : Void{
+			if (data == null) 				return;
+			for (line/* AS3HX WARNING could not determine type for var: line exp: ECall(EField(EIdent(data),split),[EConst(CString(\n))]) type: null */ in data.split("\n")){
+				var fields : Array<Dynamic> = line.split(",");
+				if (fields.length >= 2) {
+					languages.push([StringTools.trim(fields[0]), StringTools.trim(fields[1])]);
+				}
+			}
+		};
+		languages = [["en", "English"]];  // English is always the first entry  
+		Scratch.app.server.getLanguageList(saveLanguageList);
+	}
+	
+	public static function setLanguageValue(lang : String) : Void{
+		function gotPOFile(data : ByteArray) : Void{
+			if (data != null) {
+				dictionary = parsePOData(data);
+				checkBlockTranslations();
+				setFontsFor(lang);
+			}
+			Scratch.app.translationChanged();
+		};
+		
+		dictionary = { };  // default to English (empty dictionary) if there's no .po file  
+		setFontsFor("en");
+		if ("en" == lang) 			Scratch.app.translationChanged()
+		// there is no .po file English
+		else Scratch.app.server.getPOFile(lang, gotPOFile);
+	}
+	
+	public static function setLanguage(lang : String) : Void{
+		if ("import translation file" == lang) {importTranslationFromFile();return;
+		}
+		if ("set font size" == lang) {fontSizeMenu();return;
+		}
+		
+		setLanguageValue(lang);
+		Scratch.app.server.setSelectedLang(lang);
+	}
+	
+	public static function importTranslationFromFile() : Void{
+		function fileLoaded(e : Event) : Void{
+			var file : FileReference = cast((e.target), FileReference);
+			var i : Int = file.name.lastIndexOf(".");
+			var langName : String = file.name.substring(0, i);
+			var data : ByteArray = file.data;
+			if (data != null) {
+				dictionary = parsePOData(data);
+				setFontsFor(langName);
+				checkBlockTranslations();
+				Scratch.app.translationChanged();
+			}
+		};
+		
+		Scratch.loadSingleFile(fileLoaded);
+	}
+	
+	private static function fontSizeMenu() : Void{
+		function setFontSize(labelSize : Int) : Void{
+			var argSize : Int = Math.round(0.9 * labelSize);
+			var vOffset : Int = labelSize > (13) ? 1 : 0;
+			Block.setFonts(labelSize, argSize, false, vOffset);
+			Scratch.app.translationChanged();
+		};
+		var m : Menu = new Menu(setFontSize);
+		for (i in 8...25){m.addItem(Std.string(i), i);
+		}
+		m.showOnStage(Scratch.app.stage);
+	}
+	
+	private static function setFontsFor(lang : String) : Void{
+		// Set the rightToLeft flag and font sizes the given language.
+		
+		currentLang = lang;
+		
+		var rtlLanguages : Array<Dynamic> = ["ar", "fa", "he"];
+		rightToLeft = Lambda.indexOf(rtlLanguages, lang) > -1;
+		rightToLeftMath = ("ar" == lang);
+		Block.setFonts(10, 9, true, 0);  // default font settings  
+		if (Lambda.indexOf(font12, lang) > -1) 			Block.setFonts(11, 10, false, 0);
+		if (Lambda.indexOf(font13, lang) > -1) 			Block.setFonts(13, 12, false, 0);
+	}
+	
+	public static function map(s : String, context : Dictionary = null) : String{
+		var result : Dynamic = Reflect.field(dictionary, s);
+		if ((result == null) || (result.length == 0)) 			result = s;
+		if (context != null) 			result = StringUtils.substitute(result, context);
+		return result;
+	}
+	
+	private static function parsePOData(bytes : ByteArray) : Dynamic{
+		// Parse the given data in gettext .po file format.
+		skipBOM(bytes);
+		var lines : Array<Dynamic> = [];
+		while (bytes.bytesAvailable > 0){
+			var s : String = StringTools.trim(nextLine(bytes));
+			if ((s.length > 0) && (s.charAt(0) != "#")) 				lines.push(s);
+		}
+		return makeDictionary(lines);
+	}
+	
+	private static function skipBOM(bytes : ByteArray) : Void{
+		// Some .po files begin with a three-byte UTF-8 Byte Order Mark (BOM).
+		// Skip this BOM if it exists, otherwise do nothing.
+		if (bytes.bytesAvailable < 3) 			return;
+		var b1 : Int = bytes.readUnsignedByte();
+		var b2 : Int = bytes.readUnsignedByte();
+		var b3 : Int = bytes.readUnsignedByte();
+		if ((b1 == 0xEF) && (b2 == 0xBB) && (b3 == 0xBF)) 			return  // found BOM  ;
+		bytes.position = bytes.position - 3;
+	}
+	
+	private static function nextLine(bytes : ByteArray) : String{
+		// Read the next line from the given ByteArray. A line ends with CR, LF, or CR-LF.
+		var buf : ByteArray = new ByteArray();
+		while (bytes.bytesAvailable > 0){
+			var nextByte : Int = bytes.readUnsignedByte();
+			if (nextByte == 13) {  // CR  
+				// line could end in CR or CR-LF
+				if (bytes.readUnsignedByte() != 10) 					bytes.position--  // try to read LF, but backup if not LF  ;
+				break;
+			}
+			if (nextByte == 10) 				break  // LF  ;
+			buf.writeByte(nextByte);
+		}
+		buf.position = 0;
+		return buf.readUTFBytes(buf.length);
+	}
+	
+	private static function makeDictionary(lines : Array<Dynamic>) : Dynamic{
+		// Return a dictionary mapping original strings to their translations.
+		var dict : Dynamic = { };
+		var mode : String = "none";  // none, key, val  
+		var key : String = "";
+		var val : String = "";
+		for (line in lines){
+			if ((line.length >= 5) && (line.substring(0, 5).toLowerCase() == "msgid")) {
+				if (mode == "val") 					Reflect.setField(dict, key, val)  // recordPairIn(key, val, dict);  ;
+				mode = "key";
+				key = "";
+			}
+			else if ((line.length >= 6) && (line.substring(0, 6).toLowerCase() == "msgstr")) {
+				mode = "val";
+				val = "";
+			}
+			if (mode == "key") 				key += extractQuotedString(line);
+			if (mode == "val") 				val += extractQuotedString(line);
+		}
+		if (mode == "val") 			Reflect.setField(dict, key, val)  // recordPairIn(key, val, dict);  ;
+		// remove the empty-string metadata entry, if present.;
+		return dict;
+	}
+	
+	private static function extractQuotedString(s : String) : String{
+		// Remove leading and trailing whitespace characters.
+		var i : Int = s.indexOf("\"");  // find first double-quote  
+		if (i < 0) 			i = s.indexOf(" ")  // if no double-quote, start after first space  ;
+		var result : String = "";
+		for (i in i + 1...s.length){
+			var ch : String = s.charAt(i);
+			if ((ch == "\\") && (i < (s.length - 1))) {
+				ch = s.charAt(++i);
+				if (ch == "n") 					ch = "\n";
+				if (ch == "r") 					ch = "\r";
+				if (ch == "t") 					ch = "\t";
+			}
+			if (ch == "\"") 				return result  // closing double-quote  ;
+			result += ch;
+		}
+		return result;
+	}
+	
+	private static function checkBlockTranslations() : Void{
+		for (entry/* AS3HX WARNING could not determine type for var: entry exp: EField(EIdent(Specs),commands) type: null */ in Specs.commands)checkBlockSpec(entry[0]);
+		for (spec/* AS3HX WARNING could not determine type for var: spec exp: EField(EIdent(Specs),extensionSpecs) type: null */ in Specs.extensionSpecs)checkBlockSpec(spec);
+	}
+	
+	private static function checkBlockSpec(spec : String) : Void{
+		var translatedSpec : String = map(spec);
+		if (translatedSpec == spec) 			return  // not translated  ;
+		if (!argsMatch(extractArgs(spec), extractArgs(translatedSpec))) {
+			Scratch.app.log("Block argument mismatch:");
+			Scratch.app.log("    " + spec);
+			Scratch.app.log("    " + translatedSpec);
+			// remove broken entry from dictionary;
+		}
+	}
+	
+	private static function argsMatch(args1 : Array<Dynamic>, args2 : Array<Dynamic>) : Bool{
+		if (args1.length != args2.length) 			return false;
+		for (i in 0...args1.length){
+			if (args1[i] != args2[i]) 				return false;
+		}
+		return true;
+	}
+	
+	private static function extractArgs(spec : String) : Array<Dynamic>{
+		var result : Array<Dynamic> = [];
+		var tokens : Array<Dynamic> = ReadStream.tokenize(spec);
+		for (s in tokens){
+			if ((s.length > 1) && ((s.charAt(0) == "%") || (s.charAt(0) == "@"))) 				result.push(s);
+		}
+		return result;
+	}
+
+	public function new()
+	{
+	}
+}
