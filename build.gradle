@@ -1,5 +1,0 @@
-ext.commonDir = '.'
-apply from: 'scratch.gradle'
-
-srcDirs = ['src']
-mainClass = 'Scratch.as'

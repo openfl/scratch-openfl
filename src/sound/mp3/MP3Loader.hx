@@ -19,12 +19,12 @@
 
 package sound.mp3;
 
-import sound.mp3.ByteArray;
-import sound.mp3.Loader;
-import sound.mp3.LoaderContext;
-import sound.mp3.LoaderInfo;
-import sound.mp3.MP3FileReader;
-import sound.mp3.SoundClass;
+//import sound.mp3.ByteArray;
+//import sound.mp3.Loader;
+//import sound.mp3.LoaderContext;
+//import sound.mp3.LoaderInfo;
+//import sound.mp3.MP3FileReader;
+//import sound.mp3.SoundClass;
 
 import flash.display.*;
 import flash.events.Event;

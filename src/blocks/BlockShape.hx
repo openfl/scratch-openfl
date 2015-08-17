@@ -24,8 +24,8 @@
 
 package blocks;
 
-import blocks.Graphics;
-import blocks.Shape;
+//import blocks.Graphics;
+//import blocks.Shape;
 
 import flash.display.*;
 import flash.filters.*;
@@ -116,8 +116,8 @@ class BlockShape extends Shape {
 				topH = 6;
 			}
 			else {
-				if (!canHaveSubstack1() && !b.isHat) 					topH = b.height  // normal command block (not hat, C, or E)  ;
-				if (targetHeight != 0) 					substack1H = targetHeight - NotchDepth  // wrapping a C or E block  ;
+				if (!canHaveSubstack1() && !b.isHat) 					topH = b.height;  // normal command block (not hat, C, or E)  ;
+				if (targetHeight != 0) 					substack1H = targetHeight - NotchDepth;  // wrapping a C or E block  ;
 			}
 		}
 		filters = dropFeedbackFilters(reporterFlag);

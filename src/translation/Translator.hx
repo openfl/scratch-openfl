@@ -26,7 +26,7 @@ import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 import blocks.Block;
 
-import mx.utils.StringUtil;
+//import mx.utils.StringUtil;
 
 import uiwidgets.Menu;
 import util.*;
@@ -165,10 +165,10 @@ class Translator {
 			var nextByte : Int = bytes.readUnsignedByte();
 			if (nextByte == 13) {  // CR  
 				// line could end in CR or CR-LF
-				if (bytes.readUnsignedByte() != 10) 					bytes.position--  // try to read LF, but backup if not LF  ;
+				if (bytes.readUnsignedByte() != 10) 					bytes.position--;  // try to read LF, but backup if not LF  ;
 				break;
 			}
-			if (nextByte == 10) 				break  // LF  ;
+			if (nextByte == 10) 				break;  // LF  ;
 			buf.writeByte(nextByte);
 		}
 		buf.position = 0;
@@ -183,7 +183,7 @@ class Translator {
 		var val : String = "";
 		for (line in lines){
 			if ((line.length >= 5) && (line.substring(0, 5).toLowerCase() == "msgid")) {
-				if (mode == "val") 					Reflect.setField(dict, key, val)  // recordPairIn(key, val, dict);  ;
+				if (mode == "val") 					Reflect.setField(dict, key, val);  // recordPairIn(key, val, dict);  ;
 				mode = "key";
 				key = "";
 			}
@@ -194,7 +194,7 @@ class Translator {
 			if (mode == "key") 				key += extractQuotedString(line);
 			if (mode == "val") 				val += extractQuotedString(line);
 		}
-		if (mode == "val") 			Reflect.setField(dict, key, val)  // recordPairIn(key, val, dict);  ;
+		if (mode == "val") 			Reflect.setField(dict, key, val);  // recordPairIn(key, val, dict);  ;
 		// remove the empty-string metadata entry, if present.;
 		return dict;
 	}
@@ -202,7 +202,7 @@ class Translator {
 	private static function extractQuotedString(s : String) : String{
 		// Remove leading and trailing whitespace characters.
 		var i : Int = s.indexOf("\"");  // find first double-quote  
-		if (i < 0) 			i = s.indexOf(" ")  // if no double-quote, start after first space  ;
+		if (i < 0) 			i = s.indexOf(" ");  // if no double-quote, start after first space  ;
 		var result : String = "";
 		for (i in i + 1...s.length){
 			var ch : String = s.charAt(i);
@@ -212,7 +212,7 @@ class Translator {
 				if (ch == "r") 					ch = "\r";
 				if (ch == "t") 					ch = "\t";
 			}
-			if (ch == "\"") 				return result  // closing double-quote  ;
+			if (ch == "\"") 				return result;  // closing double-quote  ;
 			result += ch;
 		}
 		return result;

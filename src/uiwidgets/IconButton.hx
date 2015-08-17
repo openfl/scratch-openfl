@@ -29,11 +29,11 @@
 
 package uiwidgets;
 
-import uiwidgets.DisplayObject;
-import uiwidgets.Graphics;
-import uiwidgets.Shape;
-import uiwidgets.Sprite;
-import uiwidgets.TextField;
+//import uiwidgets.DisplayObject;
+//import uiwidgets.Graphics;
+//import uiwidgets.Shape;
+//import uiwidgets.Sprite;
+//import uiwidgets.TextField;
 
 import flash.display.*;
 import flash.events.MouseEvent;

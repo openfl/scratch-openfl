@@ -19,32 +19,32 @@
 
 package svgeditor;
 
-import svgeditor.Bitmap;
-import svgeditor.BitmapPencilTool;
-import svgeditor.CloneTool;
-import svgeditor.DisplayObject;
-import svgeditor.EllipseTool;
-import svgeditor.EraserTool;
-import svgeditor.Event;
-import svgeditor.EyeDropperTool;
-import svgeditor.ISVGEditable;
-import svgeditor.IconButton;
-import svgeditor.KeyboardEvent;
-import svgeditor.MouseEvent;
-import svgeditor.ObjectTransformer;
-import svgeditor.PaintBrushTool;
-import svgeditor.PaintBucketTool;
-import svgeditor.PathEditTool;
-import svgeditor.PathTool;
-import svgeditor.RectangleTool;
-import svgeditor.SVGEditTool;
-import svgeditor.SVGTool;
-import svgeditor.Scratch;
-import svgeditor.ScratchSprite;
-import svgeditor.Selection;
-import svgeditor.SetCenterTool;
-import svgeditor.Shape;
-import svgeditor.TextTool;
+//import svgeditor.Bitmap;
+//import svgeditor.BitmapPencilTool;
+//import svgeditor.CloneTool;
+//import svgeditor.DisplayObject;
+//import svgeditor.EllipseTool;
+//import svgeditor.EraserTool;
+//import svgeditor.Event;
+//import svgeditor.EyeDropperTool;
+//import svgeditor.ISVGEditable;
+//import svgeditor.IconButton;
+//import svgeditor.KeyboardEvent;
+//import svgeditor.MouseEvent;
+//import svgeditor.ObjectTransformer;
+//import svgeditor.PaintBrushTool;
+//import svgeditor.PaintBucketTool;
+//import svgeditor.PathEditTool;
+//import svgeditor.PathTool;
+//import svgeditor.RectangleTool;
+//import svgeditor.SVGEditTool;
+//import svgeditor.SVGTool;
+//import svgeditor.Scratch;
+//import svgeditor.ScratchSprite;
+//import svgeditor.Selection;
+//import svgeditor.SetCenterTool;
+//import svgeditor.Shape;
+//import svgeditor.TextTool;
 
 import assets.Resources;
 
@@ -292,7 +292,7 @@ class ImageEdit extends Sprite {
 	
 	public function isActive() : Bool{
 		// Return true if the editor is currently showing.
-		if (!root) 			return false  // Note: The editor is removed from the display tree when it is inactive.  ;
+		if (!root) 			return false;  // Note: The editor is removed from the display tree when it is inactive.  ;
 		if (CursorTool.tool) 			return false;
 		return !app.mediaLibrary;
 	}
@@ -625,7 +625,7 @@ class ImageEdit extends Sprite {
 		var s : Selection = null;
 		if (currentTool != null) {
 			if (toolMode == "select" && newMode != "select") 
-				s = (try cast(currentTool, ObjectTransformer) catch(e:Dynamic) null).getSelection()  // If the next mode is not immediate, shut down the current tool  ;
+				s = (try cast(currentTool, ObjectTransformer) catch(e:Dynamic) null).getSelection();  // If the next mode is not immediate, shut down the current tool  ;
 			
 			
 			
@@ -693,7 +693,7 @@ class ImageEdit extends Sprite {
 			
 			currentTool.addEventListener(Event.CHANGE, saveContent, false, 0, true);
 		}
-		if (lastToolMode != "") 			highlightTool(lastToolMode)  // Make sure the tool selected is visible!  ;
+		if (lastToolMode != "") 			highlightTool(lastToolMode);  // Make sure the tool selected is visible!  ;
 		
 		
 		

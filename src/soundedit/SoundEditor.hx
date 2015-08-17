@@ -22,19 +22,19 @@
 
 package soundedit;
 
-import soundedit.Graphics;
-import soundedit.IconButton;
-import soundedit.Menu;
-import soundedit.Point;
-import soundedit.Scratch;
-import soundedit.Scrollbar;
-import soundedit.Shape;
-import soundedit.Slider;
-import soundedit.SoundLevelMeter;
-import soundedit.SoundsPart;
-import soundedit.Sprite;
-import soundedit.TextField;
-import soundedit.WaveformView;
+//import soundedit.Graphics;
+//import soundedit.IconButton;
+//import soundedit.Menu;
+//import soundedit.Point;
+//import soundedit.Scratch;
+//import soundedit.Scrollbar;
+//import soundedit.Shape;
+//import soundedit.Slider;
+//import soundedit.SoundLevelMeter;
+//import soundedit.SoundsPart;
+//import soundedit.Sprite;
+//import soundedit.TextField;
+//import soundedit.WaveformView;
 
 import flash.display.*;
 import flash.events.KeyboardEvent;

@@ -38,11 +38,11 @@
 package blocks;
 
 import blocks.BlockShape;
-import blocks.Graphics;
-import blocks.MouseEvent;
-import blocks.Shape;
-import blocks.Sprite;
-import blocks.TextField;
+//import blocks.Graphics;
+//import blocks.MouseEvent;
+//import blocks.Shape;
+//import blocks.Sprite;
+//import blocks.TextField;
 
 import flash.display.*;
 import flash.events.*;
@@ -149,7 +149,7 @@ class BlockArg extends Sprite {
 			if ((type == "m") && !editable) 				field.textColor = 0xFFFFFF
 			else base.setWidthAndTopHeight(30, Block.argTextFormat.size + 5);  // 14 for normal arg font  
 			field.text = (numberType != 0) ? "10" : "";
-			if (numberType != 0) 				field.restrict = "0-9e.\\-"  // restrict to numeric characters  ;
+			if (numberType != 0) 				field.restrict = "0-9e.\\-";  // restrict to numeric characters  ;
 			if (editable) {
 				base.setColor(0xFFFFFF);  // if editable, set color to white  
 				isEditable = true;

@@ -28,13 +28,13 @@
 
 package uiwidgets;
 
-import uiwidgets.DisplayObjectContainer;
-import uiwidgets.Event;
-import uiwidgets.Graphics;
-import uiwidgets.MenuItem;
-import uiwidgets.Shape;
-import uiwidgets.Sprite;
-import uiwidgets.Stage;
+//import uiwidgets.DisplayObjectContainer;
+//import uiwidgets.Event;
+//import uiwidgets.Graphics;
+//import uiwidgets.MenuItem;
+//import uiwidgets.Shape;
+//import uiwidgets.Sprite;
+//import uiwidgets.Stage;
 
 import flash.display.*;
 import flash.events.*;

@@ -17,41 +17,41 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package extensions {
+package extensions;
 import flash.events.*;
 import flash.net.*;
-import flash.utils.clearInterval;
-import flash.utils.setInterval;
+//import flash.utils.clearInterval;
+//import flash.utils.setInterval;
 
 import translation.Translator;
 
 import uiwidgets.Button;
 import uiwidgets.DialogBox;
 
-public class ExtensionDevManager extends ExtensionManager {
+class ExtensionDevManager extends ExtensionManager {
 
 	public var localExt:ScratchExtension = null;
-	public var localFilePoller:uint = 0;
-	protected var localFileRef:FileReference;
+	public var localFilePoller:UInt = 0;
+	private var localFileRef:FileReference;
 
-	public function ExtensionDevManager(app:Scratch) {
+	public function new(app:Scratch) {
 		super(app);
 	}
 
 	public function getLocalFileName(ext:ScratchExtension = null):String {
-		if (localFileRef && (ext === localExt || ext == null)) return localFileRef.name;
+		if (localFileRef && (ext == localExt || ext == null)) return localFileRef.name;
 
 		return null;
 	}
 
-	public function isLocalExtensionDirty(ext:ScratchExtension = null):Boolean {
+	public function isLocalExtensionDirty(ext:ScratchExtension = null):Bool {
 		return (!ext || ext == localExt) && localExt && localFileDirty;
 	}
 
 	// Override so that we can keep the reference to the local extension
-	private var rawExtensionLoaded:Boolean = false;
+	private var rawExtensionLoaded:Bool = false;
 
-	override public function loadRawExtension(extObj:Object):ScratchExtension {
+	override public function loadRawExtension(extObj:Dynamic):ScratchExtension {
 		var ext:ScratchExtension = extensionDict[extObj.extensionName];
 		var isLocalExt:Boolean = (localExt && ext == localExt) || (localFilePoller && !localExt);
 		ext = super.loadRawExtension(extObj);
@@ -71,21 +71,21 @@ public class ExtensionDevManager extends ExtensionManager {
 		return ext;
 	}
 
-	protected function localExtensionLoaded():void {
+	private function localExtensionLoaded():Void {
 	}
 
 	public function makeLoadExperimentalExtensionButton():Button {
-		function showShiftMenu(evt:MouseEvent):void {
+		var showShiftMenu = function (evt:MouseEvent):Void {
 			loadAndWatchExtensionFile();
-		}
+		};
 
 		// TODO: button tip link
 		var button:Button = new Button(Translator.map('Load Experimental Extension'));
-		if (SCRATCH::allow3d) { // TODO: use a better flag or rename this one
+		#if allow3d // TODO: use a better flag or rename this one
 			// This event is only available in flash 11.2 and above.
 			button.addEventListener(MouseEvent.RIGHT_CLICK, showShiftMenu);
-		}
-		button.setEventAction(function (evt:MouseEvent):void {
+		#end
+		button.setEventAction(function (evt:MouseEvent):Void {
 			if (evt.shiftKey) {
 				showShiftMenu(evt);
 			} else {
@@ -101,9 +101,9 @@ public class ExtensionDevManager extends ExtensionManager {
 	// Javascript Extension Development
 	//------------------------------
 
-	protected var localFileDirty:Boolean;
+	private var localFileDirty:Bool;
 
-	public function loadAndWatchExtensionFile(ext:ScratchExtension = null):void {
+	public function loadAndWatchExtensionFile(ext:ScratchExtension = null):Void {
 		if (localExt || localFilePoller > 0) {
 			var msg:String = 'Sorry, a new extension cannot be created while another extension is connected to a file. ' +
 					'Please save the project and disconnect from ' + localFileRef.name + ' first.';
@@ -113,7 +113,7 @@ public class ExtensionDevManager extends ExtensionManager {
 
 		var filter:FileFilter = new FileFilter('Scratch 2.0 Javascript Extension', '*.js');
 		var self:ExtensionDevManager = this;
-		Scratch.loadSingleFile(function (e:Event):void {
+		Scratch.loadSingleFile(function (e:Event):Void {
 			FileReference(e.target).removeEventListener(Event.COMPLETE, arguments.callee);
 			FileReference(e.target).addEventListener(Event.COMPLETE, self.extensionFileLoaded);
 			self.localExt = ext;
@@ -121,7 +121,7 @@ public class ExtensionDevManager extends ExtensionManager {
 		}, filter);
 	}
 
-	public function stopWatchingExtensionFile():void {
+	public function stopWatchingExtensionFile():Void {
 		if (localFilePoller > 0) clearInterval(localFilePoller);
 		localExt = null;
 		localFilePoller = 0;
@@ -133,11 +133,11 @@ public class ExtensionDevManager extends ExtensionManager {
 
 	private var localExtCodeDate:Date = null;
 
-	protected function extensionFileLoaded(e:Event):void {
+	private function extensionFileLoaded(e:Event):Void {
 		localFileRef = FileReference(e.target);
 		var lastModified:Date = localFileRef.modificationDate;
 		var self:ExtensionDevManager = this;
-		localFilePoller = setInterval(function ():void {
+		localFilePoller = setInterval(function ():Void {
 			if (lastModified.getTime() != self.localFileRef.modificationDate.getTime()) {
 				lastModified = self.localFileRef.modificationDate;
 				self.localFileDirty = true;
@@ -159,7 +159,7 @@ public class ExtensionDevManager extends ExtensionManager {
 		return localExtCodeDate;
 	}
 
-	public function loadLocalCode(db:DialogBox = null):void {
+	public function loadLocalCode(db:DialogBox = null):Void {
 		Scratch.app.runtime.stopAll();
 
 		if (localExt) app.externalCall('ScratchExtensions.unregister', null, localExt.name);
@@ -174,9 +174,9 @@ public class ExtensionDevManager extends ExtensionManager {
 		app.updatePalette();
 	}
 
-	override public function setEnabled(extName:String, flag:Boolean):void {
+	override public function setEnabled(extName:String, flag:Boolean):Void {
 		var ext:ScratchExtension = extensionDict[extName];
-		if (ext && localExt === ext && !flag) {
+		if (ext && localExt == ext && !flag) {
 			stopWatchingExtensionFile();
 		}
 
@@ -185,12 +185,11 @@ public class ExtensionDevManager extends ExtensionManager {
 
 	public function getExperimentalExtensionNames():Array {
 		var names:Array = [];
-		for each (var ext:ScratchExtension in extensionDict) {
+		for (ext in extensionDict) {
 			if (!ext.isInternal && ext.javascriptURL) {
 				names.push(ext.name);
 			}
 		}
 		return names;
 	}
-}
 }

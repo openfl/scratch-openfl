@@ -29,9 +29,9 @@
 
 package ui.parts;
 
-import ui.parts.Scratch;
-import ui.parts.TextField;
-import ui.parts.TextFormat;
+//import ui.parts.Scratch;
+//import ui.parts.TextField;
+//import ui.parts.TextFormat;
 
 import flash.display.GradientType;
 import flash.display.Graphics;

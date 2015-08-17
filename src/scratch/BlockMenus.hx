@@ -19,25 +19,25 @@
 
 package scratch;
 
-import scratch.BitmapData;
-import scratch.Block;
-import scratch.BlockArg;
-import scratch.DialogBox;
-import scratch.DisplayObject;
-import scratch.DragClient;
-import scratch.Event;
-import scratch.Graphics;
-import scratch.Matrix;
-import scratch.Menu;
-import scratch.MouseEvent;
-import scratch.Piano;
-import scratch.Point;
-import scratch.Scratch;
-import scratch.ScratchCostume;
-import scratch.ScratchObj;
-import scratch.ScratchSprite;
-import scratch.ScriptsPane;
-import scratch.Sprite;
+//import scratch.BitmapData;
+//import scratch.Block;
+//import scratch.BlockArg;
+//import scratch.DialogBox;
+//import scratch.DisplayObject;
+//import scratch.DragClient;
+//import scratch.Event;
+//import scratch.Graphics;
+//import scratch.Matrix;
+//import scratch.Menu;
+//import scratch.MouseEvent;
+//import scratch.Piano;
+//import scratch.Point;
+//import scratch.Scratch;
+//import scratch.ScratchCostume;
+//import scratch.ScratchObj;
+//import scratch.ScratchSprite;
+//import scratch.ScriptsPane;
+//import scratch.Sprite;
 
 import flash.display.*;
 import flash.events.*;
@@ -604,7 +604,7 @@ class BlockMenus implements DragClient {
 			block.warpProcFlag = cast((dialog.widget), ProcedureSpecEditor).warpFlag();
 			block.setSpec(newSpec);
 			if (block.nextBlock) 				block.nextBlock.allBlocksDo(function(b : Block) : Void{
-						if (b.op == Specs.GET_PARAM) 							b.parameterIndex = -1  // parameters may have changed; clear cached indices  ;
+						if (b.op == Specs.GET_PARAM) 							b.parameterIndex = -1;  // parameters may have changed; clear cached indices  ;
 					});
 			for (caller/* AS3HX WARNING could not determine type for var: caller exp: ECall(EField(EField(EIdent(app),runtime),allCallsOf),[EIdent(oldSpec),ECall(EField(EIdent(app),viewedObj),[])]) type: null */ in app.runtime.allCallsOf(oldSpec, app.viewedObj())){
 				var oldArgs : Array<Dynamic> = caller.args;
@@ -628,7 +628,7 @@ class BlockMenus implements DragClient {
 		var m : Menu = new Menu(varOrListSelection, "list");
 		var isGetter : Bool = block.op == Specs.GET_LIST;
 		if (isGetter) {
-			if (isInPalette(block)) 				m.addItem("delete list", deleteVarOrList)  // list reporter in palette  ;
+			if (isInPalette(block)) 				m.addItem("delete list", deleteVarOrList);  // list reporter in palette  ;
 			addGenericBlockItems(m);
 			m.addLine();
 		}

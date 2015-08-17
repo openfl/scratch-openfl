@@ -28,19 +28,19 @@
 
 package util;
 
-import util.Dictionary;
-import util.Event;
-import util.IOErrorEvent;
-import util.Loader;
-import util.SVGElement;
-import util.SVGImporter;
-import util.Scratch;
-import util.ScratchCostume;
-import util.ScratchObj;
-import util.ScratchSound;
-import util.ScratchSprite;
-import util.ScratchStage;
-import util.ZipIO;
+//import util.Dictionary;
+//import util.Event;
+//import util.IOErrorEvent;
+//import util.Loader;
+//import util.SVGElement;
+//import util.SVGImporter;
+//import util.Scratch;
+//import util.ScratchCostume;
+//import util.ScratchObj;
+//import util.ScratchSound;
+//import util.ScratchSprite;
+//import util.ScratchStage;
+//import util.ZipIO;
 
 import flash.display.*;
 import flash.events.*;
@@ -80,8 +80,8 @@ class ProjectIO {
 	public function encodeProjectAsZipFile(proj : ScratchStage) : ByteArray{
 		// Encode a project into a ByteArray. The format is a ZIP file containing
 		// the JSON project data and all images and sounds as files.
-		This is an intentional compilation error. See the README for handling the delete keyword
-		delete proj.info.penTrails  // remove the penTrails bitmap saved in some old projects' info  ;
+		//delete proj.info.penTrails  // remove the penTrails bitmap saved in some old projects' info  ;
+		proj.info.penTrails = null;
 		proj.savePenLayer();
 		proj.updateInfo();
 		recordImagesAndSounds(proj.allObjects(), false, proj);
@@ -163,7 +163,7 @@ class ProjectIO {
 		}
 		for (f/* AS3HX WARNING could not determine type for var: f exp: EIdent(files) type: null */ in files){
 			var fName : String = f[0];
-			if (fName.indexOf("__MACOSX") > -1) 				continue  // skip MacOS meta info in zip file  ;
+			if (fName.indexOf("__MACOSX") > -1) 				continue;  // skip MacOS meta info in zip file  ;
 			var fIndex : Int = as3hx.Compat.parseInt(integerName(fName));
 			var contents : ByteArray = f[1];
 			if (fName.substring(-4) == ".gif") 				images[fIndex] = contents;
@@ -227,7 +227,7 @@ class ProjectIO {
 		// Load all images in all costumes from their image data, then call whenDone.
 		function imageDecoded() : Void{
 			for (o/* AS3HX WARNING could not determine type for var: o exp: EIdent(imageDict) type: null */ in imageDict){
-				if (o == "loading...") 					return  // not yet finished loading  ;
+				if (o == "loading...") 					return;  // not yet finished loading  ;
 			}
 			allImagesLoaded();
 		};
@@ -550,7 +550,7 @@ class ProjectIO {
 	
 	private function recordImage(img : Dynamic, md5 : String, recordedAssets : Dynamic, uploading : Bool) : Int{
 		var id : Int = recordedAssetID(md5, recordedAssets, uploading);
-		if (id > -2) 			return id  // image was already added  ;
+		if (id > -2) 			return id;  // image was already added  ;
 		images.push([md5, img]);
 		id = images.length - 1;
 		Reflect.setField(recordedAssets, md5, id);
@@ -564,7 +564,7 @@ class ProjectIO {
 	
 	private function recordSound(snd : ScratchSound, md5 : String, recordedAssets : Dynamic, uploading : Bool) : Int{
 		var id : Int = recordedAssetID(md5, recordedAssets, uploading);
-		if (id > -2) 			return id  // image was already added  ;
+		if (id > -2) 			return id;  // image was already added  ;
 		sounds.push([md5, snd.soundData]);
 		id = sounds.length - 1;
 		Reflect.setField(recordedAssets, md5, id);

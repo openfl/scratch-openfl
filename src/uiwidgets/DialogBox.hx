@@ -19,16 +19,16 @@
 
 package uiwidgets;
 
-import uiwidgets.DisplayObject;
-import uiwidgets.Event;
-import uiwidgets.Graphics;
-import uiwidgets.IconButton;
-import uiwidgets.KeyboardEvent;
-import uiwidgets.Sprite;
-import uiwidgets.Stage;
-import uiwidgets.TextField;
-import uiwidgets.TextFormat;
-import uiwidgets.VariableTextField;
+//import uiwidgets.DisplayObject;
+//import uiwidgets.Event;
+//import uiwidgets.Graphics;
+//import uiwidgets.IconButton;
+//import uiwidgets.KeyboardEvent;
+//import uiwidgets.Sprite;
+//import uiwidgets.Stage;
+//import uiwidgets.TextField;
+//import uiwidgets.TextFormat;
+//import uiwidgets.VariableTextField;
 
 import flash.display.*;
 import flash.events.*;
@@ -337,7 +337,7 @@ class DialogBox extends Sprite {
 			fieldY += line.height;
 			if (line.text.length == 0) 				fieldY += blankLineSpace;
 		}
-		if (textLines.length > 0) 			fieldY += spaceAfterText  // buttons  ;
+		if (textLines.length > 0) 			fieldY += spaceAfterText;  // buttons  ;
 		
 		if (buttons.length > 0) {
 			totalW = (buttons.length - 1) * 10;
@@ -390,7 +390,7 @@ class DialogBox extends Sprite {
 			h += line.height;
 			if (line.length == 0) 				h += blankLineSpace;
 		}
-		if (textLines.length > 0) 			h += spaceAfterText  // buttons  ;
+		if (textLines.length > 0) 			h += spaceAfterText;  // buttons  ;
 		
 		totalW = 0;
 		for (i in 0...buttons.length){totalW += buttons[i].width + 10;

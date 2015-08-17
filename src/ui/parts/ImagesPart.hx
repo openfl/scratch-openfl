@@ -25,36 +25,36 @@
 
 package ui.parts;
 
-import ui.parts.BitmapData;
-import ui.parts.BitmapEdit;
-import ui.parts.Button;
-import ui.parts.DrawProperties;
-import ui.parts.EditableLabel;
-import ui.parts.Graphics;
-import ui.parts.IconButton;
-import ui.parts.ImageEdit;
-import ui.parts.Matrix;
-import ui.parts.MediaLibrary;
-import ui.parts.MediaPane;
-import ui.parts.Point;
-import ui.parts.SVGEdit;
-import ui.parts.SVGElement;
-import ui.parts.SVGExport;
-import ui.parts.Scratch;
-import ui.parts.ScratchCostume;
-import ui.parts.ScratchObj;
-import ui.parts.ScratchSprite;
-import ui.parts.ScrollFrame;
-import ui.parts.Shape;
-import ui.parts.TextField;
-import ui.parts.TextFormat;
-import ui.parts.UIPart;
+//import ui.parts.BitmapData;
+//import ui.parts.BitmapEdit;
+//import ui.parts.Button;
+//import ui.parts.DrawProperties;
+//import ui.parts.EditableLabel;
+//import ui.parts.Graphics;
+//import ui.parts.IconButton;
+//import ui.parts.ImageEdit;
+//import ui.parts.Matrix;
+//import ui.parts.MediaLibrary;
+//import ui.parts.MediaPane;
+//import ui.parts.Point;
+//import ui.parts.SVGEdit;
+//import ui.parts.SVGElement;
+//import ui.parts.SVGExport;
+//import ui.parts.Scratch;
+//import ui.parts.ScratchCostume;
+//import ui.parts.ScratchObj;
+//import ui.parts.ScratchSprite;
+//import ui.parts.ScrollFrame;
+//import ui.parts.Shape;
+//import ui.parts.TextField;
+//import ui.parts.TextFormat;
+//import ui.parts.UIPart;
 
 import flash.display.*;
 import flash.events.MouseEvent;
 import flash.geom.*;
 import flash.text.*;
-import flash.utils.SetTimeout;
+//import flash.utils.SetTimeout;
 
 import scratch.*;
 
@@ -149,7 +149,7 @@ class ImagesPart extends UIPart {
 		backdropLibraryButton.visible = isStage();
 		costumeLibraryButton.visible = !isStage();
 		(try cast(listFrame.contents, MediaPane) catch(e:Dynamic) null).refresh();
-		if (!fromEditor) 			selectCostume()  // this refresh is because the editor just saved the costume; do nothing  ;
+		if (!fromEditor) 			selectCostume();  // this refresh is because the editor just saved the costume; do nothing  ;
 	}
 	
 	private function updateLabel() : Void{
@@ -558,7 +558,7 @@ class ImagesPart extends UIPart {
 				for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(spr),costumes) type: null */ in spr.costumes)addAndSelectCostume(c);
 				return;
 			}
-			var costumeList : Array<Dynamic> = try cast(costumeOrSprite, Array</*AS3HX WARNING no type*/>) catch(e:Dynamic) null;
+			var costumeList : Array<Dynamic> = try cast(costumeOrSprite, Array<Dynamic>) catch(e:Dynamic) null;
 			if (costumeList != null) {
 				for (c in costumeList){
 					addAndSelectCostume(c);

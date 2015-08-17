@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="Scratch 2" package="edu.mit.scratch" version="2.0.0" company="MIT" />
+	<app main="Scratch" path="bin" file="Scratch" />
+	
+	<source path="src" />
+	
+	<haxelib name="openfl" />
+	
+	<!-- <haxedef name="allow3d" /> -->
+	<haxedef name="revision" value="dev" />
+	
+	<haxeflag name="-swf-lib" value="libs/as3corelib.swc" if="flash" />
+	<haxeflag name="-swf-lib" value="libs/blooddy_crypto.swc" if="flash" />
+	
+</project>

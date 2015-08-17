@@ -19,12 +19,12 @@
 
 package assets;
 
-import assets.Bitmap;
-import assets.BitmapData;
-import assets.Font;
-import assets.ResourceClass;
-import assets.TextField;
-import assets.TextFormat;
+//import assets.Bitmap;
+//import assets.BitmapData;
+//import assets.Font;
+//import assets.ResourceClass;
+//import assets.TextField;
+//import assets.TextFormat;
 
 import flash.display.*;
 import flash.text.*;

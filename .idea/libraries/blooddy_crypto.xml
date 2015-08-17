@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="blooddy_crypto" type="flex">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/blooddy_crypto.swc!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
