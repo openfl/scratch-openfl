@@ -43,9 +43,9 @@ class Scrollbar extends Sprite implements DragClient {
 	private var sliderSizeFraction : Float = 0.1;  // slider size, used to show fraction of docutment vislbe (range: 0-1)  
 	private var isVertical : Bool;
 	private var dragOffset : Int;
-	private var scrollFunction : Function;
+	private var scrollFunction : Dynamic;
 	
-	public function new(w : Int, h : Int, scrollFunction : Function = null)
+	public function new(w : Int, h : Int, scrollFunction : Dynamic = null)
 	{
 		super();
 		this.scrollFunction = scrollFunction;

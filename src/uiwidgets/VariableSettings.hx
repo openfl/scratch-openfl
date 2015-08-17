@@ -19,7 +19,7 @@
 
 package uiwidgets;
 
-import uiwidgets.Graphics;
+//import uiwidgets.Graphics;
 
 import flash.display.*;
 import flash.text.*;

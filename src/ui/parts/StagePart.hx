@@ -55,8 +55,8 @@ class StagePart extends UIPart {
 	private var readoutLabelFormat : TextFormat = new TextFormat(CSS.font, 12, readoutTextColor, true);
 	private var readoutFormat : TextFormat = new TextFormat(CSS.font, 10, readoutTextColor);
 	
-	private inline var topBarHeightNormal : Int = 39;
-	private inline var topBarHeightSmallPlayerMode : Int = 26;
+	private inline static var topBarHeightNormal : Int = 39;
+	private inline static var topBarHeightSmallPlayerMode : Int = 26;
 	
 	private var topBarHeight : Int = topBarHeightNormal;
 	

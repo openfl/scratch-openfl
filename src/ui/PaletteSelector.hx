@@ -26,10 +26,10 @@
 
 package ui;
 
-import ui.Graphics;
-import ui.PaletteSelectorItem;
-import ui.Scratch;
-import ui.Sprite;
+//import ui.Graphics;
+//import ui.PaletteSelectorItem;
+//import ui.Scratch;
+//import ui.Sprite;
 
 import flash.display.*;
 import translation.Translator;

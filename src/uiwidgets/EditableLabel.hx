@@ -26,14 +26,14 @@
 
 package uiwidgets;
 
-import uiwidgets.BevelFilter;
-import uiwidgets.FocusEvent;
-import uiwidgets.Graphics;
-import uiwidgets.KeyboardEvent;
-import uiwidgets.Shape;
-import uiwidgets.Sprite;
-import uiwidgets.TextField;
-import uiwidgets.TextFormat;
+//import uiwidgets.BevelFilter;
+//import uiwidgets.FocusEvent;
+//import uiwidgets.Graphics;
+//import uiwidgets.KeyboardEvent;
+//import uiwidgets.Shape;
+//import uiwidgets.Sprite;
+//import uiwidgets.TextField;
+//import uiwidgets.TextFormat;
 
 import flash.display.*;
 import flash.events.*;
@@ -43,16 +43,16 @@ import flash.text.*;
 class EditableLabel extends Sprite {
 	
 	private var defaultFormat : TextFormat = new TextFormat(CSS.font, 13, 0x929497);
-	private inline var bgColor : Int = 0xFFFFFF;
-	private inline var frameColor : Int = 0xA6A8AB;
+	private inline static var bgColor : Int = 0xFFFFFF;
+	private inline static var frameColor : Int = 0xA6A8AB;
 	
 	public var tf : TextField;
 	
 	private var bezel : Shape;
 	private var dynamicBezel : Bool;
-	private var textChanged : Function;
+	private var textChanged : Dynamic;
 	
-	public function new(textChanged : Function, format : TextFormat = null)
+	public function new(textChanged : Dynamic, format : TextFormat = null)
 	{
 		super();
 		this.textChanged = textChanged;
@@ -65,7 +65,7 @@ class EditableLabel extends Sprite {
 	}
 	
 	public function setWidth(w : Int) : Void{
-		if (tf.text.length == 0) 			tf.text = " "  // needs at least one character to compute textHeight  ;
+		if (tf.text.length == 0) 			tf.text = " ";  // needs at least one character to compute textHeight  ;
 		var h : Int = tf.textHeight + 5;  // the height is determined by the font  
 		var g : Graphics = bezel.graphics;
 		g.clear();

@@ -284,7 +284,7 @@ class TopBarPart extends UIPart {
 		}
 	}
 	
-	private function makeToolButton(iconName : String, fcn : Function) : IconButton{
+	private function makeToolButton(iconName : String, fcn : Dynamic) : IconButton{
 		function mouseDown(evt : MouseEvent) : Void{
 			toolOnMouseDown = CursorTool.tool;
 		};

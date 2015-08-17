@@ -55,13 +55,13 @@ class DialogBox extends Sprite {
 	private var maxLabelWidth : Int = 0;
 	private var maxFieldWidth : Int = 0;
 	private var heightPerField : Int = Math.max(makeLabel("foo").height, makeField(10).height) + 10;
-	private inline var spaceAfterText : Int = 18;
-	private inline var blankLineSpace : Int = 7;
+	private inline static var spaceAfterText : Int = 18;
+	private inline static var blankLineSpace : Int = 7;
 	
-	private var acceptFunction : Function;  // if not nil, called when menu interaction is accepted  
-	private var cancelFunction : Function;  // if not nil, called when menu interaction is canceled  
+	private var acceptFunction : Dynamic;  // if not nil, called when menu interaction is accepted  
+	private var cancelFunction : Dynamic;  // if not nil, called when menu interaction is canceled  
 	
-	public function new(acceptFunction : Function = null, cancelFunction : Function = null)
+	public function new(acceptFunction : Dynamic = null, cancelFunction : Dynamic = null)
 	{
 		super();
 		this.acceptFunction = acceptFunction;
@@ -73,7 +73,7 @@ class DialogBox extends Sprite {
 		addEventListener(FocusEvent.KEY_FOCUS_CHANGE, focusChange);
 	}
 	
-	public static function ask(question : String, defaultAnswer : String, stage : Stage = null, resultFunction : Function = null, context : Dictionary = null) : Void{
+	public static function ask(question : String, defaultAnswer : String, stage : Stage = null, resultFunction : Dynamic = null, context : Dictionary = null) : Void{
 		function done() : Void{if (resultFunction != null) 				resultFunction(d.fields["answer"].text);
 		};
 		var d : DialogBox = new DialogBox(done);
@@ -84,7 +84,7 @@ class DialogBox extends Sprite {
 		d.showOnStage((stage != null) ? stage : Scratch.app.stage);
 	}
 	
-	public static function confirm(question : String, stage : Stage = null, okFunction : Function = null, cancelFunction : Function = null, context : Dictionary = null) : Void{
+	public static function confirm(question : String, stage : Stage = null, okFunction : Dynamic = null, cancelFunction : Dynamic = null, context : Dictionary = null) : Void{
 		var d : DialogBox = new DialogBox(okFunction, cancelFunction);
 		d.addTitle(question);
 		d.addAcceptCancelButtons("OK");
@@ -92,7 +92,7 @@ class DialogBox extends Sprite {
 		d.showOnStage((stage != null) ? stage : Scratch.app.stage);
 	}
 	
-	public static function notify(title : String, msg : String, stage : Stage = null, leftJustify : Bool = false, okFunction : Function = null, cancelFunction : Function = null, context : Dictionary = null) : Void{
+	public static function notify(title : String, msg : String, stage : Stage = null, leftJustify : Bool = false, okFunction : Dynamic = null, cancelFunction : Dynamic = null, context : Dictionary = null) : Void{
 		var d : DialogBox = new DialogBox(okFunction, cancelFunction);
 		d.leftJustify = leftJustify;
 		d.addTitle(title);
@@ -186,7 +186,7 @@ class DialogBox extends Sprite {
 		addButton("Cancel", cancel);
 	}
 	
-	public function addButton(label : String, action : Function) : Void{
+	public function addButton(label : String, action : Dynamic) : Void{
 		function doAction() : Void{
 			remove();
 			if (action != null) 				action();

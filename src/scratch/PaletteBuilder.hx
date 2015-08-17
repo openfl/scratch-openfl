@@ -52,7 +52,7 @@ class PaletteBuilder {
 		this.app = app;
 	}
 
-	public static function strings():Array {
+	public static function strings():Array<String> {
 		return [
 			'Stage selected:', 'No motion blocks',
 			'Make a Block', 'Make a List', 'Make a Variable',
@@ -60,7 +60,7 @@ class PaletteBuilder {
 			'New Block', 'Add an Extension'];
 	}
 
-	public function showBlocksForCategory(selectedCategory:Int, scrollToOrigin:Boolean, shiftKey:Boolean = false):Void {
+	public function showBlocksForCategory(selectedCategory:Int, scrollToOrigin:Bool, shiftKey:Bool = false):Void {
 		if (app.palette == null) return;
 		app.palette.clear(scrollToOrigin);
 		nextY = 7;
@@ -95,7 +95,7 @@ class PaletteBuilder {
 				var label:String = spec[0];
 				if (targetObj.isStage && spec[3] == 'whenClicked') label = 'when Stage clicked';
 				var block:Block = new Block(label, spec[1], blockColor, spec[3], defaultArgs);
-				var showCheckbox:Boolean = isCheckboxReporter(spec[3]);
+				var showCheckbox:Bool = isCheckboxReporter(spec[3]);
 				if (showCheckbox) addReporterCheckbox(block);
 				addItem(block, showCheckbox);
 				cmdCount++;
@@ -106,7 +106,7 @@ class PaletteBuilder {
 		}
 	}
 
-	private function addItem(o:DisplayObject, hasCheckbox:Boolean = false):Void {
+	private function addItem(o:DisplayObject, hasCheckbox:Bool = false):Void {
 		o.x = hasCheckbox ? 23 : 6;
 		o.y = nextY;
 		app.palette.addChild(o);
@@ -124,7 +124,7 @@ class PaletteBuilder {
 		return t;
 	}
 
-	private function showMyBlocksPalette(shiftKey:Boolean):Void {
+	private function showMyBlocksPalette(shiftKey:Bool):Void {
 		// show creation button, hat, and call blocks
 		var catColor:Int = Specs.blockColor(Specs.procedureColor);
 		addItem(new Button(Translator.map('Make a Block'), makeNewBlock, false, '/help/studio/tips/blocks/make-a-block/'));
@@ -241,7 +241,7 @@ class PaletteBuilder {
 		d.showOnStage(app.stage);
 	}
 
-	private function makeVarSettings(isList:Boolean, isStage:Boolean):VariableSettings {
+	private function makeVarSettings(isList:Bool, isStage:Bool):VariableSettings {
 		return new VariableSettings(isList, isStage);
 	}
 
@@ -302,7 +302,7 @@ class PaletteBuilder {
 		app.palette.addChild(b);
 	}
 
-	private function isCheckboxReporter(op:String):Boolean {
+	private function isCheckboxReporter(op:String):Bool {
 		var checkboxReporters:Array = [
 			'xpos', 'ypos', 'heading', 'costumeIndex', 'scale', 'volume', 'timeAndDate',
 			'backgroundIndex', 'sceneName', 'tempo', 'answer', 'timer', 'soundLevel', 'isLoud',
@@ -311,7 +311,7 @@ class PaletteBuilder {
 		return checkboxReporters.indexOf(op) > -1;
 	}
 
-	private function isSpriteSpecific(op:String):Boolean {
+	private function isSpriteSpecific(op:String):Bool {
 		var spriteSpecific:Array = ['costumeIndex', 'xpos', 'ypos', 'heading', 'scale', 'volume'];
 		return spriteSpecific.indexOf(op) > -1;
 	}
@@ -322,7 +322,7 @@ class PaletteBuilder {
 		return '';
 	}
 
-	private function addVariableCheckbox(varName:String, isList:Boolean):Void {
+	private function addVariableCheckbox(varName:String, isList:Bool):Void {
 		var b:IconButton = new IconButton(toggleWatcher, 'checkbox');
 		b.disableMouseover();
 		var targetObj:ScratchObj = app.viewedObj();
@@ -355,7 +355,7 @@ class PaletteBuilder {
 					break;
 			}
 		}
-		var showFlag:Boolean = !app.runtime.watcherShowing(data);
+		var showFlag:Bool = !app.runtime.watcherShowing(data);
 		app.runtime.showWatcher(data, showFlag);
 		b.setOn(showFlag);
 		app.setSaveNeeded();
@@ -451,7 +451,7 @@ class PaletteBuilder {
 	}
 
 	//[Embed(source='../assets/reload.png')]
-	@:bitmap("../assets/reload.png") private static inline var ReloadIcon:Class;
+	@:bitmap("../assets/reload.png") private static var ReloadIcon:Class<Bitmap>;
 
 	private function addLineForExtensionTitle(titleButton:IconButton, ext:ScratchExtension):Void {
 		var x:Int = titleButton.width + 12;
@@ -499,7 +499,7 @@ class PaletteBuilder {
 				var op:String = opPrefix + spec[2];
 				var defaultArgs:Array = spec.slice(3);
 				var block:Block = new Block(spec[1], spec[0], blockColor, op, defaultArgs);
-				var showCheckbox:Boolean = (spec[0] == 'r' && defaultArgs.length == 0);
+				var showCheckbox:Bool = (spec[0] == 'r' && defaultArgs.length == 0);
 				if (showCheckbox) addReporterCheckbox(block);
 				addItem(block, showCheckbox);
 			} else {

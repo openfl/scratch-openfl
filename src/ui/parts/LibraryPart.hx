@@ -54,8 +54,8 @@ class LibraryPart extends UIPart {
 	private var smallTextFormat : TextFormat = new TextFormat(CSS.font, 10, CSS.textColor);
 	
 	private var bgColor : Int = CSS.tabColor;
-	private inline var stageAreaWidth : Int = 77;
-	private inline var updateInterval : Int = 200;  // msecs between thumbnail updates  
+	private inline static var stageAreaWidth : Int = 77;
+	private inline static var updateInterval : Int = 200;  // msecs between thumbnail updates  
 	
 	private var lastUpdate : UInt;  // time of last thumbnail update  
 	

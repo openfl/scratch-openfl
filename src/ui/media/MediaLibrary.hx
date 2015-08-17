@@ -34,31 +34,31 @@ import util.*;
 
 class MediaLibrary extends Sprite {
 
-	private inline var titleFormat:TextFormat = new TextFormat(CSS.font, 24, 0x444143);
+	private inline static var titleFormat:TextFormat = new TextFormat(CSS.font, 24, 0x444143);
 
-	private static inline var backdropCategories:Array = [
+	private static inline var backdropCategories:Array<String> = [
 		'All', 'Indoors', 'Outdoors', 'Other'];
-	private static inline var costumeCategories:Array = [
+	private static inline var costumeCategories:Array<String> = [
 		'All', 'Animals', 'Fantasy', 'Letters', 'People', 'Things', 'Transportation'];
-	private static inline var extensionCategories:Array = [
+	private static inline var extensionCategories:Array<String> = [
 		'All', 'Hardware'];
-	private static inline var soundCategories:Array = [
+	private static inline var soundCategories:Array<String> = [
 		'All', 'Animal', 'Effects', 'Electronic', 'Human', 'Instruments',
 		'Music Loops', 'Percussion', 'Vocals'];
 
-	private static inline var backdropThemes:Array = [
+	private static inline var backdropThemes:Array<String> = [
 		'Castle', 'City', 'Flying', 'Holiday', 'Music and Dance', 'Nature', 'Space', 'Sports', 'Underwater'];
-	private static inline var costumeThemes:Array = [
+	private static inline var costumeThemes:Array<String> = [
 		'Castle', 'City', 'Flying', 'Holiday', 'Music and Dance', 'Space', 'Sports', 'Underwater', 'Walking'];
 
-	private static inline var imageTypes:Array = ['All', 'Bitmap', 'Vector'];
+	private static inline var imageTypes:Array<String> = ['All', 'Bitmap', 'Vector'];
 
-	private static inline var spriteFeatures:Array = ['All', 'Scripts', 'Costumes > 1', 'Sounds'];
+	private static inline var spriteFeatures:Array<String> = ['All', 'Scripts', 'Costumes > 1', 'Sounds'];
 
 	private var app:Scratch;
 	private var assetType:String;
 	private var whenDone:Function;
-	private var allItems:Array = [];
+	private var allItems:Array<Dynamic> = [];
 
 	private var title:TextField;
 	private var outerFrame:Shape;
@@ -90,8 +90,8 @@ class MediaLibrary extends Sprite {
 		addButtons();
 	}
 
-	public static function strings():Array {
-		var result:Array = [
+	public static function strings():Array<String> {
+		var result:Array<String> = [
 			'Backdrop Library', 'Costume Library', 'Sprite Library', 'Sound Library',
 			'Category', 'Theme', 'Type', 'Features',
 			'Uploading image...', 'Uploading sprite...', 'Uploading sound...',
@@ -389,7 +389,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		return true;
 	}
 
-	private function appendItems(items:Array):Void {
+	private function appendItems(items:Array<Dynamic>):Void {
 		if (items.length == 0) return;
 		var itemWidth:Int = cast (items[0], MediaLibraryItem).frameWidth + 6;
 		var totalWidth:Int = resultsFrame.width - 15;
@@ -602,7 +602,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		gifImported(newCostumes);
 	}
 
-	private function gifImported(newCostumes:Array):Void {
+	private function gifImported(newCostumes:Array<Dynamic>):Void {
 		whenDone(newCostumes);
 	}
 

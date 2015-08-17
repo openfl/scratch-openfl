@@ -34,8 +34,8 @@
 
 package uiwidgets;
 
-import uiwidgets.Graphics;
-import uiwidgets.ScrollFrameContents;
+//import uiwidgets.Graphics;
+//import uiwidgets.ScrollFrameContents;
 
 import flash.display.*;
 import flash.events.*;
@@ -47,9 +47,9 @@ class ScrollFrame extends Sprite implements DragClient {
 	public var contents : ScrollFrameContents;
 	public var allowHorizontalScrollbar : Bool = true;
 	
-	private inline var decayFactor : Float = 0.95;  // velocity decay (make zero to stop instantly)  
-	private inline var stopThreshold : Float = 0.4;  // stop when velocity is below threshold  
-	private inline var cornerRadius : Int = 0;
+	private inline static var decayFactor : Float = 0.95;  // velocity decay (make zero to stop instantly)  
+	private inline static var stopThreshold : Float = 0.4;  // stop when velocity is below threshold  
+	private inline static var cornerRadius : Int = 0;
 	private var useFrame : Bool = false;
 	
 	private var scrollbarThickness : Int = 9;
@@ -73,7 +73,7 @@ class ScrollFrame extends Sprite implements DragClient {
 		if (dragScrolling) 			scrollbarThickness = 3;
 		mask = new Shape();
 		addChild(mask);
-		if (useFrame) 			addShadowFrame()  // adds a shadow to top and left  ;
+		if (useFrame) 			addShadowFrame();  // adds a shadow to top and left  ;
 		setWidthHeight(100, 100);
 		setContents(new ScrollFrameContents());
 		addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
@@ -291,8 +291,8 @@ class ScrollFrame extends Sprite implements DragClient {
 		contents.x = Math.max(-maxScrollH(), Math.min(contents.x, 0));
 		contents.y = Math.max(-maxScrollV(), Math.min(contents.y, 0));
 		
-		if ((contents.x > -1) || ((contents.x - 1) < -maxScrollH())) 			xVelocity = 0  // hit end, so stop  ;
-		if ((contents.y > -1) || ((contents.y - 1) < -maxScrollV())) 			yVelocity = 0  // hit end, so stop  ;
+		if ((contents.x > -1) || ((contents.x - 1) < -maxScrollH())) 			xVelocity = 0;  // hit end, so stop  ;
+		if ((contents.y > -1) || ((contents.y - 1) < -maxScrollV())) 			yVelocity = 0;  // hit end, so stop  ;
 		constrainScroll();
 		updateScrollbars();
 		

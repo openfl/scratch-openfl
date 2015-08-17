@@ -27,26 +27,26 @@
 //
 // SVGElements can convert SVG colors in various formats to an integer RGB value.
 
-package svgutils {
+package svgutils;
 	import flash.display.*;
 	import flash.geom.*;
 	import flash.text.*;
 
 	import svgeditor.DrawProperties;
 
-public class SVGElement {
+class SVGElement {
 
 	public var tag:String;
 	public var id:String;
-	public var attributes:Object;
-	public var subElements:Array;
+	public var attributes:Dynamic;
+	public var subElements:Array<SVGElement>;
 
 	public var bitmap:BitmapData;
 	public var path:SVGPath;
 	public var text:String;
 	public var transform:Matrix;
 
-	public function SVGElement(tag:String, id:String = '') {
+	public function new(tag:String, id:String = '') {
 		if (!id || (id.length == 0)) id = 'ID' + Math.random();
 		this.tag = tag;
 		this.id = id;
@@ -54,11 +54,11 @@ public class SVGElement {
 		this.subElements = [];
 	}
 
-	public function allElements():Array {
+	public function allElements():Array<SVGElement> {
 		// Return an array of all my SVG elements (visible and not) in rendering order.
-		function collectElements(el:SVGElement):void {
+		function collectElements(el:SVGElement):Void {
 			result.push(el);
-			for each (var subEl:SVGElement in el.subElements) collectElements(subEl);
+			for (subEl in el.subElements) collectElements(subEl);
 		}
 		var result:Array = [];
 		collectElements(this);
@@ -69,9 +69,9 @@ public class SVGElement {
 		// Return a shallow copy (no subElements) of the current SVGElement.
 		var copy:SVGElement = new SVGElement(tag, id);
 		copy.attributes = {};
-		for (var attr:String in attributes) {
-			var v:* = attributes[attr];
-			if (v is Array) v = v.concat(); // make a copy of array value
+		for (attr in attributes) {
+			var v:Dynamic = attributes[attr];
+			if (Std.is (v, Array)) v = v.concat(); // make a copy of array value
 			copy.attributes[attr] = v;
 		}
 		copy.bitmap = bitmap;
@@ -81,7 +81,7 @@ public class SVGElement {
 		return copy;
 	}
 
-	public static function makeBitmapEl(bm:BitmapData, scale:Number = 1):SVGElement {
+	public static function makeBitmapEl(bm:BitmapData, scale:Float = 1):SVGElement {
 		// Create an SVGElement for the given bitmap.
 		var el:SVGElement = new SVGElement('image');
 		el.bitmap = bm;
@@ -96,7 +96,7 @@ public class SVGElement {
 		return el;
 	}
 
-	public function setShapeStroke(props:DrawProperties):void {
+	public function setShapeStroke(props:DrawProperties):Void {
 		if(props.alpha > 0 && tag != 'text') {
 			setAttribute('stroke', colorToHex(props.color & 0xFFFFFF));
 			setAttribute('stroke-width', props.strokeWidth);
@@ -105,13 +105,13 @@ public class SVGElement {
 		}
 	}
 
-	public function setShapeFill(props:DrawProperties):void {
-		var fillable:Boolean = props.alpha>0 && (tag != 'path' || !path || path.getSegmentEndPoints()[2]);
+	public function setShapeFill(props:DrawProperties):Void {
+		var fillable:Bool = props.alpha>0 && (tag != 'path' || !path || path.getSegmentEndPoints()[2]);
 		setAttribute('fill', (fillable ? colorToHex(props.color & 0xFFFFFF) : 'none'));
 	}
 
-	public function applyShapeProps(props:DrawProperties):void {
-		var isShape:Boolean = (tag == 'path' || tag == 'ellipse' || tag == 'rect' || tag == 'polylines');
+	public function applyShapeProps(props:DrawProperties):Void {
+		var isShape:Bool = (tag == 'path' || tag == 'ellipse' || tag == 'rect' || tag == 'polylines');
 		if (isShape && getAttribute('stroke') != 'none')
 			setAttribute('stroke-width', props.strokeWidth);
 		if (tag == 'text') {
@@ -119,7 +119,7 @@ public class SVGElement {
 		}
 	}
 
-	public function setFont(fontName:String, fontSize:int = 0):void {
+	public function setFont(fontName:String, fontSize:Int = 0):Void {
 		if (tag == 'text') {
 			setAttribute('font-family', fontName);
 			if (fontSize > 0) setAttribute('font-size', fontSize);
@@ -127,29 +127,29 @@ public class SVGElement {
 	}
 
 	// Detects if this is part of the background of a backdrop
-	public function isBackDropBG():Boolean {
-		return ('scratch-type' in attributes && attributes['scratch-type'].indexOf('backdrop-') === 0);
+	public function isBackDropBG():Bool {
+		return ('scratch-type' in attributes && attributes['scratch-type'].indexOf('backdrop-') == 0);
 	}
 
-	public function isBackDropFill():Boolean {
+	public function isBackDropFill():Bool {
 		return ('scratch-type' in attributes && attributes['scratch-type'] == 'backdrop-fill');
 	}
 
-	public function alpha():Number {
-		var a:Number = Number(getAttribute('opacity', 1));
+	public function alpha():Float {
+		var a:Float = Number(getAttribute('opacity', 1));
 		if (a >= 1) return 1;
 		return (a > 0) ? a : 0;
 	}
 
-	public function getAttribute(key:String, defaultIfMissing:* = undefined):* {
+	public function getAttribute(key:String, defaultIfMissing:Dynamic = undefined):Dynamic {
 		// Return the value of the given attribute or the given default
 		// value if the attribute is missing.
 		if(attributes.hasOwnProperty(key)) {
-			var rawValue:* = attributes[key];
-			if(rawValue is String && rawValue.indexOf('%') == rawValue.length - 1)
+			var rawValue:Dynamic = attributes[key];
+			if(Std.is (rawValue, String) && rawValue.indexOf('%') == rawValue.length - 1)
 				return parseFloat(rawValue) / 100;
 			// This fixes corrupted gradients created
-			else if(defaultIfMissing is Number && rawValue === 'undefined')
+			else if (Std.is (defaultIfMissing, Float) && rawValue == 'undefined')
 				return defaultIfMissing;
 
 			return rawValue;
@@ -157,27 +157,28 @@ public class SVGElement {
 		return defaultIfMissing;
 	}
 
-	public function setAttribute(key:String, value:*):void {
-		if (value === null || value === undefined) {
-			delete attributes[key];
+	public function setAttribute(key:String, value:Dynamic):Void {
+		if (value == null || value == undefined) {
+			//delete attributes[key];
+			Reflect.deleteField (attributes, key);
 		} else {
 			attributes[key] = value;
 		}
 	}
 
-	public function deleteAttributes(keys:Array):void {
-		for each (var k:String in keys) delete attributes[k];
+	public function deleteAttributes(keys:Array<String>):Void {
+		for (k in keys) Reflect.deleteField (attributes, k);
 	}
 
-	public function extractNumericArgs(input:String):Array {
+	public function extractNumericArgs(input:String):Array<Float> {
 		// Parse a string containing one more numeric arguments and return an array of Numbers.
-		var result:Array = [];
-		var numStrings:Array = input.match(/(?:\+|-)?\d+(?:\.\d+)?(?:e(?:\+|-)?\d+)?/g);
-		for each (var s:String in numStrings) result.push(Number(s));
+		var result:Array<Float> = [];
+		var numStrings:Array<String> = input.match(~/(?:\+|-)?\d+(?:\.\d+)?(?:e(?:\+|-)?\d+)?/g);
+		for (s in numStrings) result.push(Std.parseFloat(s));
 		return result;
 	}
 
-	public function convertToPath():void {
+	public function convertToPath():Void {
 		// Convert a circle, ellipse, line, polyline, polygon, or rect into a path with
 		// a 'points' attribute (an array of Points) for internal use and an SVG 'd'
 		// attribute (a string containing path commands) for export.
@@ -195,12 +196,12 @@ public class SVGElement {
 		tag = 'path';
 	}
 
-	public function setPath(pathStr:String):void {
+	public function setPath(pathStr:String):Void {
 		setAttribute('d', pathStr);
 		updatePath();
 	}
 
-	public function updatePath():void {
+	public function updatePath():Void {
 		// This can be used to update the path for, say, a rectangle or ellipse after
 		// changing their attributes.
 		new SVGImportPath().generatePathCmds(this);
@@ -210,12 +211,12 @@ public class SVGElement {
 	// Rendering
 	//------------------------------
 
-	public function renderImageOn(bmp:Bitmap):void {
+	public function renderImageOn(bmp:Bitmap):Void {
 		// Render an image element on the given Bitmap.
 		var bmData:BitmapData = bitmap;
 		if (bmData == null) { // image not yet loaded; use a placeholder (a magenta rectangle)
-			var w:int = getAttribute('width', 10);
-			var h:int = getAttribute('height', 10);
+			var w:Int = getAttribute('width', 10);
+			var h:Int = getAttribute('height', 10);
 			bmData = new BitmapData(w, h, false, 0xFF00FF);
 		}
 		bmp.bitmapData = bmData;
@@ -225,16 +226,16 @@ public class SVGElement {
 		if (transform) bmp.transform.matrix = transform;
 	}
 
-	public function renderPathOn(s:Shape, forHitTest:Boolean = false):void {
+	public function renderPathOn(s:Shape, forHitTest:Bool = false):Void {
 		SVGPath.render(this, s.graphics, forHitTest);
 		//s.alpha = alpha();
 		//if (transform) s.transform.matrix = transform;
 	}
 
-	public function renderTextOn(tf:TextField):void {
+	public function renderTextOn(tf:TextField):Void {
 		// Render a text element on the given TextField.
 		// For now, always use an embedded font to allow rotation.
-		const useEmbeddedFont:Boolean = true;
+		var useEmbeddedFont:Bool = true;
 		if (!text) return;
 		var fmt:TextFormat = new TextFormat(
 			getAttribute('font-family', 'Helvetica'),
@@ -261,7 +262,7 @@ public class SVGElement {
 
 		// Adjust for the 2-pixel TextField inset (gutter) and the
 		// fact that the y-origin for SVG text is the baseline.
-		var ascent:Number = tf.getLineMetrics(0).ascent;
+		var ascent:Float = tf.getLineMetrics(0).ascent;
 		tf.x = getAttribute('x', 0) - 2;
 		tf.y = (getAttribute('y', 0) - ascent) - 2;
 
@@ -279,8 +280,8 @@ public class SVGElement {
 		if (transform) tf.transform.matrix = transform;
 	}
 
-	private function hasEmbeddedFont(fontName:String):Boolean {
-		for each (var f:Font in Font.enumerateFonts(false)) {
+	private function hasEmbeddedFont(fontName:String):Bool {
+		for (f in Font.enumerateFonts(false)) {
 			if (fontName == f.fontName) return true;
 		}
 		return false;
@@ -290,29 +291,29 @@ public class SVGElement {
 	// Colors
 	//------------------------------
 
-	private function testColorValue():void {
+	private function testColorValue():Void {
 		// Unit tests for the getColorValue() function.
 		var tests:Array = ['red', 'purple', '#F70', '#FF8000', 'rgb(255, 128, 0)', 'rgb(100%, 50%, 0%)'];
-		for each (var s:String in tests) {
+		for (s in tests) {
 			trace(s + ' -> ' + getColorValue(s).toString(16));
 		}
 	}
 
-	static public function colorToHex(c:uint):String {
+	static public function colorToHex(c:UInt):String {
 		var s:String = c.toString(16).toUpperCase();
 		while (s.length < 6) s = '0' + s;
 		return '#' + s;
 	}
 
-	public function getColorValue(attrValue:*):int {
-		var s:String = attrValue as String;
-		if (!s || (s == 'none') || (s == '')) return 0x808080;
+	public function getColorValue(attrValue:Dynamic):Int {
+		var s:String = cast (attrValue, String);
+		if (s == null || (s == 'none') || (s == '')) return 0x808080;
 		if (s.charAt(0) == '#') { // #RGB or #RRGGBB
 			s = s.slice(1);
 			if (s.length < 6) s = s.charAt(0) + s.charAt(0) + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2);
 			return int('0x' + s);
 		}
-		var i:int = s.indexOf('rgb(');
+		var i:Int = s.indexOf('rgb(');
 		if (i == 0) {
 			s = s.slice(4, s.length - 1);
 			var rgb:Array = s.split(',');
@@ -325,24 +326,24 @@ public class SVGElement {
 		return getColorByName(s);
 	}
 
-	private function colorPercent(s:String):int {
-		var i:int = s.indexOf('%');
+	private function colorPercent(s:String):Int {
+		var i:Int = s.indexOf('%');
 		if (i > -1) s = s.slice(0, i);
-		var fraction:Number = Math.max(0, Math.min(Number(s) / 100, 1));
+		var fraction:Float = Math.max(0, Math.min(Number(s) / 100, 1));
 		return 255 * fraction;
 	}
 
-	private function colorComponent(s:String):int {
+	private function colorComponent(s:String):Int {
 		return Math.max(0, Math.min(Number(s), 255));
 	}
 
-	private function getColorByName(colorName:String):int {
+	private function getColorByName(colorName:String):Int {
 		// Return an RGB value for the given color name or zero (black) if
 		// the color name is not recognized.
 		return namedColors[colorName.toLowerCase()];
 	}
 
-	private const namedColors:Object = {
+	private inline static var namedColors:Dynamic = {
 		'aliceblue': 0xF0F8FF,
 		'antiquewhite': 0xFAEBD7,
 		'aqua': 0x00FFFF,
@@ -492,4 +493,4 @@ public class SVGElement {
 		'yellowgreen': 0x9ACD32
 	}
 
-}}
+}

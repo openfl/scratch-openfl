@@ -70,7 +70,7 @@ class DrawProperties {
 	}
 	
 	private static function adjustWidth(raw : Int) : Int{
-		if (Scratch.app.imagesPart && (Std.is(Scratch.app.imagesPart.editor, SVGEdit))) 			return raw  // above 10, use Squeak brush sizes  ;
+		if (Scratch.app.imagesPart && (Std.is(Scratch.app.imagesPart.editor, SVGEdit))) 			return raw;  // above 10, use Squeak brush sizes  ;
 		
 		
 		

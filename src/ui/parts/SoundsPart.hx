@@ -60,7 +60,7 @@ class SoundsPart extends UIPart {
 	public var editor : SoundEditor;
 	public var currentIndex : Int;
 	
-	private inline var columnWidth : Int = 106;
+	private inline static var columnWidth : Int = 106;
 	
 	private var shape : Shape;
 	private var listFrame : ScrollFrame;
@@ -212,7 +212,7 @@ class SoundsPart extends UIPart {
 		addChild(importButton = makeButton(soundFromComputer, "import", left + 61, buttonY - 1));
 	}
 	
-	private function makeButton(fcn : Function, iconName : String, x : Int, y : Int) : IconButton{
+	private function makeButton(fcn : Dynamic, iconName : String, x : Int, y : Int) : IconButton{
 		var b : IconButton = new IconButton(fcn, iconName);
 		b.isMomentary = true;
 		b.x = x;

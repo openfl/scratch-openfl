@@ -19,11 +19,11 @@
 
 package scratch;
 
-import scratch.Graphics;
-import scratch.Shape;
-import scratch.Sprite;
-import scratch.TextField;
-import scratch.TextFormat;
+//import scratch.Graphics;
+//import scratch.Shape;
+//import scratch.Sprite;
+//import scratch.TextField;
+//import scratch.TextFormat;
 
 import flash.display.*;
 import flash.text.*;

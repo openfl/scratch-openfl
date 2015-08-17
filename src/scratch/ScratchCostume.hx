@@ -83,7 +83,7 @@ class ScratchCostume {
 	public var fontSize:Int;
 
 	// Undo support; not saved
-	public var undoList:Array = [];
+	public var undoList:Array<Dynamic> = [];
 	public var undoListIndex:Int;
 
 	public function new(name:String, data:Dynamic, centerX:Int = 99999, centerY:Int = 99999, bmRes:Int = 1) {
@@ -301,7 +301,7 @@ class ScratchCostume {
 	 object is composed of
 	 ** a single point
 	 */
-	private function RasterHull():Array
+	private function RasterHull():Array<Dynamic>
 	{
 		var dispObj:DisplayObject = displayObj();
 		var r:Rectangle = dispObj.getBounds(dispObj);
@@ -621,7 +621,7 @@ class ScratchCostume {
 		return '.dat'; // generic data; should not happen
 	}
 
-	public function generateOrFindComposite(allCostumes:Array):Void {
+	public function generateOrFindComposite(allCostumes:Array<Dynamic>):Void {
 		// If this costume has a text layer bitmap, compute or find a composite bitmap.
 		// Since there can be multiple copies of the same costume, first try to find a
 		// costume with the same base and text layer bitmaps and share its composite

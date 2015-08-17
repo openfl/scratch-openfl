@@ -33,7 +33,7 @@ import uiwidgets.*;
 
 class CameraDialog extends DialogBox {
 	
-	private var saveFunc : Function;
+	private var saveFunc : Dynamic;
 	private var picture : Bitmap;
 	private var video : Video;
 	
@@ -41,7 +41,7 @@ class CameraDialog extends DialogBox {
 		return ["Camera", "Save", "Close"];
 	}
 	
-	public function new(saveFunc : Function)
+	public function new(saveFunc : Dynamic)
 	{
 		super();
 		this.saveFunc = saveFunc;

@@ -98,7 +98,7 @@ class TabsPart extends UIPart {
 		refresh();
 	}
 	
-	private function makeTab(label : String, action : Function) : IconButton{
+	private function makeTab(label : String, action : Dynamic) : IconButton{
 		return new IconButton(action, makeTabImg(label, true), makeTabImg(label, false), true);
 	}
 	
