@@ -1,0 +1,23 @@
+{
+	"objName": "Blue Ellipse",
+	"costumes": [
+		{
+			"costumeName": "blueEllipse",
+			"baseLayerID": -1,
+			"baseLayerMD5": "blueellipse.svg",
+			"rotationCenterX": 240,
+			"rotationCenterY": 185
+		}
+	],
+	
+	"currentCostumeIndex": 0,
+	"scratchX": 0,
+	"scratchY": 0,
+	"scale": 1,
+	"direction": 90,
+	"rotationStyle": "normal",
+	"isDraggable": false,
+	"indexInLibrary": 100000,
+	"visible": true,
+	"spriteInfo": { }
+}

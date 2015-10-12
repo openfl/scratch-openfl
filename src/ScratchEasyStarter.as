@@ -11,7 +11,6 @@ package
 		}
 		
 		protected override function initServer():void {
-			trace("woo");
 			server = new ServerEasyStarter();
 		}
 	}

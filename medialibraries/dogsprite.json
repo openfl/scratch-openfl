@@ -1,0 +1,33 @@
+{
+	"objName": "Dog",
+	"costumes": [
+		{
+			"costumeName": "dog",
+			"baseLayerID": -1,
+			"baseLayerMD5": "dog.png",
+			"rotationCenterX": 45,
+			"rotationCenterY": 20
+		}
+	],
+	"sounds": [
+		{
+			"soundName": "bip",
+			"soundID": -1,
+			"md5": "bip.wav",
+			"sampleCount": 0,
+			"rate": 11025,
+			"format": "" 
+		}
+	],
+	
+	"currentCostumeIndex": 0,
+	"scratchX": 0,
+	"scratchY": 0,
+	"scale": 1,
+	"direction": 90,
+	"rotationStyle": "normal",
+	"isDraggable": false,
+	"indexInLibrary": 100000,
+	"visible": true,
+	"spriteInfo": { }
+}
