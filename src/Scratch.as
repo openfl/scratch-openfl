@@ -95,7 +95,7 @@ public class Scratch extends Sprite {
 	public var runtime:ScratchRuntime;
 	public var interp:Interpreter;
 	public var extensionManager:ExtensionManager;
-	public var server:Server;
+	public var server:IServer;
 	public var gh:GestureHandler;
 	public var projectID:String = '';
 	public var projectOwner:String = '';
