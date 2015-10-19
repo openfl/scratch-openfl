@@ -120,7 +120,8 @@ public class Server implements IServer {
 	// The url and data parameters match those passed to callServer.
 	protected function onCallServerHttpStatus(url:String, data:*, event:HTTPStatusEvent):void {
 		if (event.status < 200 || event.status > 299) {
-			Scratch.app.logMessage(event.toString());
+			if (event.status != 0)  // Happens when reading local files
+				Scratch.app.logMessage(url + ' -- ' + event.toString());
 		}
 	}
 

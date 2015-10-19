@@ -4,13 +4,14 @@ package util
 
 	public class ServerEasyStarter extends Server
 	{
-		
-		public function ServerEasyStarter() {
-			
+		public var resourcePrefix:String;
+
+		public function ServerEasyStarter(resourceUrlPrefix:String = '../') {
+			resourcePrefix = resourceUrlPrefix;
 		}
 		
 		protected override function getCdnStaticSiteURL():String {
-			return "../";
+			return resourcePrefix;
 		}
 
 		public override function getAsset(md5:String, whenDone:Function):URLLoader {
@@ -19,7 +20,7 @@ package util
 //			return null;
 //		}
 			var url:String = URLs.assetCdnPrefix + URLs.internalAPI + 'asset/' + md5 + '/get/';
-			url = "../medialibraries/" + md5;
+			url = resourcePrefix + 'medialibraries/' + md5;
 			return serverGet(url, whenDone);
 		}
 	}
