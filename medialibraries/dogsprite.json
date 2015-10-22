@@ -13,8 +13,8 @@
 		{
 			"soundName": "bip",
 			"soundID": -1,
-			"md5": "bip.wav",
-			"sampleCount": 0,
+			"md5": "bip8_11025.wav",
+			"sampleCount": 603,
 			"rate": 11025,
 			"format": "" 
 		}
