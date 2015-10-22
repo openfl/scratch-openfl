@@ -7,12 +7,17 @@ package util
 	import flash.geom.Matrix;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.system.ApplicationDomain;
+	import flash.system.LoaderContext;
 	import flash.utils.ByteArray;
 
 	/**
 	 * Variant of the server which returns resources that are embedded in the
 	 * SWF itself. (This is needed because the Chrome version of Flash does
 	 * not allow local file access.)
+	 * 
+	 * Actually, this still doesn't work. Apparently, the Chrome sandbox doesn't
+	 * let you decode byte arrays to png files when using local file access.
 	 */
 	public class ServerAllEmbedded extends Server
 	{
@@ -78,11 +83,12 @@ package util
 			
 			// Convert the raw image data to a bitmap
 			var loader:Loader = new Loader();
+			var loaderContext:LoaderContext = new LoaderContext(false, ApplicationDomain.currentDomain, null);
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, imageLoaded);
 			if (embeddedFiles[md5] == null)
 				callback(null);
 			else
-				loader.loadBytes(new (embeddedFiles[md5])() as ByteArray);
+				loader.loadBytes(new (embeddedFiles[md5])() as ByteArray, loaderContext);
 			
 			return new DummyURLLoader();
 		}
