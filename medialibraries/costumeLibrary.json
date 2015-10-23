@@ -1,0 +1,12 @@
+[
+	{
+		"name": "dog",
+		"md5": "dog.png",
+		"type": "costume",
+		"tags": ["bitmap", "animals"],
+		"__info_comments": "[centerX, centerY, [bitmapResolution(defaults to 1)]]",
+		"info":[45, 20]
+	}
+]
+
+
