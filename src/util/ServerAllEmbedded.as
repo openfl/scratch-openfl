@@ -19,7 +19,7 @@ package util
 	 * Actually, this still doesn't work. Apparently, the Chrome sandbox doesn't
 	 * let you decode byte arrays to png files when using local file access.
 	 */
-	public class ServerAllEmbedded extends Server
+	SCRATCH::allEmbed public class ServerAllEmbedded extends Server
 	{
 		public function ServerAllEmbedded() {
 			

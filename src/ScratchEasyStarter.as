@@ -27,6 +27,12 @@ package
 			// web page. So it seems easier for setup to simply disable it.
 			initialize();
 		}
+		
+				
+		protected override function startInEditMode():Boolean {
+			return true;
+		}
+
 	}
 	
 
