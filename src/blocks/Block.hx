@@ -69,7 +69,7 @@ class Block extends Sprite
 	public var spec : String;
 	public var type : String;
 	public var op : String = "";
-	public var opFunction : Dynamic->Dynamic;
+	public var opFunction : Block->Dynamic;
 	public var args : Array<Dynamic> = [];
 	public var defaultArgValues : Array<Dynamic> = [];
 	public var parameterIndex : Int = -1;  // cache of parameter index, used by GET_PARAM block  

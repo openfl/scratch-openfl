@@ -43,36 +43,37 @@ class SoundPrims
 		this.interp = interpreter;
 	}
 
-	public function addPrimsTo(primTable : Dictionary) : Void{
-		Reflect.setField(primTable, "playSound:", primPlaySound);
-		Reflect.setField(primTable, "doPlaySoundAndWait", primPlaySoundUntilDone);
-		Reflect.setField(primTable, "stopAllSounds", function(b : Dynamic) : Dynamic{ScratchSoundPlayer.stopAllSounds();
-		});
-
-		Reflect.setField(primTable, "drum:duration:elapsed:from:", primPlayDrum);  // Scratch 1.4 drum numbers  
-		Reflect.setField(primTable, "playDrum", primPlayDrum);
-		Reflect.setField(primTable, "rest:elapsed:from:", primPlayRest);
-
-		Reflect.setField(primTable, "noteOn:duration:elapsed:from:", primPlayNote);
-		Reflect.setField(primTable, "midiInstrument:", primSetInstrument);  // Scratch 1.4 instrument numbers  
-		Reflect.setField(primTable, "instrument:", primSetInstrument);
-
-		Reflect.setField(primTable, "changeVolumeBy:", primChangeVolume);
-		Reflect.setField(primTable, "setVolumeTo:", primSetVolume);
-		Reflect.setField(primTable, "volume", primVolume);
-
-		Reflect.setField(primTable, "changeTempoBy:", function(b : Dynamic) : Dynamic{
-			app.stagePane.setTempo(app.stagePane.tempoBPM + interp.numarg(b, 0));
-			interp.redraw();
-		});
-		Reflect.setField(primTable, "setTempoTo:", function(b : Dynamic) : Dynamic{
-			app.stagePane.setTempo(interp.numarg(b, 0));
-			interp.redraw();
-		});
-		Reflect.setField(primTable, "tempo", function(b : Dynamic) : Dynamic{return app.stagePane.tempoBPM;
-		});
+	public function addPrimsTo(primTable : Map<String, Block->Dynamic>) : Void{
+		//primTable[ "playSound:"] = primPlaySound;
+		//primTable[ "doPlaySoundAndWait"] = primPlaySoundUntilDone;
+		//primTable[ "stopAllSounds"] = function(b : Dynamic) : Dynamic{ScratchSoundPlayer.stopAllSounds();
+		//};
+//
+		//primTable[ "drum:duration:elapsed:from:"] = primPlayDrum;  // Scratch 1.4 drum numbers  
+		//primTable[ "playDrum"] = primPlayDrum;
+		//primTable[ "rest:elapsed:from:"] = primPlayRest;
+//
+		//primTable[ "noteOn:duration:elapsed:from:"] = primPlayNote;
+		//primTable[ "midiInstrument:"] = primSetInstrument;  // Scratch 1.4 instrument numbers  
+		//primTable[ "instrument:"] = primSetInstrument;
+//
+		//primTable[ "changeVolumeBy:"] = primChangeVolume;
+		//primTable[ "setVolumeTo:"] = primSetVolume;
+		//primTable[ "volume"] = primVolume;
+//
+		//primTable[ "changeTempoBy:"] = function(b : Dynamic) : Dynamic{
+			//app.stagePane.setTempo(app.stagePane.tempoBPM + interp.numarg(b, 0));
+			//interp.redraw();
+		//};
+		//primTable[ "setTempoTo:"] = function(b : Dynamic) : Dynamic{
+			//app.stagePane.setTempo(interp.numarg(b, 0));
+			//interp.redraw();
+		//};
+		//primTable[ "tempo"] = function(b : Dynamic) : Dynamic{return app.stagePane.tempoBPM;
+		//};
 	}
 
+	/*
 	private function primPlaySound(b : Block) : Void{
 		var snd : ScratchSound = interp.targetObj().findSound(interp.arg(b, 0));
 		if (snd != null)             playSound(snd, interp.targetObj());
@@ -264,4 +265,5 @@ class SoundPrims
 		21, 21, 21, 21, 
 		// Telephone Ring, Helicopter, Applause, Gunshot
 		21, 21, 21, 21];
+		*/
 }

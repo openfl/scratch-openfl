@@ -197,7 +197,7 @@ class PaletteBuilder {
 		var obj:ScratchObj = (varSettings.isLocal) ? app.viewedObj() : app.stageObj();
 		if (obj.hasName(name)) {
 			DialogBox.notify("Cannot Add", "That name is already in use.");
-			return;
+			return null;
 		}
 		var variable:Dynamic = (varSettings.isList ? obj.lookupOrCreateList(name) : obj.lookupOrCreateVar(name));
 
@@ -210,7 +210,7 @@ class PaletteBuilder {
 	private function makeVariable():Void {
 		var d:DialogBox ;
 		var varSettings:VariableSettings ;
-		function makeVar2():Void {
+		function makeVar2(param: Dynamic):Void {
 			var n:String = d.getField('Variable name').replace(~/^\s+|\s+$/g, '');
 			if (n.length == 0) return;
 

@@ -46,58 +46,63 @@ class Primitives
 		this.interp = interpreter;
 	}
 
-	public function addPrimsTo(primTable : Dictionary) : Void{
+	public function addPrimsTo(primTable : Map<String,Block->Dynamic>) : Void{
 		// operators
-		Reflect.setField(primTable, "+", function(b : Dynamic) : Dynamic{return interp.numarg(b, 0) + interp.numarg(b, 1);
-		});
-		Reflect.setField(primTable, "-", function(b : Dynamic) : Dynamic{return interp.numarg(b, 0) - interp.numarg(b, 1);
-		});
-		Reflect.setField(primTable, "*", function(b : Dynamic) : Dynamic{return interp.numarg(b, 0) * interp.numarg(b, 1);
-		});
-		Reflect.setField(primTable, "/", function(b : Dynamic) : Dynamic{return interp.numarg(b, 0) / interp.numarg(b, 1);
-		});
-		Reflect.setField(primTable, "randomFrom:to:", primRandom);
-		Reflect.setField(primTable, "<", function(b : Dynamic) : Dynamic{return compare(interp.arg(b, 0), interp.arg(b, 1)) < 0;
-		});
-		Reflect.setField(primTable, "=", function(b : Dynamic) : Dynamic{return compare(interp.arg(b, 0), interp.arg(b, 1)) == 0;
-		});
-		Reflect.setField(primTable, ">", function(b : Dynamic) : Dynamic{return compare(interp.arg(b, 0), interp.arg(b, 1)) > 0;
-		});
-		Reflect.setField(primTable, "&", function(b : Dynamic) : Dynamic{return interp.arg(b, 0) && interp.arg(b, 1);
-		});
-		Reflect.setField(primTable, "|", function(b : Dynamic) : Dynamic{return interp.arg(b, 0) || interp.arg(b, 1);
-		});
-		Reflect.setField(primTable, "not", function(b : Dynamic) : Dynamic{return !interp.arg(b, 0);
-		});
-		Reflect.setField(primTable, "abs", function(b : Dynamic) : Dynamic{return Math.abs(interp.numarg(b, 0));
-		});
-		Reflect.setField(primTable, "sqrt", function(b : Dynamic) : Dynamic{return Math.sqrt(interp.numarg(b, 0));
-		});
+		primTable[ "+"] = function(b : Dynamic) : Dynamic{return interp.numarg(b, 0) + interp.numarg(b, 1);
+		};
+		primTable[ "-"] = function(b : Dynamic) : Dynamic{return interp.numarg(b, 0) - interp.numarg(b, 1);
+		};
+		primTable[ "*"] = function(b : Dynamic) : Dynamic{return interp.numarg(b, 0) * interp.numarg(b, 1);
+		};
+		primTable[ "/"] = function(b : Dynamic) : Dynamic{return interp.numarg(b, 0) / interp.numarg(b, 1);
+		};
+		primTable[ "randomFrom:to:"] = primRandom;
+		primTable[ "<"] = function(b : Dynamic) : Dynamic{return compare(interp.arg(b, 0), interp.arg(b, 1)) < 0;
+		};
+		primTable[ "="] = function(b : Dynamic) : Dynamic{return compare(interp.arg(b, 0), interp.arg(b, 1)) == 0;
+		};
+		primTable[ ">"] = function(b : Dynamic) : Dynamic{return compare(interp.arg(b, 0), interp.arg(b, 1)) > 0;
+		};
+		primTable[ "&"] = function(b : Dynamic) : Dynamic{return interp.arg(b, 0) && interp.arg(b, 1);
+		};
+		primTable[ "|"] = function(b : Dynamic) : Dynamic{return interp.arg(b, 0) || interp.arg(b, 1);
+		};
+		primTable[ "not"] = function(b : Dynamic) : Dynamic{return !interp.arg(b, 0);
+		};
+		primTable[ "abs"] = function(b : Dynamic) : Dynamic{return Math.abs(interp.numarg(b, 0));
+		};
+		primTable[ "sqrt"] = function(b : Dynamic) : Dynamic{return Math.sqrt(interp.numarg(b, 0));
+		};
 
-		Reflect.setField(primTable, "concatenate:with:", function(b : Dynamic) : Dynamic{return ("" + interp.arg(b, 0) + interp.arg(b, 1)).substr(0, 10240);
-		});
-		Reflect.setField(primTable, "letter:of:", primLetterOf);
-		Reflect.setField(primTable, "stringLength:", function(b : Dynamic) : Dynamic{return Std.string(interp.arg(b, 0)).length;
-		});
+		primTable[ "concatenate:with:"] = function(b : Dynamic) : Dynamic{return ("" + interp.arg(b, 0) + interp.arg(b, 1)).substr(0, 10240);
+		};
+		primTable[ "letter:of:"] = primLetterOf;
+		primTable[ "stringLength:"] = function(b : Dynamic) : Dynamic{return Std.string(interp.arg(b, 0)).length;
+		};
 
-		Reflect.setField(primTable, "%", primModulo);
-		Reflect.setField(primTable, "rounded", function(b : Dynamic) : Dynamic{return Math.round(interp.numarg(b, 0));
-		});
-		Reflect.setField(primTable, "computeFunction:of:", primMathFunction);
+		primTable[ "%"] = primModulo;
+		primTable[ "rounded"] = function(b : Dynamic) : Dynamic{return Math.round(interp.numarg(b, 0));
+		};
+		primTable[ "computeFunction:of:"] = primMathFunction;
 
 		// clone
-		Reflect.setField(primTable, "createCloneOf", primCreateCloneOf);
-		Reflect.setField(primTable, "deleteClone", primDeleteClone);
-		Reflect.setField(primTable, "whenCloned", interp.primNoop);
+		primTable[ "createCloneOf"] = primCreateCloneOf;
+		primTable[ "deleteClone"] = primDeleteClone;
+		primTable[ "whenCloned"] = interp.primNoop;
 
 		// testing (for development)
-		Reflect.setField(primTable, "NOOP", interp.primNoop);
-		Reflect.setField(primTable, "COUNT", function(b : Dynamic) : Dynamic{return counter;
-		});
-		Reflect.setField(primTable, "INCR_COUNT", function(b : Dynamic) : Dynamic{counter++;
-		});
-		Reflect.setField(primTable, "CLR_COUNT", function(b : Dynamic) : Dynamic{counter = 0;
-		});
+		primTable[ "NOOP"] = interp.primNoop;
+		primTable[ "COUNT"] = function(b : Dynamic) : Dynamic {
+			return counter;
+		};
+		primTable[ "INCR_COUNT"] = function(b : Dynamic) : Dynamic {
+			counter++;
+			return null;
+		};
+		primTable[ "CLR_COUNT"] = function(b : Dynamic) : Dynamic {
+			counter = 0;
+			return null;
+		};
 
 		new LooksPrims(app, interp).addPrimsTo(primTable);
 		new MotionAndPenPrims(app, interp).addPrimsTo(primTable);
@@ -106,7 +111,7 @@ class Primitives
 		addOtherPrims(primTable);
 	}
 
-	private function addOtherPrims(primTable : Dictionary) : Void{
+	private function addOtherPrims(primTable : Map<String,Block->Dynamic>) : Void{
 		new SensingPrims(app, interp).addPrimsTo(primTable);
 		new ListPrims(app, interp).addPrimsTo(primTable);
 	}
@@ -198,12 +203,12 @@ class Primitives
 		return 1;
 	}
 
-	private function primCreateCloneOf(b : Block) : Void{
+	private function primCreateCloneOf(b : Block) : Dynamic{
 		var objName : String = interp.arg(b, 0);
 		var proto : ScratchSprite = app.stagePane.spriteNamed(objName);
 		if ("_myself_" == objName)             proto = cast(interp.activeThread.target, ScratchSprite);
-		if (proto == null)             return;
-		if (app.runtime.cloneCount > MaxCloneCount)             return;
+		if (proto == null)             return null;
+		if (app.runtime.cloneCount > MaxCloneCount)             return null;
 		var clone : ScratchSprite = new ScratchSprite();
 		if (proto.parent == app.stagePane) 
 			app.stagePane.addChildAt(clone, app.stagePane.getChildIndex(proto))
@@ -219,14 +224,16 @@ class Primitives
 			}
 		}
 		app.runtime.cloneCount++;
+		return null;
 	}
 
-	private function primDeleteClone(b : Block) : Void{
+	private function primDeleteClone(b : Block) : Dynamic{
 		var clone : ScratchSprite = interp.targetSprite();
-		if ((clone == null) || (!clone.isClone) || (clone.parent == null))             return;
+		if ((clone == null) || (!clone.isClone) || (clone.parent == null))             return null;
 		if (clone.bubble != null && clone.bubble.parent != null)             clone.bubble.parent.removeChild(clone.bubble);
 		clone.parent.removeChild(clone);
 		app.interp.stopThreadsFor(clone);
 		app.runtime.cloneCount--;
+		return null;
 	}
 }

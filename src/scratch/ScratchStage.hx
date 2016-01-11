@@ -99,7 +99,7 @@ class ScratchStage extends ScratchObj {
 		}
 		var app:Scratch = Scratch.app;
 		if ((app != null) && Std.is(app.gh.carriedObj, ScratchSprite)) {
-			var spr:ScratchSprite = ScratchSprite(app.gh.carriedObj);
+			var spr:ScratchSprite = cast(app.gh.carriedObj, ScratchSprite);
 			if ((spr.objName == spriteName) && !spr.isClone) return spr;
 		}
 		return null;
@@ -738,7 +738,7 @@ class ScratchStage extends ScratchObj {
 		for (i in 0...numChildren) {
 			var c:DisplayObject = getChildAt(i);
 			if (Std.is(c, ListWatcher)) {
-				ListWatcher(c).updateContents();
+				cast(c,ListWatcher).updateContents();
 			}
 		}
 	}
@@ -789,7 +789,7 @@ class ScratchStage extends ScratchObj {
 		var c:DisplayObject;
 		for (i in 0...numChildren) {
 			c = getChildAt(i);
-			if ((Std.is(c, ScratchSprite) && !ScratchSprite(c).isClone)
+			if ((Std.is(c, ScratchSprite) && !cast(c,ScratchSprite).isClone)
 				|| Std.is(c, Watcher) || Std.is(c, ListWatcher)) {
 				children.push(c);
 			}
@@ -800,7 +800,7 @@ class ScratchStage extends ScratchObj {
 		if(uiLayer != this) {
 			for (i in 0...uiLayer.numChildren) {
 				c = uiLayer.getChildAt(i);
-				if ((Std.is(c, ScratchSprite) && !ScratchSprite(c).isClone)
+				if ((Std.is(c, ScratchSprite) && !cast(c,ScratchSprite).isClone)
 						|| Std.is(c, Watcher) || Std.is(c, ListWatcher)) {
 					children.push(c);
 				}
@@ -843,7 +843,7 @@ class ScratchStage extends ScratchObj {
 		for (i in 0...children.length) {
 			o = children[i];
 			if (Std.is(o, ScratchSprite)) {
-				addChild(ScratchSprite(o));
+				addChild(cast(o,ScratchSprite));
 			} else if (o.sliderMin != undefined) { // o is a watcher record
 				o.target = spriteNameMap[o.target]; // update target before instantiating
 				if (o.target) {

@@ -493,7 +493,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		}
 		function fileSelected(e:Event):Void {
 			for (j in 0...files.fileList.length) {
-				var file:FileReference = FileReference(files.fileList[j]);
+				var file:FileReference = files.fileList[j];
 				file.addEventListener(Event.COMPLETE, fileLoaded);
 				file.load();
 			}

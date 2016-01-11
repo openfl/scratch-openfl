@@ -460,7 +460,7 @@ class GestureHandler
 		var menu : Menu;
 		try{menu = mouseTarget.menu(evt);
 		}        catch (e : Error){ };
-		if (menu != null)             menu.showOnStage(stage, evt.stageX / app.scaleX, evt.stageY / app.scaleY);
+		if (menu != null)             menu.showOnStage(stage, Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY));
 	}
 
 	private var lastGrowShrinkSprite : Sprite;

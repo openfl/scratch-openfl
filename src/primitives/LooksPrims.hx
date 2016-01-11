@@ -41,49 +41,63 @@ class LooksPrims
 		this.interp = interpreter;
 	}
 
-	public function addPrimsTo(primTable : Dictionary) : Void{
-		Reflect.setField(primTable, "lookLike:", primShowCostume);
-		Reflect.setField(primTable, "nextCostume", primNextCostume);
-		Reflect.setField(primTable, "costumeIndex", primCostumeIndex);
-		Reflect.setField(primTable, "costumeName", primCostumeName);
+	public function addPrimsTo(primTable : Map<String, Block->Dynamic>) : Void{
+		primTable[ "lookLike:"] = primShowCostume;
+		primTable[ "nextCostume"] = primNextCostume;
+		primTable[ "costumeIndex"] = primCostumeIndex;
+		primTable[ "costumeName"] = primCostumeName;
 
-		Reflect.setField(primTable, "showBackground:", primShowCostume);  // used by Scratch 1.4 and earlier (doesn't start scene hats)  
-		Reflect.setField(primTable, "nextBackground", primNextCostume);  // used by Scratch 1.4 and earlier (doesn't start scene hats)  
-		Reflect.setField(primTable, "backgroundIndex", primSceneIndex);
-		Reflect.setField(primTable, "sceneName", primSceneName);
-		Reflect.setField(primTable, "nextScene", function(b : Dynamic) : Dynamic{startScene("next backdrop", false);
-		});
-		Reflect.setField(primTable, "startScene", function(b : Dynamic) : Dynamic{startScene(interp.arg(b, 0), false);
-		});
-		Reflect.setField(primTable, "startSceneAndWait", function(b : Dynamic) : Dynamic{startScene(interp.arg(b, 0), true);
-		});
+		primTable[ "showBackground:"] = primShowCostume;  // used by Scratch 1.4 and earlier (doesn't start scene hats)  
+		primTable[ "nextBackground"] = primNextCostume;  // used by Scratch 1.4 and earlier (doesn't start scene hats)  
+		primTable[ "backgroundIndex"] = primSceneIndex;
+		primTable[ "sceneName"] = primSceneName;
+		primTable[ "nextScene"] = function(b : Dynamic) : Dynamic { 
+			startScene("next backdrop", false);
+			return null;
+		};
+		primTable[ "startScene"] = function(b : Dynamic) : Dynamic {
+			startScene(interp.arg(b, 0), false);
+			return null;
+		};
+		primTable[ "startSceneAndWait"] = function(b : Dynamic) : Dynamic {
+			startScene(interp.arg(b, 0), true);
+			return null;
+		};
 
-		Reflect.setField(primTable, "say:duration:elapsed:from:", function(b : Dynamic) : Dynamic{showBubbleAndWait(b, "talk");
-		});
-		Reflect.setField(primTable, "say:", function(b : Dynamic) : Dynamic{showBubble(b, "talk");
-		});
-		Reflect.setField(primTable, "think:duration:elapsed:from:", function(b : Dynamic) : Dynamic{showBubbleAndWait(b, "think");
-		});
-		Reflect.setField(primTable, "think:", function(b : Dynamic) : Dynamic{showBubble(b, "think");
-		});
+		primTable[ "say:duration:elapsed:from:"] = function(b : Dynamic) : Dynamic {
+			showBubbleAndWait(b, "talk");
+			return null;
+		};
+		primTable[ "say:"] = function(b : Dynamic) : Dynamic {
+			showBubble(b, "talk");
+			return null;
+		};
+		primTable[ "think:duration:elapsed:from:"] = function(b : Dynamic) : Dynamic {
+			showBubbleAndWait(b, "think");
+			return null;
+		};
+		primTable[ "think:"] = function(b : Dynamic) : Dynamic {
+			showBubble(b, "think");
+			return null;
+		};
 
-		Reflect.setField(primTable, "changeGraphicEffect:by:", primChangeEffect);
-		Reflect.setField(primTable, "setGraphicEffect:to:", primSetEffect);
-		Reflect.setField(primTable, "filterReset", primClearEffects);
+		primTable[ "changeGraphicEffect:by:"] = primChangeEffect;
+		primTable[ "setGraphicEffect:to:"] = primSetEffect;
+		primTable[ "filterReset"] = primClearEffects;
 
-		Reflect.setField(primTable, "changeSizeBy:", primChangeSize);
-		Reflect.setField(primTable, "setSizeTo:", primSetSize);
-		Reflect.setField(primTable, "scale", primSize);
+		primTable[ "changeSizeBy:"] = primChangeSize;
+		primTable[ "setSizeTo:"] = primSetSize;
+		primTable[ "scale"] = primSize;
 
-		Reflect.setField(primTable, "show", primShow);
-		Reflect.setField(primTable, "hide", primHide);
+		primTable[ "show"] = primShow;
+		primTable[ "hide"] = primHide;
 		//		primTable['hideAll']				= primHideAll;
 
-		Reflect.setField(primTable, "comeToFront", primGoFront);
-		Reflect.setField(primTable, "goBackByLayers:", primGoBack);
+		primTable[ "comeToFront"] = primGoFront;
+		primTable[ "goBackByLayers:"] = primGoBack;
 
-		Reflect.setField(primTable, "setVideoState", primSetVideoState);
-		Reflect.setField(primTable, "setVideoTransparency", primSetVideoTransparency);
+		//primTable[ "setVideoState"] = primSetVideoState;
+		//primTable[ "setVideoTransparency"] = primSetVideoTransparency;
 
 		//		primTable['scrollAlign']			= primScrollAlign;
 		//		primTable['scrollRight']			= primScrollRight;
@@ -91,18 +105,19 @@ class LooksPrims
 		//		primTable['xScroll']				= function(b:*):* { return app.stagePane.xScroll };
 		//		primTable['yScroll']				= function(b:*):* { return app.stagePane.yScroll };
 
-		Reflect.setField(primTable, "setRotationStyle", primSetRotationStyle);
+		primTable[ "setRotationStyle"] = primSetRotationStyle;
 	}
 
-	private function primNextCostume(b : Block) : Void{
+	private function primNextCostume(b : Block) : Dynamic{
 		var s : ScratchObj = interp.targetObj();
 		if (s != null)             s.showCostume(s.currentCostumeIndex + 1);
 		if (s.visible)             interp.redraw();
+		return null;
 	}
 
-	private function primShowCostume(b : Block) : Void{
+	private function primShowCostume(b : Block) : Dynamic{
 		var s : ScratchObj = interp.targetObj();
-		if (s == null)             return;
+		if (s == null)             return null;
 		var arg : Dynamic = interp.arg(b, 0);
 		if (Std.is(arg, Float) || Std.is(arg, Int)) {
 			s.showCostume(arg - 1);
@@ -121,10 +136,11 @@ class LooksPrims
 			else {
 				var n : Float = Interpreter.asNumber(arg);
 				if (!Math.isNaN(n))                     s.showCostume(n - 1)
-				else return;
+				else return null;
 			}
 		}
 		if (s.visible)             interp.redraw();
+		return null;
 	}
 
 	private function primCostumeIndex(b : Block) : Float{
@@ -199,56 +215,62 @@ class LooksPrims
 		if (s.visible)             interp.redraw();
 	}
 
-	private function primChangeEffect(b : Block) : Void{
+	private function primChangeEffect(b : Block) : Dynamic{
 		var s : ScratchObj = interp.targetObj();
-		if (s == null)             return;
+		if (s == null)             return null;
 		var filterName : String = interp.arg(b, 0);
 		var delta : Float = interp.numarg(b, 1);
-		if (delta == 0)             return;
+		if (delta == 0)             return null;
 
 		var newValue : Float = s.filterPack.getFilterSetting(filterName) + delta;
 		s.filterPack.setFilter(filterName, newValue);
 		s.applyFilters();
 		if (s.visible || s == Scratch.app.stagePane)             interp.redraw();
+		return null;
 	}
 
-	private function primSetEffect(b : Block) : Void{
+	private function primSetEffect(b : Block) : Dynamic{
 		var s : ScratchObj = interp.targetObj();
-		if (s == null)             return;
+		if (s == null)             return null;
 		var filterName : String = interp.arg(b, 0);
 		var newValue : Float = interp.numarg(b, 1);
 		if (s.filterPack.setFilter(filterName, newValue)) 
 			s.applyFilters();
 		if (s.visible || s == Scratch.app.stagePane)             interp.redraw();
+		return null;
 	}
 
-	private function primClearEffects(b : Block) : Void{
+	private function primClearEffects(b : Block) : Dynamic{
 		var s : ScratchObj = interp.targetObj();
 		s.clearFilters();
 		s.applyFilters();
 		if (s.visible || s == Scratch.app.stagePane)             interp.redraw();
+		return null;
 	}
 
-	private function primChangeSize(b : Block) : Void{
+	private function primChangeSize(b : Block) : Dynamic{
 		var s : ScratchSprite = interp.targetSprite();
-		if (s == null)             return;
+		if (s == null)             return null;
 		var oldScale : Float = s.scaleX;
 		s.setSize(s.getSize() + interp.numarg(b, 0));
 		if (s.visible && (s.scaleX != oldScale))             interp.redraw();
+		return null;
 	}
 
-	private function primSetRotationStyle(b : Block) : Void{
+	private function primSetRotationStyle(b : Block) : Dynamic{
 		var s : ScratchSprite = interp.targetSprite();
 		var newStyle : String = try cast(interp.arg(b, 0), String) catch(e:Dynamic) null;
-		if ((s == null) || (newStyle == null))             return;
+		if ((s == null) || (newStyle == null))             return null;
 		s.setRotationStyle(newStyle);
+		return null;
 	}
 
-	private function primSetSize(b : Block) : Void{
+	private function primSetSize(b : Block) : Dynamic{
 		var s : ScratchSprite = interp.targetSprite();
-		if (s == null)             return;
+		if (s == null)             return null;
 		s.setSize(interp.numarg(b, 0));
 		if (s.visible)             interp.redraw();
+		return null;
 	}
 
 	private function primSize(b : Block) : Float{
@@ -257,27 +279,29 @@ class LooksPrims
 		return Math.round(s.getSize());
 	}
 
-	private function primShow(b : Block) : Void{
+	private function primShow(b : Block) : Dynamic{
 		var s : ScratchSprite = interp.targetSprite();
-		if (s == null)             return;
+		if (s == null)             return null;
 		s.visible = true;
 		if (!app.isIn3D)             s.applyFilters();
 		s.updateBubble();
 		if (s.visible)             interp.redraw();
+		return null;
 	}
 
-	private function primHide(b : Block) : Void{
+	private function primHide(b : Block) : Dynamic{
 		var s : ScratchSprite = interp.targetSprite();
-		if ((s == null) || !s.visible)             return;
+		if ((s == null) || !s.visible)             return null;
 		s.visible = false;
 		if (!app.isIn3D)             s.applyFilters();
 		s.updateBubble();
 		interp.redraw();
+		return null;
 	}
 
-	private function primHideAll(b : Block) : Void{
+	private function primHideAll(b : Block) : Dynamic{
 		// Hide all sprites and delete all clones. Only works from the stage.
-		if (!interp.targetObj().isStage)             return;
+		if (!interp.targetObj().isStage)             return null;
 		app.stagePane.deleteClones();
 		for (i in 0...app.stagePane.numChildren){
 			var o : Dynamic = app.stagePane.getChildAt(i);
@@ -287,18 +311,20 @@ class LooksPrims
 			}
 		}
 		interp.redraw();
+		return null;
 	}
 
-	private function primGoFront(b : Block) : Void{
+	private function primGoFront(b : Block) : Dynamic{
 		var s : ScratchSprite = interp.targetSprite();
-		if ((s == null) || (s.parent == null))             return;
+		if ((s == null) || (s.parent == null))             return null;
 		s.parent.setChildIndex(s, s.parent.numChildren - 1);
 		if (s.visible)             interp.redraw();
+		return null;
 	}
 
-	private function primGoBack(b : Block) : Void{
+	private function primGoBack(b : Block) : Dynamic{
 		var s : ScratchSprite = interp.targetSprite();
-		if ((s == null) || (s.parent == null))             return;
+		if ((s == null) || (s.parent == null))             return null;
 		var newIndex : Int = Std.int(s.parent.getChildIndex(s) - interp.numarg(b, 0));
 		newIndex = Std.int(Math.max(minSpriteLayer(), Math.min(newIndex, s.parent.numChildren - 1)));
 
@@ -306,6 +332,7 @@ class LooksPrims
 			s.parent.setChildIndex(s, newIndex);
 			if (s.visible)                 interp.redraw();
 		}
+		return null;
 	}
 
 	private function minSpriteLayer() : Int{
@@ -314,27 +341,32 @@ class LooksPrims
 		return stg.getChildIndex((stg.videoImage != null) ? stg.videoImage : stg.penLayer) + 1;
 	}
 
-	private function primSetVideoState(b : Block) : Void{
+	private function primSetVideoState(b : Block) : Dynamic{
 		app.stagePane.setVideoState(interp.arg(b, 0));
+		return null;
 	}
 
-	private function primSetVideoTransparency(b : Block) : Void{
+	private function primSetVideoTransparency(b : Block) : Dynamic{
 		app.stagePane.setVideoTransparency(interp.numarg(b, 0));
 		app.stagePane.setVideoState("on");
+		return null;
 	}
 
-	private function primScrollAlign(b : Block) : Void{
-		if (!interp.targetObj().isStage)             return;
+	private function primScrollAlign(b : Block) : Dynamic{
+		if (!interp.targetObj().isStage)             return null;
 		app.stagePane.scrollAlign(interp.arg(b, 0));
+		return null;
 	}
 
-	private function primScrollRight(b : Block) : Void{
-		if (!interp.targetObj().isStage)             return;
+	private function primScrollRight(b : Block) : Dynamic{
+		if (!interp.targetObj().isStage)             return null;
 		app.stagePane.scrollRight(interp.numarg(b, 0));
+		return null;
 	}
 
-	private function primScrollUp(b : Block) : Void{
-		if (!interp.targetObj().isStage)             return;
+	private function primScrollUp(b : Block) : Dynamic{
+		if (!interp.targetObj().isStage)             return null;
 		app.stagePane.scrollUp(interp.numarg(b, 0));
+		return null;
 	}
 }

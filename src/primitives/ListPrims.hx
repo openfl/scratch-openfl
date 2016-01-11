@@ -43,15 +43,15 @@ class ListPrims
 		this.interp = interpreter;
 	}
 
-	public function addPrimsTo(primTable : Dictionary) : Void{
+	public function addPrimsTo(primTable : Map<String, Block->Dynamic>) : Void{
 		primTable[Specs.GET_LIST] = primContents;
-		Reflect.setField(primTable, "append:toList:", primAppend);
-		Reflect.setField(primTable, "deleteLine:ofList:", primDelete);
-		Reflect.setField(primTable, "insert:at:ofList:", primInsert);
-		Reflect.setField(primTable, "setLine:ofList:to:", primReplace);
-		Reflect.setField(primTable, "getLine:ofList:", primGetItem);
-		Reflect.setField(primTable, "lineCountOfList:", primLength);
-		Reflect.setField(primTable, "list:contains:", primContains);
+		primTable[ "append:toList:"] = primAppend;
+		primTable[ "deleteLine:ofList:"] = primDelete;
+		primTable[ "insert:at:ofList:"] = primInsert;
+		primTable[ "setLine:ofList:to:"] = primReplace;
+		primTable[ "getLine:ofList:"] = primGetItem;
+		primTable[ "lineCountOfList:"] = primLength;
+		primTable[ "list:contains:"] = primContains;
 	}
 
 	private function primContents(b : Block) : String{
@@ -67,32 +67,34 @@ class ListPrims
 		return (list.contents.join((allSingleLetters) ? "" : " "));
 	}
 
-	private function primAppend(b : Block) : Void{
+	private function primAppend(b : Block) : Dynamic{
 		var list : ListWatcher = listarg(b, 1);
-		if (list == null)             return;
+		if (list == null)             return null;
 		listAppend(list, interp.arg(b, 0));
 		if (list.visible)             list.updateWatcher(list.contents.length, false, interp);
+		return null;
 	}
 
 	private function listAppend(list : ListWatcher, item : Dynamic) : Void{
 		list.contents.push(item);
 	}
 
-	private function primDelete(b : Block) : Void{
+	private function primDelete(b : Block) : Dynamic{
 		var which : Dynamic = interp.arg(b, 0);
 		var list : ListWatcher = listarg(b, 1);
-		if (list == null)             return;
+		if (list == null)             return null;
 		var len : Int = list.contents.length;
 		if (which == "all") {
 			listSet(list, []);
 			if (list.visible)                 list.updateWatcher(-1, false, interp);
 		}
 		var n : Float = ((which == "last")) ? len : Std.parseFloat(which);
-		if (Math.isNaN(n))             return;
+		if (Math.isNaN(n))             return null;
 		var i : Int = Math.round(n);
-		if ((i < 1) || (i > len))             return;
+		if ((i < 1) || (i > len))             return null;
 		listDelete(list, i);
 		if (list.visible)             list.updateWatcher((((i == len)) ? i - 1 : i), false, interp);
+		return null;
 	}
 
 	private function listSet(list : ListWatcher, newValue : Array<Dynamic>) : Void{
@@ -103,34 +105,36 @@ class ListPrims
 		list.contents.splice(i - 1, 1);
 	}
 
-	private function primInsert(b : Block) : Void{
+	private function primInsert(b : Block) : Dynamic{
 		var val : Dynamic = interp.arg(b, 0);
 		var where : Dynamic = interp.arg(b, 1);
 		var list : ListWatcher = listarg(b, 2);
-		if (list == null)             return;
+		if (list == null)             return null;
 		if (where == "last") {
 			listAppend(list, val);
 			if (list.visible)                 list.updateWatcher(list.contents.length, false, interp);
 		}
 		else {
 			var i : Int = computeIndex(where, list.contents.length + 1);
-			if (i < 0)                 return;
+			if (i < 0)                 return null;
 			listInsert(list, i, val);
 			if (list.visible)                 list.updateWatcher(i, false, interp);
 		}
+		return null;
 	}
 
 	private function listInsert(list : ListWatcher, i : Int, item : Dynamic) : Void{
 		list.contents.splice(i - 1, 0, item);
 	}
 
-	private function primReplace(b : Block) : Void{
+	private function primReplace(b : Block) : Dynamic{
 		var list : ListWatcher = listarg(b, 1);
-		if (list == null)             return;
+		if (list == null)             return null;
 		var i : Int = computeIndex(interp.arg(b, 0), list.contents.length);
-		if (i < 0)             return;
+		if (i < 0)             return null;
 		listReplace(list, i, interp.arg(b, 2));
 		if (list.visible)             list.updateWatcher(i, false, interp);
+		return null;
 	}
 
 	private function listReplace(list : ListWatcher, i : Int, item : Dynamic) : Void{

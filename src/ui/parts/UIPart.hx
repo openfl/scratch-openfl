@@ -92,7 +92,7 @@ class UIPart extends Sprite
 		g.curveTo(cx, cy, p2x, p2y);
 	}
 
-	private static function drawBoxBkgGradientShape(g : Graphics, angle : Float, colors : Array<Dynamic>, ratios : Array<Dynamic>, path : Array<Dynamic>, w : Float, h : Float) : Void{
+	private static function drawBoxBkgGradientShape(g : Graphics, angle : Float, colors : Array<UInt>, ratios : Array<Dynamic>, path : Array<Dynamic>, w : Float, h : Float) : Void{
 		var m : Matrix = new Matrix();
 		m.createGradientBox(w, h, angle, 0, 0);
 		g.beginGradientFill(GradientType.LINEAR, colors, [100, 100], ratios, m);

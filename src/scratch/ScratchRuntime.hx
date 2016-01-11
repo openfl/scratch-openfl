@@ -788,7 +788,7 @@ class ScratchRuntime {
 		}
 
 		for (obj in allBroadcastBlocksWithMsg(oldMsg)) {
-				Block(obj).broadcastMsg = newMsg;
+				cast(obj,Block).broadcastMsg = newMsg;
 		}
 
 		app.updatePalette();
@@ -982,7 +982,7 @@ class ScratchRuntime {
 			if (isList && targetObj.ownsList(varName)) return;
 		}
 		var w:DisplayObject = isList ? watcherForList(targetObj, varName) : watcherForVar(targetObj, varName);
-		if (Std.is(w, ListWatcher)) ListWatcher(w).prepareToShow();
+		if (Std.is(w, ListWatcher)) cast(w,ListWatcher).prepareToShow();
 		if (w != null && (!w.visible || w.parent == null)) {
 			showOnStage(w);
 			app.updatePalette(false);
@@ -1078,7 +1078,7 @@ class ScratchRuntime {
 				v.watcher = existing;
 			} else {
 				v.watcher = new Watcher();
-				Watcher(v.watcher).initForVar(targetObj, vName);
+				cast(v.watcher, Watcher).initForVar(targetObj, vName);
 			}
 		}
 		return v.watcher;

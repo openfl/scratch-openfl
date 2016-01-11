@@ -397,7 +397,7 @@ class Watcher extends Sprite implements DragClient
 	}
 
 	private function sliderMinMaxDialog() : Void{
-		var d : DialogBox = new DialogBox(setMinMax);
+		var d : DialogBox;
 		function setMinMax() : Void{
 			var min : String = d.getField("Min");
 			var max : String = d.getField("Max");
@@ -410,6 +410,7 @@ class Watcher extends Sprite implements DragClient
 			setSliderValue(sliderMin);
 			Scratch.app.setSaveNeeded();
 		};
+		d = new DialogBox(setMinMax);
 		d.addTitle("Slider Range");
 		d.addField("Min", 120, isDiscrete || Std.int(sliderMin) != (sliderMin != 0) ? sliderMin : Std.int(sliderMin) + ".0");
 		d.addField("Max", 120, sliderMax);

@@ -66,7 +66,7 @@ class CSS
 	public static var projectInfoFormat : TextFormat = new TextFormat(font, 12, textColor);
 
 	// Section title bars
-	public static var titleBarColors : Array<Dynamic> = [white, tabColor];
+	public static var titleBarColors : Array<UInt> = [white, tabColor];
 	public static inline var titleBarH : Int = 30;
 
 	public function new()

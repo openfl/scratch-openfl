@@ -137,7 +137,7 @@ class BlockColorEditor extends Sprite
 			if ((r[0] > 0) && (r[0] <= 20))                 m.addItem(r[1]);
 		}
 		var p : Point = category.localToGlobal(new Point(0, 0));
-		m.showOnStage(stage, p.x + 1, p.y + category.height - 1);
+		m.showOnStage(stage, Std.int(p.x + 1), Std.int(p.y + category.height - 1));
 	}
 
 	private function selectCategory(catName : String) : Void{
@@ -152,7 +152,7 @@ class BlockColorEditor extends Sprite
 		blockShape.x = 5;
 		blockShape.y = 30;
 
-		blockLabel = makeLabel("", 11, blockShape.x + 4, blockShape.y + 3);
+		blockLabel = makeLabel("", 11, Std.int(blockShape.x + 4), Std.int(blockShape.y + 3));
 		blockLabel.defaultTextFormat = new TextFormat("Arial", 11, 0xFFFFFF, true);
 		blockLabel.text = "block color test";
 	}

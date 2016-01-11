@@ -44,50 +44,52 @@ class SensingPrims
 		this.interp = interpreter;
 	}
 
-	public function addPrimsTo(primTable : Dictionary) : Void{
+	public function addPrimsTo(primTable : Map<String, Block->Dynamic>) : Void{
 		// sensing
-		Reflect.setField(primTable, "touching:", primTouching);
-		Reflect.setField(primTable, "touchingColor:", primTouchingColor);
-		Reflect.setField(primTable, "color:sees:", primColorSees);
+		primTable[ "touching:"] = primTouching;
+		primTable[ "touchingColor:"] = primTouchingColor;
+		primTable[ "color:sees:"] = primColorSees;
 
-		Reflect.setField(primTable, "doAsk", primAsk);
-		Reflect.setField(primTable, "answer", function(b : Dynamic) : Dynamic{return app.runtime.lastAnswer;
-		});
+		primTable[ "doAsk"] = primAsk;
+		primTable[ "answer"] = function(b : Dynamic) : Dynamic{return app.runtime.lastAnswer;
+		};
 
-		Reflect.setField(primTable, "mousePressed", function(b : Dynamic) : Dynamic{return app.gh.mouseIsDown;
-		});
-		Reflect.setField(primTable, "mouseX", function(b : Dynamic) : Dynamic{return app.stagePane.scratchMouseX();
-		});
-		Reflect.setField(primTable, "mouseY", function(b : Dynamic) : Dynamic{return app.stagePane.scratchMouseY();
-		});
-		Reflect.setField(primTable, "timer", function(b : Dynamic) : Dynamic{return app.runtime.timer();
-		});
-		Reflect.setField(primTable, "timerReset", function(b : Dynamic) : Dynamic{app.runtime.timerReset();
-		});
-		Reflect.setField(primTable, "keyPressed:", primKeyPressed);
-		Reflect.setField(primTable, "distanceTo:", primDistanceTo);
-		Reflect.setField(primTable, "getAttribute:of:", primGetAttribute);
-		Reflect.setField(primTable, "soundLevel", function(b : Dynamic) : Dynamic{return app.runtime.soundLevel();
-		});
-		Reflect.setField(primTable, "isLoud", function(b : Dynamic) : Dynamic{return app.runtime.isLoud();
-		});
-		Reflect.setField(primTable, "timestamp", primTimestamp);
-		Reflect.setField(primTable, "timeAndDate", function(b : Dynamic) : Dynamic{return app.runtime.getTimeString(interp.arg(b, 0));
-		});
-		Reflect.setField(primTable, "getUserName", function(b : Dynamic) : Dynamic{return "";
-		});
+		primTable[ "mousePressed"] = function(b : Dynamic) : Dynamic{return app.gh.mouseIsDown;
+		};
+		primTable[ "mouseX"] = function(b : Dynamic) : Dynamic{return app.stagePane.scratchMouseX();
+		};
+		primTable[ "mouseY"] = function(b : Dynamic) : Dynamic{return app.stagePane.scratchMouseY();
+		};
+		primTable[ "timer"] = function(b : Dynamic) : Dynamic{return app.runtime.timer();
+		};
+		primTable[ "timerReset"] = function(b : Dynamic) : Dynamic {
+			app.runtime.timerReset();
+			return null;
+		};
+		primTable[ "keyPressed:"] = primKeyPressed;
+		primTable[ "distanceTo:"] = primDistanceTo;
+		primTable[ "getAttribute:of:"] = primGetAttribute;
+		primTable[ "soundLevel"] = function(b : Dynamic) : Dynamic{return app.runtime.soundLevel();
+		};
+		primTable[ "isLoud"] = function(b : Dynamic) : Dynamic{return app.runtime.isLoud();
+		};
+		primTable[ "timestamp"] = primTimestamp;
+		primTable[ "timeAndDate"] = function(b : Dynamic) : Dynamic{return app.runtime.getTimeString(interp.arg(b, 0));
+		};
+		primTable[ "getUserName"] = function(b : Dynamic) : Dynamic{return "";
+		};
 
 		// sensor
-		//Reflect.setField(primTable, "sensor:", function(b : Dynamic) : Dynamic{return app.runtime.getSensor(interp.arg(b, 0));
-		//});
-		//Reflect.setField(primTable, "sensorPressed:", function(b : Dynamic) : Dynamic{return app.runtime.getBooleanSensor(interp.arg(b, 0));
-		//});
+		//primTable[ "sensor:"] = function(b : Dynamic) : Dynamic{return app.runtime.getSensor(interp.arg(b, 0));
+		//};
+		//primTable[ "sensorPressed:"] = function(b : Dynamic) : Dynamic{return app.runtime.getBooleanSensor(interp.arg(b, 0));
+		//};
 
 		// variable and list watchers
-		Reflect.setField(primTable, "showVariable:", primShowWatcher);
-		Reflect.setField(primTable, "hideVariable:", primHideWatcher);
-		Reflect.setField(primTable, "showList:", primShowListWatcher);
-		Reflect.setField(primTable, "hideList:", primHideListWatcher);
+		primTable[ "showVariable:"] = primShowWatcher;
+		primTable[ "hideVariable:"] = primHideWatcher;
+		primTable[ "showList:"] = primShowListWatcher;
+		primTable[ "hideList:"] = primHideListWatcher;
 	}
 
 	// TODO: move to stage
@@ -212,11 +214,11 @@ class SensingPrims
 		return app.stagePane.getBitmapWithoutSpriteFilteredByColor(s, c);
 	}
 
-	private function primAsk(b : Block) : Void{
+	private function primAsk(b : Block) : Dynamic{
 		if (app.runtime.askPromptShowing()) {
 			// wait if (1) some other sprite is asking (2) this question is answered (when firstTime is false)
 			interp.doYield();
-			return;
+			return null;
 		}
 		var obj : ScratchObj = interp.targetObj();
 		if (interp.activeThread.firstTime) {
@@ -235,6 +237,7 @@ class SensingPrims
 			if ((Std.is(obj, ScratchSprite)) && (obj.visible))                 cast((obj), ScratchSprite).hideBubble();
 			interp.activeThread.firstTime = true;
 		}
+		return null;
 	}
 
 	private function primKeyPressed(b : Block) : Bool{
@@ -303,21 +306,25 @@ class SensingPrims
 	private function primShowWatcher(b : Block) : Dynamic{
 		var obj : ScratchObj = interp.targetObj();
 		if (obj != null)             app.runtime.showVarOrListFor(interp.arg(b, 0), false, obj);
+		return null;
 	}
 
 	private function primHideWatcher(b : Block) : Dynamic{
 		var obj : ScratchObj = interp.targetObj();
 		if (obj != null)             app.runtime.hideVarOrListFor(interp.arg(b, 0), false, obj);
+		return null;
 	}
 
 	private function primShowListWatcher(b : Block) : Dynamic{
 		var obj : ScratchObj = interp.targetObj();
 		if (obj != null)             app.runtime.showVarOrListFor(interp.arg(b, 0), true, obj);
+		return null;
 	}
 
 	private function primHideListWatcher(b : Block) : Dynamic{
 		var obj : ScratchObj = interp.targetObj();
 		if (obj != null)             app.runtime.hideVarOrListFor(interp.arg(b, 0), true, obj);
+		return null;
 	}
 
 	private function primTimestamp(b : Block) : Dynamic{

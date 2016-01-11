@@ -74,7 +74,7 @@ class Interpreter
 	public var turboMode : Bool = false;
 
 	private var app : Scratch;
-	private var primTable : Dictionary;  // maps opcodes to functions  
+	private var primTable : Map<String,Block->Dynamic>;  // maps opcodes to functions  
 	private var threads : Array<Dynamic> = [];  // all threads  
 	private var yield : Bool;  // set true to indicate that active thread should yield control  
 	private var startTime : Int;  // start time for stepThreads()  
@@ -319,7 +319,7 @@ class Interpreter
 			//if (op.indexOf(".") > -1)                 
 				//b.opFunction = app.extensionManager.primExtensionOp;
 			//else 
-			b.opFunction = ((Reflect.field(primTable, op) == null)) ? primNoop : Reflect.field(primTable, op);
+			b.opFunction = (!primTable.exists(op)) ? primNoop : primTable[op];
 		}  // TODO: Optimize this into a cached check if the args *could* block at all  
 
 
@@ -446,48 +446,67 @@ class Interpreter
 	/* Primitives */
 
 	public function isImplemented(op : String) : Bool{
-		return Reflect.field(primTable, op) != null;
+		return primTable.exists(op);
 	}
 
-	public function getPrim(op : String) : Void->Dynamic {return Reflect.field(primTable, op);
+	public function getPrim(op : String) : Block->Dynamic {return primTable[op];
 	}
 
 	private function initPrims() : Void{
-		primTable = new Dictionary();
+		primTable = new Map<String, Block->Dynamic>();
 		// control
-		Reflect.setField(primTable, "whenGreenFlag", primNoop);
-		Reflect.setField(primTable, "whenKeyPressed", primNoop);
-		Reflect.setField(primTable, "whenClicked", primNoop);
-		Reflect.setField(primTable, "whenSceneStarts", primNoop);
-		Reflect.setField(primTable, "wait:elapsed:from:", primWait);
-		Reflect.setField(primTable, "doForever", function(b : Dynamic) : Dynamic{startCmdList(b.subStack1, true);
-		});
-		Reflect.setField(primTable, "doRepeat", primRepeat);
-		Reflect.setField(primTable, "broadcast:", function(b : Dynamic) : Dynamic{broadcast(arg(b, 0), false);
-		});
-		Reflect.setField(primTable, "doBroadcastAndWait", function(b : Dynamic) : Dynamic{broadcast(arg(b, 0), true);
-		});
-		Reflect.setField(primTable, "whenIReceive", primNoop);
-		Reflect.setField(primTable, "doForeverIf", function(b : Dynamic) : Dynamic{if (arg(b, 0))                 startCmdList(b.subStack1, true)
+		primTable[ "whenGreenFlag"] = primNoop;
+		primTable[ "whenKeyPressed"] = primNoop;
+		primTable[ "whenClicked"] = primNoop;
+		primTable[ "whenSceneStarts"] = primNoop;
+		primTable[ "wait:elapsed:from:"] = primWait;
+		primTable[ "doForever"] = function(b : Dynamic) : Dynamic {
+			startCmdList(b.subStack1, true);
+			return null;
+		};
+		primTable[ "doRepeat"] = primRepeat;
+		primTable[ "broadcast:"] = function(b : Dynamic) : Dynamic {
+			broadcast(arg(b, 0), false);
+			return null;
+		};
+		primTable[ "doBroadcastAndWait"] = function(b : Dynamic) : Dynamic {
+			broadcast(arg(b, 0), true);
+			return null;
+		};
+		primTable[ "whenIReceive"] = primNoop;
+		primTable[ "doForeverIf"] = function(b : Dynamic) : Dynamic {
+			if (arg(b, 0))                 startCmdList(b.subStack1, true);
 			else yield = true;
-		});
-		Reflect.setField(primTable, "doForLoop", primForLoop);
-		Reflect.setField(primTable, "doIf", function(b : Dynamic) : Dynamic{if (arg(b, 0))                 startCmdList(b.subStack1);
-		});
-		Reflect.setField(primTable, "doIfElse", function(b : Dynamic) : Dynamic{if (arg(b, 0))                 startCmdList(b.subStack1)
+			return null;
+		};
+		primTable[ "doForLoop"] = primForLoop;
+		primTable[ "doIf"] = function(b : Dynamic) : Dynamic {
+			if (arg(b, 0))                 startCmdList(b.subStack1);
+			return null;
+		};
+		primTable[ "doIfElse"] = function(b : Dynamic) : Dynamic {
+			if (arg(b, 0))                 startCmdList(b.subStack1);
 			else startCmdList(b.subStack2);
-		});
-		Reflect.setField(primTable, "doWaitUntil", function(b : Dynamic) : Dynamic{if (!arg(b, 0))                 yield = true;
-		});
-		Reflect.setField(primTable, "doWhile", function(b : Dynamic) : Dynamic{if (arg(b, 0))                 startCmdList(b.subStack1, true);
-		});
-		Reflect.setField(primTable, "doUntil", function(b : Dynamic) : Dynamic{if (!arg(b, 0))                 startCmdList(b.subStack1, true);
-		});
-		Reflect.setField(primTable, "doReturn", primReturn);
-		Reflect.setField(primTable, "stopAll", function(b : Dynamic) : Dynamic{app.runtime.stopAll();yield = true;
-		});
-		Reflect.setField(primTable, "stopScripts", primStop);
-		Reflect.setField(primTable, "warpSpeed", primOldWarpSpeed);
+			return null;
+		};
+		primTable[ "doWaitUntil"] = function(b : Dynamic) : Dynamic {
+			if (!arg(b, 0))                 yield = true;
+			return null;
+		};
+		primTable[ "doWhile"] = function(b : Dynamic) : Dynamic {
+			if (arg(b, 0))                 startCmdList(b.subStack1, true);
+			return null;
+		};
+		primTable[ "doUntil"] = function(b : Dynamic) : Dynamic {
+			if (!arg(b, 0))                 startCmdList(b.subStack1, true);
+			return null;
+		};
+		primTable[ "doReturn"] = primReturn;
+		primTable[ "stopAll"] = function(b : Dynamic) : Dynamic { app.runtime.stopAll(); yield = true;
+			return null;
+		};
+		primTable[ "stopScripts"] = primStop;
+		primTable[ "warpSpeed"] = primOldWarpSpeed;
 
 		// procedures
 		primTable[Specs.CALL] = primCall;
@@ -499,15 +518,15 @@ class Interpreter
 		primTable[Specs.GET_PARAM] = primGetParam;
 
 		// edge-trigger hat blocks
-		Reflect.setField(primTable, "whenDistanceLessThan", primNoop);
-		Reflect.setField(primTable, "whenSensorConnected", primNoop);
-		Reflect.setField(primTable, "whenSensorGreaterThan", primNoop);
-		Reflect.setField(primTable, "whenTiltIs", primNoop);
+		primTable[ "whenDistanceLessThan"] = primNoop;
+		primTable[ "whenSensorConnected"] = primNoop;
+		primTable[ "whenSensorGreaterThan"] = primNoop;
+		primTable[ "whenTiltIs"] = primNoop;
 
 		addOtherPrims(primTable);
 	}
 
-	private function addOtherPrims(primTable : Dictionary) : Void{
+	private function addOtherPrims(primTable : Map<String,Block->Dynamic>) : Void{
 		// other primitives
 		new Primitives(app, this).addPrimsTo(primTable);
 	}
@@ -519,23 +538,23 @@ class Interpreter
 			if (spec.length > 3) {
 				op = spec[3];
 				allOps.push(op);
-				if (Reflect.field(primTable, op) == null)                     trace("Unimplemented: " + op);
+				if (!primTable.exists(op))                     trace("Unimplemented: " + op);
 			}
 		}
-		for (op in Reflect.fields(primTable)){
+		for (op in primTable.keys()){
 			if (Lambda.indexOf(allOps, op) < 0)                 trace("Not in specs: " + op);
 		}
 	}
 
-	public function primNoop(b : Dynamic) : Dynamic { return null;
+	public function primNoop(b : Block) : Dynamic { return null;
 	}
 
-	private function primForLoop(b : Block) : Void{
+	private function primForLoop(b : Block) : Dynamic {
 		var list : Array<Dynamic> = [];
 		var loopVar : Variable;
 
 		if (activeThread.firstTime) {
-			if (!(Std.is(arg(b, 0), String)))                 return;
+			if (!(Std.is(arg(b, 0), String)))                 return null;
 			var listArg : Dynamic = arg(b, 1);
 			if (Std.is(listArg, Array)) {
 				list = try cast(listArg, Array<Dynamic/*AS3HX WARNING no type*/>) catch(e:Dynamic) null;
@@ -569,15 +588,17 @@ class Interpreter
 			activeThread.tmp = 0;
 			activeThread.firstTime = true;
 		}
+		return null;
 	}
 
-	private function primOldWarpSpeed(b : Block) : Void{
+	private function primOldWarpSpeed(b : Block) : Dynamic{
 		// Semi-support for old warp block: run substack at normal speed.
-		if (b.subStack1 == null)             return;
+		if (b.subStack1 == null)             return null;
 		startCmdList(b.subStack1);
+		return null;
 	}
 
-	private function primRepeat(b : Block) : Void{
+	private function primRepeat(b : Block) : Dynamic{
 		if (activeThread.firstTime) {
 			var repeatCount : Float = Math.max(0, Math.min(Math.round(numarg(b, 0)), 2147483647));  // clip to range: 0 to 2^31-1  
 			activeThread.tmp = Std.int(repeatCount);
@@ -590,23 +611,26 @@ class Interpreter
 		else {
 			activeThread.firstTime = true;
 		}
+		return null;
 	}
 
-	private function primStop(b : Block) : Void{
+	private function primStop(b : Block) : Dynamic {
 		var type : String = arg(b, 0);
 		if (type == "all") {app.runtime.stopAll();yield = true;
 		}
 		if (type == "this script")             primReturn(b);
 		if (type == "other scripts in sprite")             stopThreadsFor(activeThread.target, true);
 		if (type == "other scripts in stage")             stopThreadsFor(activeThread.target, true);
+		return null;
 	}
 
-	private function primWait(b : Block) : Void{
+	private function primWait(b : Block) : Dynamic{
 		if (activeThread.firstTime) {
 			startTimer(numarg(b, 0));
 			redraw();
 		}
 		else checkTimer();
+		return null;
 	}
 
 	// Broadcast and scene starting
@@ -630,7 +654,7 @@ class Interpreter
 			activeThread.firstTime = false;
 		}
 		var done : Bool = true;
-		for (t/* AS3HX WARNING could not determine type for var: t exp: EField(EIdent(activeThread),tmpObj) type: null */ in activeThread.tmpObj){if (Lambda.indexOf(threads, t) >= 0)                 done = false;
+		for (t  in cast(activeThread.tmpObj, Array<Dynamic>)){if (Lambda.indexOf(threads, t) >= 0)                 done = false;
 		}
 		if (done) {
 			activeThread.tmpObj = null;
@@ -661,7 +685,7 @@ class Interpreter
 			activeThread.firstTime = false;
 		}
 		var done : Bool = true;
-		for (t/* AS3HX WARNING could not determine type for var: t exp: EField(EIdent(activeThread),tmpObj) type: null */ in activeThread.tmpObj){if (Lambda.indexOf(threads, t) >= 0)                 done = false;
+		for (t/* AS3HX WARNING could not determine type for var: t exp: EField(EIdent(activeThread),tmpObj) type: null */ in cast(activeThread.tmpObj, Array<Dynamic>)){if (Lambda.indexOf(threads, t) >= 0)                 done = false;
 		}
 		if (done) {
 			activeThread.tmpObj = null;
@@ -674,7 +698,7 @@ class Interpreter
 
 	// Procedure call/return
 
-	private function primCall(b : Block) : Void{
+	private function primCall(b : Block) : Dynamic{
 		// Call a procedure. Handle recursive calls and "warp" procedures.
 		// The activeThread.firstTime flag is used to mark the first call
 		// to a procedure running in warp mode. activeThread.firstTime is
@@ -688,7 +712,7 @@ class Interpreter
 			proc = obj.lookupProcedure(spec);
 			obj.procCache[spec] = proc;
 		}
-		if (proc == null)             return;
+		if (proc == null)             return null;
 
 		if (warpThread != null) {
 			activeThread.firstTime = false;
@@ -710,15 +734,17 @@ class Interpreter
 		for (i in 0...argCount){argList.push(arg(b, i));
 		}
 		startCmdList(proc, false, argList);
+		return null;
 	}
 
-	private function primReturn(b : Block) : Void{
+	private function primReturn(b : Block) : Dynamic{
 		// Return from the innermost procedure. If not in a procedure, stop the thread.
 		var didReturn : Bool = activeThread.returnFromProcedure();
 		if (!didReturn) {
 			activeThread.stop();
 			yield = true;
 		}
+		return null;
 	}
 
 	// Variable Primitives
