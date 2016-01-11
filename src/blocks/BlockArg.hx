@@ -177,7 +177,7 @@ class BlockArg extends Sprite
 			argValue = value;  // set argValue after textChanged()  
 			return;
 		}
-		if (type == "c")             base.setColor(as3hx.Compat.parseInt(argValue) & 0xFFFFFF);
+		if (type == "c")             base.setColor(Std.parseInt(argValue) & 0xFFFFFF);
 		base.redraw();
 	}
 

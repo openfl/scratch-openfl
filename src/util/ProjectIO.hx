@@ -154,7 +154,7 @@ class ProjectIO
 		for (f/* AS3HX WARNING could not determine type for var: f exp: EIdent(files) type: null */ in files){
 			var fName : String = f[0];
 			if (fName.indexOf("__MACOSX") > -1)                 continue;  // skip MacOS meta info in zip file  ;
-			var fIndex : Int = as3hx.Compat.parseInt(integerName(fName));
+			var fIndex : Int = Std.parseInt(integerName(fName));
 			var contents : ByteArray = f[1];
 			if (fName.substring(-4) == ".gif")                 images[fIndex] = contents;
 			if (fName.substring(-4) == ".jpg")                 images[fIndex] = contents;

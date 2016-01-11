@@ -52,7 +52,7 @@ class Perf
 		if (totalStart == 0)             return  // not monitoring performance  ;
 		var totalMSecs : Int = Math.round(haxe.Timer.stamp() * 1000) - totalStart;
 		var unaccountedFor : Int = totalMSecs - lapTotal;
-		Scratch.app.log("Total: " + totalMSecs + " msecs; unaccounted for: " + unaccountedFor + " msecs (" + as3hx.Compat.parseInt((100 * unaccountedFor) / totalMSecs) + "%)");
+		Scratch.app.log("Total: " + totalMSecs + " msecs; unaccounted for: " + unaccountedFor + " msecs (" + Std.parseInt((100 * unaccountedFor) / totalMSecs) + "%)");
 		totalStart = lapStart = lapTotal = 0;
 	}
 

@@ -454,7 +454,7 @@ class ListWatcher extends Sprite
 
 			var cellNum : TextField = allocateCellNum(Std.string(i + 1));
 			cellNum.x = cellNumRight - cellNum.width - 3;
-			cellNum.y = nextY + as3hx.Compat.parseInt((cell.height - cellNum.height) / 2);
+			cellNum.y = nextY + Std.parseInt((cell.height - cellNum.height) / 2);
 			cellNum.textColor = 0;
 			visibleCellNums.push(cellNum);
 			cellPane.addChild(cellNum);

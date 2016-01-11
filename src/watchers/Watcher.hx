@@ -146,7 +146,7 @@ class Watcher extends Sprite implements DragClient
 		// Set slider range. Make it discrete if min, max, and current value are all integral.
 		sliderMin = min;
 		sliderMax = max;
-		isDiscrete = (as3hx.Compat.parseInt(min) == min) && (as3hx.Compat.parseInt(max) == max) && (as3hx.Compat.parseInt(val) == val);
+		isDiscrete = (Std.parseInt(min) == min) && (Std.parseInt(max) == max) && (Std.parseInt(val) == val);
 	}
 
 	override public function hitTestPoint(globalX : Float, globalY : Float, shapeFlag : Bool = true) : Bool{
@@ -411,7 +411,7 @@ class Watcher extends Sprite implements DragClient
 		};
 		var d : DialogBox = new DialogBox(setMinMax);
 		d.addTitle("Slider Range");
-		d.addField("Min", 120, isDiscrete || as3hx.Compat.parseInt(sliderMin) != (sliderMin != 0) ? sliderMin : as3hx.Compat.parseInt(sliderMin) + ".0");
+		d.addField("Min", 120, isDiscrete || Std.parseInt(sliderMin) != (sliderMin != 0) ? sliderMin : Std.parseInt(sliderMin) + ".0");
 		d.addField("Max", 120, sliderMax);
 		d.addAcceptCancelButtons("OK");
 		d.showOnStage(stage);

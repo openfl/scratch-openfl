@@ -545,7 +545,7 @@ class Interpreter
 				if (!Math.isNaN(n))                     listArg = n;
 			}
 			if ((Std.is(listArg, Float)) && !Math.isNaN(listArg)) {
-				var last : Int = as3hx.Compat.parseInt(listArg);
+				var last : Int = Std.parseInt(listArg);
 				if (last >= 1) {
 					list = new Array<Dynamic>(last - 1);
 					for (i in 0...last){list[i] = i + 1;

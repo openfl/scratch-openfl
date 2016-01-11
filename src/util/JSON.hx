@@ -249,7 +249,7 @@ class JSON
 			case "n":return "\n";
 			case "r":return "\r";
 			case "t":return "\t";
-			case "u":return String.fromCharCode(as3hx.Compat.parseInt("0x" + src.nextString(4)));
+			case "u":return String.fromCharCode(Std.parseInt("0x" + src.nextString(4)));
 		}
 		return ch;
 	}

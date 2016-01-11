@@ -351,7 +351,7 @@ class ProcedureSpecEditor extends Sprite
 		for (o in row)maxH = Std.int(Math.max(maxH, o.height));
 		for (o in row){
 			o.x = nextX;
-			o.y = nextY + as3hx.Compat.parseInt((maxH - o.height) / 2) + (((Std.is(o, TextField))) ? 1 : 1);
+			o.y = nextY + Std.parseInt((maxH - o.height) / 2) + (((Std.is(o, TextField))) ? 1 : 1);
 			nextX += o.width + 4;
 			if ((Std.is(o, BlockArg)) && (cast((o), BlockArg).type == "s"))                 nextX -= 2;
 		}
@@ -447,7 +447,7 @@ class ProcedureSpecEditor extends Sprite
 		var e : Array<Dynamic> = new EReg('\\d+$', "").exec(name);
 		var n : String = (e != null) ? e[0] : "";
 		var base : String = name.substring(0, name.length - n.length);
-		var i : Int = as3hx.Compat.parseInt(n != null ? n : "1") + 1;
+		var i : Int = Std.parseInt(n != null ? n : "1") + 1;
 		while (Lambda.indexOf(taken, base + i) != -1){
 			i++;
 		}
@@ -496,7 +496,7 @@ class ProcedureSpecEditor extends Sprite
 		}
 		if (focusItem != null) {
 			var r : Rectangle = focusItem.getBounds(this);
-			deleteButton.x = r.x + as3hx.Compat.parseInt(r.width / 2) - 6;
+			deleteButton.x = r.x + Std.parseInt(r.width / 2) - 6;
 		}
 		deleteButton.visible = (row.length > 1);
 		deleteButton.y = -6;

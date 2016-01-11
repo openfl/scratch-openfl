@@ -342,10 +342,10 @@ class BlockMenus implements DragClient
 	private function notePicker(evt : MouseEvent) : Void{
 		var piano : Piano = new Piano(block.base.color, app.viewedObj().instrument, setBlockArg);
 		if (!Math.isNaN(blockArg.argValue)) {
-			piano.selectNote(as3hx.Compat.parseInt(blockArg.argValue));
+			piano.selectNote(Std.parseInt(blockArg.argValue));
 		}
 		var p : Point = blockArg.localToGlobal(new Point(blockArg.width, blockArg.height));
-		piano.showOnStage(app.stage, as3hx.Compat.parseInt(p.x - piano.width / 2), p.y);
+		piano.showOnStage(app.stage, Std.parseInt(p.x - piano.width / 2), p.y);
 	}
 
 	private function rotationStyleMenu(evt : MouseEvent) : Void{

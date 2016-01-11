@@ -182,8 +182,8 @@ class Piano extends Sprite
 
 	public function showOnStage(s : Stage, x : Float = NaN, y : Float = NaN) : Void{
 		addShadowFilter();
-		this.x = as3hx.Compat.parseInt(x == (x != 0) ? x : s.mouseX);
-		this.y = as3hx.Compat.parseInt(y == (y != 0) ? y : s.mouseY);
+		this.x = Std.parseInt(x == (x != 0) ? x : s.mouseX);
+		this.y = Std.parseInt(y == (y != 0) ? y : s.mouseY);
 		s.addChild(this);
 		addStageEventListeners();
 	}
@@ -212,7 +212,7 @@ class Piano extends Sprite
 		var x : Int = 1;
 		for (k in keys){
 			if (k.isBlack) {
-				k.x = as3hx.Compat.parseInt(x - k.width / 2);
+				k.x = Std.parseInt(x - k.width / 2);
 				k.y = 0;
 			}
 			else {
@@ -236,8 +236,8 @@ class Piano extends Sprite
 	}
 
 	private function fixLabelLayout() : Void{
-		label.x = as3hx.Compat.parseInt((width - label.textWidth) / 2);
-		label.y = as3hx.Compat.parseInt(52 - label.textHeight / 2);
+		label.x = Std.parseInt((width - label.textWidth) / 2);
+		label.y = Std.parseInt(52 - label.textHeight / 2);
 	}
 
 	public static function isBlack(n : Int) : Bool{

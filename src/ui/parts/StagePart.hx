@@ -179,7 +179,7 @@ class StagePart extends UIPart
 		projectInfo.y = projectTitle.y + 18;
 
 		runButton.x = w - 60;
-		runButton.y = as3hx.Compat.parseInt((topBarHeight - runButton.height) / 2);
+		runButton.y = Std.parseInt((topBarHeight - runButton.height) / 2);
 		stopButton.x = runButton.x + 32;
 		stopButton.y = runButton.y + 1;
 
