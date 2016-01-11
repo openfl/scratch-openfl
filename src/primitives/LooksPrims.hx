@@ -104,7 +104,7 @@ class LooksPrims
 		var s : ScratchObj = interp.targetObj();
 		if (s == null)             return;
 		var arg : Dynamic = interp.arg(b, 0);
-		if (as3hx.Compat.typeof((arg)) == "number") {
+		if (Std.is(arg, Float) || Std.is(arg, Int)) {
 			s.showCostume(arg - 1);
 		}
 		else {

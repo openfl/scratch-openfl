@@ -282,7 +282,7 @@ class Block extends Sprite
 		var b : Block = new Block(spec, "o", Specs.procedureColor, "proc_declaration");
 		if (parameterNames == null)             parameterNames = [];
 		for (i in 0...parameterNames.length){
-			var argType : String = ((as3hx.Compat.typeof((defaultArgValues[i])) == "boolean")) ? "b" : "r";
+			var argType : String = Std.is(defaultArgValues[i], Bool) ? "b" : "r";
 			var pBlock : Block = new Block(parameterNames[i], argType, Specs.parameterColor, Specs.GET_PARAM);
 			pBlock.parameterIndex = i;
 			b.setArg(i, pBlock);

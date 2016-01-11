@@ -386,12 +386,12 @@ private static var Pop : Class<Dynamic>;
 		// Return a sound describe by arg, which can be a string (sound name),
 		// a number (sound index), or a string representing a number (sound index).
 		if (sounds.length == 0)             return null;
-		if (as3hx.Compat.typeof((arg)) == "number") {
+		if (Std.is(arg, Float) || Std.is(arg, Int)) {
 			var i : Int = Math.round(arg - 1) % sounds.length;
 			if (i < 0)                 i += sounds.length;  // ensure positive  ;
 			return sounds[i];
 		}
-		else if (as3hx.Compat.typeof((arg)) == "string") {
+		else if (Std.is(arg, String)) {
 			for (snd in sounds){
 				if (snd.soundName == arg)                     return snd;  // arg matches a sound name  ;
 			}  // try converting string arg to a number  

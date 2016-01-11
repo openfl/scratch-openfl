@@ -394,7 +394,7 @@ class Interpreter
 		// Convert n to a number if possible. If n is a string, it must contain
 		// at least one digit to be treated as a number (otherwise a string
 		// containing only whitespace would be consider equal to zero.)
-		if (as3hx.Compat.typeof((n)) == "string") {
+		if (Std.is(n,String)) {
 			var s : String = try cast(n, String) catch(e:Dynamic) null;
 			var len : Int = s.length;
 			for (i in 0...len){
