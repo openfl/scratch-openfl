@@ -17,39 +17,46 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package util {
-import flash.utils.getTimer;
+package util;
 
-public class Perf {
 
-	private static var totalStart:uint;
-	private static var lapStart:uint;
-	private static var lapTotal:uint;
 
-	public static function start(msg:String = null):void {
-		if (!msg) msg = 'Perf.start';
+
+class Perf
+{
+
+	private static var totalStart : Int;
+	private static var lapStart : Int;
+	private static var lapTotal : Int;
+
+	public static function start(msg : String = null) : Void{
+		if (msg == null)             msg = "Perf.start";
 		Scratch.app.log(msg);
-		totalStart = lapStart = getTimer();
+		totalStart = lapStart = Math.round(haxe.Timer.stamp() * 1000);
 		lapTotal = 0;
 	}
 
-	public static function clearLap():void {
-		lapStart = getTimer();
+	public static function clearLap() : Void{
+		lapStart = Math.round(haxe.Timer.stamp() * 1000);
 	}
 
-	public static function lap(msg:String = ""):void {
-		if (totalStart == 0) return; // not monitoring performance
-		var lapMSecs:uint = getTimer() - lapStart;
-		Scratch.app.log('  ' + msg + ': ' + lapMSecs + ' msecs');
+	public static function lap(msg : String = "") : Void{
+		if (totalStart == 0)             return  // not monitoring performance  ;
+		var lapMSecs : Int = Math.round(haxe.Timer.stamp() * 1000) - lapStart;
+		Scratch.app.log("  " + msg + ": " + lapMSecs + " msecs");
 		lapTotal += lapMSecs;
-		lapStart = getTimer();
+		lapStart = Math.round(haxe.Timer.stamp() * 1000);
 	}
 
-	public static function end():void {
-		if (totalStart == 0) return; // not monitoring performance
-		var totalMSecs:uint = getTimer() - totalStart;
-		var unaccountedFor:uint = totalMSecs - lapTotal;
-		Scratch.app.log('Total: ' + totalMSecs + ' msecs; unaccounted for: ' + unaccountedFor + ' msecs (' + int((100 * unaccountedFor) / totalMSecs) + '%)');
+	public static function end() : Void{
+		if (totalStart == 0)             return  // not monitoring performance  ;
+		var totalMSecs : Int = Math.round(haxe.Timer.stamp() * 1000) - totalStart;
+		var unaccountedFor : Int = totalMSecs - lapTotal;
+		Scratch.app.log("Total: " + totalMSecs + " msecs; unaccounted for: " + unaccountedFor + " msecs (" + as3hx.Compat.parseInt((100 * unaccountedFor) / totalMSecs) + "%)");
 		totalStart = lapStart = lapTotal = 0;
 	}
-}}
+
+	public function new()
+	{
+	}
+}

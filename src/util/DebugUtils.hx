@@ -17,29 +17,36 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package util {
+package util;
 
-import flash.utils.getQualifiedClassName;
+
+
+
 import flash.display.DisplayObjectContainer;
 import flash.display.DisplayObject;
 
-public class DebugUtils {
+class DebugUtils
+{
 
-	public static function printTree(top:DisplayObject):String {
-		var result:String = '';
+	public static function printTree(top : DisplayObject) : String{
+		var result : String = "";
 		printSubtree(top, 0, result);
 		return result;
 	}
 
-	private static function printSubtree(t:DisplayObject, indent:int, out:String):void {
-		var tabs:String = '';
-		for (var i:int = 0; i < indent; i++) tabs += '\t';
-		out += tabs + getQualifiedClassName(t) + '\n';
-		var container:DisplayObjectContainer = t as DisplayObjectContainer;
-		if (container == null) return;
-		for (i = 0; i < container.numChildren; i++) {
+	private static function printSubtree(t : DisplayObject, indent : Int, out : String) : Void{
+		var tabs : String = "";
+		for (i in 0...indent){tabs += "\t";
+		}
+		out += tabs + Type.getClassName(t) + "\n";
+		var container : DisplayObjectContainer = try cast(t, DisplayObjectContainer) catch(e:Dynamic) null;
+		if (container == null)             return;
+		for (i in 0...container.numChildren){
 			printSubtree(container.getChildAt(i), indent + 1, out);
 		}
 	}
 
-}}
+	public function new()
+	{
+	}
+}

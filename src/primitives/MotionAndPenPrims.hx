@@ -22,140 +22,146 @@
 //
 // Scratch motion and pen primitives.
 
-package primitives {
-	import blocks.*;
+package primitives;
 
-	import flash.display.*;
-	import flash.geom.*;
-	import flash.utils.Dictionary;
 
-	import interpreter.*;
+import blocks.*;
 
-	import scratch.*;
+import flash.display.*;
+import flash.geom.*;
+import flash.utils.Dictionary;
 
-public class MotionAndPenPrims {
+import interpreter.*;
 
-	private var app:Scratch;
-	private var interp:Interpreter;
+import scratch.*;
 
-	public function MotionAndPenPrims(app:Scratch, interpreter:Interpreter) {
+class MotionAndPenPrims
+{
+
+	private var app : Scratch;
+	private var interp : Interpreter;
+
+	public function new(app : Scratch, interpreter : Interpreter)
+	{
 		this.app = app;
 		this.interp = interpreter;
 	}
 
-	public function addPrimsTo(primTable:Dictionary):void {
-		primTable["forward:"]			= primMove;
-		primTable["turnRight:"]			= primTurnRight;
-		primTable["turnLeft:"]			= primTurnLeft;
-		primTable["heading:"]			= primSetDirection;
-		primTable["pointTowards:"]		= primPointTowards;
-		primTable["gotoX:y:"]			= primGoTo;
-		primTable["gotoSpriteOrMouse:"]	= primGoToSpriteOrMouse;
-		primTable["glideSecs:toX:y:elapsed:from:"] = primGlide;
+	public function addPrimsTo(primTable : Dictionary) : Void{
+		Reflect.setField(primTable, "forward:", primMove);
+		Reflect.setField(primTable, "turnRight:", primTurnRight);
+		Reflect.setField(primTable, "turnLeft:", primTurnLeft);
+		Reflect.setField(primTable, "heading:", primSetDirection);
+		Reflect.setField(primTable, "pointTowards:", primPointTowards);
+		Reflect.setField(primTable, "gotoX:y:", primGoTo);
+		Reflect.setField(primTable, "gotoSpriteOrMouse:", primGoToSpriteOrMouse);
+		Reflect.setField(primTable, "glideSecs:toX:y:elapsed:from:", primGlide);
 
-		primTable["changeXposBy:"]		= primChangeX;
-		primTable["xpos:"]				= primSetX;
-		primTable["changeYposBy:"]		= primChangeY;
-		primTable["ypos:"]				= primSetY;
+		Reflect.setField(primTable, "changeXposBy:", primChangeX);
+		Reflect.setField(primTable, "xpos:", primSetX);
+		Reflect.setField(primTable, "changeYposBy:", primChangeY);
+		Reflect.setField(primTable, "ypos:", primSetY);
 
-		primTable["bounceOffEdge"]		= primBounceOffEdge;
+		Reflect.setField(primTable, "bounceOffEdge", primBounceOffEdge);
 
-		primTable["xpos"]				= primXPosition;
-		primTable["ypos"]				= primYPosition;
-		primTable["heading"]			= primDirection;
+		Reflect.setField(primTable, "xpos", primXPosition);
+		Reflect.setField(primTable, "ypos", primYPosition);
+		Reflect.setField(primTable, "heading", primDirection);
 
-		primTable["clearPenTrails"]		= primClear;
-		primTable["putPenDown"]			= primPenDown;
-		primTable["putPenUp"]			= primPenUp;
-		primTable["penColor:"]			= primSetPenColor;
-		primTable["setPenHueTo:"]		= primSetPenHue;
-		primTable["changePenHueBy:"]	= primChangePenHue;
-		primTable["setPenShadeTo:"]		= primSetPenShade;
-		primTable["changePenShadeBy:"]	= primChangePenShade;
-		primTable["penSize:"]			= primSetPenSize;
-		primTable["changePenSizeBy:"]	= primChangePenSize;
-		primTable["stampCostume"]		= primStamp;
+		Reflect.setField(primTable, "clearPenTrails", primClear);
+		Reflect.setField(primTable, "putPenDown", primPenDown);
+		Reflect.setField(primTable, "putPenUp", primPenUp);
+		Reflect.setField(primTable, "penColor:", primSetPenColor);
+		Reflect.setField(primTable, "setPenHueTo:", primSetPenHue);
+		Reflect.setField(primTable, "changePenHueBy:", primChangePenHue);
+		Reflect.setField(primTable, "setPenShadeTo:", primSetPenShade);
+		Reflect.setField(primTable, "changePenShadeBy:", primChangePenShade);
+		Reflect.setField(primTable, "penSize:", primSetPenSize);
+		Reflect.setField(primTable, "changePenSizeBy:", primChangePenSize);
+		Reflect.setField(primTable, "stampCostume", primStamp);
 	}
 
-	private function primMove(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s == null) return;
-		var radians:Number = (Math.PI * (90 - s.direction)) / 180;
-		var d:Number = interp.numarg(b, 0);
+	private function primMove(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s == null)             return;
+		var radians : Float = (Math.PI * (90 - s.direction)) / 180;
+		var d : Float = interp.numarg(b, 0);
 		moveSpriteTo(s, s.scratchX + (d * Math.cos(radians)), s.scratchY + (d * Math.sin(radians)));
 	}
 
-	private function primTurnRight(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
+	private function primTurnRight(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
 		if (s != null) {
 			s.setDirection(s.direction + interp.numarg(b, 0));
-			if (s.visible) interp.redraw();
+			if (s.visible)                 interp.redraw();
 		}
 	}
 
-	private function primTurnLeft(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
+	private function primTurnLeft(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
 		if (s != null) {
 			s.setDirection(s.direction - interp.numarg(b, 0));
-			if (s.visible) interp.redraw();
+			if (s.visible)                 interp.redraw();
 		}
 	}
 
-	private function primSetDirection(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
+	private function primSetDirection(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
 		if (s != null) {
 			s.setDirection(interp.numarg(b, 0));
-			if (s.visible) interp.redraw();
+			if (s.visible)                 interp.redraw();
 		}
 	}
 
-	private function primPointTowards(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		var p:Point = mouseOrSpritePosition(interp.arg(b, 0));
-		if ((s == null) || (p == null)) return;
-		var dx:Number = p.x - s.scratchX;
-		var dy:Number = p.y - s.scratchY;
-		var angle:Number = 90 - ((Math.atan2(dy, dx) * 180) / Math.PI);
+	private function primPointTowards(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		var p : Point = mouseOrSpritePosition(interp.arg(b, 0));
+		if ((s == null) || (p == null))             return;
+		var dx : Float = p.x - s.scratchX;
+		var dy : Float = p.y - s.scratchY;
+		var angle : Float = 90 - ((Math.atan2(dy, dx) * 180) / Math.PI);
 		s.setDirection(angle);
-		if (s.visible) interp.redraw();
+		if (s.visible)             interp.redraw();
 	}
 
-	private function primGoTo(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) moveSpriteTo(s, interp.numarg(b, 0), interp.numarg(b, 1));
+	private function primGoTo(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             moveSpriteTo(s, interp.numarg(b, 0), interp.numarg(b, 1));
 	}
 
-	private function primGoToSpriteOrMouse(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		var p:Point = mouseOrSpritePosition(interp.arg(b, 0));
-		if ((s == null) || (p == null)) return;
+	private function primGoToSpriteOrMouse(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		var p : Point = mouseOrSpritePosition(interp.arg(b, 0));
+		if ((s == null) || (p == null))             return;
 		moveSpriteTo(s, p.x, p.y);
 	}
 
-	private function primGlide(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s == null) return;
+	private function primGlide(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s == null)             return;
 		if (interp.activeThread.firstTime) {
-			var secs:Number = interp.numarg(b, 0);
-			var destX:Number = interp.numarg(b, 1);
-			var destY:Number = interp.numarg(b, 2);
+			var secs : Float = interp.numarg(b, 0);
+			var destX : Float = interp.numarg(b, 1);
+			var destY : Float = interp.numarg(b, 2);
 			if (secs <= 0) {
 				moveSpriteTo(s, destX, destY);
 				return;
-			}
-			// record state: [0]start msecs, [1]duration, [2]startX, [3]startY, [4]endX, [5]endY
+			}  // record state: [0]start msecs, [1]duration, [2]startX, [3]startY, [4]endX, [5]endY  
+
 			interp.activeThread.tmpObj =
-				[interp.currentMSecs, 1000 * secs, s.scratchX, s.scratchY, destX, destY];
+					[interp.currentMSecs, 1000 * secs, s.scratchX, s.scratchY, destX, destY];
 			interp.startTimer(secs);
-		} else {
-			var state:Array = interp.activeThread.tmpObj;
+		}
+		else {
+			var state : Array<Dynamic> = interp.activeThread.tmpObj;
 			if (!interp.checkTimer()) {
 				// in progress: move to intermediate position along path
-				var frac:Number = (interp.currentMSecs - state[0]) / state[1];
-				var newX:Number = state[2] + (frac * (state[4] - state[2]));
-				var newY:Number = state[3] + (frac * (state[5] - state[3]));
+				var frac : Float = (interp.currentMSecs - state[0]) / state[1];
+				var newX : Float = state[2] + (frac * (state[4] - state[2]));
+				var newY : Float = state[3] + (frac * (state[5] - state[3]));
 				moveSpriteTo(s, newX, newY);
-			} else {
+			}
+			else {
 				// finished: move to final position and clear state
 				moveSpriteTo(s, state[4], state[5]);
 				interp.activeThread.tmpObj = null;
@@ -163,203 +169,214 @@ public class MotionAndPenPrims {
 		}
 	}
 
-	private function mouseOrSpritePosition(arg:String):Point {
+	private function mouseOrSpritePosition(arg : String) : Point{
 		if (arg == "_mouse_") {
-			var w:ScratchStage = app.stagePane;
+			var w : ScratchStage = app.stagePane;
 			return new Point(w.scratchMouseX(), w.scratchMouseY());
-		} else {
-			var s:ScratchSprite = app.stagePane.spriteNamed(arg);
-			if (s == null) return null;
+		}
+		else {
+			var s : ScratchSprite = app.stagePane.spriteNamed(arg);
+			if (s == null)                 return null;
 			return new Point(s.scratchX, s.scratchY);
 		}
 		return null;
 	}
 
-	private function primChangeX(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) moveSpriteTo(s, s.scratchX + interp.numarg(b, 0), s.scratchY);
+	private function primChangeX(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             moveSpriteTo(s, s.scratchX + interp.numarg(b, 0), s.scratchY);
 	}
 
-	private function primSetX(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) moveSpriteTo(s, interp.numarg(b, 0), s.scratchY);
+	private function primSetX(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             moveSpriteTo(s, interp.numarg(b, 0), s.scratchY);
 	}
 
-	private function primChangeY(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) moveSpriteTo(s, s.scratchX, s.scratchY + interp.numarg(b, 0));
+	private function primChangeY(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             moveSpriteTo(s, s.scratchX, s.scratchY + interp.numarg(b, 0));
 	}
 
-	private function primSetY(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) moveSpriteTo(s, s.scratchX, interp.numarg(b, 0));
+	private function primSetY(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             moveSpriteTo(s, s.scratchX, interp.numarg(b, 0));
 	}
 
-	private function primBounceOffEdge(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s == null) return;
-		if (!turnAwayFromEdge(s)) return;
+	private function primBounceOffEdge(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s == null)             return;
+		if (!turnAwayFromEdge(s))             return;
 		ensureOnStageOnBounce(s);
-		if (s.visible) interp.redraw();
+		if (s.visible)             interp.redraw();
 	}
 
-	private function primXPosition(b:Block):Number {
-		var s:ScratchSprite = interp.targetSprite();
-		return (s != null) ? snapToInteger(s.scratchX) : 0;
+	private function primXPosition(b : Block) : Float{
+		var s : ScratchSprite = interp.targetSprite();
+		return ((s != null)) ? snapToInteger(s.scratchX) : 0;
 	}
 
-	private function primYPosition(b:Block):Number {
-		var s:ScratchSprite = interp.targetSprite();
-		return (s != null) ? snapToInteger(s.scratchY) : 0;
+	private function primYPosition(b : Block) : Float{
+		var s : ScratchSprite = interp.targetSprite();
+		return ((s != null)) ? snapToInteger(s.scratchY) : 0;
 	}
 
-	private function primDirection(b:Block):Number {
-		var s:ScratchSprite = interp.targetSprite();
-		return (s != null) ? snapToInteger(s.direction) : 0;
+	private function primDirection(b : Block) : Float{
+		var s : ScratchSprite = interp.targetSprite();
+		return ((s != null)) ? snapToInteger(s.direction) : 0;
 	}
 
-	private function snapToInteger(n:Number):Number {
-		var rounded:Number = Math.round(n);
-		var delta:Number = n - rounded;
-		if (delta < 0) delta = -delta;
-		return (delta < 1e-9) ? rounded : n;
+	private function snapToInteger(n : Float) : Float{
+		var rounded : Float = Math.round(n);
+		var delta : Float = n - rounded;
+		if (delta < 0)             delta = -delta;
+		return ((delta < 1e-9)) ? rounded : n;
 	}
 
-	private function primClear(b:Block):void {
+	private function primClear(b : Block) : Void{
 		app.stagePane.clearPenStrokes();
 		interp.redraw();
 	}
 
-	private function primPenDown(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) s.penIsDown = true;
+	private function primPenDown(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             s.penIsDown = true;
 		touch(s, s.scratchX, s.scratchY);
 		interp.redraw();
 	}
 
-	private function touch(s:ScratchSprite, x:Number, y:Number):void {
-		var g:Graphics = app.stagePane.newPenStrokes.graphics;
+	private function touch(s : ScratchSprite, x : Float, y : Float) : Void{
+		var g : Graphics = app.stagePane.newPenStrokes.graphics;
 		g.lineStyle();
-		var alpha:Number = (0xFF & (s.penColorCache >> 24)) / 0xFF;
-		if (alpha == 0) alpha = 1;
-		g.beginFill(0xFFFFFF & s.penColorCache, alpha);
+		var alpha : Float = (0xFF & (Std.int(s.penColorCache) >> 24)) / 0xFF;
+		if (alpha == 0)             alpha = 1;
+		g.beginFill(0xFFFFFF & Std.int(s.penColorCache), alpha);
 		g.drawCircle(240 + x, 180 - y, s.penWidth / 2);
 		g.endFill();
 		app.stagePane.penActivity = true;
 	}
 
-	private function primPenUp(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) s.penIsDown = false;
+	private function primPenUp(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             s.penIsDown = false;
 	}
 
-	private function primSetPenColor(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) s.setPenColor(interp.numarg(b, 0));
+	private function primSetPenColor(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             s.setPenColor(interp.numarg(b, 0));
 	}
 
-	private function primSetPenHue(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) s.setPenHue(interp.numarg(b, 0));
+	private function primSetPenHue(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             s.setPenHue(interp.numarg(b, 0));
 	}
 
-	private function primChangePenHue(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) s.setPenHue(s.penHue + interp.numarg(b, 0));
+	private function primChangePenHue(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             s.setPenHue(s.penHue + interp.numarg(b, 0));
 	}
 
-	private function primSetPenShade(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) s.setPenShade(interp.numarg(b, 0));
+	private function primSetPenShade(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             s.setPenShade(interp.numarg(b, 0));
 	}
 
-	private function primChangePenShade(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) s.setPenShade(s.penShade + interp.numarg(b, 0));
+	private function primChangePenShade(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             s.setPenShade(s.penShade + interp.numarg(b, 0));
 	}
 
-	private function primSetPenSize(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) s.setPenSize(Math.max(1, Math.min(960, Math.round(interp.numarg(b, 0)))));
+	private function primSetPenSize(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             s.setPenSize(Math.max(1, Math.min(960, Math.round(interp.numarg(b, 0)))));
 	}
 
-	private function primChangePenSize(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
-		if (s != null) s.setPenSize(s.penWidth + interp.numarg(b, 0));
+	private function primChangePenSize(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
+		if (s != null)             s.setPenSize(s.penWidth + interp.numarg(b, 0));
 	}
 
-	private function primStamp(b:Block):void {
-		var s:ScratchSprite = interp.targetSprite();
+	private function primStamp(b : Block) : Void{
+		var s : ScratchSprite = interp.targetSprite();
 		// In 3D mode, get the alpha from the ghost filter
 		// Otherwise, it can be easily accessed from the color transform.
-		var alpha:Number = (Scratch.app.isIn3D ?
-			1.0 - (Math.max(0, Math.min(s.filterPack.getFilterSetting('ghost'), 100)) / 100) :
-			s.img.transform.colorTransform.alphaMultiplier);
+		var alpha : Float = ((Scratch.app.isIn3D) ? 
+		1.0 - (Math.max(0, Math.min(s.filterPack.getFilterSetting("ghost"), 100)) / 100) : 
+		s.img.transform.colorTransform.alphaMultiplier);
 
 		doStamp(s, alpha);
 	}
 
-	private function doStamp(s:ScratchSprite, stampAlpha:Number):void {
-		if (s == null) return;
+	private function doStamp(s : ScratchSprite, stampAlpha : Float) : Void{
+		if (s == null)             return;
 		app.stagePane.stampSprite(s, stampAlpha);
 		interp.redraw();
 	}
 
-	private function moveSpriteTo(s:ScratchSprite, newX:Number, newY:Number):void {
-		if (!(s.parent is ScratchStage)) return; // don't move while being dragged
-		var oldX:Number = s.scratchX;
-		var oldY:Number = s.scratchY;
+	private function moveSpriteTo(s : ScratchSprite, newX : Float, newY : Float) : Void{
+		if (!(Std.is(s.parent, ScratchStage)))             return;  // don't move while being dragged  ;
+		var oldX : Float = s.scratchX;
+		var oldY : Float = s.scratchY;
 		s.setScratchXY(newX, newY);
 		s.keepOnStage();
-		if (s.penIsDown) stroke(s, oldX, oldY, s.scratchX, s.scratchY);
-		if ((s.penIsDown) || (s.visible)) interp.redraw();
+		if (s.penIsDown)
+			stroke(s, oldX, oldY, s.scratchX, s.scratchY);
+		if ((s.penIsDown) || (s.visible))             interp.redraw();
 	}
 
-	private function stroke(s:ScratchSprite, oldX:Number, oldY:Number, newX:Number, newY:Number):void {
-		var g:Graphics = app.stagePane.newPenStrokes.graphics;
-		var alpha:Number = (0xFF & (s.penColorCache >> 24)) / 0xFF;
-		if (alpha == 0) alpha = 1;
-		g.lineStyle(s.penWidth, 0xFFFFFF & s.penColorCache, alpha);
+	private function stroke(s : ScratchSprite, oldX : Float, oldY : Float, newX : Float, newY : Float) : Void{
+		var g : Graphics = app.stagePane.newPenStrokes.graphics;
+		var alpha : Float = (0xFF & (Std.int(s.penColorCache) >> 24)) / 0xFF;
+		if (alpha == 0)             alpha = 1;
+		g.lineStyle(s.penWidth, 0xFFFFFF & Std.int(s.penColorCache), alpha);
 		g.moveTo(240 + oldX, 180 - oldY);
 		g.lineTo(240 + newX, 180 - newY);
-//trace('pen line('+oldX+', '+oldY+', '+newX+', '+newY+')');
+		//trace('pen line('+oldX+', '+oldY+', '+newX+', '+newY+')');
 		app.stagePane.penActivity = true;
 	}
 
-	private function turnAwayFromEdge(s:ScratchSprite):Boolean {
+	private function turnAwayFromEdge(s : ScratchSprite) : Bool{
 		// turn away from the nearest edge if it's close enough; otherwise do nothing
 		// Note: comparisons are in the stage coordinates, with origin (0, 0)
 		// use bounding rect of the sprite to account for costume rotation and scale
-		var r:Rectangle = s.bounds();
+		var r : Rectangle = s.bounds();
 		// measure distance to edges
-		var d1:Number = Math.max(0, r.left);
-		var d2:Number = Math.max(0, r.top);
-		var d3:Number = Math.max(0, ScratchObj.STAGEW - r.right);
-		var d4:Number = Math.max(0, ScratchObj.STAGEH - r.bottom);
+		var d1 : Float = Math.max(0, r.left);
+		var d2 : Float = Math.max(0, r.top);
+		var d3 : Float = Math.max(0, ScratchObj.STAGEW - r.right);
+		var d4 : Float = Math.max(0, ScratchObj.STAGEH - r.bottom);
 		// find the nearest edge
-		var e:int = 0, minDist:Number = 100000;
-		if (d1 < minDist) { minDist = d1; e = 1 }
-		if (d2 < minDist) { minDist = d2; e = 2 }
-		if (d3 < minDist) { minDist = d3; e = 3 }
-		if (d4 < minDist) { minDist = d4; e = 4 }
-		if (minDist > 0) return false;  // not touching to any edge
-		// point away from nearest edge
-		var radians:Number = ((90 - s.direction) * Math.PI) / 180;
-		var dx:Number = Math.cos(radians);
-		var dy:Number = -Math.sin(radians);
-		if (e == 1) { dx = Math.max(0.2, Math.abs(dx)) }
-		if (e == 2) { dy = Math.max(0.2, Math.abs(dy)) }
-		if (e == 3) { dx = 0 - Math.max(0.2, Math.abs(dx)) }
-		if (e == 4) { dy = 0 - Math.max(0.2, Math.abs(dy)) }
-		var newDir:Number = ((180 * Math.atan2(dy, dx)) / Math.PI) + 90;
+		var e : Int = 0;
+		var minDist : Float = 100000;
+		if (d1 < minDist) {minDist = d1;e = 1;
+		}
+		if (d2 < minDist) {minDist = d2;e = 2;
+		}
+		if (d3 < minDist) {minDist = d3;e = 3;
+		}
+		if (d4 < minDist) {minDist = d4;e = 4;
+		}
+		if (minDist > 0)             return false;  // point away from nearest edge    // not touching to any edge  ;
+
+		var radians : Float = ((90 - s.direction) * Math.PI) / 180;
+		var dx : Float = Math.cos(radians);
+		var dy : Float = -Math.sin(radians);
+		if (e == 1) {dx = Math.max(0.2, Math.abs(dx));
+		}
+		if (e == 2) {dy = Math.max(0.2, Math.abs(dy));
+		}
+		if (e == 3) {dx = 0 - Math.max(0.2, Math.abs(dx));
+		}
+		if (e == 4) {dy = 0 - Math.max(0.2, Math.abs(dy));
+		}
+		var newDir : Float = ((180 * Math.atan2(dy, dx)) / Math.PI) + 90;
 		s.setDirection(newDir);
 		return true;
 	}
 
-	private function ensureOnStageOnBounce(s:ScratchSprite):void {
-		var r:Rectangle = s.bounds();
-		if (r.left < 0) moveSpriteTo(s, s.scratchX - r.left, s.scratchY);
-		if (r.top < 0) moveSpriteTo(s, s.scratchX, s.scratchY + r.top);
+	private function ensureOnStageOnBounce(s : ScratchSprite) : Void{
+		var r : Rectangle = s.bounds();
+		if (r.left < 0)             moveSpriteTo(s, s.scratchX - r.left, s.scratchY);
+		if (r.top < 0)             moveSpriteTo(s, s.scratchX, s.scratchY + r.top);
 		if (r.right > ScratchObj.STAGEW) {
 			moveSpriteTo(s, s.scratchX - (r.right - ScratchObj.STAGEW), s.scratchY);
 		}
@@ -367,5 +384,4 @@ public class MotionAndPenPrims {
 			moveSpriteTo(s, s.scratchX, s.scratchY + (r.bottom - ScratchObj.STAGEH));
 		}
 	}
-
-}}
+}

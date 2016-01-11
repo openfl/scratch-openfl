@@ -17,57 +17,84 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package svgeditor {
-public class DrawProperties {
+package svgeditor;
+
+
+class DrawProperties
+{
+	public var color(get, set) : Int;
+	public var alpha(get, never) : Float;
+	public var secondColor(get, set) : Int;
+	public var secondAlpha(get, never) : Float;
+	public var strokeWidth(get, set) : Int;
+	public var eraserWidth(get, set) : Int;
+
 
 	// colors
-	public var rawColor:uint = 0xFF000000;
-	public var rawSecondColor:uint = 0xFFFFFFFF;
+	public var rawColor : Int = 0xFF000000;
+	public var rawSecondColor : Int = 0xFFFFFFFF;
 
-	public function set color(c:uint):void { rawColor = c }
-	public function get color():uint { return rawColor & 0xFFFFFF }
-	public function get alpha():Number { return ((rawColor >> 24) & 0xFF) / 0xFF }
+	private function set_color(c : Int) : Int{rawColor = c;
+		return c;
+	}
+	private function get_color() : Int{return rawColor & 0xFFFFFF;
+	}
+	private function get_alpha() : Float{return ((rawColor >> 24) & 0xFF) / 0xFF;
+	}
 
-	public function set secondColor(c:uint):void { rawSecondColor = c }
-	public function get secondColor():uint { return rawSecondColor & 0xFFFFFF }
-	public function get secondAlpha():Number { return ((rawSecondColor >> 24) & 0xFF) / 0xFF }
+	private function set_secondColor(c : Int) : Int{rawSecondColor = c;
+		return c;
+	}
+	private function get_secondColor() : Int{return rawSecondColor & 0xFFFFFF;
+	}
+	private function get_secondAlpha() : Float{return ((rawSecondColor >> 24) & 0xFF) / 0xFF;
+	}
 
 	// stroke
-	public var smoothness:Number = 1;
-	private var rawStrokeWidth:Number = 1;
-	private var rawEraserWidth:Number = 4;
+	public var smoothness : Float = 1;
+	private var rawStrokeWidth : Float = 1;
+	private var rawEraserWidth : Float = 4;
 
-	public function set strokeWidth(w:int):void { rawStrokeWidth = w }
-	public function set eraserWidth(w:int):void { rawEraserWidth = w }
+	private function set_strokeWidth(w : Int) : Int{rawStrokeWidth = w;
+		return w;
+	}
+	private function set_eraserWidth(w : Int) : Int{rawEraserWidth = w;
+		return w;
+	}
 
-	public function get strokeWidth():int {
+	private function get_strokeWidth() : Int{
 		return adjustWidth(rawStrokeWidth);
 	}
 
-	public function get eraserWidth():int {
+	private function get_eraserWidth() : Int{
 		return adjustWidth(rawEraserWidth);
 	}
 
-	private static function adjustWidth(raw:int):int {
-		if (Scratch.app.imagesPart && (Scratch.app.imagesPart.editor is SVGEdit)) return raw;
+	private static function adjustWidth(raw : Int) : Int{
+		if (Scratch.app.imagesPart && (Std.is(Scratch.app.imagesPart.editor, SVGEdit)))             return raw;  // above 10, use Squeak brush sizes  ;
 
-		// above 10, use Squeak brush sizes
-		const n:Number = Math.max(1, Math.round(raw));
-		switch(n) {
-			case 11: return 13;
-			case 12: return 19;
-			case 13: return 29;
-			case 14: return 47;
-			case 15: return 75;
-			default: return n;
+
+
+		var n : Float = Math.max(1, Math.round(raw));
+		switch (n)
+		{
+			case 11:return 13;
+			case 12:return 19;
+			case 13:return 29;
+			case 14:return 47;
+			case 15:return 75;
+			default:return n;
 		}
 	}
 
 	// fill
-	public var fillType:String = 'solid'; // solid, linearHorizontal, linearVertical, radial
-	public var filledShape:Boolean = false;
+	public var fillType : String = "solid";  // solid, linearHorizontal, linearVertical, radial  
+	public var filledShape : Bool = false;
 
 	// font
-	public var fontName:String = 'Helvetica';
+	public var fontName : String = "Helvetica";
 
-}}
+	public function new()
+	{
+	}
+}

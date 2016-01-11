@@ -17,43 +17,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package logging {
-import flash.utils.getTimer;
+package logging;
 
-public class LogEntry {
-	public var timeStamp:Number;
-	public var severity:int;
-	public var messageKey:String;
-	public var extraData:Object;
 
-	public function LogEntry(severity:String, messageKey:String, extraData:Object = null) {
+
+
+class LogEntry
+{
+	public var timeStamp : Float;
+	public var severity : Int;
+	public var messageKey : String;
+	public var extraData : Dynamic;
+
+	public function new(severity : String, messageKey : String, extraData : Dynamic = null)
+	{
 		setAll(severity, messageKey, extraData);
 	}
 
 	// Set all fields of this event
-	public function setAll(severity:String, messageKey:String, extraData:Object = null):void {
+	public function setAll(severity : String, messageKey : String, extraData : Dynamic = null) : Void{
 		this.timeStamp = getCurrentTime();
 		this.severity = LogLevel.LEVEL.indexOf(severity);
 		this.messageKey = messageKey;
 		this.extraData = extraData;
 	}
 
-	private static const tempDate:Date = new Date();
-	private function makeTimeStampString():String {
+	private static var tempDate : Date = Date.now();
+	private function makeTimeStampString() : String{
 		tempDate.time = timeStamp;
 		return tempDate.toLocaleTimeString();
 	}
 
 	// Generate a string representing this event. Does not include extraData.
-	public function toString():String {
-		return [makeTimeStampString(), LogLevel.LEVEL[severity], messageKey].join(' | ');
+	public function toString() : String{
+		return [makeTimeStampString(), LogLevel.LEVEL[severity], messageKey].join(" | ");
 	}
 
-	private static const timerOffset:Number = new Date().time - getTimer();
+	private static var timerOffset : Float = Date.now().getTime() - Math.round(haxe.Timer.stamp() * 1000);
 
 	// Returns approximately the same value as "new Date().time" without GC impact
-	public static function getCurrentTime():Number {
-		return getTimer() + timerOffset;
+	public static function getCurrentTime() : Float{
+		return Math.round(haxe.Timer.stamp() * 1000) + timerOffset;
 	}
 }
-}
+

@@ -24,28 +24,36 @@
 // state of a thread so it can continue from where it left off, and it has
 // a stack to support nested control structures and procedure calls.
 
-package interpreter {
-	import blocks.Block;
+package interpreter;
 
-public class Thread {
 
-	public var target:*;			// object that owns the stack
-	public var topBlock:Block;		// top block of the stack
-	public var tmpObj:*;			// temporary object (not saved on stack)
-	public var startDelayCount:int;	// number of frames to delay before starting
+import blocks.Block;
+
+
+import blocks.*;
+import interpreter.*;
+
+class Thread
+{
+
+	public var target : Dynamic;  // object that owns the stack  
+	public var topBlock : Block;  // top block of the stack  
+	public var tmpObj : Dynamic;  // temporary object (not saved on stack)  
+	public var startDelayCount : Int;  // number of frames to delay before starting  
 
 	// the following state is pushed and popped when running substacks
-	public var block:Block;
-	public var isLoop:Boolean;
-	public var firstTime:Boolean;	// used by certain control structures
-	public var tmp:int;				// used by repeat and wait
-	public var args:Array;			// arguments to a user-defined procedure
+	public var block : Block;
+	public var isLoop : Bool;
+	public var firstTime : Bool;  // used by certain control structures  
+	public var tmp : Int;  // used by repeat and wait  
+	public var args : Array<Dynamic>;  // arguments to a user-defined procedure  
 
 	// the stack
-	private var stack:Vector.<StackFrame>;
-	private var sp:int;
+	private var stack : Array<StackFrame>;
+	private var sp : Int;
 
-	public function Thread(b:Block, targetObj:*, startupDelay:int = 0) {
+	public function new(b : Block, targetObj : Dynamic, startupDelay : Int = 0)
+	{
 		target = targetObj;
 		stop();
 		topBlock = b;
@@ -57,9 +65,9 @@ public class Thread {
 		tmp = 0;
 	}
 
-	public function pushStateForBlock(b:Block):void {
-		if (sp >= (stack.length - 1)) growStack();
-		var old:StackFrame = stack[sp++];
+	public function pushStateForBlock(b : Block) : Void{
+		if (sp >= (stack.length - 1))             growStack();
+		var old : StackFrame = stack[sp++];
 		old.block = block;
 		old.isLoop = isLoop;
 		old.firstTime = firstTime;
@@ -72,22 +80,23 @@ public class Thread {
 		tmp = 0;
 	}
 
-	public function popState():Boolean {
-		if (sp == 0) return false;
-		var old:StackFrame = stack[--sp];
-		block		= old.block;
-		isLoop		= old.isLoop;
-		firstTime	= old.firstTime;
-		tmp			= old.tmp;
-		args		= old.args;
+	public function popState() : Bool{
+		if (sp == 0)             return false;
+		var old : StackFrame = stack[--sp];
+		block = old.block;
+		isLoop = old.isLoop;
+		firstTime = old.firstTime;
+		tmp = old.tmp;
+		args = old.args;
 		return true;
 	}
 
-	public function stackEmpty():Boolean { return sp == 0 }
+	public function stackEmpty() : Bool{return sp == 0;
+	}
 
-	public function stop():void {
+	public function stop() : Void{
 		block = null;
-		stack = new Vector.<StackFrame>(4);
+		stack = new Array<StackFrame>();
 		stack[0] = new StackFrame();
 		stack[1] = new StackFrame();
 		stack[2] = new StackFrame();
@@ -95,56 +104,67 @@ public class Thread {
 		sp = 0;
 	}
 
-	public function isRecursiveCall(procCall:Block, procHat:Block):Boolean {
-		var callCount:int = 5; // maximum number of enclosing procedure calls to examine
-		for (var i:int = sp - 1; i >= 0; i--) {
-			var b:Block = stack[i].block;
+	public function isRecursiveCall(procCall : Block, procHat : Block) : Bool{
+		var callCount : Int = 5;  // maximum number of enclosing procedure calls to examine  
+		var i : Int = sp - 1;
+		while (i >= 0){
+			var b : Block = stack[i].block;
 			if (b.op == Specs.CALL) {
-				if (procCall == b) return true;
-				if (procHat == target.procCache[b.spec]) return true;
+				if (procCall == b)                     return true;
+				if (procHat == target.procCache[b.spec])                     return true;
 			}
-			if (--callCount < 0) return false;
+			if (--callCount < 0)                 return false;
+			i--;
 		}
 		return false;
 	}
 
-	public function returnFromProcedure():Boolean {
-		for (var i:int = sp - 1; i >= 0; i--) {
+	public function returnFromProcedure() : Bool{
+		var i : Int = sp - 1;
+		while (i >= 0){
 			if (stack[i].block.op == Specs.CALL) {
 				sp = i + 1;
 				popState();
 				return true;
 			}
+			i--;
 		}
 		return false;
 	}
 
-	private function initForBlock(b:Block):void {
+	private function initForBlock(b : Block) : Void{
 		block = b;
 		isLoop = false;
 		firstTime = true;
 		tmp = 0;
 	}
 
-	private function growStack():void {
+	private function growStack() : Void{
 		// The stack is an array of Thread instances, pre-allocated for efficiency.
 		// When growing, the current size is doubled.
-		var s:int = stack.length;
-		var n:int = s + s;
+		var s : Int = stack.length;
+		var n : Int = s + s;
 		stack.length = n;
-		for (var i:int = s; i < n; ++i)
-			stack[i] = new StackFrame();
+		for (i in s...n){stack[i] = new StackFrame();
+		}
 	}
+}
 
-}}
 
-import blocks.*;
-import interpreter.*;
+class StackFrame
+{
+	@:allow(interpreter)
+	private var block : Block;
+	@:allow(interpreter)
+	private var isLoop : Bool;
+	@:allow(interpreter)
+	private var firstTime : Bool;
+	@:allow(interpreter)
+	private var tmp : Int;
+	@:allow(interpreter)
+	private var args : Array<Dynamic>;
 
-class StackFrame {
-	internal var block:Block;
-	internal var isLoop:Boolean;
-	internal var firstTime:Boolean;
-	internal var tmp:int;
-	internal var args:Array;
+	public function new()
+	{
+	}
 }

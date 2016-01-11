@@ -23,28 +23,37 @@
 // A simple slider for a fractional value from 0-1. Either vertical or horizontal, depending on its aspect ratio.
 // The client can supply an optional function to be called when the value is changed.
 
-package uiwidgets {
-	import flash.display.*;
-	import flash.events.*;
-	import flash.geom.*;
-	import util.DragClient;
+package uiwidgets;
 
-public class Slider extends Sprite implements DragClient {
 
-	public var slotColor:int = 0xBBBDBF;
-	public var slotColor2:int = -1; // if >= 0, fill with linear gradient from slotColor to slotColor2
+import flash.display.*;
+import flash.events.*;
+import flash.geom.*;
+import util.DragClient;
 
-	private var slot:Shape;
-	private var knob:Shape;
-	private var positionFraction:Number = 0; // range: 0-1
+class Slider extends Sprite implements DragClient
+{
+	public var min(get, set) : Float;
+	public var max(get, set) : Float;
+	public var value(get, set) : Float;
 
-	private var isVertical:Boolean;
-	private var dragOffset:int;
-	private var scrollFunction:Function;
-	private var minValue:Number;
-	private var maxValue:Number;
 
-	public function Slider(w:int, h:int, scrollFunction:Function = null) {
+	public var slotColor : Int = 0xBBBDBF;
+	public var slotColor2 : Int = -1;  // if >= 0, fill with linear gradient from slotColor to slotColor2  
+
+	private var slot : Shape;
+	private var knob : Shape;
+	private var positionFraction : Float = 0;  // range: 0-1  
+
+	private var isVertical : Bool;
+	private var dragOffset : Int;
+	private var scrollFunction : Dynamic->Void;
+	private var minValue : Float;
+	private var maxValue : Float;
+
+	public function new(w : Int, h : Int, scrollFunction : Dynamic->Void = null)
+	{
+		super();
 		this.scrollFunction = scrollFunction;
 		minValue = 0;
 		maxValue = 1;
@@ -55,50 +64,59 @@ public class Slider extends Sprite implements DragClient {
 		addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 	}
 
-	public function get min():Number { return minValue; }
-	public function set min(n:Number):void { minValue = n; }
+	private function get_min() : Float{return minValue;
+	}
+	private function set_min(n : Float) : Float{minValue = n;
+		return n;
+	}
 
-	public function get max():Number { return maxValue; }
-	public function set max(n:Number):void { maxValue = n; }
+	private function get_max() : Float{return maxValue;
+	}
+	private function set_max(n : Float) : Float{maxValue = n;
+		return n;
+	}
 
-	public function get value():Number { return positionFraction * (maxValue - minValue) + minValue; }
-	public function set value(n:Number):void {
+	private function get_value() : Float{return positionFraction * (maxValue - minValue) + minValue;
+	}
+	private function set_value(n : Float) : Float{
 		// Update the slider value (0-1).
-		var newFraction:Number = Math.max(0, Math.min((n - minValue) / (maxValue - minValue), 1));
+		var newFraction : Float = Math.max(0, Math.min((n - minValue) / (maxValue - minValue), 1));
 		if (newFraction != positionFraction) {
 			positionFraction = newFraction;
 			moveKnob();
 		}
+		return n;
 	}
 
-	public function setWidthHeight(w:int, h:int):void {
+	public function setWidthHeight(w : Int, h : Int) : Void{
 		isVertical = h > w;
 		drawSlot(w, h);
 		drawKnob(w, h);
 	}
 
-	private function drawSlot(w:int, h:int):void {
-		const slotRadius:int = 9;
-		var g:Graphics = slot.graphics;
+	private function drawSlot(w : Int, h : Int) : Void{
+		var slotRadius : Int = 9;
+		var g : Graphics = slot.graphics;
 		g.clear();
 		if (slotColor2 >= 0) {
-			var m:Matrix = new Matrix();
-			m.createGradientBox(w, h, (isVertical ? -Math.PI / 2 : Math.PI), 0, 0);
+			var m : Matrix = new Matrix();
+			m.createGradientBox(w, h, ((isVertical) ? -Math.PI / 2 : Math.PI), 0, 0);
 			g.beginGradientFill(GradientType.LINEAR, [slotColor, slotColor2], [1, 1], [0, 255], m);
-		} else {
+		}
+		else {
 			g.beginFill(slotColor);
 		}
 		g.drawRoundRect(0, 0, w, h, slotRadius, slotRadius);
 		g.endFill();
 	}
 
-	private function drawKnob(w:int, h:int):void {
-		const knobOutline:int = 0x707070;
-		const knobFill:int = 0xEBEBEB;
-		const knobRadius:int = 6; // 3;
-		var knobW:int = isVertical ? w + 7 : 7;
-		var knobH:int = isVertical ? 7 : h + 7;
-		var g:Graphics = knob.graphics;
+	private function drawKnob(w : Int, h : Int) : Void{
+		var knobOutline : Int = 0x707070;
+		var knobFill : Int = 0xEBEBEB;
+		var knobRadius : Int = 6;  // 3;  
+		var knobW : Int = (isVertical) ? w + 7 : 7;
+		var knobH : Int = (isVertical) ? 7 : h + 7;
+		var g : Graphics = knob.graphics;
 		g.clear();
 		g.lineStyle(1, knobOutline);
 		g.beginFill(knobFill);
@@ -106,49 +124,52 @@ public class Slider extends Sprite implements DragClient {
 		g.endFill();
 	}
 
-	private function moveKnob():void {
+	private function moveKnob() : Void{
 		if (isVertical) {
 			knob.x = -4;
 			knob.y = Math.round((1 - positionFraction) * (slot.height - knob.height));
-		} else {
+		}
+		else {
 			knob.x = Math.round(positionFraction * (slot.width - knob.width));
 			knob.y = -4;
 		}
 	}
 
-	private function mouseDown(evt:MouseEvent):void {
+	private function mouseDown(evt : MouseEvent) : Void{
 		Scratch.app.gh.setDragClient(this, evt);
 	}
 
-	public function dragBegin(evt:MouseEvent):void {
-		var sliderOrigin:Point = knob.localToGlobal(new Point(0, 0));
+	public function dragBegin(evt : MouseEvent) : Void{
+		var sliderOrigin : Point = knob.localToGlobal(new Point(0, 0));
 		if (isVertical) {
 			dragOffset = evt.stageY - sliderOrigin.y;
 			dragOffset = Math.max(5, Math.min(dragOffset, knob.height - 5));
-		} else {
+		}
+		else {
 			dragOffset = evt.stageX - sliderOrigin.x;
 			dragOffset = Math.max(5, Math.min(dragOffset, knob.width - 5));
 		}
 		dragMove(evt);
 	}
 
-	public function dragMove(evt:MouseEvent):void {
-		var range:int, frac:Number;
-		var localP:Point = globalToLocal(new Point(evt.stageX, evt.stageY));
+	public function dragMove(evt : MouseEvent) : Void{
+		var range : Int;
+		var frac : Float;
+		var localP : Point = globalToLocal(new Point(evt.stageX, evt.stageY));
 		if (isVertical) {
 			range = slot.height - knob.height;
 			positionFraction = 1 - (localP.y - dragOffset) / range;
-		} else {
+		}
+		else {
 			range = slot.width - knob.width;
 			positionFraction = (localP.x - dragOffset) / range;
 		}
 		positionFraction = Math.max(0, Math.min(positionFraction, 1));
 		moveKnob();
-		if (scrollFunction != null) scrollFunction(this.value);
+		if (scrollFunction != null)             scrollFunction(this.value);
 	}
 
-	public function dragEnd(evt:MouseEvent):void {
+	public function dragEnd(evt : MouseEvent) : Void{
 		dispatchEvent(new Event(Event.COMPLETE));
 	}
-
-}}
+}

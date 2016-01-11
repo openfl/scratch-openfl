@@ -22,48 +22,54 @@
 //
 // Styles for Scratch Editor based on the Upstatement design.
 
-package {
-	import flash.text.*;
-	import assets.Resources;
 
-public class CSS {
+import flash.text.*;
+import assets.Resources;
 
-	public static function topBarColor():int { return Scratch.app.isExtensionDevMode ? topBarColor_ScratchX : topBarColor_default; }
-	public static function backgroundColor():int { return Scratch.app.isExtensionDevMode ? backgroundColor_ScratchX : backgroundColor_default; }
+class CSS
+{
+
+	public static function topBarColor() : Int{return (Scratch.app.isExtensionDevMode) ? topBarColor_ScratchX : topBarColor_default;
+	}
+	public static function backgroundColor() : Int{return (Scratch.app.isExtensionDevMode) ? backgroundColor_ScratchX : backgroundColor_default;
+	}
 
 	// ScratchX
-	public static const topBarColor_ScratchX:int = 0x30485f;
-	public static const backgroundColor_ScratchX:int = 0x3f5975;
+	public static inline var topBarColor_ScratchX : Int = 0x30485f;
+	public static inline var backgroundColor_ScratchX : Int = 0x3f5975;
 
 	// Colors
-	public static const white:int = 0xFFFFFF;
-	public static const backgroundColor_default:int = white;
-	public static const topBarColor_default:int = 0x9C9EA2;
-	public static const tabColor:int = 0xE6E8E8;
-	public static const panelColor:int = 0xF2F2F2;
-	public static const itemSelectedColor:int = 0xD0D0D0;
-	public static const borderColor:int = 0xD0D1D2;
-	public static const textColor:int = 0x5C5D5F; // 0x6C6D6F
-	public static const buttonLabelColor:int = textColor;
-	public static const buttonLabelOverColor:int = 0xFBA939;
-	public static const offColor:int = 0x8F9193; // 0x9FA1A3
-	public static const onColor:int = textColor; // 0x4C4D4F
-	public static const overColor:int = 0x179FD7;
-	public static const arrowColor:int = 0xA6A8AC;
+	public static inline var white : Int = 0xFFFFFF;
+	public static var backgroundColor_default : Int = white;
+	public static inline var topBarColor_default : Int = 0x9C9EA2;
+	public static inline var tabColor : Int = 0xE6E8E8;
+	public static inline var panelColor : Int = 0xF2F2F2;
+	public static inline var itemSelectedColor : Int = 0xD0D0D0;
+	public static inline var borderColor : Int = 0xD0D1D2;
+	public static inline var textColor : Int = 0x5C5D5F;  // 0x6C6D6F  
+	public static var buttonLabelColor : Int = textColor;
+	public static inline var buttonLabelOverColor : Int = 0xFBA939;
+	public static inline var offColor : Int = 0x8F9193;  // 0x9FA1A3  
+	public static var onColor : Int = textColor;  // 0x4C4D4F  
+	public static inline var overColor : Int = 0x179FD7;
+	public static inline var arrowColor : Int = 0xA6A8AC;
 
 	// Fonts
-	public static const font:String = Resources.chooseFont(['Arial', 'Verdana', 'DejaVu Sans']);
-	public static const menuFontSize:int = 12;
-	public static const normalTextFormat:TextFormat = new TextFormat(font, 12, textColor);
-	public static const topBarButtonFormat:TextFormat = new TextFormat(font, 12, white, true);
-	public static const titleFormat:TextFormat = new TextFormat(font, 14, textColor);
-	public static const thumbnailFormat:TextFormat = new TextFormat(font, 11, textColor);
-	public static const thumbnailExtraInfoFormat:TextFormat = new TextFormat(font, 9, textColor);
-	public static const projectTitleFormat:TextFormat = new TextFormat(font, 13, textColor);
-	public static const projectInfoFormat:TextFormat = new TextFormat(font, 12, textColor);
+	public static var font : String = Resources.chooseFont(["Arial", "Verdana", "DejaVu Sans"]);
+	public static inline var menuFontSize : Int = 12;
+	public static var normalTextFormat : TextFormat = new TextFormat(font, 12, textColor);
+	public static var topBarButtonFormat : TextFormat = new TextFormat(font, 12, white, true);
+	public static var titleFormat : TextFormat = new TextFormat(font, 14, textColor);
+	public static var thumbnailFormat : TextFormat = new TextFormat(font, 11, textColor);
+	public static var thumbnailExtraInfoFormat : TextFormat = new TextFormat(font, 9, textColor);
+	public static var projectTitleFormat : TextFormat = new TextFormat(font, 13, textColor);
+	public static var projectInfoFormat : TextFormat = new TextFormat(font, 12, textColor);
 
 	// Section title bars
-	public static const titleBarColors:Array = [white, tabColor];
-	public static const titleBarH:int = 30;
+	public static var titleBarColors : Array<Dynamic> = [white, tabColor];
+	public static inline var titleBarH : Int = 30;
 
-}}
+	public function new()
+	{
+	}
+}

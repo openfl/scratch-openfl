@@ -22,25 +22,28 @@
 //
 // A variable is a name-value pair.
 
-package interpreter {
-	import util.JSON;
+package interpreter;
 
-public class Variable {
 
-	public var name:String;
-	public var value:*;
-	public var watcher:*;
-	public var isPersistent:Boolean;
+import util.JSON;
 
-	public function Variable(vName:String, initialValue:*) {
+class Variable
+{
+
+	public var name : String;
+	public var value : Dynamic;
+	public var watcher : Dynamic;
+	public var isPersistent : Bool;
+
+	public function new(vName : String, initialValue : Dynamic)
+	{
 		name = vName;
 		value = initialValue;
 	}
 
-	public function writeJSON(json:util.JSON):void {
-		json.writeKeyValue('name', name);
-		json.writeKeyValue('value', value);
-		json.writeKeyValue('isPersistent', isPersistent);
+	public function writeJSON(json : util.JSON) : Void{
+		json.writeKeyValue("name", name);
+		json.writeKeyValue("value", value);
+		json.writeKeyValue("isPersistent", isPersistent);
 	}
-
-}}
+}

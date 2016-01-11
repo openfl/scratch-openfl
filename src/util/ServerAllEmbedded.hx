@@ -22,13 +22,13 @@ package util
 	SCRATCH::allEmbed public class ServerAllEmbedded extends Server
 	{
 		public function ServerAllEmbedded() {
-			
+
 		}
-		
+
 		// Overall resource lists
 		[Embed(source='../../medialibraries/spriteLibrary.json', mimeType='application/octet-stream')] private static const spriteLibraryJson:Class;
 		[Embed(source='../../medialibraries/backdropLibrary.json', mimeType='application/octet-stream')] private static const backdropLibraryJson:Class;
-		
+
 		// Descriptions of individual sprites
 		[Embed(source='../../medialibraries/blueellipsesprite.json', mimeType='application/octet-stream')] private static const blueEllipseSpriteJson:Class;
 		[Embed(source='../../medialibraries/dogsprite.json', mimeType='application/octet-stream')] private static const dogSpriteJson:Class;
@@ -37,7 +37,7 @@ package util
 		[Embed(source='../../medialibraries/blueellipse.svg', mimeType='application/octet-stream')] private static const blueEllipseSvg:Class;
 		[Embed(source='../../medialibraries/dog.png', mimeType='application/octet-stream')] private static const dogPng:Class;
 		[Embed(source='../../medialibraries/earthrise.jpg', mimeType='application/octet-stream')] private static const earthriseJpg:Class;
-		
+
 		// Dictionary containing all the files
 		private var embeddedFiles:Object = {
 			'spriteLibrary.json' : spriteLibraryJson,
@@ -48,7 +48,7 @@ package util
 			'dog.png' : dogPng,
 			'earthrise.jpg' : earthriseJpg
 		};
-		
+
 		protected override function getCdnStaticSiteURL():String {
 			return "../";
 		}
@@ -60,7 +60,7 @@ package util
 				whenDone(new (embeddedFiles[md5])() as ByteArray);
 			return getDummyUrlLoader();
 		}
-		
+
 		public override function getMediaLibrary(type:String, callback:Function):URLLoader {
 			var file:String = type + 'Library.json';
 			if (embeddedFiles[file] == null)
@@ -69,7 +69,7 @@ package util
 				callback(new (embeddedFiles[file])() as ByteArray);
 			return getDummyUrlLoader();
 		}
-		
+
 		public override function getThumbnail(md5:String, w:int, h:int, callback:Function):URLLoader {
 			function imageLoaded(e:Event):void {
 				// Scale down the bitmap to a thumbnail
@@ -80,7 +80,7 @@ package util
 				thumb.draw(image, m);
 				callback(thumb);
 			}
-			
+
 			// Convert the raw image data to a bitmap
 			var loader:Loader = new Loader();
 			var loaderContext:LoaderContext = new LoaderContext(false, ApplicationDomain.currentDomain, null);
@@ -89,10 +89,10 @@ package util
 				callback(null);
 			else
 				loader.loadBytes(new (embeddedFiles[md5])() as ByteArray, loaderContext);
-			
+
 			return new DummyURLLoader();
 		}
-		
+
 		// The Scratch server API expects a URLLoader to be returned, but we don't use
 		// any because we're simply accessing resources embedded in the SWF file. So we
 		// create a URLLoader that accesses some random data so that we have something to return.

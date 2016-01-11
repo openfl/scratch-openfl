@@ -17,51 +17,58 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package uiwidgets {
-	import flash.display.Shape;
-	import flash.display.Sprite;
-	import flash.events.MouseEvent;
-	import flash.events.Event;
-	import flash.filters.BevelFilter;
-	import flash.geom.Point;
-	import util.DragClient
+package uiwidgets;
 
-public class Scrollbar extends Sprite implements DragClient {
 
-	public static var color:int = 0xCBCDCF;
-	public static var sliderColor:int = 0x424447;
-	public static var cornerRadius:int = 9;
-	public static var look3D:Boolean = false;
+import flash.display.Shape;
+import flash.display.Sprite;
+import flash.events.MouseEvent;
+import flash.events.Event;
+import flash.filters.BevelFilter;
+import flash.geom.Point;
+import util.DragClient;
 
-	public var w:int, h:int;
+class Scrollbar extends Sprite implements DragClient
+{
 
-	private var base:Shape;
-	private var slider:Shape;
-	private var positionFraction:Number = 0;		// scroll amount (range: 0-1)
-	private var sliderSizeFraction:Number = 0.1;	// slider size, used to show fraction of docutment vislbe (range: 0-1)
-	private var isVertical:Boolean;
-	private var dragOffset:int;
-	private var scrollFunction:Function;
+	public static var color : Int = 0xCBCDCF;
+	public static var sliderColor : Int = 0x424447;
+	public static var cornerRadius : Int = 9;
+	public static var look3D : Bool = false;
 
-	public function Scrollbar(w:int, h:int, scrollFunction:Function = null) {
+	public var w : Int;public var h : Int;
+
+	private var base : Shape;
+	private var slider : Shape;
+	private var positionFraction : Float = 0;  // scroll amount (range: 0-1)  
+	private var sliderSizeFraction : Float = 0.1;  // slider size, used to show fraction of docutment vislbe (range: 0-1)  
+	private var isVertical : Bool;
+	private var dragOffset : Int;
+	private var scrollFunction : Dynamic->Void;
+
+	public function new(w : Int, h : Int, scrollFunction : Dynamic -> Void = null)
+	{
+		super();
 		this.scrollFunction = scrollFunction;
 		base = new Shape();
 		slider = new Shape();
 		addChild(base);
 		addChild(slider);
-		if (look3D) addFilters();
+		if (look3D)             addFilters();
 		alpha = 0.7;
 		setWidthHeight(w, h);
 		allowDragging(true);
 	}
 
-	public function scrollValue():Number { return positionFraction }
-	public function sliderSize():Number { return sliderSizeFraction }
+	public function scrollValue() : Float{return positionFraction;
+	}
+	public function sliderSize() : Float{return sliderSizeFraction;
+	}
 
-	public function update(position:Number, sliderSize:Number = 0):Boolean {
+	public function update(position : Float, sliderSize : Float = 0) : Bool{
 		// Update the scrollbar scroll position (0-1) and slider size (0-1)
-		var newPosition:Number = Math.max(0, Math.min(position, 1));
-		var newSliderSize:Number = Math.max(0, Math.min(sliderSize, 1));
+		var newPosition : Float = Math.max(0, Math.min(position, 1));
+		var newSliderSize : Float = Math.max(0, Math.min(sliderSize, 1));
 		if ((newPosition != positionFraction) || (newSliderSize != sliderSizeFraction)) {
 			positionFraction = newPosition;
 			sliderSizeFraction = newSliderSize;
@@ -71,7 +78,7 @@ public class Scrollbar extends Sprite implements DragClient {
 		return slider.visible;
 	}
 
-	public function setWidthHeight(w:int, h:int):void {
+	public function setWidthHeight(w : Int, h : Int) : Void{
 		this.w = w;
 		this.h = h;
 		base.graphics.clear();
@@ -81,19 +88,22 @@ public class Scrollbar extends Sprite implements DragClient {
 		drawSlider();
 	}
 
-	private function drawSlider():void {
-		var w:int, h:int, maxSize:int;
+	private function drawSlider() : Void{
+		var w : Int;
+		var h : Int;
+		var maxSize : Int;
 		isVertical = base.height > base.width;
 		if (isVertical) {
-			maxSize = base.height;
-			w = base.width;
-			h = Math.max(10, Math.min(sliderSizeFraction * maxSize, maxSize));
+			maxSize = Std.int(base.height);
+			w = Std.int(base.width);
+			h = Std.int(Math.max(10, Math.min(sliderSizeFraction * maxSize, maxSize)));
 			slider.x = 0;
 			slider.y = positionFraction * (this.height - h);
-		} else {
-			maxSize = base.width;
-			w = Math.max(10, Math.min(sliderSizeFraction * maxSize, maxSize));
-			h = base.height;
+		}
+		else {
+			maxSize = Std.int(base.width);
+			w = Std.int(Math.max(10, Math.min(sliderSizeFraction * maxSize, maxSize)));
+			h = Std.int(base.height);
 			slider.x = positionFraction * (this.width - w);
 			slider.y = 0;
 		}
@@ -103,8 +113,8 @@ public class Scrollbar extends Sprite implements DragClient {
 		slider.graphics.endFill();
 	}
 
-	private function addFilters():void {
-		var f:BevelFilter = new BevelFilter();
+	private function addFilters() : Void{
+		var f : BevelFilter = new BevelFilter();
 		f.distance = 1;
 		f.blurX = f.blurY = 2;
 		f.highlightAlpha = 0.5;
@@ -119,44 +129,47 @@ public class Scrollbar extends Sprite implements DragClient {
 		slider.filters = [f];
 	}
 
-	public function allowDragging(flag:Boolean):void {
-		if (flag) addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+	public function allowDragging(flag : Bool) : Void{
+		if (flag)             addEventListener(MouseEvent.MOUSE_DOWN, mouseDown)
 		else removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 	}
 
-	private function mouseDown(evt:MouseEvent):void {
+	private function mouseDown(evt : MouseEvent) : Void{
 		Scratch.app.gh.setDragClient(this, evt);
 	}
 
-	public function dragBegin(evt:MouseEvent):void {
-		var sliderOrigin:Point = slider.localToGlobal(new Point(0, 0));
+	public function dragBegin(evt : MouseEvent) : Void{
+		var sliderOrigin : Point = slider.localToGlobal(new Point(0, 0));
 		if (isVertical) {
-			dragOffset = evt.stageY - sliderOrigin.y;
-			dragOffset = Math.max(5, Math.min(dragOffset, slider.height - 5));
-		} else {
-			dragOffset = evt.stageX - sliderOrigin.x;
-			dragOffset = Math.max(5, Math.min(dragOffset, slider.width - 5));
+			dragOffset = Std.int(evt.stageY - sliderOrigin.y);
+			dragOffset = Std.int(Math.max(5, Math.min(dragOffset, slider.height - 5)));
+		}
+		else {
+			dragOffset = Std.int(evt.stageX - sliderOrigin.x);
+			dragOffset = Std.int(Math.max(5, Math.min(dragOffset, slider.width - 5)));
 		}
 		dispatchEvent(new Event(Event.SCROLL));
 		dragMove(evt);
 	}
 
-	public function dragMove(evt:MouseEvent):void {
-		var range:int, frac:Number;
-		var localP:Point = globalToLocal(new Point(evt.stageX, evt.stageY));
+	public function dragMove(evt : MouseEvent) : Void{
+		var range : Int;
+		var frac : Float;
+		var localP : Point = globalToLocal(new Point(evt.stageX, evt.stageY));
 		if (isVertical) {
-			range = base.height - slider.height;
+			range = Std.int(base.height - slider.height);
 			positionFraction = (localP.y - dragOffset) / range;
-		} else {
-			range = base.width - slider.width;
+		}
+		else {
+			range = Std.int(base.width - slider.width);
 			positionFraction = (localP.x - dragOffset) / range;
 		}
 		positionFraction = Math.max(0, Math.min(positionFraction, 1));
 		drawSlider();
-		if (scrollFunction != null) scrollFunction(positionFraction);
+		if (scrollFunction != null)             scrollFunction(positionFraction);
 	}
 
-	public function dragEnd(evt:MouseEvent):void {
+	public function dragEnd(evt : MouseEvent) : Void{
 		dispatchEvent(new Event(Event.COMPLETE));
 	}
-}}
+}

@@ -31,72 +31,74 @@
 // This task could be automated, of course, but this way gives the programmer precise control over
 // what strings are collected (for example, it can collect strings that are constructed dynamically).
 
-package translation {
-	import flash.net.FileReference;
-	import scratch.*;
-	import soundedit.SoundEditor;
-	import svgeditor.*;
-	import ui.*;
-	import ui.media.*;
-	import ui.parts.*;
-	import uiwidgets.*;
-	import util.*;
-	import watchers.*;
+package translation;
 
-public class TranslatableStrings {
 
-	private static const exclude:Array = [
-		'1',
-		'%n * %n', '%n + %n', '%n - %n', '%n / %n',
-		'%s < %s', '%s = %s', '%s > %s',
-	];
-	private static const uiExtras:Array = ['Backpack'];
-	private static const commandExtras:Array = ['define', 'else'];
+import flash.net.FileReference;
+import scratch.*;
+//import soundedit.SoundEditor;
+import svgeditor.*;
+import ui.*;
+import ui.media.*;
+import ui.parts.*;
+import uiwidgets.*;
+import util.*;
+import watchers.*;
 
-	private static var strings:Array = [];
+class TranslatableStrings
+{
 
-	static public function exportCommands():void {
+	private static var exclude : Array<Dynamic> = [
+		"1", 
+		"%n * %n", "%n + %n", "%n - %n", "%n / %n", 
+		"%s < %s", "%s = %s", "%s > %s"];
+	private static var uiExtras : Array<Dynamic> = ["Backpack"];
+	private static var commandExtras : Array<Dynamic> = ["define", "else"];
+
+	private static var strings : Array<Dynamic> = [];
+
+	public static function exportCommands() : Void{
 		strings = commandExtras.concat();
-		for each (var r:Array in Specs.commands) {
-			if ((r[2] < 90) || (r[2] > 100)) { // ignore obsolete and experiment specs (categories 90-100)
-				var spec:String = r[0];
-				if ((spec.length > 0) && (spec.charAt(0) != '-')) add(spec, true);
+		for (r/* AS3HX WARNING could not determine type for var: r exp: EField(EIdent(Specs),commands) type: null */ in Specs.commands){
+			if ((r[2] < 90) || (r[2] > 100)) {  // ignore obsolete and experiment specs (categories 90-100)  
+				var spec : String = r[0];
+				if ((spec.length > 0) && (spec.charAt(0) != "-"))                     add(spec, true);
 			}
 		}
 		addAll(Specs.extensionSpecs);
 		addAll(PaletteSelector.strings());
-		export('commands');
+		export("commands");
 	}
 
-	static public function exportHelpScreenNames():void {
+	public static function exportHelpScreenNames() : Void{
 		// Generate a file mapping block specs to ops, used as keys for help screens.
-		var dict:Object = {};
-		var keys:Array = [];
-		dict['variable reporter'] = 'readVariable';
-		dict['set variable to'] = 'setVar:to:';
-		dict['change variable by'] = 'changeVar:by:';
-		dict['list reporter'] = 'contentsOfList:';
-		dict['procedure definition hat'] = 'procDef';
-		dict['procedure call block'] = 'call';
-		for each (var r:Array in Specs.commands) {
-			if ((r.length > 3) && (r[2] < 90) || (r[2] > 100)) { // ignore obsolete and experiment specs (categories 90-100)
-				var spec:String = r[0];
-				var op:String = r[3];
-				if (keys.indexOf(spec) < 0) {
-					dict[spec] = op;
+		var dict : Dynamic = { };
+		var keys : Array<Dynamic> = [];
+		Reflect.setField(dict, "variable reporter", "readVariable");
+		Reflect.setField(dict, "set variable to", "setVar:to:");
+		Reflect.setField(dict, "change variable by", "changeVar:by:");
+		Reflect.setField(dict, "list reporter", "contentsOfList:");
+		Reflect.setField(dict, "procedure definition hat", "procDef");
+		Reflect.setField(dict, "procedure call block", "call");
+		for (r/* AS3HX WARNING could not determine type for var: r exp: EField(EIdent(Specs),commands) type: null */ in Specs.commands){
+			if ((r.length > 3) && (r[2] < 90) || (r[2] > 100)) {  // ignore obsolete and experiment specs (categories 90-100)  
+				var spec : String = r[0];
+				var op : String = r[3];
+				if (Lambda.indexOf(keys, spec) < 0) {
+					Reflect.setField(dict, spec, op);
 					keys.push(spec);
 				}
 			}
 		}
-		var data:String = '';
+		var data : String = "";
 		keys.sort(Array.CASEINSENSITIVE);
-		for each (var k:String in keys) {
-			data += "\t  '" + dict[k] + "': '/help/studio/tips/blocks/FILENAME',\n";
+		for (k in keys){
+			data += "\t  '" + Reflect.field(dict, Std.string(k)) + "': '/help/studio/tips/blocks/FILENAME',\n";
 		}
-		new FileReference().save(data, 'helpScreens.txt');
+		new FileReference().save(data, "helpScreens.txt");
 	}
 
-	public static function exportUIStrings():void {
+	public static function exportUIStrings() : Void{
 		strings = uiExtras.concat();
 
 		// collect strings from various UI classes
@@ -118,7 +120,7 @@ public class TranslatableStrings {
 		// Get the strings from the Scratch app instance so that the offline version can add strings
 		addAll(Scratch.app.strings());
 		addAll(ScriptsPane.strings());
-		addAll(SoundEditor.strings());
+//        addAll(SoundEditor.strings());
 		addAll(SoundsPart.strings());
 		addAll(SpriteInfoPart.strings());
 		addAll(SpriteThumbnail.strings());
@@ -130,51 +132,56 @@ public class TranslatableStrings {
 		addAll(CameraDialog.strings());
 		Menu.stringCollectionMode = false;
 
-		export('uiStrings');
+		export("uiStrings");
 	}
 
-	public static function addAll(list:Array, removeParens:Boolean = true):void {
-		for each (var s:String in list) add(s, removeParens);
+	public static function addAll(list : Array<Dynamic>, removeParens : Bool = true) : Void{
+		for (s in list)add(s, removeParens);
 	}
 
-	public static function add(s:String, removeParens:Boolean = true):void {
-		if (removeParens) s = removeParentheticals(s);
+	public static function add(s : String, removeParens : Bool = true) : Void{
+		if (removeParens)             s = removeParentheticals(s);
 		s = removeWhitespace(s);
-		if ((s.length < 2) || (exclude.indexOf(s) > -1)) return;
-		if (strings.indexOf(s) > -1) return; // already added
+		if ((s.length < 2) || (Lambda.indexOf(exclude, s) > -1))             return;
+		if (Lambda.indexOf(strings, s) > -1)             return  // already added  ;
 		strings.push(s);
 	}
 
-	public static function has(s:String):Boolean { return strings.indexOf(s) > -1 }
+	public static function has(s : String) : Bool{return Lambda.indexOf(strings, s) > -1;
+	}
 
-	private static function export(defaultName:String):void {
+	private static function export(defaultName : String) : Void{
 		// Save the collected strings to a file, one string per line.
-		var data:String = '';
+		var data : String = "";
 		strings.sort(Array.CASEINSENSITIVE);
-		for each (var s:String in strings) data += s + '\n';
-		data += '\n';
-		new FileReference().save(data, defaultName + '.txt');
+		for (s in strings)data += s + "\n";
+		data += "\n";
+		new FileReference().save(data, defaultName + ".txt");
 		Scratch.app.translationChanged();
 	}
 
-	private static function removeParentheticals(s:String):String {
+	private static function removeParentheticals(s : String) : String{
 		// Remove substrings of the form (*).
-		var i:int, j:int;
-		while (((i = s.indexOf('(')) > -1) && ((j = s.indexOf(')')) > -1)) {
-			s = s.slice(0, i) + s.slice(j + 1);
+		var i : Int;
+		var j : Int;
+		while (((i = s.indexOf("(")) > -1) && ((j = s.indexOf(")")) > -1)){
+			s = s.substring(0, i) + s.substring(j + 1);
 		}
 		return s;
 	}
 
-	private static function removeWhitespace(s:String):String {
+	private static function removeWhitespace(s : String) : String{
 		// Remove leading and trailing whitespace characters.
-		if (s.length == 0) return '';
-		var i:int = 0;
-		while ((i < s.length) && (s.charCodeAt(i) <= 32)) i++;
-		if (i == s.length) return '';
-		var j:int = s.length - 1;
-		while ((j > i) && (s.charCodeAt(j) <= 32)) j--;
-		return s.slice(i, j + 1);
+		if (s.length == 0)             return "";
+		var i : Int = 0;
+		while ((i < s.length) && (s.charCodeAt(i) <= 32))i++;
+		if (i == s.length)             return "";
+		var j : Int = s.length - 1;
+		while ((j > i) && (s.charCodeAt(j) <= 32))j--;
+		return s.substring(i, j + 1);
 	}
 
-}}
+	public function new()
+	{
+	}
+}

@@ -17,11 +17,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package util {
-	import flash.events.MouseEvent;
+package util;
 
-public interface DragClient {
-	function dragBegin(evt:MouseEvent):void;
-	function dragMove(evt:MouseEvent):void;
-	function dragEnd(evt:MouseEvent):void;
-}}
+
+import flash.events.MouseEvent;
+
+interface DragClient
+{
+
+	function dragBegin(evt : MouseEvent) : Void;
+	function dragMove(evt : MouseEvent) : Void;
+	function dragEnd(evt : MouseEvent) : Void;
+}

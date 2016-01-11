@@ -17,24 +17,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package uiwidgets {
+package uiwidgets;
+
+import CSS;
 import flash.display.*;
 import flash.events.MouseEvent;
 import flash.geom.Matrix;
 import flash.text.*;
 
-public class Button extends Sprite {
+class Button extends Sprite
+{
 
-	private var labelOrIcon:DisplayObject;
-	private var color:* = CSS.titleBarColors;
-	private var minWidth:int = 50;
-	private var compact:Boolean;
+	private var labelOrIcon : DisplayObject;
+	private var color : Dynamic = CSS.titleBarColors;
+	private var minWidth : Int = 50;
+	private var compact : Bool;
 
-	private var action:Function; // takes no arguments
-	private var eventAction:Function; // like action, but takes the event as an argument
-	private var tipName:String;
+	private var action : Void->Void;  // takes no arguments  
+	private var eventAction : Dynamic->Void;  // like action, but takes the event as an argument  
+	private var tipName : String;
 
-	public function Button(label:String, action:Function = null, compact:Boolean = false, tipName:String = null) {
+	public function new(label : String, action : Void->Void= null, compact : Bool = false, tipName : String = null)
+	{
+		super();
 		this.action = action;
 		this.compact = compact;
 		this.tipName = tipName;
@@ -47,42 +52,44 @@ public class Button extends Sprite {
 		setColor(CSS.titleBarColors);
 	}
 
-	public function setLabel(s:String):void {
-		if (labelOrIcon is TextField) {
-			TextField(labelOrIcon).text = s;
+	public function setLabel(s : String) : Void{
+		if (Std.is(labelOrIcon, TextField)) {
+			cast((labelOrIcon), TextField).text = s;
 			setMinWidthHeight(0, 0);
-		} else {
-			if ((labelOrIcon != null) && (labelOrIcon.parent != null)) labelOrIcon.parent.removeChild(labelOrIcon);
+		}
+		else {
+			if ((labelOrIcon != null) && (labelOrIcon.parent != null))                 labelOrIcon.parent.removeChild(labelOrIcon);
 			addLabel(s);
 		}
 	}
 
-	public function setIcon(icon:DisplayObject):void {
+	public function setIcon(icon : DisplayObject) : Void{
 		if ((labelOrIcon != null) && (labelOrIcon.parent != null)) {
 			labelOrIcon.parent.removeChild(labelOrIcon);
 		}
 		labelOrIcon = icon;
-		if (icon != null) addChild(labelOrIcon);
+		if (icon != null)             addChild(labelOrIcon);
 		setMinWidthHeight(0, 0);
 	}
 
-	public function setMinWidthHeight(minW:int, minH:int):void {
+	public function setMinWidthHeight(minW : Int, minH : Int) : Void{
 		if (labelOrIcon != null) {
-			if (labelOrIcon is TextField) {
-				minW = Math.max(minWidth, labelOrIcon.width + 11);
-				minH = compact ? 20 : 25;
-			} else {
-				minW = Math.max(minWidth, labelOrIcon.width + 12);
-				minH = Math.max(minH, labelOrIcon.height + 11);
+			if (Std.is(labelOrIcon, TextField)) {
+				minW = Std.int(Math.max(minWidth, labelOrIcon.width + 11));
+				minH = (compact) ? 20 : 25;
+			}
+			else {
+				minW = Std.int(Math.max(minWidth, labelOrIcon.width + 12));
+				minH = Std.int(Math.max(minH, labelOrIcon.height + 11));
 			}
 			labelOrIcon.x = ((minW - labelOrIcon.width) / 2);
 			labelOrIcon.y = ((minH - labelOrIcon.height) / 2);
-		}
-		// outline
+		}  // outline  
+
 		graphics.clear();
 		graphics.lineStyle(0.5, CSS.borderColor, 1, true);
-		if (color is Array) {
-			var matr:Matrix = new Matrix();
+		if (Std.is(color, Array)) {
+			var matr : Matrix = new Matrix();
 			matr.createGradientBox(minW, minH, Math.PI / 2, 0, 0);
 			graphics.beginGradientFill(GradientType.LINEAR, CSS.titleBarColors, [100, 100], [0x00, 0xFF], matr);
 		}
@@ -91,44 +98,44 @@ public class Button extends Sprite {
 		graphics.endFill();
 	}
 
-	public function setEventAction(newEventAction:Function):Function {
-		var oldEventAction:Function = eventAction;
+	public function setEventAction(newEventAction : Dynamic->Void) : Dynamic->Void{
+		var oldEventAction : Dynamic->Void = eventAction;
 		eventAction = newEventAction;
 		return oldEventAction;
 	}
 
-	private function mouseOver(evt:MouseEvent):void {
-		setColor(CSS.overColor)
+	private function mouseOver(evt : MouseEvent) : Void{
+		setColor(CSS.overColor);
 	}
 
-	private function mouseOut(evt:MouseEvent):void {
-		setColor(CSS.titleBarColors)
+	private function mouseOut(evt : MouseEvent) : Void{
+		setColor(CSS.titleBarColors);
 	}
 
-	private function mouseDown(evt:MouseEvent):void {
-		Menu.removeMenusFrom(stage)
+	private function mouseDown(evt : MouseEvent) : Void{
+		Menu.removeMenusFrom(stage);
 	}
 
-	private function mouseUp(evt:MouseEvent):void {
-		if (action != null) action();
-		if (eventAction != null) eventAction(evt);
+	private function mouseUp(evt : MouseEvent) : Void{
+		if (action != null)             action();
+		if (eventAction != null)             eventAction(evt);
 		evt.stopImmediatePropagation();
 	}
 
-	public function handleTool(tool:String, evt:MouseEvent):void {
-		if (tool == 'help' && tipName) Scratch.app.showTip(tipName);
+	public function handleTool(tool : String, evt : MouseEvent) : Void{
+		if (tool == "help" && tipName != null)             Scratch.app.showTip(tipName);
 	}
 
-	private function setColor(c:*):void {
+	private function setColor(c : Dynamic) : Void{
 		color = c;
-		if (labelOrIcon is TextField) {
-			(labelOrIcon as TextField).textColor = (c == CSS.overColor) ? CSS.white : CSS.buttonLabelColor;
+		if (Std.is(labelOrIcon, TextField)) {
+			(try cast(labelOrIcon, TextField) catch(e:Dynamic) null).textColor = ((c == CSS.overColor)) ? CSS.white : CSS.buttonLabelColor;
 		}
 		setMinWidthHeight(5, 5);
 	}
 
-	private function addLabel(s:String):void {
-		var label:TextField = new TextField();
+	private function addLabel(s : String) : Void{
+		var label : TextField = new TextField();
 		label.autoSize = TextFieldAutoSize.LEFT;
 		label.selectable = false;
 		label.background = false;
@@ -139,6 +146,5 @@ public class Button extends Sprite {
 		setMinWidthHeight(0, 0);
 		addChild(label);
 	}
+}
 
-}
-}

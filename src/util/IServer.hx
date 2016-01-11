@@ -25,22 +25,26 @@
 // Note: All operations call the callback function with the result
 // if the operation succeeded or null if it failed.
 
-package util {
-	import flash.net.URLLoader;
+package util;
 
-public interface IServer {
+
+import flash.net.URLLoader;
+
+interface IServer
+{
+
 	// -----------------------------
 	// Asset API
 	//------------------------------
-	function getAsset(md5:String, callback:Function):URLLoader;
-	function getMediaLibrary(type:String, callback:Function):URLLoader;
-	function getThumbnail(md5:String, w:int, h:int, callback:Function):URLLoader;
+	function getAsset(md5 : String, callback : Dynamic->Void) : URLLoader;
+	function getMediaLibrary(type : String, callback : Dynamic->Void) : URLLoader;
+	function getThumbnail(md5 : String, w : Int, h : Int, callback : Dynamic->Void) : URLLoader;
 
 	// -----------------------------
 	// Translation Support
 	//------------------------------
-	function getLanguageList(callback:Function):void;
-	function getPOFile(lang:String, callback:Function):void;
-	function getSelectedLang(callback:Function):void;
-	function setSelectedLang(lang:String):void;
-}}
+	function getLanguageList(callback : Dynamic->Void) : Void;
+	function getPOFile(lang : String, callback : Dynamic->Void) : Void;
+	function getSelectedLang(callback : Dynamic->Void) : Void;
+	function setSelectedLang(lang : String) : Void;
+}

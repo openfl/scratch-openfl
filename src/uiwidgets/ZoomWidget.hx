@@ -17,23 +17,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package uiwidgets {
-	import flash.display.Sprite;
+package uiwidgets;
 
-public class ZoomWidget extends Sprite {
 
-	private var scriptsPane:ScriptsPane;
-	private var zoom:int;
+import flash.display.Sprite;
 
-	private var smaller:IconButton;
-	private var normal:IconButton;
-	private var bigger:IconButton;
+class ZoomWidget extends Sprite
+{
 
-	public function ZoomWidget(scriptsPane:ScriptsPane) {
+	private var scriptsPane : ScriptsPane;
+	private var zoom : Int;
+
+	private var smaller : IconButton;
+	private var normal : IconButton;
+	private var bigger : IconButton;
+
+	public function new(scriptsPane : ScriptsPane)
+	{
+		super();
 		this.scriptsPane = scriptsPane;
-		addChild(smaller = new IconButton(zoomOut, 'zoomOut'));
-		addChild(normal = new IconButton(noZoom, 'noZoom'));
-		addChild(bigger = new IconButton(zoomIn, 'zoomIn'));
+		addChild(smaller = new IconButton(zoomOut, "zoomOut"));
+		addChild(normal = new IconButton(noZoom, "noZoom"));
+		addChild(bigger = new IconButton(zoomIn, "zoomIn"));
 		smaller.x = 0;
 		normal.x = 24;
 		bigger.x = 48;
@@ -42,17 +47,19 @@ public class ZoomWidget extends Sprite {
 		bigger.isMomentary = true;
 	}
 
-	private function zoomOut(b:IconButton):void { changeZoomBy(-1) }
-	private function noZoom(b:IconButton):void { zoom = 0; changeZoomBy(0) }
-	private function zoomIn(b:IconButton):void { changeZoomBy(1) }
+	private function zoomOut(b : IconButton) : Void{changeZoomBy(-1);
+	}
+	private function noZoom(b : IconButton) : Void{zoom = 0;changeZoomBy(0);
+	}
+	private function zoomIn(b : IconButton) : Void{changeZoomBy(1);
+	}
 
-	private function changeZoomBy(delta:int):void {
-		const scaleFactors:Array = [25, 50, 75, 100, 125, 150, 200];
+	private function changeZoomBy(delta : Int) : Void{
+		var scaleFactors : Array<Dynamic> = [25, 50, 75, 100, 125, 150, 200];
 		zoom += delta;
-		zoom = Math.max(-3, Math.min(zoom, 3));
+		zoom = Std.int(Math.max(-3, Math.min(zoom, 3)));
 		smaller.setDisabled(zoom < -2, 0.5);
 		bigger.setDisabled(zoom > 2, 0.5);
 		scriptsPane.setScale(scaleFactors[3 + zoom] / 100);
 	}
-
-}}
+}

@@ -17,23 +17,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package logging {
+package logging;
+
+import logging.LogEntry;
+
 import flash.system.Capabilities;
 
 import util.JSON;
 
-public class Log {
+class Log
+{
 
 	// Should the logger echo log entries to JavaScript?
-	public var echoToJS:Boolean = true;
+	public var echoToJS : Bool = true;
 
-	public const logBuffer:Vector.<LogEntry> = new <LogEntry>[];
+	public var logBuffer : Array<LogEntry> = [];
 
-	private var fixedBuffer:Boolean;
-	private var nextIndex:uint;
+	private var fixedBuffer : Bool;
+	private var nextIndex : Int;
 
 	// If messageCount is 0, keep all logged messages. Otherwise throw out old messages once `messageCount` is reached.
-	public function Log(messageCount:uint) {
+	public function new(messageCount : Int)
+	{
 		fixedBuffer = (messageCount > 0);
 		if (fixedBuffer) {
 			logBuffer.length = messageCount;
@@ -42,9 +47,9 @@ public class Log {
 	}
 
 	// Add a new entry to the log.
-	public function log(severity:String, messageKey:String, extraData:Object = null):LogEntry {
-		var entry:LogEntry = logBuffer[nextIndex];
-		if (entry) {
+	public function log(severity : String, messageKey : String, extraData : Dynamic = null) : LogEntry{
+		var entry : LogEntry = logBuffer[nextIndex];
+		if (entry != null) {
 			// Reduce GC impact by replacing the contents of existing entries
 			entry.setAll(severity, messageKey, extraData);
 		}
@@ -58,43 +63,47 @@ public class Log {
 			nextIndex %= logBuffer.length;
 		}
 
-		var entryString:String;
-		function getEntryString():String {
-			return entryString || (entryString = entry.toString());
-		}
+		var entryString : String;
+		function getEntryString() : String {
+			if (entryString == null)
+				entryString = Std.string(entry);
+			return entryString;
+		};
 
-		var extraString:String;
-		function getExtraString():String {
-			return extraString || (extraString = util.JSON.stringify(extraData));
-		}
+		var extraString : String;
+		function getExtraString() : String {
+			if (extraString == null)
+				extraString = util.JSON.stringify(extraData);
+			return extraString;
+		};
 
 		if (Capabilities.isDebugger) {
 			trace(getEntryString());
 		}
-		if (Scratch.app.jsEnabled) {
-			if (echoToJS) {
-				Scratch.app.externalCall(
-						'console.log', null, getEntryString() + (extraData ? '\n' + getExtraString() : ''));
-			}
-			if (LogLevel.TRACK == severity) {
-				Scratch.app.externalCall(
-						'JStrackEvent', null, messageKey, extraData ? getExtraString() : null);
-			}
-		}
+		//if (Scratch.app.jsEnabled) {
+			//if (echoToJS) {
+				//Scratch.app.externalCall(
+						//"console.log", null, getEntryString() + ((extraData != null) ? "\n" + getExtraString() : ""));
+			//}
+			//if (LogLevel.TRACK == severity) {
+				//Scratch.app.externalCall(
+						//"JStrackEvent", null, messageKey, (extraData != null) ? getExtraString() : null);
+			//}
+		//}
 		return entry;
 	}
 
 	// Generate a JSON-compatible object representing the contents of the log in a human- and machine-readable way.
-	public function report(severityLimit:String = LogLevel.DEBUG):Object {
-		var maxSeverity:int = LogLevel.LEVEL.indexOf(severityLimit);
-		var baseIndex:uint = fixedBuffer ? nextIndex : 0;
-		var count:uint = logBuffer.length;
-		var jsonArray:Array = [];
-		for (var index:uint = 0; index < count; ++index) {
-			var entry:LogEntry = logBuffer[(baseIndex + index) % count];
+	public function report(severityLimit : String = LogLevel.DEBUG) : Dynamic{
+		var maxSeverity : Int = LogLevel.LEVEL.indexOf(severityLimit);
+		var baseIndex : Int = (fixedBuffer) ? nextIndex : 0;
+		var count : Int = logBuffer.length;
+		var jsonArray : Array<Dynamic> = [];
+		for (index in 0...count){
+			var entry : LogEntry = logBuffer[(baseIndex + index) % count];
 			// If we're in fixedBuffer mode and nextIndex hasn't yet wrapped then there will be null entries
-			if (entry && (entry.severity <= maxSeverity)) {
-				jsonArray.push(entry.toString());
+			if (entry != null && (entry.severity <= maxSeverity)) {
+				jsonArray.push(Std.string(entry));
 				if (entry.extraData) {
 					jsonArray.push(entry.extraData);
 				}
@@ -103,4 +112,4 @@ public class Log {
 		return jsonArray;
 	}
 }
-}
+

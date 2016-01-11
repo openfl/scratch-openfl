@@ -22,38 +22,46 @@
 //
 // A simple indicator light with a color and a tooltip. Used to show extension state.
 
-package uiwidgets {
-	import flash.display.*;
-	import uiwidgets.SimpleTooltips;
+package uiwidgets;
 
-public class IndicatorLight extends Sprite {
 
-	public var target:*;
+import flash.display.*;
+import uiwidgets.SimpleTooltips;
 
-	private var color:int;
-	private var msg:String = '';
+class IndicatorLight extends Sprite
+{
 
-	public function IndicatorLight(target:* = null) {
+	public var target : Dynamic;
+
+	private var color : Int;
+	private var msg : String = "";
+
+	public function new(target : Dynamic = null)
+	{
+		super();
 		this.target = target;
 		redraw();
 	}
 
-	public function setColorAndMsg(color:int, msg:String):void {
-		if ((color == this.color) && (msg == this.msg)) return; // no change
+	public function setColorAndMsg(color : Int, msg : String) : Void{
+		if ((color == this.color) && (msg == this.msg))             return;  // no change  ;
 		this.color = color;
 		this.msg = msg;
-		SimpleTooltips.add(this, {text: msg, direction: 'bottom'});
+		SimpleTooltips.add(this, {
+					text : msg,
+					direction : "bottom",
+
+				});
 		redraw();
 	}
 
-	private function redraw():void {
-		const borderColor:int = 0x505050;
-		var g:Graphics = graphics;
+	private function redraw() : Void{
+		var borderColor : Int = 0x505050;
+		var g : Graphics = graphics;
 		g.clear();
 		g.lineStyle(1, borderColor);
 		g.beginFill(color);
 		g.drawCircle(7, 7, 6);
 		g.endFill();
 	}
-
-}}
+}

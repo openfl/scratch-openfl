@@ -17,8 +17,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package uiwidgets {
-	import flash.display.DisplayObject;
+package uiwidgets;
+
+import flash.display.DisplayObject;
 import flash.display.*;
 import flash.events.*;
 import flash.filters.DropShadowFilter;
@@ -29,64 +30,73 @@ import flash.utils.Timer;
 
 import translation.Translator;
 
-	public class SimpleTooltips {
-		static private var instance:SimpleTooltip = null;
-		/**
+
+
+
+
+
+
+
+
+
+
+class SimpleTooltips
+{
+	private static var instance : SimpleTooltip = null;
+	/**
 		 * Add a tooltip to a DisplayObject
 		 * @param dObj Attach the tooltip to this
 		 * @param opts Options (just 'text' and 'direction' right now)
 		 *
 		 */
-		static public function add(dObj:DisplayObject, opts:Object):void {
-			if (!instance) instance = new SimpleTooltip();
-			if (!dObj) return;
-			instance.addTooltip(dObj, opts);
-		}
+	public static function add(dObj : DisplayObject, opts : Dynamic) : Void{
+		if (instance == null)             instance = new SimpleTooltip();
+		if (dObj == null)             return;
+		instance.addTooltip(dObj, opts);
+	}
 
-		static public function hideAll():void {
-			if (instance) instance.forceHide();
-		}
+	public static function hideAll() : Void{
+		if (instance != null)             instance.forceHide();
+	}
 
-		static public function showOnce(dObj:DisplayObject, opts:Object):void {
-			if (!instance) instance = new SimpleTooltip();
-			instance.showOnce(dObj, opts);
-		}
+	public static function showOnce(dObj : DisplayObject, opts : Dynamic) : Void{
+		if (instance == null)             instance = new SimpleTooltip();
+		instance.showOnce(dObj, opts);
+	}
+
+	public function new()
+	{
 	}
 }
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.DropShadowFilter;
-import flash.geom.*;
-import flash.text.*;
-import flash.utils.Dictionary;
-import flash.utils.Timer;
 
-import translation.Translator;
 
-class SimpleTooltip {
+
+class SimpleTooltip
+{
 	// Map of DisplayObject => Strings
-	private var tipObjs:Dictionary = new Dictionary();
-	private var currentTipObj:DisplayObject;
-	private var nextTipObj:DisplayObject;
+	private var tipObjs : Dictionary = new Dictionary();
+	private var currentTipObj : DisplayObject;
+	private var nextTipObj : DisplayObject;
 
 	// Timing values (in milliseconds)
-	private const delay:uint = 500;
-	private const linger:uint = 1000;
-	private const fadeIn:uint = 200;
-	private const fadeOut:uint = 500;
+	private static inline var delay : Int = 500;
+	private static inline var linger : Int = 1000;
+	private static inline var fadeIn : Int = 200;
+	private static inline var fadeOut : Int = 500;
 
-	private const bgColor:uint = 0xfcfed4;
+	private static inline var bgColor : Int = 0xfcfed4;
 
 	// Timers
-	private var showTimer:Timer;
-	private var hideTimer:Timer;
-	private var animTimer:Timer;
+	private var showTimer : Timer;
+	private var hideTimer : Timer;
+	private var animTimer : Timer;
 
-	private var sprite:Sprite;
-	private var textField:TextField;
-	private var stage:Stage;
-	function SimpleTooltip() {
+	private var sprite : Sprite;
+	private var textField : TextField;
+	private var stage : Stage;
+	function new()
+	{
 		// Setup timers
 		showTimer = new Timer(delay);
 		showTimer.addEventListener(TimerEvent.TIMER, eventHandler);
@@ -107,55 +117,55 @@ class SimpleTooltip {
 		sprite.addChild(textField);
 	}
 
-	static private var instance:*;
-	public function addTooltip(dObj:DisplayObject, opts:Object):void {
-		if(!opts.hasOwnProperty('text') || !opts.hasOwnProperty('direction') ||
-			['top', 'bottom', 'left', 'right'].indexOf(opts.direction) == -1) {
-			trace('Invalid parameters!');
+	private static var instance : Dynamic;
+	public function addTooltip(dObj : DisplayObject, opts : Dynamic) : Void{
+		if (!opts.exists("text") || !opts.exists("direction") ||
+			["top", "bottom", "left", "right"].indexOf(opts.direction) == -1) {
+			trace("Invalid parameters!");
 			return;
 		}
 
-		if(tipObjs[dObj] == null) {
+		if (Reflect.field(tipObjs, Std.string(dObj)) == null) {
 			dObj.addEventListener(MouseEvent.MOUSE_OVER, eventHandler);
 		}
-		tipObjs[dObj] = opts;
+		Reflect.setField(tipObjs, Std.string(dObj), opts);
 	}
 
-	private function eventHandler(evt:Event):void {
-		switch(evt.type) {
-			case MouseEvent.MOUSE_OVER:
-				startShowTimer(evt.currentTarget as DisplayObject);
-				break;
-			case MouseEvent.MOUSE_OUT:
-				(evt.currentTarget as DisplayObject).removeEventListener(MouseEvent.MOUSE_OUT, eventHandler);
+	private function eventHandler(evt : Event) : Void{
+		var _sw2_ = (evt.type);        
 
-				if(showTimer.running) {
+		switch (_sw2_)
+		{
+			case MouseEvent.MOUSE_OVER:
+				startShowTimer(try cast(evt.currentTarget, DisplayObject) catch(e:Dynamic) null);
+			case MouseEvent.MOUSE_OUT:
+				(try cast(evt.currentTarget, DisplayObject) catch(e:Dynamic) null).removeEventListener(MouseEvent.MOUSE_OUT, eventHandler);
+
+				if (showTimer.running) {
 					showTimer.reset();
 					nextTipObj = null;
 				}
 
-				startHideTimer(evt.currentTarget as DisplayObject);
-				break;
+				startHideTimer(try cast(evt.currentTarget, DisplayObject) catch(e:Dynamic) null);
 			case TimerEvent.TIMER:
-				if(evt.target == showTimer) {
+				if (evt.target == showTimer) {
 					startShow();
 				}
 				else {
-					startHide(evt.target as Timer);
-					if(evt.target != hideTimer) {
-						(evt.target as Timer).removeEventListener(TimerEvent.TIMER, eventHandler);
+					startHide(try cast(evt.target, Timer) catch(e:Dynamic) null);
+					if (evt.target != hideTimer) {
+						(try cast(evt.target, Timer) catch(e:Dynamic) null).removeEventListener(TimerEvent.TIMER, eventHandler);
 					}
 				}
-				break;
 		}
 	}
 
-	private function startShow():void {
+	private function startShow() : Void{
 		//trace('startShow()');
 		showTimer.reset();
 		hideTimer.reset();
 		sprite.alpha = 0;
-		var ttOpts:Object = tipObjs[nextTipObj];
+		var ttOpts : Dynamic = Reflect.field(tipObjs, Std.string(nextTipObj));
 		renderTooltip(ttOpts.text);
 		currentTipObj = nextTipObj;
 
@@ -163,14 +173,14 @@ class SimpleTooltip {
 		sprite.alpha = 1;
 		stage.addChild(sprite);
 
-		var pos:Point = getPos(ttOpts.direction);
+		var pos : Point = getPos(ttOpts.direction);
 		sprite.x = pos.x;
 		sprite.y = pos.y;
 	}
 
-	public function showOnce(dObj:DisplayObject, ttOpts:Object):void {
-		if(!stage && dObj.stage) stage = dObj.stage;
-		//trace('showOnce()');
+	public function showOnce(dObj : DisplayObject, ttOpts : Dynamic) : Void{
+		if (stage == null && dObj.stage != null)             stage = dObj.stage;  //trace('showOnce()');  ;
+
 		forceHide();
 		showTimer.reset();
 		hideTimer.reset();
@@ -182,54 +192,51 @@ class SimpleTooltip {
 		sprite.alpha = 1;
 		stage.addChild(sprite);
 
-		var pos:Point = getPos(ttOpts.direction);
+		var pos : Point = getPos(ttOpts.direction);
 		sprite.x = pos.x;
 		sprite.y = pos.y;
 
 		// Show the tooltip for twice as long
-		var myTimer:Timer = new Timer(5000);
+		var myTimer : Timer = new Timer(5000);
 		myTimer.addEventListener(TimerEvent.TIMER, eventHandler);
 		myTimer.reset();
 		myTimer.start();
 	}
 
-	private function getPos(direction:String):Point {
-		var rect:Rectangle = currentTipObj.getBounds(stage);
-		var pos:Point;
-		switch(direction) {
-			case 'right':
-				pos = new Point(rect.right + 5, Math.round((rect.top + rect.bottom - sprite.height)/2));
-				break;
-			case 'left':
-				pos = new Point(rect.left - 5 - sprite.width, Math.round((rect.top + rect.bottom - sprite.height)/2));
-				break;
-			case 'top':
-				pos = new Point(Math.round((rect.left + rect.right - sprite.width)/2), rect.top - 4 - sprite.height);
-				break;
-			case 'bottom':
-				pos = new Point(Math.round((rect.left + rect.right - sprite.width)/2), rect.bottom + 4);
-				break;
+	private function getPos(direction : String) : Point{
+		var rect : Rectangle = currentTipObj.getBounds(stage);
+		var pos : Point;
+		switch (direction)
+		{
+			case "right":
+				pos = new Point(rect.right + 5, Math.round((rect.top + rect.bottom - sprite.height) / 2));
+			case "left":
+				pos = new Point(rect.left - 5 - sprite.width, Math.round((rect.top + rect.bottom - sprite.height) / 2));
+			case "top":
+				pos = new Point(Math.round((rect.left + rect.right - sprite.width) / 2), rect.top - 4 - sprite.height);
+			case "bottom":
+				pos = new Point(Math.round((rect.left + rect.right - sprite.width) / 2), rect.bottom + 4);
 		}
-		if (pos.x < 0) pos.x = 0;
-		if (pos.y < 0) pos.y = 0;
+		if (pos.x < 0)             pos.x = 0;
+		if (pos.y < 0)             pos.y = 0;
 		return pos;
 	}
 
-	public function forceHide():void {
+	public function forceHide() : Void{
 		startHide(hideTimer);
 	}
 
-	private function startHide(timer:Timer):void {
+	private function startHide(timer : Timer) : Void{
 		//trace('startHide()');
 		hideTimer.reset();
 		currentTipObj = null;
 		sprite.alpha = 0;
-		if(sprite.parent) stage.removeChild(sprite);
+		if (sprite.parent != null)             stage.removeChild(sprite);
 	}
 
-	private function renderTooltip(text:String):void {
+	private function renderTooltip(text : String) : Void{
 		//trace('renderTooltip(\''+text+'\')');
-		var g:Graphics = sprite.graphics;
+		var g : Graphics = sprite.graphics;
 		textField.text = Translator.map(text);
 		g.clear();
 		g.lineStyle(1, 0xCCCCCC);
@@ -238,18 +245,18 @@ class SimpleTooltip {
 		g.endFill();
 	}
 
-	private function startShowTimer(dObj:DisplayObject):void {
+	private function startShowTimer(dObj : DisplayObject) : Void{
 		//trace('startShowTimer()');
-		if(!stage && dObj.stage) stage = dObj.stage;
+		if (stage == null && dObj.stage != null)             stage = dObj.stage;
 
 		dObj.addEventListener(MouseEvent.MOUSE_OUT, eventHandler);
 
-		if(dObj === currentTipObj) {
+		if (dObj == currentTipObj) {
 			hideTimer.reset();
 			return;
 		}
 
-		if(tipObjs[dObj] is Object) {
+		if (Std.is(Reflect.field(tipObjs, Std.string(dObj)), Dynamic)) {
 			nextTipObj = dObj;
 
 			showTimer.reset();
@@ -257,9 +264,9 @@ class SimpleTooltip {
 		}
 	}
 
-	private function startHideTimer(dObj:DisplayObject):void {
+	private function startHideTimer(dObj : DisplayObject) : Void{
 		//trace('startHideTimer()');
-		if(dObj !== currentTipObj) return;
+		if (dObj != currentTipObj)             return;
 
 		hideTimer.reset();
 		hideTimer.start();

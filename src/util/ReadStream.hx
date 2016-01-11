@@ -22,109 +22,120 @@
 //
 // A simple character stream with two character look-ahead and tokenization.
 
-package util {
-public class ReadStream {
+package util;
 
-	private var src:String, i:int;
 
-	public function ReadStream(s:String) {
+class ReadStream
+{
+
+	private var src : String;private var i : Int;
+
+	public function new(s : String)
+	{
 		src = s;
 		i = 0;
 	}
 
-	public function atEnd():Boolean {
+	public function atEnd() : Bool{
 		return i >= src.length;
 	}
 
-	public function next():String {
-		if (i >= src.length) return '';
+	public function next() : String{
+		if (i >= src.length)             return "";
 		return src.charAt(i++);
 	}
 
-	public function peek():String {
-		return (i < src.length) ? src.charAt(i) : '';
+	public function peek() : String{
+		return ((i < src.length)) ? src.charAt(i) : "";
 	}
 
-	public function peek2():String {
-		return ((i + 1) < src.length) ? src.charAt(i + 1) : '';
+	public function peek2() : String{
+		return (((i + 1) < src.length)) ? src.charAt(i + 1) : "";
 	}
 
-	public function peekString(n:int):String { return src.slice(i, i + n) }
+	public function peekString(n : Int) : String{return src.substring(i, i + n);
+	}
 
-	public function nextString(n:int):String {
+	public function nextString(n : Int) : String{
 		i += n;
-		return src.slice(i - n, i);
+		return src.substring(i - n, i);
 	}
 
-	public function pos():int { return i }
-
-	public function setPos(newPos:int):void { i = newPos }
-
-	public function skip(count:int):void { i += count }
-
-	public function skipWhiteSpace():void {
-		while ((i < src.length) && (src.charCodeAt(i) <= 32)) i++;
+	public function pos() : Int{return i;
 	}
 
-	public function upToEnd():String {
-		var result:String = (i < src.length) ? src.slice(i, src.length) : '';
+	public function setPos(newPos : Int) : Void{i = newPos;
+	}
+
+	public function skip(count : Int) : Void{i += count;
+	}
+
+	public function skipWhiteSpace() : Void{
+		while ((i < src.length) && (src.charCodeAt(i) <= 32))i++;
+	}
+
+	public function upToEnd() : String{
+		var result : String = ((i < src.length)) ? src.substring(i, src.length) : "";
 		i = src.length;
 		return result;
 	}
 
-	public static function tokenize(s:String):Array {
-		var stream:ReadStream = new ReadStream(s);
-		var result:Array = [];
-		while (!stream.atEnd()) {
-			var token:String = stream.nextToken();
-			if (token.length > 0) result.push(token);
+	public static function tokenize(s : String) : Array<Dynamic>{
+		var stream : ReadStream = new ReadStream(s);
+		var result : Array<Dynamic> = [];
+		while (!stream.atEnd()){
+			var token : String = stream.nextToken();
+			if (token.length > 0)                 result.push(token);
 		}
 		return result;
 	}
 
-	public function nextToken():String {
+	public function nextToken() : String{
 		skipWhiteSpace();
-		if (atEnd()) return '';
-		var token:String = '';
-		var isArg:Boolean;
-		var start:int = i;
-		while (i < src.length) {
-			if (src.charCodeAt(i) <= 32) break;
-			var ch:String = src.charAt(i);
-			if (ch == '\\') {
+		if (atEnd())             return "";
+		var token : String = "";
+		var isArg : Bool;
+		var start : Int = i;
+		while (i < src.length){
+			if (src.charCodeAt(i) <= 32)                 break;
+			var ch : String = src.charAt(i);
+			if (ch == "\\") {
 				token += ch + src.charAt(i + 1);
 				i += 2;
 				continue;
 			}
-			if (ch == '%') {
-				if (i > start) break; // percent sign starts new token
+			if (ch == "%") {
+				if (i > start)                     break;  // percent sign starts new token  ;
 				isArg = true;
-			}
-			// certain punctuation marks following an argument start a new token
-			// example: 'touching %m?' (question mark after arg starts a new token) vs. 'loud?' (doesn't)
-			if (isArg && (ch == '?' || ch == '-')) break;
+			}  // example: 'touching %m?' (question mark after arg starts a new token) vs. 'loud?' (doesn't)    // certain punctuation marks following an argument start a new token  
+
+
+
+			if (isArg && (ch == "?" || ch == "-"))                 break;
 			token += ch;
 			i++;
 		}
 		return token;
 	}
 
-	public static function escape(s:String):String {
-		return s.replace(/[\\%@]/g, '\\$&');
+	public static function escape(s : String) : String{
+		return s.replace(new EReg('[\\\\%@]', "g"), "\\$&");
 	}
 
-	public static function unescape(s:String):String {
-		var result:String = '';
-		for (var i:int = 0; i < s.length; i++) {
-			var ch:String = s.charAt(i);
-			if (ch == '\\') {
+	public static function unescape(s : String) : String{
+		var result : String = "";
+		var i: Int = 0;
+		while (i < s.length) {
+			var ch : String = s.charAt(i);
+			if (ch == "\\") {
 				result += s.charAt(i + 1);
 				i++;
-			} else {
+			}
+			else {
 				result += ch;
 			}
+			i++;
 		}
 		return result;
 	}
-
-}}
+}

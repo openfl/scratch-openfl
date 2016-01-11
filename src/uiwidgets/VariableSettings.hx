@@ -17,25 +17,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package uiwidgets {
-	import flash.display.*;
-	import flash.text.*;
-	import assets.Resources;
-	import translation.Translator;
+package uiwidgets;
 
-public class VariableSettings extends Sprite {
 
-	public var isLocal:Boolean;
+import flash.display.*;
+import flash.text.*;
+import assets.Resources;
+import translation.Translator;
 
-	public var isList:Boolean;
-	private var isStage:Boolean;
+class VariableSettings extends Sprite
+{
 
-	protected var globalButton:IconButton;
-	private var globalLabel:TextField;
-	protected var localButton:IconButton;
-	protected var localLabel:TextField;
+	public var isLocal : Bool;
 
-	public function VariableSettings(isList:Boolean, isStage:Boolean) {
+	public var isList : Bool;
+	private var isStage : Bool;
+
+	private var globalButton : IconButton;
+	private var globalLabel : TextField;
+	private var localButton : IconButton;
+	private var localLabel : TextField;
+
+	public function new(isList : Bool, isStage : Bool)
+	{
+		super();
 		this.isList = isList;
 		this.isStage = isStage;
 		addLabels();
@@ -44,42 +49,44 @@ public class VariableSettings extends Sprite {
 		updateButtons();
 	}
 
-	public static function strings():Array {
-		return ['For this sprite only', 'For all sprites', 'list', 'variable'];
+	public static function strings() : Array<Dynamic>{
+		return ["For this sprite only", "For all sprites", "list", "variable"];
 	}
 
-	protected function addLabels():void {
+	private function addLabels() : Void{
 		addChild(localLabel = Resources.makeLabel(
-			Translator.map('For this sprite only'), CSS.normalTextFormat));
+								Translator.map("For this sprite only"), CSS.normalTextFormat));
 
 		addChild(globalLabel = Resources.makeLabel(
-			Translator.map('For all sprites'), CSS.normalTextFormat));
+								Translator.map("For all sprites"), CSS.normalTextFormat));
 	}
 
-	protected function addButtons():void {
-		function setLocal(b:IconButton):void { isLocal = true; updateButtons() }
-		function setGlobal(b:IconButton):void { isLocal = false; updateButtons() }
+	private function addButtons() : Void{
+		function setLocal(b : IconButton) : Void{isLocal = true;updateButtons();
+		};
+		function setGlobal(b : IconButton) : Void{isLocal = false;updateButtons();
+		};
 		addChild(localButton = new IconButton(setLocal, null));
 		addChild(globalButton = new IconButton(setGlobal, null));
 	}
 
-	protected function updateButtons():void {
+	private function updateButtons() : Void{
 		localButton.setOn(isLocal);
 		localButton.setDisabled(false, 0.2);
 		localLabel.alpha = 1;
 		globalButton.setOn(!isLocal);
 	}
 
-	protected function fixLayout():void {
-		var nextX:int = 0;
-		var baseY:int = 10;
+	private function fixLayout() : Void{
+		var nextX : Int = 0;
+		var baseY : Int = 10;
 
 		globalButton.x = nextX;
 		globalButton.y = baseY + 3;
 		globalLabel.x = (nextX += 16);
 		globalLabel.y = baseY;
 
-		nextX += globalLabel.textWidth + 20;
+		nextX += Std.int(globalLabel.textWidth + 20);
 
 		localButton.x = nextX;
 		localButton.y = baseY + 3;
@@ -95,11 +102,11 @@ public class VariableSettings extends Sprite {
 		}
 	}
 
-	protected function drawLine():void {
-		var lineY:int = 36;
-		var w:int = getRect(this).width;
-		if (isStage) w += 10;
-		var g:Graphics = graphics;
+	private function drawLine() : Void{
+		var lineY : Int = 36;
+		var w : Int = Std.int(getRect(this).width);
+		if (isStage)             w += 10;
+		var g : Graphics = graphics;
 		g.clear();
 		g.beginFill(0xD0D0D0);
 		g.drawRect(0, lineY, w, 1);
@@ -107,4 +114,4 @@ public class VariableSettings extends Sprite {
 		g.drawRect(0, lineY + 1, w, 1);
 		g.endFill();
 	}
-}}
+}

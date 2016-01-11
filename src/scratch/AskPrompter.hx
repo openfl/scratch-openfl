@@ -17,27 +17,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package scratch {
-	import flash.display.*;
-	import flash.events.*;
-	import flash.filters.*;
-	import flash.text.*;
-	import assets.Resources;
+package scratch;
 
-public class AskPrompter extends Sprite {
 
-	private const fontSize:int = 13;
-	private const outlineColor:int = 0x4AADDE;
-	private const inputFieldColor:int = 0xF2F2F2;
+import flash.display.*;
+import flash.events.*;
+import flash.filters.*;
+import flash.text.*;
+import assets.Resources;
 
-	private var app:Scratch;
-	private var input:TextField;
-	private var doneButton:Bitmap;
+class AskPrompter extends Sprite
+{
 
-	public function	AskPrompter(promptString:String, app:Scratch) {
+	private static inline var fontSize : Int = 13;
+	private static inline var outlineColor : Int = 0x4AADDE;
+	private static inline var inputFieldColor : Int = 0xF2F2F2;
+
+	private var app : Scratch;
+	private var input : TextField;
+	private var doneButton : Bitmap;
+
+	public function new(promptString : String, app : Scratch)
+	{
+		super();
 		this.app = app;
-		var w:int = 449;
-		var h:int = (promptString == "") ? 34 : 51;
+		var w : Int = 449;
+		var h : Int = ((promptString == "")) ? 34 : 51;
 		addBackground(w, h);
 		addDoneButton(w, h);
 		addPrompt(promptString);
@@ -48,22 +53,23 @@ public class AskPrompter extends Sprite {
 		addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 	}
 
-	public function grabKeyboardFocus():void {
-		if(stage) stage.focus = input;
+	public function grabKeyboardFocus() : Void{
+		if (stage != null)             stage.focus = input;
 	}
 
-	public function answer():String { return input.text; }
-
-	private function mouseDown(evt:MouseEvent):void {
-		if (doneButton.hitTestPoint(evt.stageX, evt.stageY)) app.runtime.hideAskPrompt(this);
+	public function answer() : String{return input.text;
 	}
 
-	private function keyDown(evt:KeyboardEvent):void {
-		if (evt.charCode == 13) app.runtime.hideAskPrompt(this);
+	private function mouseDown(evt : MouseEvent) : Void{
+		if (doneButton.hitTestPoint(evt.stageX, evt.stageY))             app.runtime.hideAskPrompt(this);
 	}
 
-	private function addBackground(w:int, h:int):void {
-		var shape:Shape = new Shape();
+	private function keyDown(evt : KeyboardEvent) : Void{
+		if (evt.charCode == 13)             app.runtime.hideAskPrompt(this);
+	}
+
+	private function addBackground(w : Int, h : Int) : Void{
+		var shape : Shape = new Shape();
 		shape.graphics.lineStyle(3, outlineColor, 1, true);
 		shape.graphics.beginFill(0xFFFFFF);
 		shape.graphics.drawRoundRect(0, 0, w, h, 13);
@@ -71,27 +77,27 @@ public class AskPrompter extends Sprite {
 		addChild(shape);
 	}
 
-	private function addDoneButton(w:int, h:int):void {
+	private function addDoneButton(w : Int, h : Int) : Void{
 		doneButton = Resources.createBmp("promptCheckButton");
 		doneButton.x = w - 26;
 		doneButton.y = h - 26;
 		addChild(doneButton);
 	}
 
-	private function addPrompt(s:String):void {
-		if (s == "") return;
-		var tf:TextField = new TextField();
+	private function addPrompt(s : String) : Void{
+		if (s == "")             return;
+		var tf : TextField = new TextField();
 		tf.defaultTextFormat = new TextFormat(CSS.font, fontSize - 1, 0, true);
 		tf.selectable = false;
 		tf.text = s;
 		tf.width = 430;
-		tf.height = fontSize + 5
+		tf.height = fontSize + 5;
 		tf.x = 9;
 		tf.y = 2;
 		addChild(tf);
 	}
 
-	private function addInputField(h:int):void {
+	private function addInputField(h : Int) : Void{
 		input = new TextField();
 		input.defaultTextFormat = new TextFormat(CSS.font, fontSize, 0, false);
 		input.type = TextFieldType.INPUT;
@@ -100,7 +106,7 @@ public class AskPrompter extends Sprite {
 		input.width = 410;
 		input.height = 20;
 
-		var f:BevelFilter = new BevelFilter();
+		var f : BevelFilter = new BevelFilter();
 		f.angle = 225;
 		f.shadowAlpha = 0.6;
 		f.distance = 3;
@@ -113,5 +119,4 @@ public class AskPrompter extends Sprite {
 		input.y = h - (input.height + 5);
 		addChild(input);
 	}
-
-}}
+}

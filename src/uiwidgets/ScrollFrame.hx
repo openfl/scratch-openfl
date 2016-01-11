@@ -32,67 +32,72 @@
 //
 // Note: The client should call updateSize() after adding or removing contents.
 
-package uiwidgets {
-	import flash.display.*;
-	import flash.events.*;
-	import flash.filters.GlowFilter;
-	import util.DragClient;
+package uiwidgets;
 
-public class ScrollFrame extends Sprite implements DragClient {
 
-	public var contents:ScrollFrameContents;
-	public var allowHorizontalScrollbar:Boolean = true;
+import flash.display.*;
+import flash.events.*;
+import flash.filters.GlowFilter;
+import util.DragClient;
 
-	private const decayFactor:Number = 0.95;	// velocity decay (make zero to stop instantly)
-	private const stopThreshold:Number = 0.4;	// stop when velocity is below threshold
-	private const cornerRadius:int = 0;
-	private const useFrame:Boolean = false;
+class ScrollFrame extends Sprite implements DragClient
+{
 
-	private var scrollbarThickness:int = 9;
+	public var contents : ScrollFrameContents;
+	public var allowHorizontalScrollbar : Bool = true;
 
-	private var shadowFrame:Shape;
-	private var hScrollbar:Scrollbar;
-	private var vScrollbar:Scrollbar;
+	private static inline var decayFactor : Float = 0.95;  // velocity decay (make zero to stop instantly)  
+	private static inline var stopThreshold : Float = 0.4;  // stop when velocity is below threshold  
+	private static inline var cornerRadius : Int = 0;
+	private var useFrame : Bool = false;
 
-	private var dragScrolling:Boolean;
-	private var xOffset:int;
-	private var yOffset:int;
-	private var xHistory:Array;
-	private var yHistory:Array;
-	private var xVelocity:Number = 0;
-	private var yVelocity:Number = 0;
+	private var scrollbarThickness : Int = 9;
 
-	public function ScrollFrame(dragScrolling:Boolean = false) {
+	private var shadowFrame : Shape;
+	private var hScrollbar : Scrollbar;
+	private var vScrollbar : Scrollbar;
+
+	private var dragScrolling : Bool;
+	private var xOffset : Int;
+	private var yOffset : Int;
+	private var xHistory : Array<Dynamic>;
+	private var yHistory : Array<Dynamic>;
+	private var xVelocity : Float = 0;
+	private var yVelocity : Float = 0;
+
+	public function new(dragScrolling : Bool = false)
+	{
+		super();
 		this.dragScrolling = dragScrolling;
-		if (dragScrolling) scrollbarThickness = 3;
+		if (dragScrolling)             scrollbarThickness = 3;
 		mask = new Shape();
 		addChild(mask);
-		if (useFrame) addShadowFrame(); // adds a shadow to top and left
+		if (useFrame)             addShadowFrame();  // adds a shadow to top and left  ;
 		setWidthHeight(100, 100);
 		setContents(new ScrollFrameContents());
 		addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
-		enableScrollWheel('vertical');
+		enableScrollWheel("vertical");
 	}
 
-	public function setWidthHeight(w:int, h:int):void {
-		drawShape(Shape(mask).graphics, w, h);
-		if (shadowFrame) drawShape(shadowFrame.graphics, w, h);
-		if (contents) contents.updateSize();
+	public function setWidthHeight(w : Int, h : Int) : Void{
+		drawShape(cast((mask), Shape).graphics, w, h);
+		if (shadowFrame != null)             drawShape(shadowFrame.graphics, w, h);
+		if (contents != null)             contents.updateSize();
 		fixLayout();
 	}
 
-	private function drawShape(g:Graphics, w:int, h:int):void {
+	private function drawShape(g : Graphics, w : Int, h : Int) : Void{
 		g.clear();
 		g.beginFill(0xFF00, 1);
 		g.drawRect(0, 0, w, h);
 		g.endFill();
 	}
 
-	private function addShadowFrame():void {
+	private function addShadowFrame() : Void{
 		// Adds a shadow on top and left to make contents appear inset.
 		shadowFrame = new Shape();
 		addChild(shadowFrame);
-		var f:GlowFilter = new GlowFilter(0x0F0F0F);
+		var f : GlowFilter = new GlowFilter(0x0F0F0F);
 		f.blurX = f.blurY = 5;
 		f.alpha = 0.2;
 		f.inner = true;
@@ -100,39 +105,40 @@ public class ScrollFrame extends Sprite implements DragClient {
 		shadowFrame.filters = [f];
 	}
 
-	public function setContents(newContents:Sprite):void {
-		if (contents) this.removeChild(contents);
-		contents = newContents as ScrollFrameContents;
+	public function setContents(newContents : Sprite) : Void{
+		if (contents != null)             this.removeChild(contents);
+		contents = try cast(newContents, ScrollFrameContents) catch(e:Dynamic) null;
 		contents.x = contents.y = 0;
 		addChildAt(contents, 1);
 		contents.updateSize();
 		updateScrollbars();
 	}
 
-	private var scrollWheelHorizontal:Boolean;
+	private var scrollWheelHorizontal : Bool;
 
-	public function enableScrollWheel(type:String):void {
+	public function enableScrollWheel(type : String) : Void{
 		// Enable or disable the scroll wheel.
 		// Types other than 'vertical' or 'horizontal' disable the scroll wheel.
 		removeEventListener(MouseEvent.MOUSE_WHEEL, handleScrollWheel);
-		if (('horizontal' == type) || ('vertical' == type)) {
+		if (("horizontal" == type) || ("vertical" == type)) {
 			addEventListener(MouseEvent.MOUSE_WHEEL, handleScrollWheel);
-			scrollWheelHorizontal = ('horizontal' == type);
+			scrollWheelHorizontal = ("horizontal" == type);
 		}
 	}
 
-	private function handleScrollWheel(evt:MouseEvent):void {
-		var delta:int = 10 * evt.delta;
+	private function handleScrollWheel(evt : MouseEvent) : Void{
+		var delta : Int = 10 * evt.delta;
 		if (scrollWheelHorizontal != evt.shiftKey) {
 			contents.x = Math.min(0, Math.max(contents.x + delta, -maxScrollH()));
-		} else {
+		}
+		else {
 			contents.y = Math.min(0, Math.max(contents.y + delta, -maxScrollV()));
 		}
 		updateScrollbars();
 	}
 
-	public function showHScrollbar(show:Boolean):void {
-		if (hScrollbar) {
+	public function showHScrollbar(show : Bool) : Void{
+		if (hScrollbar != null) {
 			removeChild(hScrollbar);
 			hScrollbar = null;
 		}
@@ -144,8 +150,8 @@ public class ScrollFrame extends Sprite implements DragClient {
 		fixLayout();
 	}
 
-	public function showVScrollbar(show:Boolean):void {
-		if (vScrollbar) {
+	public function showVScrollbar(show : Bool) : Void{
+		if (vScrollbar != null) {
 			removeChild(vScrollbar);
 			vScrollbar = null;
 		}
@@ -157,95 +163,102 @@ public class ScrollFrame extends Sprite implements DragClient {
 		fixLayout();
 	}
 
-	public function visibleW():int { return mask.width }
-	public function visibleH():int { return mask.height }
-
-	public function updateScrollbars():void {
-		if (hScrollbar) hScrollbar.update(-contents.x / maxScrollH(), visibleW() / contents.width);
-		if (vScrollbar) vScrollbar.update(-contents.y / maxScrollV(), visibleH() / contents.height);
+	public function visibleW() : Int{return Std.int(mask.width);
+	}
+	public function visibleH() : Int{return Std.int(mask.height);
 	}
 
-	public function updateScrollbarVisibility():void {
+	public function updateScrollbars() : Void{
+		if (hScrollbar != null)             hScrollbar.update(-contents.x / maxScrollH(), visibleW() / contents.width);
+		if (vScrollbar != null)             vScrollbar.update(-contents.y / maxScrollV(), visibleH() / contents.height);
+	}
+
+	public function updateScrollbarVisibility() : Void{
 		// Update scrollbar visibility when not in dragScrolling mode.
 		// Called by the client after adding/removing content.
-		if (dragScrolling) return;
-		var shouldShow:Boolean, doesShow:Boolean;
+		if (dragScrolling)             return;
+		var shouldShow : Bool;
+		var doesShow : Bool;
 		shouldShow = (visibleW() < contents.width) && allowHorizontalScrollbar;
 		doesShow = hScrollbar != null;
-		if (shouldShow != doesShow) showHScrollbar(shouldShow);
+		if (shouldShow != doesShow)             showHScrollbar(shouldShow);
 		shouldShow = visibleH() < contents.height;
 		doesShow = vScrollbar != null;
-		if (shouldShow != doesShow) showVScrollbar(shouldShow);
+		if (shouldShow != doesShow)             showVScrollbar(shouldShow);
 		updateScrollbars();
 	}
 
-	private function setHScroll(frac:Number):void {
+	private function setHScroll(frac : Float) : Void{
 		contents.x = -frac * maxScrollH();
 		xVelocity = yVelocity = 0;
 	}
 
-	private function setVScroll(frac:Number):void {
+	private function setVScroll(frac : Float) : Void{
 		contents.y = -frac * maxScrollV();
 		xVelocity = yVelocity = 0;
 	}
 
-	public function maxScrollH():int {
-		return Math.max(0, contents.width - visibleW());
+	public function maxScrollH() : Int{
+		return Std.int(Math.max(0, contents.width - visibleW()));
 	}
 
-	public function maxScrollV():int {
-		return Math.max(0, contents.height - visibleH());
+	public function maxScrollV() : Int{
+		return Std.int(Math.max(0, contents.height - visibleH()));
 	}
 
-	public function canScrollLeft():Boolean {return contents.x < 0}
-	public function canScrollRight():Boolean {return contents.x > -maxScrollH()}
-	public function canScrollUp():Boolean {return contents.y < 0}
-	public function canScrollDown():Boolean {return contents.y > -maxScrollV()}
+	public function canScrollLeft() : Bool{return contents.x < 0;
+	}
+	public function canScrollRight() : Bool{return contents.x > -maxScrollH();
+	}
+	public function canScrollUp() : Bool{return contents.y < 0;
+	}
+	public function canScrollDown() : Bool{return contents.y > -maxScrollV();
+	}
 
-	private function fixLayout():void {
-		var inset:int = 2;
-		if (hScrollbar) {
-			hScrollbar.setWidthHeight(mask.width - 14, hScrollbar.h);
+	private function fixLayout() : Void{
+		var inset : Int = 2;
+		if (hScrollbar != null) {
+			hScrollbar.setWidthHeight(Std.int(mask.width - 14), hScrollbar.h);
 			hScrollbar.x = inset;
 			hScrollbar.y = mask.height - hScrollbar.h - inset;
 		}
-		if (vScrollbar) {
-			vScrollbar.setWidthHeight(vScrollbar.w, mask.height - (2 * inset));
+		if (vScrollbar != null) {
+			vScrollbar.setWidthHeight(vScrollbar.w, Std.int(mask.height - (2 * inset)));
 			vScrollbar.x = mask.width - vScrollbar.w - inset;
 			vScrollbar.y = inset;
 		}
 		updateScrollbars();
 	}
 
-	public function constrainScroll():void {
+	public function constrainScroll() : Void{
 		contents.x = Math.max(-maxScrollH(), Math.min(contents.x, 0));
 		contents.y = Math.max(-maxScrollV(), Math.min(contents.y, 0));
 	}
 
-	private function mouseDown(evt:MouseEvent):void {
-		if (evt.shiftKey || !dragScrolling) return;
+	private function mouseDown(evt : MouseEvent) : Void{
+		if (evt.shiftKey || !dragScrolling)             return;
 		if (evt.target == contents) {
-			Object(root).gh.setDragClient(this, evt);
-			contents.mouseChildren = false; // disable mouse events while scrolling
+			cast(root, Dynamic).gh.setDragClient(this, evt);
+			contents.mouseChildren = false;
 		}
 	}
 
-	public function dragBegin(evt:MouseEvent):void {
+	public function dragBegin(evt : MouseEvent) : Void{
 		xHistory = [mouseX, mouseX, mouseX];
 		yHistory = [mouseY, mouseY, mouseY];
-		xOffset = mouseX - contents.x;
-		yOffset = mouseY - contents.y;
+		xOffset = Std.int(mouseX - contents.x);
+		yOffset = Std.int(mouseY - contents.y);
 
-		if (visibleW() < contents.width) showHScrollbar(true);
-		if (visibleH() < contents.height) showVScrollbar(true);
-		if (hScrollbar) hScrollbar.allowDragging(false);
-		if (vScrollbar) vScrollbar.allowDragging(false);
+		if (visibleW() < contents.width)             showHScrollbar(true);
+		if (visibleH() < contents.height)             showVScrollbar(true);
+		if (hScrollbar != null)             hScrollbar.allowDragging(false);
+		if (vScrollbar != null)             vScrollbar.allowDragging(false);
 		updateScrollbars();
 
 		removeEventListener(Event.ENTER_FRAME, step);
 	}
 
-	public function dragMove(evt:MouseEvent):void {
+	public function dragMove(evt : MouseEvent) : Void{
 		xHistory.push(mouseX);
 		yHistory.push(mouseY);
 		xHistory.shift();
@@ -256,7 +269,7 @@ public class ScrollFrame extends Sprite implements DragClient {
 		updateScrollbars();
 	}
 
-	public function dragEnd(evt:MouseEvent):void {
+	public function dragEnd(evt : MouseEvent) : Void{
 		xVelocity = (xHistory[2] - xHistory[0]) / 1.5;
 		yVelocity = (yHistory[2] - yHistory[0]) / 1.5;
 		if ((Math.abs(xVelocity) < 2) && (Math.abs(yVelocity) < 2)) {
@@ -265,31 +278,30 @@ public class ScrollFrame extends Sprite implements DragClient {
 		addEventListener(Event.ENTER_FRAME, step);
 	}
 
-	private function step(evt:Event):void {
+	private function step(evt : Event) : Void{
 		// Implements inertia after releasing the mouse when dragScrolling.
 		xVelocity = decayFactor * xVelocity;
 		yVelocity = decayFactor * yVelocity;
-		if (Math.abs(xVelocity) < stopThreshold) xVelocity = 0;
-		if (Math.abs(yVelocity) < stopThreshold) yVelocity = 0;
+		if (Math.abs(xVelocity) < stopThreshold)             xVelocity = 0;
+		if (Math.abs(yVelocity) < stopThreshold)             yVelocity = 0;
 		contents.x += xVelocity;
 		contents.y += yVelocity;
 
 		contents.x = Math.max(-maxScrollH(), Math.min(contents.x, 0));
 		contents.y = Math.max(-maxScrollV(), Math.min(contents.y, 0));
 
-		if ((contents.x > -1) || ((contents.x - 1) < -maxScrollH())) xVelocity = 0; // hit end, so stop
-		if ((contents.y > -1) || ((contents.y - 1) < -maxScrollV())) yVelocity = 0; // hit end, so stop
+		if ((contents.x > -1) || ((contents.x - 1) < -maxScrollH()))             xVelocity = 0;  // hit end, so stop  ;
+		if ((contents.y > -1) || ((contents.y - 1) < -maxScrollV()))             yVelocity = 0;  // hit end, so stop  ;
 		constrainScroll();
 		updateScrollbars();
 
-		if ((xVelocity == 0) && (yVelocity == 0)) { // stopped
-			if (hScrollbar) hScrollbar.allowDragging(true);
-			if (vScrollbar) vScrollbar.allowDragging(true);
+		if ((xVelocity == 0) && (yVelocity == 0)) {  // stopped  
+			if (hScrollbar != null)                 hScrollbar.allowDragging(true);
+			if (vScrollbar != null)                 vScrollbar.allowDragging(true);
 			showHScrollbar(false);
 			showVScrollbar(false);
 			contents.mouseChildren = true;
 			removeEventListener(Event.ENTER_FRAME, step);
 		}
 	}
-
-}}
+}

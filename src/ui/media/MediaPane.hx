@@ -17,50 +17,55 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package ui.media {
-	import flash.display.Sprite;
-	import flash.geom.Point;
-	import flash.text.TextField;
-	import assets.Resources;
-	import scratch.*;
-	import ui.parts.SoundsPart;
-	import uiwidgets.*;
+package ui.media;
 
-public class MediaPane extends ScrollFrameContents {
 
-	public var app:Scratch;
+import flash.display.Sprite;
+import flash.geom.Point;
+import flash.text.TextField;
+import assets.Resources;
+import scratch.*;
+import ui.parts.SoundsPart;
+import uiwidgets.*;
 
-	private var isSound:Boolean;
-	private var lastCostume:ScratchCostume;
+class MediaPane extends ScrollFrameContents
+{
 
-	public function MediaPane(app:Scratch, type:String):void {
+	public var app : Scratch;
+
+	private var isSound : Bool;
+	private var lastCostume : ScratchCostume;
+
+	public function new(app : Scratch, type : String)
+	{
+		super();
 		this.app = app;
-		isSound = (type == 'sounds');
+		isSound = (type == "sounds");
 		refresh();
 	}
 
-	public function refresh():void {
-		if (app.viewedObj() == null) return;
-		replaceContents(isSound ? soundItems() : costumeItems());
+	public function refresh() : Void{
+		if (app.viewedObj() == null)             return;
+		replaceContents((isSound) ? soundItems() : costumeItems());
 		updateSelection();
 	}
 
 	// Returns true if we might need to save
-	public function updateSelection():Boolean {
+	public function updateSelection() : Bool{
 		if (isSound) {
 			updateSoundSelection();
 			return true;
-	}
+		}
 
 		return updateCostumeSelection();
 	}
 
-	private function replaceContents(newItems:Array):void {
-		while (numChildren > 0) removeChildAt(0);
-		var nextY:int = 3;
-		var n:int = 1;
-		for each (var item:Sprite in newItems) {
-			var numLabel:TextField = Resources.makeLabel('' + n++, CSS.thumbnailExtraInfoFormat);
+	private function replaceContents(newItems : Array<Dynamic>) : Void{
+		while (numChildren > 0)removeChildAt(0);
+		var nextY : Int = 3;
+		var n : Int = 1;
+		for (item in newItems){
+			var numLabel : TextField = Resources.makeLabel("" + n++, CSS.thumbnailExtraInfoFormat);
 			numLabel.x = 9;
 			numLabel.y = nextY + 1;
 			item.x = 7;
@@ -71,41 +76,42 @@ public class MediaPane extends ScrollFrameContents {
 		}
 		updateSize();
 		lastCostume = null;
-		x = y = 0; // reset scroll offset
+		x = y = 0;
 	}
 
-	private function costumeItems():Array {
-		var result:Array = [];
-		var viewedObj:ScratchObj = app.viewedObj();
-		for each (var c:ScratchCostume in viewedObj.costumes) {
+	private function costumeItems() : Array<Dynamic>{
+		var result : Array<Dynamic> = [];
+		var viewedObj : ScratchObj = app.viewedObj();
+		for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(viewedObj),costumes) type: null */ in viewedObj.costumes){
 			result.push(Scratch.app.createMediaInfo(c, viewedObj));
 		}
 		return result;
 	}
 
-	private function soundItems():Array {
-		var result:Array = [];
-		var viewedObj:ScratchObj = app.viewedObj();
-		for each (var snd:ScratchSound in viewedObj.sounds) {
+	private function soundItems() : Array<Dynamic>{
+		var result : Array<Dynamic> = [];
+		var viewedObj : ScratchObj = app.viewedObj();
+		for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(viewedObj),sounds) type: null */ in viewedObj.sounds){
 			result.push(Scratch.app.createMediaInfo(snd, viewedObj));
 		}
 		return result;
 	}
 
 	// Returns true if the costume changed
-	private function updateCostumeSelection():Boolean {
-		var viewedObj:ScratchObj = app.viewedObj();
-		if ((viewedObj == null) || isSound) return false;
-		var current:ScratchCostume = viewedObj.currentCostume();
-		if (current == lastCostume) return false;
-		var oldCostume:ScratchCostume = lastCostume;
-		for (var i:int = 0 ; i < numChildren ; i++) {
-			var ci:MediaInfo = getChildAt(i) as MediaInfo;
+	private function updateCostumeSelection() : Bool{
+		var viewedObj : ScratchObj = app.viewedObj();
+		if ((viewedObj == null) || isSound)             return false;
+		var current : ScratchCostume = viewedObj.currentCostume();
+		if (current == lastCostume)             return false;
+		var oldCostume : ScratchCostume = lastCostume;
+		for (i in 0...numChildren){
+			var ci : MediaInfo = try cast(getChildAt(i), MediaInfo) catch(e:Dynamic) null;
 			if (ci != null) {
 				if (ci.mycostume == current) {
 					ci.highlight();
 					scrollToItem(ci);
-				} else {
+				}
+				else {
 					ci.unhighlight();
 				}
 			}
@@ -114,29 +120,29 @@ public class MediaPane extends ScrollFrameContents {
 		return (oldCostume != null);
 	}
 
-	private function scrollToItem(item:MediaInfo):void {
-		var frame:ScrollFrame = parent as ScrollFrame;
-		if (!frame) return;
-		var itemTop:int = item.y + y - 1;
-		var itemBottom:int = itemTop + item.height;
+	private function scrollToItem(item : MediaInfo) : Void{
+		var frame : ScrollFrame = try cast(parent, ScrollFrame) catch(e:Dynamic) null;
+		if (frame == null)             return;
+		var itemTop : Int = Std.int(item.y + y - 1);
+		var itemBottom : Int = Std.int(itemTop + item.height);
 		y -= Math.max(0, itemBottom - frame.visibleH());
 		y -= Math.min(0, itemTop);
 		frame.updateScrollbars();
 	}
 
-	private function updateSoundSelection():void {
-		var viewedObj:ScratchObj = app.viewedObj();
-		if ((viewedObj == null) || !isSound) return;
-		if (viewedObj.sounds.length < 1) return;
-		if (!this.parent || !this.parent.parent) return;
-		var sp:SoundsPart = this.parent.parent as SoundsPart;
-		if (sp == null) return;
-	 	sp.currentIndex = Math.min(sp.currentIndex, viewedObj.sounds.length - 1);
-		var current:ScratchSound = viewedObj.sounds[sp.currentIndex] as ScratchSound;
-		for (var i:int = 0 ; i < numChildren ; i++) {
-			var si:MediaInfo = getChildAt(i) as MediaInfo;
+	private function updateSoundSelection() : Void{
+		var viewedObj : ScratchObj = app.viewedObj();
+		if ((viewedObj == null) || !isSound)             return;
+		if (viewedObj.sounds.length < 1)             return;
+		if (this.parent == null || this.parent.parent == null)             return;
+		var sp : SoundsPart = try cast(this.parent.parent, SoundsPart) catch(e:Dynamic) null;
+		if (sp == null)             return;
+		sp.currentIndex = Std.int(Math.min(sp.currentIndex, viewedObj.sounds.length - 1));
+		var current : ScratchSound = try cast(viewedObj.sounds[sp.currentIndex], ScratchSound) catch(e:Dynamic) null;
+		for (i in 0...numChildren){
+			var si : MediaInfo = try cast(getChildAt(i), MediaInfo) catch(e:Dynamic) null;
 			if (si != null) {
-				if (si.mysound == current) si.highlight();
+				if (si.mysound == current)                     si.highlight()
 				else si.unhighlight();
 			}
 		}
@@ -146,61 +152,60 @@ public class MediaPane extends ScrollFrameContents {
 	// Dropping
 	//------------------------------
 
-	public function handleDrop(obj:*):Boolean {
-		var item:MediaInfo = obj as MediaInfo;
-		if (item && item.owner == app.viewedObj()) {
+	public function handleDrop(obj : Dynamic) : Bool{
+		var item : MediaInfo = try cast(obj, MediaInfo) catch(e:Dynamic) null;
+		if (item != null && item.owner == app.viewedObj()) {
 			changeMediaOrder(item);
 			return true;
 		}
 		return false;
 	}
 
-	private function changeMediaOrder(dropped:MediaInfo):void {
-		var inserted:Boolean = false;
-		var newItems:Array = [];
-		var dropY:int = globalToLocal(new Point(dropped.x, dropped.y)).y;
-		for (var i:int = 0; i < numChildren; i++) {
-			var item:MediaInfo = getChildAt(i) as MediaInfo;
-			if (!item) continue; // skip item numbers
+	private function changeMediaOrder(dropped : MediaInfo) : Void{
+		var inserted : Bool = false;
+		var newItems : Array<Dynamic> = [];
+		var dropY : Int = Std.int(globalToLocal(new Point(dropped.x, dropped.y)).y);
+		for (i in 0...numChildren){
+			var item : MediaInfo = try cast(getChildAt(i), MediaInfo) catch(e:Dynamic) null;
+			if (item == null)                 {i++;continue;
+			}  // skip item numbers  ;
 			if (!inserted && (dropY < item.y)) {
 				newItems.push(dropped);
 				inserted = true;
 			}
-			if (!sameMedia(item, dropped)) newItems.push(item);
+			if (!sameMedia(item, dropped))                 newItems.push(item);
 		}
-		if (!inserted) newItems.push(dropped);
+		if (!inserted)             newItems.push(dropped);
 		replacedMedia(newItems);
-		// update the target object with the new costume/sound list
-		// refresh();
 	}
 
-	private function sameMedia(item1:MediaInfo, item2:MediaInfo):Boolean {
-		if (item1.mycostume && (item1.mycostume == item2.mycostume)) return true;
-		if (item1.mysound && (item1.mysound == item2.mysound)) return true;
+	private function sameMedia(item1 : MediaInfo, item2 : MediaInfo) : Bool{
+		if (item1.mycostume  != null&& (item1.mycostume == item2.mycostume))             return true;
+		if (item1.mysound != null && (item1.mysound == item2.mysound))             return true;
 		return false;
 	}
 
-	private function replacedMedia(newList:Array):void {
+	private function replacedMedia(newList : Array<Dynamic>) : Void{
 		// Note: Clones can share the costume and sound arrays with their prototype,
 		// so this method mutates those arrays in place rather than replacing them.
-		var el:MediaInfo;
-		var scratchObj:ScratchObj = app.viewedObj();
+		var el : MediaInfo;
+		var scratchObj : ScratchObj = app.viewedObj();
 		if (isSound) {
-			scratchObj.sounds.splice(0); // remove all
-			for each (el in newList) {
-				if (el.mysound) scratchObj.sounds.push(el.mysound);
+			scratchObj.sounds.splice(0);  // remove all  
+			for (el in newList){
+				if (el.mysound)                     scratchObj.sounds.push(el.mysound);
 			}
-		} else {
-			var oldCurrentCostume:ScratchCostume = scratchObj.currentCostume();
-			scratchObj.costumes.splice(0); // remove all
-			for each (el in newList) {
-				if (el.mycostume) scratchObj.costumes.push(el.mycostume);
+		}
+		else {
+			var oldCurrentCostume : ScratchCostume = scratchObj.currentCostume();
+			scratchObj.costumes.splice(0);  // remove all  
+			for (el in newList){
+				if (el.mycostume)                     scratchObj.costumes.push(el.mycostume);
 			}
-			var cIndex:int = scratchObj.costumes.indexOf(oldCurrentCostume);
-			if (cIndex > -1) scratchObj.currentCostumeIndex = cIndex;
+			var cIndex : Int = scratchObj.costumes.indexOf(oldCurrentCostume);
+			if (cIndex > -1)                 scratchObj.currentCostumeIndex = cIndex;
 		}
 		app.setSaveNeeded();
 		refresh();
 	}
-
-}}
+}

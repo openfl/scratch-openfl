@@ -46,164 +46,174 @@
 // DisplayObject hierarchy and print their names in the console. This can be used to
 // understand the nesting of UI objects.
 
-package util {
-	import flash.display.*;
-	import flash.events.MouseEvent;
-	import flash.filters.*;
-	import flash.geom.*;
-	import flash.text.*;
-	import flash.utils.getTimer;
-	import blocks.*;
-	import scratch.*;
-	import uiwidgets.*;
-	import svgeditor.*;
-	import watchers.*;
+package util;
 
-public class GestureHandler {
+import flash.errors.Error;
 
-	private const DOUBLE_CLICK_MSECS:int = 400;
-	private const DEBUG:Boolean = false;
+import flash.display.*;
+import flash.events.MouseEvent;
+import flash.filters.*;
+import flash.geom.*;
+import flash.text.*;
 
-	private const SCROLL_RANGE:Number = 60;
-	private const SCROLL_MAX_SPEED:Number = 1000 / 50;
-	private const SCROLL_MSECS:int = 500;
+import blocks.*;
+import scratch.*;
+import uiwidgets.*;
+import svgeditor.*;
+import watchers.*;
 
-	public var mouseIsDown:Boolean;
+class GestureHandler
+{
+
+	private static inline var DOUBLE_CLICK_MSECS : Int = 400;
+	private var DEBUG : Bool = false;
+
+	private static inline var SCROLL_RANGE : Float = 60;
+	private var SCROLL_MAX_SPEED : Float = 1000 / 50;
+	private static inline var SCROLL_MSECS : Int = 500;
+
+	public var mouseIsDown : Bool;
 
 	// Grab-n-drop support:
-	public var carriedObj:Sprite;
-	private var originalParent:DisplayObjectContainer;
-	private var originalPosition:Point;
-	private var originalScale:Number;
+	public var carriedObj : Sprite;
+	private var originalParent : DisplayObjectContainer;
+	private var originalPosition : Point;
+	private var originalScale : Float;
 
-	private var app:Scratch;
-	private var stage:Stage;
-	private var dragClient:DragClient;
-	private var mouseDownTime:uint;
-	private var gesture:String = "idle";
-	private var mouseTarget:*;
-	private var objToGrabOnUp:Sprite;
-	private var mouseDownEvent:MouseEvent;
-	private var inIE:Boolean;
+	private var app : Scratch;
+	private var stage : Stage;
+	private var dragClient : DragClient;
+	private var mouseDownTime : Int;
+	private var gesture : String = "idle";
+	private var mouseTarget : Dynamic;
+	private var objToGrabOnUp : Sprite;
+	private var mouseDownEvent : MouseEvent;
+	private var inIE : Bool;
 
-	private var scrollTarget:ScrollFrame;
-	private var scrollStartTime:int;
-	private var scrollXVelocity:Number;
-	private var scrollYVelocity:Number;
+	private var scrollTarget : ScrollFrame;
+	private var scrollStartTime : Int;
+	private var scrollXVelocity : Float;
+	private var scrollYVelocity : Float;
 
-	private var bubble:TalkBubble;
-	private var bubbleStartX:Number;
-	private var bubbleStartY:Number;
-	private static var bubbleRange:Number = 25;
-	private static var bubbleMargin:Number = 5;
+	private var bubble : TalkBubble;
+	private var bubbleStartX : Float;
+	private var bubbleStartY : Float;
+	private static var bubbleRange : Float = 25;
+	private static var bubbleMargin : Float = 5;
 
-	public function GestureHandler(app:Scratch, inIE:Boolean) {
+	public function new(app : Scratch, inIE : Bool)
+	{
 		this.app = app;
 		this.stage = app.stage;
 		this.inIE = inIE;
 	}
 
-	public function setDragClient(newClient:DragClient, evt:MouseEvent):void {
+	public function setDragClient(newClient : DragClient, evt : MouseEvent) : Void{
 		Menu.removeMenusFrom(stage);
-		if (carriedObj) return;
-		if (dragClient != null) dragClient.dragEnd(evt);
-		dragClient = newClient as DragClient;
+		if (carriedObj != null)             return;
+		if (dragClient != null)             dragClient.dragEnd(evt);
+		dragClient = try cast(newClient, DragClient) catch(e:Dynamic) null;
 		dragClient.dragBegin(evt);
 		evt.stopImmediatePropagation();
 	}
 
-	public function grabOnMouseUp(obj:Sprite):void {
-		if (CursorTool.tool == 'copy') {
+	public function grabOnMouseUp(obj : Sprite) : Void{
+		if (CursorTool.tool == "copy") {
 			// If duplicate tool, grab right away
 			grab(obj, null);
-			gesture = 'drag';
-		} else {
+			gesture = "drag";
+		}
+		else {
 			objToGrabOnUp = obj;
 		}
 	}
 
-	public function step():void {
-		if ((getTimer() - mouseDownTime) > DOUBLE_CLICK_MSECS) {
+	public function step() : Void{
+		if ((Math.round(haxe.Timer.stamp() * 1000) - mouseDownTime) > DOUBLE_CLICK_MSECS) {
 			if (gesture == "unknown") {
-				if (mouseTarget != null) handleDrag(null);
-				if (gesture != 'drag') handleClick(mouseDownEvent);
+				if (mouseTarget != null)                     handleDrag(null);
+				if (gesture != "drag")                     handleClick(mouseDownEvent);
 			}
 			if (gesture == "clickOrDoubleClick") {
 				handleClick(mouseDownEvent);
 			}
 		}
-		if (carriedObj && scrollTarget && (getTimer() - scrollStartTime) > SCROLL_MSECS && (scrollXVelocity || scrollYVelocity)) {
+		if (carriedObj != null && scrollTarget != null && (Math.round(haxe.Timer.stamp() * 1000) - scrollStartTime) > SCROLL_MSECS && (scrollXVelocity != 0 || scrollYVelocity != 0)) {
 			scrollTarget.contents.x = Math.min(0, Math.max(-scrollTarget.maxScrollH(), scrollTarget.contents.x + scrollXVelocity));
 			scrollTarget.contents.y = Math.min(0, Math.max(-scrollTarget.maxScrollV(), scrollTarget.contents.y + scrollYVelocity));
 			scrollTarget.constrainScroll();
 			scrollTarget.updateScrollbars();
-			var b:Block = carriedObj as Block;
-			if (b) {
+			var b : Block = try cast(carriedObj, Block) catch(e:Dynamic) null;
+			if (b != null) {
 				app.scriptsPane.findTargetsFor(b);
 				app.scriptsPane.updateFeedbackFor(b);
 			}
 		}
 	}
 
-	public function rightMouseClick(evt:MouseEvent):void {
+	public function rightMouseClick(evt : MouseEvent) : Void{
 		// You only get this event in AIR.
-		rightMouseDown(evt.stageX, evt.stageY, false);
+		rightMouseDown(Std.int(evt.stageX), Std.int(evt.stageY), false);
 	}
 
-	public function rightMouseDown(x:int, y:int, isChrome:Boolean):void {
+	public function rightMouseDown(x : Int, y : Int, isChrome : Bool) : Void{
 		// To avoid getting the Adobe menu on right-click, JavaScript captures
 		// right-button mouseDown events and calls this method.'
 		Menu.removeMenusFrom(stage);
-		var menuTarget:* = findTargetFor('menu', app, x, y);
-		if (!menuTarget) return;
-		try { var menu:Menu = menuTarget.menu(new MouseEvent('right click')) } catch (e:Error) {}
-		if (menu) menu.showOnStage(stage, x, y);
-		if (!isChrome) Menu.removeMenusFrom(stage); // hack: clear menuJustCreated because there's no rightMouseUp
+		var menuTarget : Dynamic = findTargetFor("menu", app, x, y);
+		if (menuTarget == null)             return;
+		try{var menu : Menu = menuTarget.menu(new MouseEvent("right click"));
+		}        catch (e : Error){ };
+		if (menu != null)             menu.showOnStage(stage, x, y);
+		if (!isChrome)             Menu.removeMenusFrom(stage);  // hack: clear menuJustCreated because there's no rightMouseUp  ;
 	}
 
-	private function findTargetFor(property:String, obj:*, x:int, y:int):DisplayObject {
+	private function findTargetFor(property : String, obj : Dynamic, x : Int, y : Int) : DisplayObject{
 		// Return the innermost child  of obj that contains the given (global) point
 		// and implements the menu() method.
-		if (!obj.visible || !obj.hitTestPoint(x, y, true)) return null;
-		if (obj is DisplayObjectContainer) {
-			for (var i:int = obj.numChildren - 1; i >= 0; i--) {
-				var found:DisplayObject = findTargetFor(property, obj.getChildAt(i), x, y);
-				if (found) return found;
+		if (!obj.visible || !obj.hitTestPoint(x, y, true))             return null;
+		if (Std.is(obj, DisplayObjectContainer)) {
+			var i : Int = Std.int(obj.numChildren - 1);
+			while (i >= 0){
+				var found : DisplayObject = findTargetFor(property, obj.getChildAt(i), x, y);
+				if (found != null)                     return found;
+				i--;
 			}
 		}
-		return (property in obj) ? obj : null;
+		return ((Lambda.has(obj, property))) ? obj : null;
 	}
 
-	public function mouseDown(evt:MouseEvent):void {
-		if(inIE && app.editMode && app.jsEnabled)
-			app.externalCall('tip_bar_api.fixIE');
+	public function mouseDown(evt : MouseEvent) : Void{
+		//if (inIE && app.editMode && app.jsEnabled) 
+			//app.externalCall("tip_bar_api.fixIE");
 
-		evt.updateAfterEvent(); // needed to avoid losing display updates with later version of Flash 11
+		evt.updateAfterEvent();  // needed to avoid losing display updates with later version of Flash 11  
 		hideBubble();
 		mouseIsDown = true;
-		if (gesture == 'clickOrDoubleClick') {
+		if (gesture == "clickOrDoubleClick") {
 			handleDoubleClick(mouseDownEvent);
 			return;
 		}
-		if (CursorTool.tool) {
+		if (CursorTool.tool != null) {
 			handleTool(evt);
 			return;
 		}
-		mouseDownTime = getTimer();
+		mouseDownTime = Math.round(haxe.Timer.stamp() * 1000);
 		mouseDownEvent = evt;
 		gesture = "unknown";
 		mouseTarget = null;
 
-		if (carriedObj != null) { drop(evt); return; }
+		if (carriedObj != null) {drop(evt);return;
+		}
 
 		if (dragClient != null) {
 			dragClient.dragBegin(evt);
 			return;
 		}
-		if (DEBUG && evt.shiftKey) return showDebugFeedback(evt);
+		if (DEBUG && evt.shiftKey)             return showDebugFeedback(evt);
 
-		var t:* = evt.target;
-		if ((t is TextField) && (TextField(t).type == TextFieldType.INPUT)) return;
+		var t : Dynamic = evt.target;
+		if ((Std.is(t, TextField)) && (cast((t), TextField).type == TextFieldType.INPUT))             return;
 		mouseTarget = findMouseTarget(evt, t);
 		if (mouseTarget == null) {
 			gesture = "ignore";
@@ -214,96 +224,102 @@ public class GestureHandler {
 			handleClick(evt);
 			return;
 		}
-		if (evt.shiftKey && app.editMode && ('menu' in mouseTarget)) {
+		if (evt.shiftKey && app.editMode && (Lambda.has(mouseTarget, "menu"))) {
 			gesture = "menu";
 			return;
 		}
 	}
 
-	private function doClickImmediately():Boolean {
+	private function doClickImmediately() : Bool{
 		// Answer true when clicking on the stage or a locked sprite in play (presentation) mode.
-		if (app.editMode) return false;
-		if (mouseTarget is ScratchStage) return true;
-		return (mouseTarget is ScratchSprite) && !ScratchSprite(mouseTarget).isDraggable;
+		if (app.editMode)             return false;
+		if (Std.is(mouseTarget, ScratchStage))             return true;
+		return (Std.is(mouseTarget, ScratchSprite)) && !cast((mouseTarget), ScratchSprite).isDraggable;
 	}
 
-	public function mouseMove(evt:MouseEvent):void {
-		if (gesture == "debug") { evt.stopImmediatePropagation(); return; }
+	public function mouseMove(evt : MouseEvent) : Void{
+		if (gesture == "debug") {evt.stopImmediatePropagation();return;
+		}
 		mouseIsDown = evt.buttonDown;
 		if (dragClient != null) {
 			dragClient.dragMove(evt);
 			return;
 		}
 		if (gesture == "unknown") {
-			if (mouseTarget != null) handleDrag(evt);
+			if (mouseTarget != null)                 handleDrag(evt);
 			return;
 		}
-		if ((gesture == "drag") && (carriedObj is Block)) {
-			app.scriptsPane.updateFeedbackFor(Block(carriedObj));
+		if ((gesture == "drag") && (Std.is(carriedObj, Block))) {
+			app.scriptsPane.updateFeedbackFor(cast((carriedObj), Block));
 		}
-		if ((gesture == "drag") && (carriedObj is ScratchSprite)) {
-			var stageP:Point = app.stagePane.globalToLocal(carriedObj.localToGlobal(new Point(0, 0)));
-			var spr:ScratchSprite = ScratchSprite(carriedObj);
+		if ((gesture == "drag") && (Std.is(carriedObj, ScratchSprite))) {
+			var stageP : Point = app.stagePane.globalToLocal(carriedObj.localToGlobal(new Point(0, 0)));
+			var spr : ScratchSprite = cast((carriedObj), ScratchSprite);
 			spr.scratchX = stageP.x - 240;
 			spr.scratchY = 180 - stageP.y;
 			spr.updateBubble();
 		}
-		var oldTarget:ScrollFrame = scrollTarget;
+		var oldTarget : ScrollFrame = scrollTarget;
 		scrollTarget = null;
-		var targets:Array = stage.getObjectsUnderPoint(new Point(stage.mouseX, stage.mouseY));
-		for each (var t:* in targets) {
-			if (t is ScrollFrameContents) {
-				scrollTarget = t.parent as ScrollFrame;
+		var targets : Array<Dynamic> = stage.getObjectsUnderPoint(new Point(stage.mouseX, stage.mouseY));
+		for (t in targets){
+			if (Std.is(t, ScrollFrameContents)) {
+				scrollTarget = try cast(t.parent, ScrollFrame) catch(e:Dynamic) null;
 				if (scrollTarget != oldTarget) {
-					scrollStartTime = getTimer();
+					scrollStartTime = Math.round(haxe.Timer.stamp() * 1000);
 				}
 				break;
 			}
 		}
-		if (scrollTarget) {
-			var p:Point = scrollTarget.localToGlobal(new Point(0, 0));
-			var mx:int = stage.mouseX;
-			var my:int = stage.mouseY;
-			var d:Number = mx - p.x;
+		if (scrollTarget != null) {
+			var p : Point = scrollTarget.localToGlobal(new Point(0, 0));
+			var mx : Int = Std.int(stage.mouseX);
+			var my : Int = Std.int(stage.mouseY);
+			var d : Float = mx - p.x;
 			if (d >= 0 && d <= SCROLL_RANGE && scrollTarget.canScrollLeft()) {
 				scrollXVelocity = (1 - d / SCROLL_RANGE) * SCROLL_MAX_SPEED;
-			} else {
+			}
+			else {
 				d = p.x + scrollTarget.visibleW() - mx;
 				if (d >= 0 && d <= SCROLL_RANGE && scrollTarget.canScrollRight()) {
 					scrollXVelocity = (d / SCROLL_RANGE - 1) * SCROLL_MAX_SPEED;
-				} else {
+				}
+				else {
 					scrollXVelocity = 0;
 				}
 			}
 			d = my - p.y;
 			if (d >= 0 && d <= SCROLL_RANGE && scrollTarget.canScrollUp()) {
 				scrollYVelocity = (1 - d / SCROLL_RANGE) * SCROLL_MAX_SPEED;
-			} else {
+			}
+			else {
 				d = p.y + scrollTarget.visibleH() - my;
 				if (d >= 0 && d <= SCROLL_RANGE && scrollTarget.canScrollDown()) {
 					scrollYVelocity = (d / SCROLL_RANGE - 1) * SCROLL_MAX_SPEED;
-				} else {
+				}
+				else {
 					scrollYVelocity = 0;
 				}
 			}
-			if (!scrollXVelocity && !scrollYVelocity) {
-				scrollStartTime = getTimer();
+			if (scrollXVelocity == 0 && scrollYVelocity == 0) {
+				scrollStartTime = Math.round(haxe.Timer.stamp() * 1000);
 			}
 		}
-		if (bubble) {
-			var dx:Number = bubbleStartX - stage.mouseX;
-			var dy:Number = bubbleStartY - stage.mouseY;
+		if (bubble != null) {
+			var dx : Float = bubbleStartX - stage.mouseX;
+			var dy : Float = bubbleStartY - stage.mouseY;
 			if (dx * dx + dy * dy > bubbleRange * bubbleRange) {
 				hideBubble();
 			}
 		}
 	}
 
-	public function mouseUp(evt:MouseEvent):void {
-		if (gesture == "debug") { evt.stopImmediatePropagation(); return; }
+	public function mouseUp(evt : MouseEvent) : Void{
+		if (gesture == "debug") {evt.stopImmediatePropagation();return;
+		}
 		mouseIsDown = false;
 		if (dragClient != null) {
-			var oldClient:DragClient = dragClient;
+			var oldClient : DragClient = dragClient;
 			dragClient = null;
 			oldClient.dragEnd(evt);
 			return;
@@ -311,7 +327,7 @@ public class GestureHandler {
 		drop(evt);
 		Menu.removeMenusFrom(stage);
 		if (gesture == "unknown") {
-			if (mouseTarget && ('doubleClick' in mouseTarget)) gesture = "clickOrDoubleClick";
+			if (mouseTarget != null && (Lambda.has(mouseTarget, "doubleClick")))                 gesture = "clickOrDoubleClick"
 			else {
 				handleClick(evt);
 				mouseTarget = null;
@@ -319,8 +335,8 @@ public class GestureHandler {
 			}
 			return;
 		}
-		if (gesture == "menu") handleMenu(evt);
-		if (app.scriptsPane) app.scriptsPane.draggingDone();
+		if (gesture == "menu")             handleMenu(evt);
+		if (app.scriptsPane != null)             app.scriptsPane.draggingDone();
 		mouseTarget = null;
 		gesture = "idle";
 		if (objToGrabOnUp != null) {
@@ -330,173 +346,181 @@ public class GestureHandler {
 		}
 	}
 
-	public function mouseWheel(evt:MouseEvent):void {
+	public function mouseWheel(evt : MouseEvent) : Void{
 		hideBubble();
 	}
 
-	public function escKeyDown():void {
-		if (carriedObj != null && carriedObj is Block) {
+	public function escKeyDown() : Void{
+		if (carriedObj != null && Std.is(carriedObj, Block)) {
 			carriedObj.stopDrag();
 			removeDropShadowFrom(carriedObj);
-			Block(carriedObj).restoreOriginalState();
+			cast((carriedObj), Block).restoreOriginalState();
 			carriedObj = null;
 		}
 	}
 
-	private function findMouseTarget(evt:MouseEvent, target:*):DisplayObject {
+	private function findMouseTarget(evt : MouseEvent, target : Dynamic) : DisplayObject{
 		// Find the mouse target for the given event. Return null if no target found.
 
-		if ((target is TextField) && (TextField(target).type == TextFieldType.INPUT)) return null;
-		if ((target is Button) || (target is IconButton)) return null;
+		if ((Std.is(target, TextField)) && (cast((target), TextField).type == TextFieldType.INPUT))             return null;
+		if ((Std.is(target, Button)) || (Std.is(target, IconButton)))             return null;
 
-		var o:DisplayObject = evt.target as DisplayObject;
-		var mouseTarget:Boolean = false;
-		while (o != null) {
-			if (isMouseTarget(o, evt.stageX / app.scaleX, evt.stageY / app.scaleY)) {
+		var o : DisplayObject = try cast(evt.target, DisplayObject) catch(e:Dynamic) null;
+		var mouseTarget : Bool = false;
+		while (o != null){
+			if (isMouseTarget(o, Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY))) {
 				mouseTarget = true;
 				break;
 			}
 			o = o.parent;
 		}
-		var rect:Rectangle = app.stageObj().getRect(stage);
-		if(!mouseTarget && rect.contains(evt.stageX, evt.stageY))  return findMouseTargetOnStage(evt.stageX / app.scaleX, evt.stageY / app.scaleY);
-		if (o == null) return null;
-		if ((o is Block) && Block(o).isEmbeddedInProcHat()) return o.parent;
-		if (o is ScratchObj) return findMouseTargetOnStage(evt.stageX / app.scaleX, evt.stageY / app.scaleY);
+		var rect : Rectangle = app.stageObj().getRect(stage);
+		if (!mouseTarget && rect.contains(evt.stageX, evt.stageY))             return findMouseTargetOnStage(Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY));
+		if (o == null)             return null;
+		if ((Std.is(o, Block)) && cast((o), Block).isEmbeddedInProcHat())             return o.parent;
+		if (Std.is(o, ScratchObj))             return findMouseTargetOnStage(Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY));
 		return o;
 	}
 
-	private function findMouseTargetOnStage(globalX:int, globalY:int):DisplayObject {
+	private function findMouseTargetOnStage(globalX : Int, globalY : Int) : DisplayObject{
 		// Find the front-most, visible stage element at the given point.
 		// Take sprite shape into account so you can click or grab a sprite
 		// through a hole in another sprite that is in front of it.
 		// Return the stage if no other object is found.
-		if(app.isIn3D) app.stagePane.visible = true;
-		var uiLayer:Sprite = app.stagePane.getUILayer();
-		for (var i:int = uiLayer.numChildren - 1; i > 0; i--) {
-			var o:DisplayObject = uiLayer.getChildAt(i) as DisplayObject;
-			if (o is Bitmap) break; // hit the paint layer of the stage; no more elments
+		if (app.isIn3D)             app.stagePane.visible = true;
+		var o : DisplayObject;
+		var uiLayer : Sprite = app.stagePane.getUILayer();
+		var i : Int = uiLayer.numChildren - 1;
+		while (i > 0){
+			o = try cast(uiLayer.getChildAt(i), DisplayObject) catch(e:Dynamic) null;
+			if (Std.is(o, Bitmap))                 break;  // hit the paint layer of the stage; no more elments  ;
 			if (o.visible && o.hitTestPoint(globalX, globalY, true)) {
-				if(app.isIn3D) app.stagePane.visible = false;
+				if (app.isIn3D)                     app.stagePane.visible = false;
 				return o;
 			}
+			i--;
 		}
-		if(app.stagePane != uiLayer) {
-			for (i = app.stagePane.numChildren - 1; i > 0; i--) {
-				o = app.stagePane.getChildAt(i) as DisplayObject;
-				if (o is Bitmap) break; // hit the paint layer of the stage; no more elments
+		if (app.stagePane != uiLayer) {
+			i = app.stagePane.numChildren - 1;
+			while (i > 0){
+				o = try cast(app.stagePane.getChildAt(i), DisplayObject) catch(e:Dynamic) null;
+				if (Std.is(o, Bitmap))                     break;  // hit the paint layer of the stage; no more elments  ;
 				if (o.visible && o.hitTestPoint(globalX, globalY, true)) {
-					if(app.isIn3D) app.stagePane.visible = false;
+					if (app.isIn3D)                         app.stagePane.visible = false;
 					return o;
 				}
+				i--;
 			}
 		}
 
-		if(app.isIn3D) app.stagePane.visible = false;
+		if (app.isIn3D)             app.stagePane.visible = false;
 		return app.stagePane;
 	}
 
-	private function isMouseTarget(o:DisplayObject, globalX:int, globalY:int):Boolean {
+	private function isMouseTarget(o : DisplayObject, globalX : Int, globalY : Int) : Bool{
 		// Return true if the given object is hit by the mouse and has a
 		// method named click, doubleClick, menu or objToGrab.
-		if (!o.hitTestPoint(globalX, globalY, true)) return false;
-		if (('click' in o) || ('doubleClick' in o)) return true;
-		if (('menu' in o) || ('objToGrab' in o)) return true;
+		if (!o.hitTestPoint(globalX, globalY, true))             return false;
+		if ((Lambda.has(o, "click")) || (Lambda.has(o, "doubleClick")))             return true;
+		if ((Lambda.has(o, "menu")) || (Lambda.has(o, "objToGrab")))             return true;
 		return false;
 	}
 
-	private function handleDrag(evt:MouseEvent):void {
+	private function handleDrag(evt : MouseEvent) : Void{
 		// Note: Called with a null event if gesture is click and hold.
 		Menu.removeMenusFrom(stage);
-		if (!('objToGrab' in mouseTarget)) return;
+		if (!(Lambda.has(mouseTarget, "objToGrab")))             return;
 		if (!app.editMode) {
-			if (app.loadInProgress) return;
-			if ((mouseTarget is ScratchSprite) && !ScratchSprite(mouseTarget).isDraggable) return; // don't drag locked sprites in presentation mode
-			if ((mouseTarget is Watcher) || (mouseTarget is ListWatcher)) return; // don't drag watchers in presentation mode
+			if (app.loadInProgress)                 return;
+			if ((Std.is(mouseTarget, ScratchSprite)) && !cast((mouseTarget), ScratchSprite).isDraggable)                 return  // don't drag locked sprites in presentation mode  ;
+			if ((Std.is(mouseTarget, Watcher)) || (Std.is(mouseTarget, ListWatcher)))                 return;  // don't drag watchers in presentation mode  ;
 		}
 		grab(mouseTarget, evt);
-		gesture = 'drag';
-		if (carriedObj is Block) {
-			app.scriptsPane.updateFeedbackFor(Block(carriedObj));
+		gesture = "drag";
+		if (Std.is(carriedObj, Block)) {
+			app.scriptsPane.updateFeedbackFor(cast((carriedObj), Block));
 		}
 	}
 
-	private function handleClick(evt:MouseEvent):void {
-		if (mouseTarget == null) return;
+	private function handleClick(evt : MouseEvent) : Void{
+		if (mouseTarget == null)             return;
 		evt.updateAfterEvent();
-		if ('click' in mouseTarget) mouseTarget.click(evt);
-		gesture = 'click';
+		if (Lambda.has(mouseTarget, "click"))             mouseTarget.click(evt);
+		gesture = "click";
 	}
 
-	private function handleDoubleClick(evt:MouseEvent):void {
-		if (mouseTarget == null) return;
-		if ('doubleClick' in mouseTarget) mouseTarget.doubleClick(evt);
+	private function handleDoubleClick(evt : MouseEvent) : Void{
+		if (mouseTarget == null)             return;
+		if (Lambda.has(mouseTarget, "doubleClick"))             mouseTarget.doubleClick(evt);
 		gesture = "doubleClick";
 	}
 
-	private function handleMenu(evt:MouseEvent):void {
-		if (mouseTarget == null) return;
-		var menu:Menu;
-		try { menu = mouseTarget.menu(evt) } catch (e:Error) {}
-		if (menu) menu.showOnStage(stage, evt.stageX / app.scaleX, evt.stageY / app.scaleY);
+	private function handleMenu(evt : MouseEvent) : Void{
+		if (mouseTarget == null)             return;
+		var menu : Menu;
+		try{menu = mouseTarget.menu(evt);
+		}        catch (e : Error){ };
+		if (menu != null)             menu.showOnStage(stage, evt.stageX / app.scaleX, evt.stageY / app.scaleY);
 	}
 
-	private var lastGrowShrinkSprite:Sprite;
+	private var lastGrowShrinkSprite : Sprite;
 
-	private function handleTool(evt:MouseEvent):void {
-		var isGrowShrink:Boolean = ('grow' == CursorTool.tool) || ('shrink' == CursorTool.tool);
-		var t:* = findTargetFor('handleTool', app, evt.stageX / app.scaleX, evt.stageY / app.scaleY);
-		if(!t) t = findMouseTargetOnStage(evt.stageX / app.scaleX, evt.stageY / app.scaleY);
+	private function handleTool(evt : MouseEvent) : Void{
+		var isGrowShrink : Bool = ("grow" == CursorTool.tool) || ("shrink" == CursorTool.tool);
+		var t : Dynamic = findTargetFor("handleTool", app, Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY));
+		if (t == null)             t = findMouseTargetOnStage(Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY));
 
-		if (isGrowShrink && (t is ScratchSprite)) {
-			function clearTool(e:MouseEvent):void {
-				if (lastGrowShrinkSprite) {
+		if (isGrowShrink && (Std.is(t, ScratchSprite))) {
+			function clearTool(e : MouseEvent) : Void{
+				if (lastGrowShrinkSprite != null) {
 					lastGrowShrinkSprite.removeEventListener(MouseEvent.MOUSE_OUT, clearTool);
 					lastGrowShrinkSprite = null;
 					app.clearTool();
 				}
-			}
-			if (!lastGrowShrinkSprite && !evt.shiftKey) {
+			};
+			if (lastGrowShrinkSprite == null && !evt.shiftKey) {
 				t.addEventListener(MouseEvent.MOUSE_OUT, clearTool);
 				lastGrowShrinkSprite = t;
 			}
 			t.handleTool(CursorTool.tool, evt);
 			return;
 		}
-		if (t && 'handleTool' in t) t.handleTool(CursorTool.tool, evt);
-		if (isGrowShrink && (t is Block && t.isInPalette || t is ImageCanvas)) return; // grow/shrink sticky for scripting area
+		if (t != null && Lambda.has(t, "handleTool"))             t.handleTool(CursorTool.tool, evt);
+		if (isGrowShrink && (Std.is(t, Block) && t.isInPalette || Std.is(t, ImageCanvas)))             return  // grow/shrink sticky for scripting area  ;
 
-		if (!evt.shiftKey) app.clearTool(); // don't clear if shift pressed
+		if (!evt.shiftKey)             app.clearTool();  // don't clear if shift pressed  ;
 	}
 
-	private function grab(obj:*, evt:MouseEvent):void {
+	private function grab(obj : Dynamic, evt : MouseEvent) : Void{
 		// Note: Called with a null event if gesture is click and hold.
-		if (evt) drop(evt);
+		if (evt != null)             drop(evt);
 
-		var globalP:Point = obj.localToGlobal(new Point(0, 0)); // record the original object's global position
-		obj = obj.objToGrab(evt ? evt : new MouseEvent('')); // can return the original object, a new object, or null
-		if (!obj) return; // not grabbable
-		if (obj.parent) globalP = obj.localToGlobal(new Point(0, 0)); // update position if not a copy
+		var globalP : Point = obj.localToGlobal(new Point(0, 0));  // record the original object's global position  
+		obj = obj.objToGrab((evt != null) ? evt : new MouseEvent(""));  // can return the original object, a new object, or null  
+		if (obj == null)             return  // not grabbable  ;
+		if (obj.parent)             globalP = obj.localToGlobal(new Point(0, 0));  // update position if not a copy  ;
 
-		originalParent = obj.parent; // parent is null if objToGrab() returns a new object
+		originalParent = obj.parent;  // parent is null if objToGrab() returns a new object  
 		originalPosition = new Point(obj.x, obj.y);
 		originalScale = obj.scaleX;
 
-		if (obj is Block) {
-			var b:Block = Block(obj);
+		if (Std.is(obj, Block)) {
+			var b : Block = cast((obj), Block);
 			b.saveOriginalState();
-			if (b.parent is Block) Block(b.parent).removeBlock(b);
-			if (b.parent != null) b.parent.removeChild(b);
+			if (Std.is(b.parent, Block))                 cast((b.parent), Block).removeBlock(b);
+			if (b.parent != null)                 b.parent.removeChild(b);
 			app.scriptsPane.prepareToDrag(b);
-		} else if (obj is ScratchComment) {
-			var c:ScratchComment = ScratchComment(obj);
-			if (c.parent != null) c.parent.removeChild(c);
+		}
+		else if (Std.is(obj, ScratchComment)) {
+			var c : ScratchComment = cast((obj), ScratchComment);
+			if (c.parent != null)                 c.parent.removeChild(c);
 			app.scriptsPane.prepareToDragComment(c);
-		} else {
-			var inStage:Boolean = (obj.parent == app.stagePane);
+		}
+		else {
+			var inStage : Bool = (obj.parent == app.stagePane);
 			if (obj.parent != null) {
-				if(obj is ScratchSprite && app.isIn3D)
-					(obj as ScratchSprite).prepareToDrag();
+				if (Std.is(obj, ScratchSprite) && app.isIn3D) 
+					(try cast(obj, ScratchSprite) catch(e:Dynamic) null).prepareToDrag();
 
 				obj.parent.removeChild(obj);
 			}
@@ -505,36 +529,36 @@ public class GestureHandler {
 			}
 		}
 
-		if (app.editMode) addDropShadowTo(obj);
+		if (app.editMode)             addDropShadowTo(obj);
 		stage.addChild(obj);
 		obj.x = globalP.x;
 		obj.y = globalP.y;
-		if (evt && mouseDownEvent) {
+		if (evt != null && mouseDownEvent != null) {
 			obj.x += evt.stageX - mouseDownEvent.stageX;
 			obj.y += evt.stageY - mouseDownEvent.stageY;
 		}
 		obj.startDrag();
-		if(obj is DisplayObject) obj.cacheAsBitmap = true;
+		if (Std.is(obj, DisplayObject))             obj.cacheAsBitmap = true;
 		carriedObj = obj;
-		scrollStartTime = getTimer();
+		scrollStartTime = Math.round(haxe.Timer.stamp() * 1000);
 	}
 
-	private function dropHandled(droppedObj:*, evt:MouseEvent):Boolean {
+	private function dropHandled(droppedObj : Dynamic, evt : MouseEvent) : Bool{
 		// Search for an object to handle this drop and return true one is found.
 		// Note: Search from front to back, so the front-most object catches the dropped object.
-		if(app.isIn3D) app.stagePane.visible = true;
-		var possibleTargets:Array = stage.getObjectsUnderPoint(new Point(evt.stageX / app.scaleX, evt.stageY / app.scaleY));
-		if(app.isIn3D) {
+		if (app.isIn3D)             app.stagePane.visible = true;
+		var possibleTargets : Array<Dynamic> = stage.getObjectsUnderPoint(new Point(evt.stageX / app.scaleX, evt.stageY / app.scaleY));
+		if (app.isIn3D) {
 			app.stagePane.visible = false;
-			if(possibleTargets.length == 0 && app.stagePane.scrollRect.contains(app.stagePane.mouseX, app.stagePane.mouseY))
+			if (possibleTargets.length == 0 && app.stagePane.scrollRect.contains(app.stagePane.mouseX, app.stagePane.mouseY)) 
 				possibleTargets.push(app.stagePane);
 		}
 		possibleTargets.reverse();
-		var tried:Array = [];
-		for each (var o:* in possibleTargets) {
-			while (o) { // see if some parent can handle the drop
-				if (tried.indexOf(o) == -1) {
-					if (('handleDrop' in o) && o.handleDrop(droppedObj)) return true;
+		var tried : Array<Dynamic> = [];
+		for (o in possibleTargets){
+			while (o){  // see if some parent can handle the drop  
+				if (Lambda.indexOf(tried, o) == -1) {
+					if ((Lambda.has(o, "handleDrop")) && o.handleDrop(droppedObj))                         return true;
 					tried.push(o);
 				}
 				o = o.parent;
@@ -543,23 +567,24 @@ public class GestureHandler {
 		return false;
 	}
 
-	private function drop(evt:MouseEvent):void {
-		if (carriedObj == null) return;
-		if(carriedObj is DisplayObject) carriedObj.cacheAsBitmap = false;
+	private function drop(evt : MouseEvent) : Void{
+		if (carriedObj == null)             return;
+		if (Std.is(carriedObj, DisplayObject))             carriedObj.cacheAsBitmap = false;
 		carriedObj.stopDrag();
 		removeDropShadowFrom(carriedObj);
 		carriedObj.parent.removeChild(carriedObj);
 
 		if (!dropHandled(carriedObj, evt)) {
-			if (carriedObj is Block) {
-				Block(carriedObj).restoreOriginalState();
-			} else if (originalParent) { // put carriedObj back where it came from
+			if (Std.is(carriedObj, Block)) {
+				cast((carriedObj), Block).restoreOriginalState();
+			}
+			else if (originalParent != null) {  // put carriedObj back where it came from  
 				carriedObj.x = originalPosition.x;
 				carriedObj.y = originalPosition.y;
 				carriedObj.scaleX = carriedObj.scaleY = originalScale;
 				originalParent.addChild(carriedObj);
-				if (carriedObj is ScratchSprite) {
-					var ss:ScratchSprite = carriedObj as ScratchSprite;
+				if (Std.is(carriedObj, ScratchSprite)) {
+					var ss : ScratchSprite = try cast(carriedObj, ScratchSprite) catch(e:Dynamic) null;
 					ss.updateCostume();
 					ss.updateBubble();
 				}
@@ -571,50 +596,51 @@ public class GestureHandler {
 		originalPosition = null;
 	}
 
-	private function addDropShadowTo(o:DisplayObject):void {
-		var f:DropShadowFilter = new DropShadowFilter();
-		var blockScale:Number = (app.scriptsPane) ? app.scriptsPane.scaleX : 1;
+	private function addDropShadowTo(o : DisplayObject) : Void{
+		var f : DropShadowFilter = new DropShadowFilter();
+		var blockScale : Float = ((app.scriptsPane != null)) ? app.scriptsPane.scaleX : 1;
 		f.distance = 8 * blockScale;
 		f.blurX = f.blurY = 2;
 		f.alpha = 0.4;
 		o.filters = o.filters.concat([f]);
 	}
 
-	private function removeDropShadowFrom(o:DisplayObject):void {
-		var newFilters:Array = [];
-		for each (var f:* in o.filters) {
-			if (!(f is DropShadowFilter)) newFilters.push(f);
+	private function removeDropShadowFrom(o : DisplayObject) : Void{
+		var newFilters : Array<flash.filters.BitmapFilter> = [];
+		for (f/* AS3HX WARNING could not determine type for var: f exp: EField(EIdent(o),filters) type: null */ in o.filters){
+			if (!(Std.is(f, DropShadowFilter)))                 newFilters.push(f);
 		}
 		o.filters = newFilters;
 	}
 
-	public function showBubble(text:String, x:Number, y:Number, width:Number = 0):void {
+	public function showBubble(text : String, x : Float, y : Float, width : Float = 0) : Void{
 		hideBubble();
-		bubble = new TalkBubble(text || ' ', 'say', 'result', this);
+		bubble = new TalkBubble(text != null ? text : " ", "say", "result", this);
 		bubbleStartX = stage.mouseX;
 		bubbleStartY = stage.mouseY;
-		var bx:Number = x + width;
-		var by:Number = y - bubble.height;
+		var bx : Float = x + width;
+		var by : Float = y - bubble.height;
 		if (bx + bubble.width > stage.stageWidth - bubbleMargin && x - bubble.width > bubbleMargin) {
 			bx = x - bubble.width;
-			bubble.setDirection('right');
-		} else {
-			bubble.setDirection('left');
+			bubble.setDirection("right");
+		}
+		else {
+			bubble.setDirection("left");
 		}
 		bubble.x = Math.max(bubbleMargin, Math.min(stage.stageWidth - bubbleMargin, bx));
 		bubble.y = Math.max(bubbleMargin, Math.min(stage.stageHeight - bubbleMargin, by));
 
-		var f:DropShadowFilter = new DropShadowFilter();
+		var f : DropShadowFilter = new DropShadowFilter();
 		f.distance = 4;
 		f.blurX = f.blurY = 8;
 		f.alpha = 0.2;
-		bubble.filters = bubble.filters.concat(f);
+		bubble.filters = bubble.filters.concat([f]);
 
 		stage.addChild(bubble);
 	}
 
-	public function hideBubble():void {
-		if (bubble) {
+	public function hideBubble() : Void{
+		if (bubble != null) {
 			stage.removeChild(bubble);
 			bubble = null;
 		}
@@ -622,28 +648,30 @@ public class GestureHandler {
 
 	/* Debugging */
 
-	private var debugSelection:DisplayObject;
+	private var debugSelection : DisplayObject;
 
-	private function showDebugFeedback(evt:MouseEvent):void {
+	private function showDebugFeedback(evt : MouseEvent) : Void{
 		// Highlights the clicked DisplayObject and prints it in the debug console.
 		// Multiple clicks walk up the display hierarchy. This is useful for understanding
 		// the structure of the UI.
 
-		evt.stopImmediatePropagation(); // don't let the clicked object handle this event
-		gesture = "debug"; // prevent mouseMove and mouseUp processing
+		evt.stopImmediatePropagation();  // don't let the clicked object handle this event  
+		gesture = "debug";  // prevent mouseMove and mouseUp processing  
 
-		var stage:DisplayObject = evt.target.stage;
+		var stage : DisplayObject = evt.target.stage;
 		if (debugSelection != null) {
 			removeDebugGlow(debugSelection);
 			if (debugSelection.getRect(stage).containsPoint(new Point(stage.mouseX, stage.mouseY))) {
 				debugSelection = debugSelection.parent;
-			} else {
-				debugSelection = DisplayObject(evt.target);
 			}
-		} else {
-			debugSelection = DisplayObject(evt.target);
+			else {
+				debugSelection = cast((evt.target), DisplayObject);
+			}
 		}
-		if (debugSelection is Stage) {
+		else {
+			debugSelection = cast((evt.target), DisplayObject);
+		}
+		if (Std.is(debugSelection, Stage)) {
 			debugSelection = null;
 			return;
 		}
@@ -651,10 +679,10 @@ public class GestureHandler {
 		addDebugGlow(debugSelection);
 	}
 
-	private function addDebugGlow(o:DisplayObject):void {
-		var newFilters:Array = [];
-		if (o.filters != null) newFilters = o.filters;
-		var f:GlowFilter = new GlowFilter(0xFFFF00);
+	private function addDebugGlow(o : DisplayObject) : Void{
+		var newFilters : Array<flash.filters.BitmapFilter> = [];
+		if (o.filters != null)             newFilters = o.filters;
+		var f : GlowFilter = new GlowFilter(0xFFFF00);
 		f.strength = 15;
 		f.blurX = f.blurY = 6;
 		f.inner = true;
@@ -662,12 +690,11 @@ public class GestureHandler {
 		o.filters = newFilters;
 	}
 
-	private function removeDebugGlow(o:DisplayObject):void {
-		var newFilters:Array = [];
-		for each (var f:* in o.filters) {
-			if (!(f is GlowFilter)) newFilters.push(f);
+	private function removeDebugGlow(o : DisplayObject) : Void{
+		var newFilters : Array<flash.filters.BitmapFilter> = [];
+		for (f/* AS3HX WARNING could not determine type for var: f exp: EField(EIdent(o),filters) type: null */ in o.filters){
+			if (!(Std.is(f, GlowFilter)))                 newFilters.push(f);
 		}
 		o.filters = newFilters;
 	}
-
-}}
+}

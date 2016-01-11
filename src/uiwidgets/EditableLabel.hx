@@ -24,38 +24,43 @@
 // By default, the bezel is always visible, but useDynamicBezel() can be used to make
 // it appear only while the user is editing the text (i.e. it has keyboard focus).
 
-package uiwidgets {
-	import flash.display.*;
-	import flash.events.*;
-	import flash.filters.*;
-	import flash.text.*;
+package uiwidgets;
 
-public class EditableLabel extends Sprite {
 
-	private const defaultFormat:TextFormat = new TextFormat(CSS.font, 13, 0x929497);
-	private const bgColor:int = 0xFFFFFF;
-	private const frameColor:int = 0xA6A8AB;
+import flash.display.*;
+import flash.events.*;
+import flash.filters.*;
+import flash.text.*;
 
-	public var tf:TextField;
+class EditableLabel extends Sprite
+{
 
-	private var bezel:Shape;
-	private var dynamicBezel:Boolean;
-	private var textChanged:Function;
+	private var defaultFormat : TextFormat = new TextFormat(CSS.font, 13, 0x929497);
+	private static inline var bgColor : Int = 0xFFFFFF;
+	private static inline var frameColor : Int = 0xA6A8AB;
 
-	public function EditableLabel(textChanged:Function, format:TextFormat = null) {
+	public var tf : TextField;
+
+	private var bezel : Shape;
+	private var dynamicBezel : Bool;
+	private var textChanged : Void->Void;
+
+	public function new(textChanged : Void->Void, format : TextFormat = null)
+	{
+		super();
 		this.textChanged = textChanged;
 		bezel = new Shape();
 		addChild(bezel);
 		addFilter();
-		if (format == null) format = defaultFormat;
+		if (format == null)             format = defaultFormat;
 		addTextField(format);
 		setWidth(100);
 	}
 
-	public function setWidth(w:int):void {
-		if (tf.text.length == 0) tf.text = ' '; // needs at least one character to compute textHeight
-		var h:int = tf.textHeight + 5; // the height is determined by the font
-		var g:Graphics = bezel.graphics;
+	public function setWidth(w : Int) : Void{
+		if (tf.text.length == 0)             tf.text = " ";  // needs at least one character to compute textHeight  ;
+		var h : Int = Std.int(tf.textHeight + 5);  // the height is determined by the font  
+		var g : Graphics = bezel.graphics;
 		g.clear();
 		g.lineStyle(0.5, frameColor, 1, true);
 		g.beginFill(bgColor);
@@ -65,38 +70,40 @@ public class EditableLabel extends Sprite {
 		tf.height = h - 1;
 	}
 
-	public function contents():String { return tf.text }
-	public function setContents(s:String):void { tf.text = s }
-	public function setEditable(flag:Boolean):void {
-		tf.type = flag ? TextFieldType.INPUT : TextFieldType.DYNAMIC;
+	public function contents() : String{return tf.text;
+	}
+	public function setContents(s : String) : Void{tf.text = s;
+	}
+	public function setEditable(flag : Bool) : Void{
+		tf.type = (flag) ? TextFieldType.INPUT : TextFieldType.DYNAMIC;
 		tf.selectable = flag;
 		bezel.visible = flag;
 	}
 
-	public function useDynamicBezel(flag:Boolean):void {
+	public function useDynamicBezel(flag : Bool) : Void{
 		dynamicBezel = flag;
 		bezel.visible = !dynamicBezel;
 	}
 
-	private function focusChange(evt:FocusEvent):void {
-		if (dynamicBezel) bezel.visible = ((root.stage.focus == tf) && (tf.type == TextFieldType.INPUT));
-		if ((evt.type == FocusEvent.FOCUS_OUT) && (textChanged != null)) textChanged();
+	private function focusChange(evt : FocusEvent) : Void{
+		if (dynamicBezel)             bezel.visible = ((root.stage.focus == tf) && (tf.type == TextFieldType.INPUT));
+		if ((evt.type == FocusEvent.FOCUS_OUT) && (textChanged != null))             textChanged();
 	}
 
-	private function keystroke(evt:KeyboardEvent):void {
+	private function keystroke(evt : KeyboardEvent) : Void{
 		// Called after each keystroke.
-		var k:int = evt.charCode;
+		var k : Int = evt.charCode;
 		if ((k == 10) || (k == 13)) {
-			stage.focus = null; // relinquish keyboard focus
+			stage.focus = null;  // relinquish keyboard focus  
 			evt.stopPropagation();
 		}
 	}
 
-	private function addTextField(format:TextFormat):void {
+	private function addTextField(format : TextFormat) : Void{
 		tf = new TextField();
 		tf.defaultTextFormat = format;
 		tf.type = TextFieldType.INPUT;
-		var debugAlignment:Boolean = false;
+		var debugAlignment : Bool = false;
 		if (debugAlignment) {
 			tf.background = true;
 			tf.backgroundColor = 0xA0A0FF;
@@ -109,8 +116,8 @@ public class EditableLabel extends Sprite {
 		addChild(tf);
 	}
 
-	private function addFilter():void {
-		var f:BevelFilter = new BevelFilter();
+	private function addFilter() : Void{
+		var f : BevelFilter = new BevelFilter();
 		f.angle = 225;
 		f.shadowAlpha = 0.5;
 		f.distance = 2;
@@ -118,5 +125,4 @@ public class EditableLabel extends Sprite {
 		f.blurX = f.blurY = 2;
 		bezel.filters = [f];
 	}
-
-}}
+}

@@ -17,48 +17,56 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package uiwidgets {
-	import flash.display.*;
-	import flash.geom.*;
+package uiwidgets;
 
-public class StretchyBitmap extends Sprite {
+import uiwidgets.Bitmap;
+import uiwidgets.BitmapData;
 
-	private var srcBM:BitmapData;
-	private var cachedBM:Bitmap;
+import flash.display.*;
+import flash.geom.*;
 
-	public function StretchyBitmap(bm:BitmapData = null, w:int = 100, h:int = 75) {
+class StretchyBitmap extends Sprite
+{
+
+	private var srcBM : BitmapData;
+	private var cachedBM : Bitmap;
+
+	public function new(bm : BitmapData = null, w : Int = 100, h : Int = 75)
+	{
+		super();
 		srcBM = bm;
-		if (srcBM == null) srcBM = new BitmapData(1, 1, false, 0x808080);
+		if (srcBM == null)             srcBM = new BitmapData(1, 1, false, 0x808080);
 		cachedBM = new Bitmap(srcBM);
 		addChild(cachedBM);
 		setWidthHeight(w, h);
 	}
 
-	public function setWidthHeight(w:int, h:int):void {
-		var srcW:int = srcBM.width;
-		var srcH:int = srcBM.height;
+	public function setWidthHeight(w : Int, h : Int) : Void{
+		var srcW : Int = srcBM.width;
+		var srcH : Int = srcBM.height;
 		w = Math.max(w, srcW);
 		h = Math.max(h, srcH);
-		var halfSrc:int;
+		var halfSrc : Int;
 
 		// adjust width
-		var newBM:BitmapData = new BitmapData(w, h, true, 0xFF000000);
+		var newBM : BitmapData = new BitmapData(w, h, true, 0xFF000000);
 		halfSrc = srcW / 2;
 		newBM.copyPixels(srcBM, new Rectangle(0, 0, halfSrc, srcH), new Point(0, 0));
 		newBM.copyPixels(srcBM, new Rectangle(srcW - halfSrc, 0, halfSrc, srcH), new Point(w - halfSrc, 0));
-		for (var dstX:int = halfSrc; dstX < (w - halfSrc); dstX++) {
+		for (dstX in halfSrc...(w - halfSrc)){
 			newBM.copyPixels(srcBM, new Rectangle(halfSrc, 0, 1, srcH), new Point(dstX, 0));
-		}
+		}  // adjust height  
 
-		// adjust height
+
+
 		halfSrc = srcH / 2;
 		newBM.copyPixels(newBM, new Rectangle(0, (srcH - halfSrc), w, halfSrc), new Point(0, h - halfSrc));
-		for (var dstY:int = halfSrc + 1; dstY < (h - halfSrc); dstY++) {
+		for (dstY in halfSrc + 1...(h - halfSrc)){
 			newBM.copyPixels(newBM, new Rectangle(0, halfSrc, w, 1), new Point(0, dstY));
-		}
+		}  // install new bitmap  
 
-		// install new bitmap
+
+
 		cachedBM.bitmapData = newBM;
 	}
-
-}}
+}

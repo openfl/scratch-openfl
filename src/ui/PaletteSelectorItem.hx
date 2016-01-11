@@ -23,20 +23,24 @@
 // A PaletteSelectorItem is a text button for a named category in a PaletteSelector.
 // It handles mouse over, out, and up events and changes its appearance when selected.
 
-package ui {
-	import flash.display.*;
-	import flash.events.MouseEvent;
-	import flash.text.*;
+package ui;
 
-public class PaletteSelectorItem extends Sprite {
+import flash.display.*;
+import flash.events.MouseEvent;
+import flash.text.*;
 
-	public var categoryID:int;
-	public var label:TextField;
-	public var isSelected:Boolean;
+class PaletteSelectorItem extends Sprite
+{
 
-	private var color:uint;
+	public var categoryID : Int;
+	public var label : TextField;
+	public var isSelected : Bool;
 
-	public function PaletteSelectorItem(id: int, s:String, c:uint) {
+	private var color : Int;
+
+	public function new(id : Int, s : String, c : Int)
+	{
+		super();
 		categoryID = id;
 		addLabel(s);
 		color = c;
@@ -46,7 +50,7 @@ public class PaletteSelectorItem extends Sprite {
 		addEventListener(MouseEvent.CLICK, mouseUp);
 	}
 
-	private function addLabel(s:String):void {
+	private function addLabel(s : String) : Void{
 		label = new TextField();
 		label.autoSize = TextFieldAutoSize.LEFT;
 		label.selectable = false;
@@ -54,38 +58,37 @@ public class PaletteSelectorItem extends Sprite {
 		addChild(label);
 	}
 
-	public function setSelected(flag:Boolean):void {
-		var w:int = 100;
-		var h:int = label.height + 2;
-		var tabInset:int = 8;
-		var tabW:int = 7;
+	public function setSelected(flag : Bool) : Void{
+		var w : Int = 100;
+		var h : Int = Std.int(label.height + 2);
+		var tabInset : Int = 8;
+		var tabW : Int = 7;
 		isSelected = flag;
-		var fmt:TextFormat = new TextFormat(CSS.font, 12, (isSelected ? CSS.white : CSS.offColor), isSelected);
+		var fmt : TextFormat = new TextFormat(CSS.font, 12, ((isSelected) ? CSS.white : CSS.offColor), isSelected);
 		label.setTextFormat(fmt);
 		label.x = 17;
 		label.y = 1;
-		var g:Graphics = this.graphics;
+		var g : Graphics = this.graphics;
 		g.clear();
-		g.beginFill(0xFF00, 0); // invisible, but mouse sensitive
+		g.beginFill(0xFF00, 0);  // invisible, but mouse sensitive  
 		g.drawRect(0, 0, w, h);
 		g.endFill();
 		g.beginFill(color);
-		g.drawRect(tabInset, 1, isSelected ? w - tabInset - 1 : tabW, h - 2);
+		g.drawRect(tabInset, 1, (isSelected) ? w - tabInset - 1 : tabW, h - 2);
 		g.endFill();
 	}
 
-	private function mouseOver(event:MouseEvent):void {
-		label.textColor = isSelected ? CSS.white : CSS.buttonLabelOverColor;
+	private function mouseOver(event : MouseEvent) : Void{
+		label.textColor = (isSelected) ? CSS.white : CSS.buttonLabelOverColor;
 	}
 
-	private function mouseOut(event:MouseEvent):void {
-		label.textColor = isSelected ? CSS.white : CSS.offColor;
+	private function mouseOut(event : MouseEvent) : Void{
+		label.textColor = (isSelected) ? CSS.white : CSS.offColor;
 	}
 
-	private function mouseUp(event:MouseEvent):void {
-		if (parent is PaletteSelector) {
-			PaletteSelector(parent).select(categoryID, event.shiftKey);
+	private function mouseUp(event : MouseEvent) : Void{
+		if (Std.is(parent, PaletteSelector)) {
+			cast((parent), PaletteSelector).select(categoryID, event.shiftKey);
 		}
 	}
-
-}}
+}

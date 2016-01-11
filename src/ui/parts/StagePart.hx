@@ -24,49 +24,54 @@
 // Note: The Scratch stage is a child of StagePart but is stored in an app instance variable (app.stagePane)
 // since it is referred from many places.
 
-package ui.parts {
-	import flash.display.*;
-	import flash.events.*;
-	import flash.text.*;
-	import flash.media.*;
-	import assets.Resources;
-	import scratch.*;
-	import translation.Translator;
-	import uiwidgets.*;
+package ui.parts;
 
-public class StagePart extends UIPart {
 
-	private const readoutTextColor:int = Scratch.app.isExtensionDevMode ? CSS.white : CSS.textColor;
-	private const readoutLabelFormat:TextFormat = new TextFormat(CSS.font, 12, readoutTextColor, true);
-	private const readoutFormat:TextFormat = new TextFormat(CSS.font, 10, readoutTextColor);
+import flash.display.*;
+import flash.events.*;
+import flash.text.*;
+import flash.media.*;
+import assets.Resources;
+import scratch.*;
+import translation.Translator;
+import uiwidgets.*;
 
-	private const topBarHeightNormal:int = 39;
-	private const topBarHeightSmallPlayerMode:int = 26;
+class StagePart extends UIPart
+{
 
-	private var topBarHeight:int = topBarHeightNormal;
+	private var readoutTextColor : Int = CSS.textColor;
+	private var readoutLabelFormat : TextFormat = new TextFormat(CSS.font, 12, CSS.textColor, true);
+	private var readoutFormat : TextFormat = new TextFormat(CSS.font, 10, CSS.textColor);
 
-	private var outline:Shape;
-	protected var projectTitle:EditableLabel;
-	protected var projectInfo:TextField;
-	private var versionInfo:TextField;
-	private var turboIndicator:TextField;
-	private var runButton:IconButton;
-	private var stopButton:IconButton;
-	private var fullscreenButton:IconButton;
-	private var stageSizeButton:Sprite;
+	private static inline var topBarHeightNormal : Int = 39;
+	private static inline var topBarHeightSmallPlayerMode : Int = 26;
 
-	private var playButton:Sprite; // YouTube-like play button in center of screen; used by Kiosk version
-	private var userNameWarning:Sprite; // Container for privacy warning message for projects that use username block
-	private var runButtonOnTicks:int;
+	private var topBarHeight : Int = topBarHeightNormal;
+
+	private var outline : Shape;
+	private var projectTitle : EditableLabel;
+	private var projectInfo : TextField;
+	private var versionInfo : TextField;
+	private var turboIndicator : TextField;
+	private var runButton : IconButton;
+	private var stopButton : IconButton;
+	private var fullscreenButton : IconButton;
+	private var stageSizeButton : Sprite;
+
+	private var playButton : Sprite;  // YouTube-like play button in center of screen; used by Kiosk version  
+	private var userNameWarning : Sprite;  // Container for privacy warning message for projects that use username block  
+	private var runButtonOnTicks : Int;
 
 	// x-y readouts
-	private var readouts:Sprite; // readouts that appear below the stage
-	private var xLabel:TextField;
-	private var xReadout:TextField;
-	private var yLabel:TextField;
-	private var yReadout:TextField;
+	private var readouts : Sprite;  // readouts that appear below the stage  
+	private var xLabel : TextField;
+	private var xReadout : TextField;
+	private var yLabel : TextField;
+	private var yReadout : TextField;
 
-	public function StagePart(app:Scratch) {
+	public function new(app : Scratch)
+	{
+		super();
 		this.app = app;
 		outline = new Shape();
 		addChild(outline);
@@ -80,37 +85,36 @@ public class StagePart extends UIPart {
 		addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheel);
 	}
 
-	public static function strings():Array {
+	public static function strings() : Array<Dynamic>{
 		return [
-			'by', 'shared', 'unshared', 'Turbo Mode',
-			'This project can detect who is using it, through the “username” block. To hide your identity, sign out before using the project.',
-		];
+		"by", "shared", "unshared", "Turbo Mode", 
+		"This project can detect who is using it, through the “username” block. To hide your identity, sign out before using the project."];
 	}
 
-	public function updateTranslation():void {
-		turboIndicator.text = Translator.map('Turbo Mode');
+	public function updateTranslation() : Void{
+		turboIndicator.text = Translator.map("Turbo Mode");
 		turboIndicator.x = w - turboIndicator.width - 73;
 		updateProjectInfo();
 	}
 
-	public function setWidthHeight(w:int, h:int, scale:Number):void {
+	public function setWidthHeight(w : Int, h : Int, scale : Float) : Void{
 		this.w = w;
 		this.h = h;
-		if (app.stagePane) app.stagePane.scaleX = app.stagePane.scaleY = scale;
+		if (app.stagePane != null)             app.stagePane.scaleX = app.stagePane.scaleY = scale;
 		topBarHeight = computeTopBarHeight();
 		drawOutline();
 		fixLayout();
 	}
 
-	public function computeTopBarHeight():int {
-		return app.isSmallPlayer ? topBarHeightSmallPlayerMode : topBarHeightNormal;
+	public function computeTopBarHeight() : Int{
+		return (app.isSmallPlayer) ? topBarHeightSmallPlayerMode : topBarHeightNormal;
 	}
 
-	public function installStage(newStage:ScratchStage, showStartButton:Boolean):void {
-		var scale:Number = app.stageIsContracted ? 0.5 : 1;
+	public function installStage(newStage : ScratchStage, showStartButton : Bool) : Void{
+		var scale : Float = (app.stageIsContracted) ? 0.5 : 1;
 		if ((app.stagePane != null) && (app.stagePane.parent != null)) {
 			scale = app.stagePane.scaleX;
-			app.stagePane.parent.removeChild(app.stagePane); // remove old stage
+			app.stagePane.parent.removeChild(app.stagePane);
 		}
 		topBarHeight = computeTopBarHeight();
 		newStage.x = 1;
@@ -118,21 +122,24 @@ public class StagePart extends UIPart {
 		newStage.scaleX = newStage.scaleY = scale;
 		addChild(newStage);
 		app.stagePane = newStage;
-		if (showStartButton) showPlayButton();
+		if (showStartButton)             showPlayButton()
 		else hidePlayButton();
 	}
 
-	public function projectName():String { return projectTitle.contents() }
-	public function setProjectName(s:String):void { projectTitle.setContents(s) }
-	public function isInPresentationMode():Boolean { return fullscreenButton.visible && fullscreenButton.isOn() }
+	public function projectName() : String{return projectTitle.contents();
+	}
+	public function setProjectName(s : String) : Void{projectTitle.setContents(s);
+	}
+	public function isInPresentationMode() : Bool{return fullscreenButton.visible && fullscreenButton.isOn();
+	}
 
-	public function exitPresentationMode():void {
+	public function exitPresentationMode() : Void{
 		fullscreenButton.setOn(false);
 		drawOutline();
 		refresh();
 	}
 
-	public function refresh():void {
+	public function refresh() : Void{
 		readouts.visible = app.editMode;
 		projectTitle.visible = app.editMode;
 		projectInfo.visible = app.editMode;
@@ -143,7 +150,7 @@ public class StagePart extends UIPart {
 			fullscreenButton.setOn(false);
 			drawStageSizeButton();
 		}
-		if (userNameWarning) userNameWarning.visible = app.usesUserNameBlock;
+		if (userNameWarning != null)             userNameWarning.visible = app.usesUserNameBlock;
 		updateProjectInfo();
 	}
 
@@ -151,33 +158,33 @@ public class StagePart extends UIPart {
 	// Layout
 	//------------------------------
 
-	private function drawOutline():void {
-		var topBarColors:Array = app.isSmallPlayer ? [CSS.tabColor, CSS.tabColor] : CSS.titleBarColors;
+	private function drawOutline() : Void{
+		var topBarColors : Array<Dynamic> = (app.isSmallPlayer) ? [CSS.tabColor, CSS.tabColor] : CSS.titleBarColors;
 
-		var g:Graphics = outline.graphics;
+		var g : Graphics = outline.graphics;
 		g.clear();
-		drawTopBar(g, topBarColors, getTopBarPath(w - 1, topBarHeight), w, topBarHeight, CSS.borderColor);
+		UIPart.drawTopBar(g, topBarColors, UIPart.getTopBarPath(w - 1, topBarHeight), w, topBarHeight, CSS.borderColor);
 		g.lineStyle(1, CSS.borderColor, 1, true);
 		g.drawRect(0, topBarHeight - 1, w - 1, h - topBarHeight);
 
 		versionInfo.visible = !fullscreenButton.isOn();
 	}
 
-	protected function fixLayout():void {
-		if (app.stagePane) app.stagePane.y = topBarHeight;
+	private function fixLayout() : Void{
+		if (app.stagePane != null)             app.stagePane.y = topBarHeight;
 
 		projectTitle.x = 50;
-		projectTitle.y = app.isOffline ? 8 : 2;
+		projectTitle.y = (app.isOffline) ? 8 : 2;
 		projectInfo.x = projectTitle.x + 3;
 		projectInfo.y = projectTitle.y + 18;
 
 		runButton.x = w - 60;
-		runButton.y = int((topBarHeight - runButton.height) / 2);
+		runButton.y = as3hx.Compat.parseInt((topBarHeight - runButton.height) / 2);
 		stopButton.x = runButton.x + 32;
 		stopButton.y = runButton.y + 1;
 
 		turboIndicator.x = w - turboIndicator.width - 73;
-		turboIndicator.y = app.isSmallPlayer ? 5 : (app.editMode ? 22 : 12);
+		turboIndicator.y = (app.isSmallPlayer) ? 5 : ((app.editMode) ? 22 : 12);
 
 		fullscreenButton.x = 11;
 		fullscreenButton.y = stopButton.y - 1;
@@ -186,89 +193,89 @@ public class StagePart extends UIPart {
 		versionInfo.x = fullscreenButton.x + 1;
 		versionInfo.y = 27;
 
-		projectTitle.setWidth(runButton.x - projectTitle.x - 15);
+		projectTitle.setWidth(Std.int(runButton.x - projectTitle.x - 15));
 
 		// x-y readouts
-		var left:int = w - 98; // w - 95
+		var left : Int = w - 98;  // w - 95  
 		xLabel.x = left;
 		xReadout.x = left + 16;
 		yLabel.x = left + 43;
 		yReadout.x = left + 60;
 
-		var top:int = h + 1;
+		var top : Int = h + 1;
 		xReadout.y = yReadout.y = top;
 		xLabel.y = yLabel.y = top - 2;
 
 		stageSizeButton.x = w - 4;
 		stageSizeButton.y = h + 2;
 
-		if (playButton) playButton.scaleX = playButton.scaleY = app.stagePane.scaleX;
+		if (playButton != null)             playButton.scaleX = playButton.scaleY = app.stagePane.scaleX;
 	}
 
-	private function addTitleAndInfo():void {
-		var fmt:TextFormat = app.isOffline ? new TextFormat(CSS.font, 16, CSS.textColor) : CSS.projectTitleFormat;
+	private function addTitleAndInfo() : Void{
+		var fmt : TextFormat = (app.isOffline) ? new TextFormat(CSS.font, 16, CSS.textColor) : CSS.projectTitleFormat;
 		projectTitle = getProjectTitle(fmt);
 		addChild(projectTitle);
 
-		addChild(projectInfo = makeLabel('', CSS.projectInfoFormat));
+		addChild(projectInfo = UIPart.makeLabel("", CSS.projectInfoFormat));
 
-		const versionFormat:TextFormat = new TextFormat(CSS.font, 9, 0x909090);
-		addChild(versionInfo = makeLabel(Scratch.versionString, versionFormat));
+		var versionFormat : TextFormat = new TextFormat(CSS.font, 9, 0x909090);
+		addChild(versionInfo = UIPart.makeLabel(Scratch.versionString, versionFormat));
 	}
 
-	protected function getProjectTitle(fmt:TextFormat):EditableLabel {
+	private function getProjectTitle(fmt : TextFormat) : EditableLabel{
 		return new EditableLabel(null, fmt);
 	}
 
-	public function updateVersionInfo(newVersion:String):void {
+	public function updateVersionInfo(newVersion : String) : Void{
 		versionInfo.text = newVersion;
 	}
 
-	private function addTurboIndicator():void {
+	private function addTurboIndicator() : Void{
 		turboIndicator = new TextField();
 		turboIndicator.defaultTextFormat = new TextFormat(CSS.font, 11, CSS.buttonLabelOverColor, true);
 		turboIndicator.autoSize = TextFieldAutoSize.LEFT;
 		turboIndicator.selectable = false;
-		turboIndicator.text = Translator.map('Turbo Mode');
+		turboIndicator.text = Translator.map("Turbo Mode");
 		turboIndicator.visible = false;
 		addChild(turboIndicator);
 	}
 
-	private function addXYReadouts():void {
+	private function addXYReadouts() : Void{
 		readouts = new Sprite();
 		addChild(readouts);
 
-		xLabel = makeLabel('x:', readoutLabelFormat);
+		xLabel = UIPart.makeLabel("x:", readoutLabelFormat);
 		readouts.addChild(xLabel);
-		xReadout = makeLabel('-888', readoutFormat);
+		xReadout = UIPart.makeLabel("-888", readoutFormat);
 		readouts.addChild(xReadout);
 
-		yLabel = makeLabel('y:', readoutLabelFormat);
+		yLabel = UIPart.makeLabel("y:", readoutLabelFormat);
 		readouts.addChild(yLabel);
-		yReadout = makeLabel('-888', readoutFormat);
+		yReadout = UIPart.makeLabel("-888", readoutFormat);
 		readouts.addChild(yReadout);
 	}
 
-	protected function updateProjectInfo():void {
+	private function updateProjectInfo() : Void{
 		projectTitle.setEditable(false);
-		projectInfo.text = '';
+		projectInfo.text = "";
 	}
 
 	// -----------------------------
 	// Stepping
 	//------------------------------
 
-	public function step():void {
+	public function step() : Void{
 		updateRunStopButtons();
-		if (app.editMode) updateMouseReadout();
+		if (app.editMode)             updateMouseReadout();
 	}
 
-	private function updateRunStopButtons():void {
+	private function updateRunStopButtons() : Void{
 		// Update the run/stop buttons.
 		// Note: To ensure that the user sees at least a flash of the
 		// on button, it stays on a minimum of two display cycles.
-		if (app.interp.threadCount() > 0) threadStarted();
-		else { // nothing running
+		if (app.interp.threadCount() > 0)             threadStarted()
+		else {  // nothing running  
 			if (runButtonOnTicks > 2) {
 				runButton.turnOff();
 				stopButton.turnOn();
@@ -277,17 +284,17 @@ public class StagePart extends UIPart {
 		runButtonOnTicks++;
 	}
 
-	private var lastX:int, lastY:int;
+	private var lastX : Int;private var lastY : Int;
 
-	private function updateMouseReadout():void {
+	private function updateMouseReadout() : Void{
 		// Update the mouse readouts. Do nothing if they are up-to-date (to minimize CPU load).
 		if (stage.mouseX != lastX) {
 			lastX = app.stagePane.scratchMouseX();
-			xReadout.text = String(lastX);
+			xReadout.text = Std.string(lastX);
 		}
 		if (stage.mouseY != lastY) {
 			lastY = app.stagePane.scratchMouseY();
-			yReadout.text = String(lastY);
+			yReadout.text = Std.string(lastY);
 		}
 	}
 
@@ -295,45 +302,47 @@ public class StagePart extends UIPart {
 	// Run/Stop/Fullscreen Buttons
 	//------------------------------
 
-	public function threadStarted():void {
+	public function threadStarted() : Void{
 		runButtonOnTicks = 0;
 		runButton.turnOn();
 		stopButton.turnOff();
-		if (playButton) hidePlayButton();
+		if (playButton != null)             hidePlayButton();
 	}
 
-	private function addRunStopButtons():void {
-		function startAll(b:IconButton):void { playButtonPressed(b.lastEvent) }
-		function stopAll(b:IconButton):void { app.runtime.stopAll() }
-		runButton = new IconButton(startAll, 'greenflag');
+	private function addRunStopButtons() : Void{
+		function startAll(b : IconButton) : Void{playButtonPressed(b.lastEvent);
+		};
+		function stopAll(b : IconButton) : Void{app.runtime.stopAll();
+		};
+		runButton = new IconButton(startAll, "greenflag");
 		runButton.actOnMouseUp();
 		addChild(runButton);
-		stopButton = new IconButton(stopAll, 'stop');
+		stopButton = new IconButton(stopAll, "stop");
 		addChild(stopButton);
 	}
 
-	private function addFullScreenButton():void {
-		function toggleFullscreen(b:IconButton):void {
+	private function addFullScreenButton() : Void{
+		function toggleFullscreen(b : IconButton) : Void{
 			app.setPresentationMode(b.isOn());
 			drawOutline();
-		}
-		fullscreenButton = new IconButton(toggleFullscreen, 'fullscreen');
+		};
+		fullscreenButton = new IconButton(toggleFullscreen, "fullscreen");
 		fullscreenButton.disableMouseover();
 		addChild(fullscreenButton);
 	}
 
-	private function addStageSizeButton():void {
-		function toggleStageSize(evt:*):void {
+	private function addStageSizeButton() : Void{
+		function toggleStageSize(evt : Dynamic) : Void{
 			app.toggleSmallStage();
-		}
+		};
 		stageSizeButton = new Sprite();
 		stageSizeButton.addEventListener(MouseEvent.MOUSE_DOWN, toggleStageSize);
 		drawStageSizeButton();
 		addChild(stageSizeButton);
 	}
 
-	private function drawStageSizeButton():void {
-		var g:Graphics = stageSizeButton.graphics;
+	private function drawStageSizeButton() : Void{
+		var g : Graphics = stageSizeButton.graphics;
 		g.clear();
 
 		// draw tab
@@ -353,7 +362,8 @@ public class StagePart extends UIPart {
 			g.moveTo(3, 3.5);
 			g.lineTo(9, 7.5);
 			g.lineTo(3, 12);
-		} else {
+		}
+		else {
 			g.moveTo(8, 3.5);
 			g.lineTo(2, 7.5);
 			g.lineTo(8, 12);
@@ -365,15 +375,15 @@ public class StagePart extends UIPart {
 	// Play Button
 	//------------------------------
 
-	private function showPlayButton():void {
+	private function showPlayButton() : Void{
 		// The play button is a YouTube-like button the covers the entire stage.
 		// Used by the player to ensure that the user clicks on the SWF to start
 		// the project, which ensures that the SWF gets keyboard focus.
-		if (!playButton) {
+		if (playButton == null) {
 			playButton = new Sprite();
 			playButton.graphics.beginFill(0, 0.3);
 			playButton.graphics.drawRect(0, 0, 480, 360);
-			var flag:Bitmap = Resources.createBmp('playerStartFlag');
+			var flag : Bitmap = Resources.createBmp("playerStartFlag");
 			flag.x = (480 - flag.width) / 2;
 			flag.y = (360 - flag.height) / 2;
 			playButton.alpha = .9;
@@ -388,24 +398,24 @@ public class StagePart extends UIPart {
 		addChild(playButton);
 	}
 
-	private function stopEvent(e:Event):void {
-		if (e) {
+	private function stopEvent(e : Event) : Void{
+		if (e != null) {
 			e.stopImmediatePropagation();
 			e.preventDefault();
 		}
 	}
 
-	public function addUserNameWarning():void {
+	public function addUserNameWarning() : Void{
 		userNameWarning = new Sprite();
-		var g:Graphics = userNameWarning.graphics;
+		var g : Graphics = userNameWarning.graphics;
 		g.clear();
 		g.beginFill(CSS.white);
 		g.drawRoundRect(10, 30, playButton.width - 20, 70, 15, 15);
 		g.endFill();
 		userNameWarning.alpha = 0.9;
 
-		const versionFormat:TextFormat = new TextFormat(CSS.font, 16, 0x000000);
-		var userNameWarningText:TextField = makeLabel(Translator.map('This project can detect who is using it, through the “username” block. To hide your identity, sign out before using the project.'), versionFormat, 15, 45);
+		var versionFormat : TextFormat = new TextFormat(CSS.font, 16, 0x000000);
+		var userNameWarningText : TextField = UIPart.makeLabel(Translator.map("This project can detect who is using it, through the “username” block. To hide your identity, sign out before using the project."), versionFormat, 15, 45);
 		userNameWarningText.width = userNameWarning.width - 10;
 		userNameWarningText.multiline = true;
 		userNameWarningText.wordWrap = true;
@@ -413,37 +423,37 @@ public class StagePart extends UIPart {
 		userNameWarning.addChild(userNameWarningText);
 		playButton.addChild(userNameWarning);
 
-		userNameWarning.visible = false; // Don't show this by default
+		userNameWarning.visible = false;
 	}
 
-	public function playButtonPressed(evt:MouseEvent):void {
-		if(app.loadInProgress) {
+	public function playButtonPressed(evt : MouseEvent) : Void{
+		if (app.loadInProgress) {
 			stopEvent(evt);
 			return;
-		}
+		}  // Mute the project if it was started with the control key down  
 
-		// Mute the project if it was started with the control key down
-		SoundMixer.soundTransform = new SoundTransform((evt && evt.ctrlKey ? 0 : 1));
 
-		if (evt && evt.shiftKey) {
+
+		SoundMixer.soundTransform = new SoundTransform((evt != null && (evt.ctrlKey) ? 0 : 1));
+
+		if (evt != null && evt.shiftKey) {
 			app.toggleTurboMode();
 			return;
 		}
 
-		var firstTime:Boolean = playButton != null;
+		var firstTime : Bool = playButton != null;
 		hidePlayButton();
 		stopEvent(evt);
 		app.runtime.startGreenFlags(firstTime);
 	}
 
-	public function hidePlayButton():void {
-		if (playButton) removeChild(playButton);
+	public function hidePlayButton() : Void{
+		if (playButton != null)             removeChild(playButton);
 		playButton = null;
 	}
 
-	private function mouseWheel(evt:MouseEvent):void {
+	private function mouseWheel(evt : MouseEvent) : Void{
 		evt.preventDefault();
-		app.runtime.startKeyHats(evt.delta > 0 ? 30 : 31);
+		app.runtime.startKeyHats(evt.delta > (0) ? 30 : 31);
 	}
-
-}}
+}

@@ -26,7 +26,9 @@
 // in a single ZIP file, and new Scratch projects stored on a server as a collection
 // of separate elements.
 
-package util {
+package util;
+
+
 import flash.display.*;
 import flash.events.*;
 import flash.net.URLLoader;
@@ -36,8 +38,8 @@ import logging.LogLevel;
 
 import scratch.*;
 
-import sound.WAVFile;
-import sound.mp3.MP3Loader;
+//import sound.WAVFile;
+//import sound.mp3.MP3Loader;
 
 import svgutils.*;
 
@@ -45,17 +47,19 @@ import translation.Translator;
 
 import uiwidgets.DialogBox;
 
-public class ProjectIO {
+class ProjectIO
+{
 
-	protected var app:Scratch;
-	protected var images:Array = [];
-	protected var sounds:Array = [];
+	private var app : Scratch;
+	private var images : Array<Dynamic> = [];
+	private var sounds : Array<Dynamic> = [];
 
-	public function ProjectIO(app:Scratch):void {
+	public function new(app : Scratch)
+	{
 		this.app = app;
 	}
 
-	public static function strings():Array {
+	public static function strings() : Array<Dynamic>{
 		return [];
 	}
 
@@ -63,52 +67,54 @@ public class ProjectIO {
 	// Encode a project or sprite as a ByteArray (a 'one-file' project)
 	//----------------------------
 
-	public function encodeProjectAsZipFile(proj:ScratchStage):ByteArray {
+	public function encodeProjectAsZipFile(proj : ScratchStage) : ByteArray{
 		// Encode a project into a ByteArray. The format is a ZIP file containing
 		// the JSON project data and all images and sounds as files.
-		delete proj.info.penTrails; // remove the penTrails bitmap saved in some old projects' info
+		//This is an intentional compilation error. See the README for handling the delete keyword
+		proj.info.penTrails = null; //delete proj.info.penTrails  // remove the penTrails bitmap saved in some old projects' info  ;
 		proj.savePenLayer();
 		proj.updateInfo();
 		recordImagesAndSounds(proj.allObjects(), false, proj);
-		var zip:ZipIO = new ZipIO();
+		var zip : ZipIO = new ZipIO();
 		zip.startWrite();
-		addJSONData('project.json', proj, zip);
+		addJSONData("project.json", proj, zip);
 		addImagesAndSounds(zip);
 		proj.clearPenLayer();
 		return zip.endWrite();
 	}
 
-	public function encodeSpriteAsZipFile(spr:ScratchSprite):ByteArray {
+	public function encodeSpriteAsZipFile(spr : ScratchSprite) : ByteArray{
 		// Encode a sprite into a ByteArray. The format is a ZIP file containing
 		// the JSON sprite data and all images and sounds as files.
 		recordImagesAndSounds([spr], false);
-		var zip:ZipIO = new ZipIO();
+		var zip : ZipIO = new ZipIO();
 		zip.startWrite();
-		addJSONData('sprite.json', spr, zip);
+		addJSONData("sprite.json", spr, zip);
 		addImagesAndSounds(zip);
 		return zip.endWrite();
 	}
 
-	protected function getScratchStage():ScratchStage {
+	private function getScratchStage() : ScratchStage{
 		return new ScratchStage();
 	}
 
-	private function addJSONData(fileName:String, obj:*, zip:ZipIO):void {
-		var jsonData:ByteArray = new ByteArray();
+	private function addJSONData(fileName : String, obj : Dynamic, zip : ZipIO) : Void{
+		var jsonData : ByteArray = new ByteArray();
 		jsonData.writeUTFBytes(util.JSON.stringify(obj));
 		zip.write(fileName, jsonData, true);
 	}
 
-	private function addImagesAndSounds(zip:ZipIO):void {
-		var i:int, ext:String;
-		for (i = 0; i < images.length; i++) {
-			var imgData:ByteArray = images[i][1];
+	private function addImagesAndSounds(zip : ZipIO) : Void{
+		var i : Int;
+		var ext : String;
+		for (i in 0...images.length){
+			var imgData : ByteArray = images[i][1];
 			ext = ScratchCostume.fileExtension(imgData);
 			zip.write(i + ext, imgData);
 		}
-		for (i = 0; i < sounds.length; i++) {
-			var sndData:ByteArray = sounds[i][1];
-			ext = ScratchSound.isWAV(sndData) ? '.wav' : '.mp3';
+		for (i in 0...sounds.length){
+			var sndData : ByteArray = sounds[i][1];
+			ext = (ScratchSound.isWAV(sndData)) ? ".wav" : ".mp3";
 			zip.write(i + ext, sndData);
 		}
 	}
@@ -117,89 +123,89 @@ public class ProjectIO {
 	// Decode a project or sprite from a ByteArray containing ZIP data
 	//----------------------------
 
-	public function decodeProjectFromZipFile(zipData:ByteArray):ScratchStage {
-		return decodeFromZipFile(zipData) as ScratchStage;
+	public function decodeProjectFromZipFile(zipData : ByteArray) : ScratchStage{
+		return try cast(decodeFromZipFile(zipData), ScratchStage) catch(e:Dynamic) null;
 	}
 
-	public function decodeSpriteFromZipFile(zipData:ByteArray, whenDone:Function, fail:Function = null):void {
-		function imagesDecoded():void {
+	public function decodeSpriteFromZipFile(zipData : ByteArray, whenDone : Function, fail : Function = null) : Void{
+		function imagesDecoded() : Void{
 			spr.showCostume(spr.currentCostumeIndex);
 			whenDone(spr);
-		}
-		var spr:ScratchSprite = decodeFromZipFile(zipData) as ScratchSprite;
-		if (spr) decodeAllImages([spr], imagesDecoded, fail);
-		else if (fail != null) fail();
+		};
+		var spr : ScratchSprite = try cast(decodeFromZipFile(zipData), ScratchSprite) catch(e:Dynamic) null;
+		if (spr != null)             decodeAllImages([spr], imagesDecoded, fail)
+		else if (fail != null)             Assert.fail();
 	}
 
-	protected function decodeFromZipFile(zipData:ByteArray):ScratchObj {
-		var jsonData:String;
+	private function decodeFromZipFile(zipData : ByteArray) : ScratchObj{
+		var jsonData : String;
 		images = [];
 		sounds = [];
-		try {
-			var files:Array = new ZipIO().read(zipData);
-		} catch (e:*) {
-			app.log(LogLevel.WARNING, 'Bad zip file; attempting to recover');
-			try {
+		try{
+			var files : Array<Dynamic> = new ZipIO().read(zipData);
+		}        catch (e : Dynamic){
+			app.log(LogLevel.WARNING, "Bad zip file; attempting to recover");
+			try{
 				files = new ZipIO().recover(zipData);
-			} catch (e:*) {
-				return null; // couldn't recover
+			}            catch (e : Dynamic){
+				return null;
 			}
 		}
-		for each (var f:Array in files) {
-			var fName:String = f[0];
-			if (fName.indexOf('__MACOSX') > -1) continue; // skip MacOS meta info in zip file
-			var fIndex:int = int(integerName(fName));
-			var contents:ByteArray = f[1];
-			if (fName.slice(-4) == '.gif') images[fIndex] = contents;
-			if (fName.slice(-4) == '.jpg') images[fIndex] = contents;
-			if (fName.slice(-4) == '.png') images[fIndex] = contents;
-			if (fName.slice(-4) == '.svg') images[fIndex] = contents;
-			if (fName.slice(-4) == '.wav') sounds[fIndex] = contents;
-			if (fName.slice(-4) == '.mp3') sounds[fIndex] = contents;
-			if (fName.slice(-5) == '.json') jsonData = contents.readUTFBytes(contents.length);
+		for (f/* AS3HX WARNING could not determine type for var: f exp: EIdent(files) type: null */ in files){
+			var fName : String = f[0];
+			if (fName.indexOf("__MACOSX") > -1)                 continue;  // skip MacOS meta info in zip file  ;
+			var fIndex : Int = as3hx.Compat.parseInt(integerName(fName));
+			var contents : ByteArray = f[1];
+			if (fName.substring(-4) == ".gif")                 images[fIndex] = contents;
+			if (fName.substring(-4) == ".jpg")                 images[fIndex] = contents;
+			if (fName.substring(-4) == ".png")                 images[fIndex] = contents;
+			if (fName.substring(-4) == ".svg")                 images[fIndex] = contents;
+			if (fName.substring(-4) == ".wav")                 sounds[fIndex] = contents;
+			if (fName.substring(-4) == ".mp3")                 sounds[fIndex] = contents;
+			if (fName.substring(-5) == ".json")                 jsonData = contents.readUTFBytes(contents.length);
 		}
-		if (jsonData == null) return null;
-		var jsonObj:Object = util.JSON.parse(jsonData);
-		if (jsonObj['children']) { // project JSON
-			var proj:ScratchStage = getScratchStage();
+		if (jsonData == null)             return null;
+		var jsonObj : Dynamic = util.JSON.parse(jsonData);
+		if (Reflect.field(jsonObj, "children")) {  // project JSON  
+			var proj : ScratchStage = getScratchStage();
 			proj.readJSON(jsonObj);
-			if (proj.penLayerID >= 0) proj.penLayerPNG = images[proj.penLayerID]
-			else if (proj.penLayerMD5) proj.penLayerPNG = images[0];
+			if (proj.penLayerID >= 0)                 proj.penLayerPNG = images[proj.penLayerID]
+			else if (proj.penLayerMD5)                 proj.penLayerPNG = images[0];
 			installImagesAndSounds(proj.allObjects());
 			return proj;
 		}
-		if (jsonObj['direction'] != null) { // sprite JSON
-			var sprite:ScratchSprite = new ScratchSprite();
+		if (Reflect.field(jsonObj, "direction") != null) {  // sprite JSON  
+			var sprite : ScratchSprite = new ScratchSprite();
 			sprite.readJSON(jsonObj);
-			sprite.instantiateFromJSON(app.stagePane)
+			sprite.instantiateFromJSON(app.stagePane);
 			installImagesAndSounds([sprite]);
 			return sprite;
 		}
 		return null;
 	}
 
-	private function integerName(s:String):String {
+	private function integerName(s : String) : String{
 		// Return the substring of digits preceding the last '.' in the given string.
 		// For example integerName('123.jpg') -> '123'.
-		const digits:String = '1234567890';
-		var end:int = s.lastIndexOf('.');
-		if (end < 0) end = s.length;
-		var start:int = end - 1;
-		if (start < 0) return s;
-		while ((start >= 0) && (digits.indexOf(s.charAt(start)) >= 0)) start--;
-		return s.slice(start + 1, end);
+		var digits : String = "1234567890";
+		var end : Int = s.lastIndexOf(".");
+		if (end < 0)             end = s.length;
+		var start : Int = end - 1;
+		if (start < 0)             return s;
+		while ((start >= 0) && (digits.indexOf(s.charAt(start)) >= 0))start--;
+		return s.substring(start + 1, end);
 	}
 
-	private function installImagesAndSounds(objList:Array):void {
+	private function installImagesAndSounds(objList : Array<Dynamic>) : Void{
 		// Install the images and sounds for the given list of ScratchObj objects.
-		for each (var obj:ScratchObj in objList) {
-			for each (var c:ScratchCostume in obj.costumes) {
-				if (images[c.baseLayerID] != undefined) c.baseLayerData = images[c.baseLayerID];
-				if (images[c.textLayerID] != undefined) c.textLayerData = images[c.textLayerID];
+		for (obj in objList){
+			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
+				if (images[c.baseLayerID] != null)                     c.baseLayerData = images[c.baseLayerID];
+				if (images[c.textLayerID] != null)                     c.textLayerData = images[c.textLayerID];
 			}
-			for each (var snd:ScratchSound in obj.sounds) {
-				var sndData:* = sounds[snd.soundID];
-				if (sndData) {
+			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
+				var sndData : Dynamic = sounds[snd.soundID];
+				if (sndData != null) {
 					snd.soundData = sndData;
 					snd.convertMP3IfNeeded();
 				}
@@ -207,173 +213,182 @@ public class ProjectIO {
 		}
 	}
 
-	public function decodeAllImages(objList:Array, whenDone:Function, fail:Function = null):void {
+	public function decodeAllImages(objList : Array<Dynamic>, whenDone : Function, fail : Function = null) : Void{
 		// Load all images in all costumes from their image data, then call whenDone.
-		function imageDecoded():void {
-			for each (var o:* in imageDict) {
-				if (o == 'loading...') return; // not yet finished loading
+		function imageDecoded() : Void{
+			for (o/* AS3HX WARNING could not determine type for var: o exp: EIdent(imageDict) type: null */ in imageDict){
+				if (o == "loading...")                     return;  // not yet finished loading  ;
 			}
 			allImagesLoaded();
-		}
-		var error:Boolean = false;
-		function decodeError():void {
-			if (error) return;
+		};
+		var error : Bool = false;
+		function decodeError() : Void{
+			if (error)                 return;
 			error = true;
-			if (fail != null) fail();
-		}
-		function allImagesLoaded():void {
-			if (error) return;
-			for each (c in allCostumes) {
+			if (fail != null)                 Assert.fail();
+		};
+		function allImagesLoaded() : Void{
+			if (error)                 return;
+			for (c/* AS3HX WARNING could not determine type for var: c exp: EIdent(allCostumes) type: null */ in allCostumes){
 				if ((c.baseLayerData != null) && (c.baseLayerBitmap == null)) {
-					var img:* = imageDict[c.baseLayerData];
-					if (img is BitmapData) c.baseLayerBitmap = img;
-					if (img is SVGElement) c.setSVGRoot(img, false);
+					var img : Dynamic = imageDict[c.baseLayerData];
+					if (Std.is(img, BitmapData))                         c.baseLayerBitmap = img;
+					if (Std.is(img, SVGElement))                         c.setSVGRoot(img, false);
 				}
-				if ((c.textLayerData != null) && (c.textLayerBitmap == null)) c.textLayerBitmap = imageDict[c.textLayerData];
+				if ((c.textLayerData != null) && (c.textLayerBitmap == null))                     c.textLayerBitmap = imageDict[c.textLayerData];
 			}
-			for each (c in allCostumes) c.generateOrFindComposite(allCostumes);
+			for (c/* AS3HX WARNING could not determine type for var: c exp: EIdent(allCostumes) type: null */ in allCostumes)c.generateOrFindComposite(allCostumes);
 			whenDone();
-		}
+		};
 
-		var c:ScratchCostume;
-		var allCostumes:Array = [];
-		for each (var o:ScratchObj in objList) {
-			for each (c in o.costumes) allCostumes.push(c);
+		var c : ScratchCostume;
+		var allCostumes : Array<Dynamic> = [];
+		for (o in objList){
+			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(o),costumes) type: null */ in o.costumes)allCostumes.push(c);
 		}
-		var imageDict:Dictionary = new Dictionary(); // maps image data to BitmapData
-		for each (c in allCostumes) {
+		var imageDict : Dictionary = new Dictionary();  // maps image data to BitmapData  
+		for (c in allCostumes){
 			if ((c.baseLayerData != null) && (c.baseLayerBitmap == null)) {
-				if (ScratchCostume.isSVGData(c.baseLayerData)) decodeSVG(c.baseLayerData, imageDict, imageDecoded);
+				if (ScratchCostume.isSVGData(c.baseLayerData))                     decodeSVG(c.baseLayerData, imageDict, imageDecoded)
 				else decodeImage(c.baseLayerData, imageDict, imageDecoded, decodeError);
 			}
-			if ((c.textLayerData != null) && (c.textLayerBitmap == null)) decodeImage(c.textLayerData, imageDict, imageDecoded, decodeError);
+			if ((c.textLayerData != null) && (c.textLayerBitmap == null))                 decodeImage(c.textLayerData, imageDict, imageDecoded, decodeError);
 		}
-		imageDecoded(); // handles case when there were no images to load
+		imageDecoded();
 	}
 
-	private function decodeImage(imageData:ByteArray, imageDict:Dictionary, doneFunction:Function, fail:Function):void {
-		function loadDone(e:Event):void {
-			imageDict[imageData] = e.target.content.bitmapData;
+	private function decodeImage(imageData : ByteArray, imageDict : Dictionary, doneFunction : Function, fail : Function) : Void{
+		function loadDone(e : Event) : Void{
+			Reflect.setField(imageDict, Std.string(imageData), e.target.content.bitmapData);
 			doneFunction();
-		}
-		function loadError(e:Event):void {
-			if (fail != null) fail();
-		}
-		if (imageDict[imageData] != null) return; // already loading or loaded
-		if (!imageData || imageData.length == 0) {
-			if (fail != null) fail();
+		};
+		function loadError(e : Event) : Void{
+			if (fail != null)                 Assert.fail();
+		};
+		if (Reflect.field(imageDict, Std.string(imageData)) != null)             return  // already loading or loaded  ;
+		if (imageData == null || imageData.length == 0) {
+			if (fail != null)                 Assert.fail();
 			return;
 		}
-		imageDict[imageData] = 'loading...';
-		var loader:Loader = new Loader();
+		Reflect.setField(imageDict, Std.string(imageData), "loading...");
+		var loader : Loader = new Loader();
 		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadDone);
 		loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError);
 		loader.loadBytes(imageData);
 	}
 
-	private function decodeSVG(svgData:ByteArray, imageDict:Dictionary, doneFunction:Function):void {
-		function loadDone(svgRoot:SVGElement):void {
-			imageDict[svgData] = svgRoot;
+	private function decodeSVG(svgData : ByteArray, imageDict : Dictionary, doneFunction : Function) : Void{
+		function loadDone(svgRoot : SVGElement) : Void{
+			Reflect.setField(imageDict, Std.string(svgData), svgRoot);
 			doneFunction();
-		}
-		if (imageDict[svgData] != null) return; // already loading or loaded
-		var importer:SVGImporter = new SVGImporter(XML(svgData));
+		};
+		if (Reflect.field(imageDict, Std.string(svgData)) != null)             return  // already loading or loaded  ;
+		var importer : SVGImporter = new SVGImporter(cast((svgData), XML));
 		if (importer.hasUnloadedImages()) {
-			imageDict[svgData] = 'loading...';
+			Reflect.setField(imageDict, Std.string(svgData), "loading...");
 			importer.loadAllImages(loadDone);
-		} else {
-			imageDict[svgData] = importer.root;
+		}
+		else {
+			Reflect.setField(imageDict, Std.string(svgData), importer.root);
 		}
 	}
 
-	public function downloadProjectAssets(projectData:ByteArray):void {
-		function assetReceived(md5:String, data:ByteArray):void {
+	public function downloadProjectAssets(projectData : ByteArray) : Void{
+		function assetReceived(md5 : String, data : ByteArray) : Void{
 			assetDict[md5] = data;
 			assetCount++;
-			if (!data) {
-				app.log(LogLevel.WARNING, 'missing asset: ' + md5);
+			if (data == null) {
+				app.log(LogLevel.WARNING, "missing asset: " + md5);
 			}
 			if (app.lp) {
 				app.lp.setProgress(assetCount / assetsToFetch.length);
 				app.lp.setInfo(
-						assetCount + ' ' +
-								Translator.map('of') + ' ' + assetsToFetch.length + ' ' +
-								Translator.map('assets loaded'));
+						assetCount + " " +
+						Translator.map("of") + " " + assetsToFetch.length + " " +
+						Translator.map("assets loaded"));
 			}
 			if (assetCount == assetsToFetch.length) {
 				installAssets(proj.allObjects(), assetDict);
 				app.runtime.decodeImagesAndInstall(proj);
 			}
-		}
+		};
 		projectData.position = 0;
-		var projObject:Object = util.JSON.parse(projectData.readUTFBytes(projectData.length));
-		var proj:ScratchStage = getScratchStage();
+		var projObject : Dynamic = util.JSON.parse(projectData.readUTFBytes(projectData.length));
+		var proj : ScratchStage = getScratchStage();
 		proj.readJSON(projObject);
-		var assetsToFetch:Array = collectAssetsToFetch(proj.allObjects());
-		var assetDict:Object = new Object();
-		var assetCount:int = 0;
-		for each (var md5:String in assetsToFetch) fetchAsset(md5, assetReceived);
+		var assetsToFetch : Array<Dynamic> = collectAssetsToFetch(proj.allObjects());
+		var assetDict : Dynamic = new Dynamic();
+		var assetCount : Int = 0;
+		for (md5 in assetsToFetch)fetchAsset(md5, assetReceived);
 	}
 
 	//----------------------------
 	// Fetch a costume or sound from the server
 	//----------------------------
 
-	public function fetchImage(id:String, costumeName:String, width:int, whenDone:Function, otherData:Object = null):URLLoader {
+	public function fetchImage(id : String, costumeName : String, width : Int, whenDone : Function, otherData : Dynamic = null) : URLLoader{
 		// Fetch an image asset from the server and call whenDone with the resulting ScratchCostume.
-		var c:ScratchCostume;
-		function gotCostumeData(data:ByteArray):void {
-			if (!data) {
-				app.log(LogLevel.WARNING, 'Image not found on server: ' + id);
+		var c : ScratchCostume;
+		function gotCostumeData(data : ByteArray) : Void{
+			if (data == null) {
+				app.log(LogLevel.WARNING, "Image not found on server: " + id);
 				return;
 			}
 			if (ScratchCostume.isSVGData(data)) {
-				if (otherData && otherData.centerX)
-					c = new ScratchCostume(costumeName, data, otherData.centerX, otherData.centerY, otherData.bitmapResolution);
-				else
-					c = new ScratchCostume(costumeName, data);
+				if (otherData != null && otherData.centerX) 
+					c = new ScratchCostume(costumeName, data, otherData.centerX, otherData.centerY, otherData.bitmapResolution)
+				else 
+				c = new ScratchCostume(costumeName, data);
 				c.baseLayerMD5 = id;
 				whenDone(c);
-			} else {
-				var loader:Loader = new Loader();
+			}
+			else {
+				var loader : Loader = new Loader();
 				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, imageLoaded);
 				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, imageError);
 				loader.loadBytes(data);
 			}
-		}
-		function imageError(event:IOErrorEvent):void {
-			app.log(LogLevel.WARNING, 'ProjectIO failed to load image', {id: id});
-		}
-		function imageLoaded(e:Event):void {
-			if (otherData && otherData.centerX)
-				c = new ScratchCostume(costumeName, e.target.content.bitmapData, otherData.centerX, otherData.centerY, otherData.bitmapResolution);
-			else
-				c = new ScratchCostume(costumeName, e.target.content.bitmapData);
-			if (width) c.bitmapResolution = c.baseLayerBitmap.width / width;
+		};
+		function imageError(event : IOErrorEvent) : Void{
+			app.log(LogLevel.WARNING, "ProjectIO failed to load image", {
+						id : id
+
+					});
+		};
+		function imageLoaded(e : Event) : Void{
+			if (otherData != null && otherData.centerX) 
+				c = new ScratchCostume(costumeName, e.target.content.bitmapData, otherData.centerX, otherData.centerY, otherData.bitmapResolution)
+			else 
+			c = new ScratchCostume(costumeName, e.target.content.bitmapData);
+			if (width != 0)                 c.bitmapResolution = c.baseLayerBitmap.width / width;
 			c.baseLayerMD5 = id;
 			whenDone(c);
-		}
+		};
 		return app.server.getAsset(id, gotCostumeData);
 	}
 
-	public function fetchSound(id:String, sndName:String, whenDone:Function):void {
+	public function fetchSound(id : String, sndName : String, whenDone : Function) : Void{
 		// Fetch a sound asset from the server and call whenDone with the resulting ScratchSound.
-		function gotSoundData(sndData:ByteArray):void {
-			if (!sndData) {
-				app.log(LogLevel.WARNING, 'Sound not found on server', {id: id});
+		function gotSoundData(sndData : ByteArray) : Void{
+			if (sndData == null) {
+				app.log(LogLevel.WARNING, "Sound not found on server", {
+							id : id
+
+						});
 				return;
 			}
-			var snd:ScratchSound;
-			try {
-				snd = new ScratchSound(sndName, sndData); // try reading data as WAV file
-			} catch (e:*) { }
-			if (snd && (snd.sampleCount > 0)) { // WAV data
+			var snd : ScratchSound;
+			try{
+				snd = new ScratchSound(sndName, sndData);
+			}            catch (e : Dynamic){ };
+			if (snd != null && (snd.sampleCount > 0)) {  // WAV data  
 				snd.md5 = id;
 				whenDone(snd);
-			} else { // try to read data as an MP3 file
+			}
+			else {  // try to read data as an MP3 file  
 				MP3Loader.convertToScratchSound(sndName, sndData, whenDone);
 			}
-		}
+		};
 		app.server.getAsset(id, gotSoundData);
 	}
 
@@ -381,169 +396,177 @@ public class ProjectIO {
 	// Download a sprite from the server
 	//----------------------------
 
-	public function fetchSprite(md5AndExt:String, whenDone:Function):void {
+	public function fetchSprite(md5AndExt : String, whenDone : Function) : Void{
 		// Fetch a sprite with the md5 hash.
-		function jsonReceived(data:ByteArray):void {
-			if (!data) return;
+		function jsonReceived(data : ByteArray) : Void{
+			if (data == null)                 return;
 			spr.readJSON(util.JSON.parse(data.readUTFBytes(data.length)));
 			spr.instantiateFromJSON(app.stagePane);
 			fetchSpriteAssets([spr], assetsReceived);
-		}
-		function assetsReceived(assetDict:Object):void {
+		};
+		function assetsReceived(assetDict : Dynamic) : Void{
 			installAssets([spr], assetDict);
 			decodeAllImages([spr], done);
-		}
-		function done():void {
+		};
+		function done() : Void{
 			spr.showCostume(spr.currentCostumeIndex);
 			spr.setDirection(spr.direction);
 			whenDone(spr);
-		}
-		var spr:ScratchSprite = new ScratchSprite();
+		};
+		var spr : ScratchSprite = new ScratchSprite();
 		app.server.getAsset(md5AndExt, jsonReceived);
 	}
 
-	private function fetchSpriteAssets(objList:Array, whenDone:Function):void {
+	private function fetchSpriteAssets(objList : Array<Dynamic>, whenDone : Function) : Void{
 		// Download all media for the given list of ScratchObj objects.
-		function assetReceived(md5:String, data:ByteArray):void {
-			if (!data) {
-				app.log(LogLevel.WARNING, 'missing sprite asset', {md5: md5});
+		function assetReceived(md5 : String, data : ByteArray) : Void{
+			if (data == null) {
+				app.log(LogLevel.WARNING, "missing sprite asset", {
+							md5 : md5
+
+						});
 			}
 			assetDict[md5] = data;
 			assetCount++;
-			if (assetCount == assetsToFetch.length) whenDone(assetDict);
-		}
-		var assetDict:Object = new Object();
-		var assetCount:int = 0;
-		var assetsToFetch:Array = collectAssetsToFetch(objList);
-		for each (var md5:String in assetsToFetch) fetchAsset(md5, assetReceived);
+			if (assetCount == assetsToFetch.length)                 whenDone(assetDict);
+		};
+		var assetDict : Dynamic = new Dynamic();
+		var assetCount : Int = 0;
+		var assetsToFetch : Array<Dynamic> = collectAssetsToFetch(objList);
+		for (md5 in assetsToFetch)fetchAsset(md5, assetReceived);
 	}
 
-	private function collectAssetsToFetch(objList:Array):Array {
+	private function collectAssetsToFetch(objList : Array<Dynamic>) : Array<Dynamic>{
 		// Return list of MD5's for all project assets.
-		var list:Array = new Array();
-		for each (var obj:ScratchObj in objList) {
-			for each (var c:ScratchCostume in obj.costumes) {
-				if (list.indexOf(c.baseLayerMD5) < 0) list.push(c.baseLayerMD5);
+		var list : Array<Dynamic> = new Array<Dynamic>();
+		for (obj in objList){
+			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
+				if (Lambda.indexOf(list, c.baseLayerMD5) < 0)                     list.push(c.baseLayerMD5);
 				if (c.textLayerMD5) {
-					if (list.indexOf(c.textLayerMD5) < 0) list.push(c.textLayerMD5);
+					if (Lambda.indexOf(list, c.textLayerMD5) < 0)                         list.push(c.textLayerMD5);
 				}
 			}
-			for each (var snd:ScratchSound in obj.sounds) {
-				if (list.indexOf(snd.md5) < 0) list.push(snd.md5);
+			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
+				if (Lambda.indexOf(list, snd.md5) < 0)                     list.push(snd.md5);
 			}
 		}
 		return list;
 	}
 
-	private function installAssets(objList:Array, assetDict:Object):void {
-		var data:ByteArray;
-		for each (var obj:ScratchObj in objList) {
-			for each (var c:ScratchCostume in obj.costumes) {
+	private function installAssets(objList : Array<Dynamic>, assetDict : Dynamic) : Void{
+		var data : ByteArray;
+		for (obj in objList){
+			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
 				data = assetDict[c.baseLayerMD5];
-				if (data) c.baseLayerData = data;
+				if (data != null)                     c.baseLayerData = data
 				else {
 					// Asset failed to load so use an empty costume
 					// BUT retain the original MD5 and don't break the reference to the costume that failed to load.
-					var origMD5:String = c.baseLayerMD5;
+					var origMD5 : String = c.baseLayerMD5;
 					c.baseLayerData = ScratchCostume.emptySVG();
 					c.baseLayerMD5 = origMD5;
 				}
-				if (c.textLayerMD5) c.textLayerData = assetDict[c.textLayerMD5];
+				if (c.textLayerMD5)                     c.textLayerData = assetDict[c.textLayerMD5];
 			}
-			for each (var snd:ScratchSound in obj.sounds) {
+			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
 				data = assetDict[snd.md5];
-				if (data) {
+				if (data != null) {
 					snd.soundData = data;
 					snd.convertMP3IfNeeded();
-				} else {
+				}
+				else {
 					snd.soundData = WAVFile.empty();
 				}
 			}
 		}
 	}
 
-	public function fetchAsset(md5:String, whenDone:Function):URLLoader {
-		return app.server.getAsset(md5, function(data:*):void { whenDone(md5, data); });
+	public function fetchAsset(md5 : String, whenDone : Function) : URLLoader{
+		return app.server.getAsset(md5, function(data : Dynamic) : Void{whenDone(md5, data);
+				});
 	}
 
 	//----------------------------
 	// Record unique images and sounds
 	//----------------------------
 
-	protected function recordImagesAndSounds(objList:Array, uploading:Boolean, proj:ScratchStage = null):void {
-		var recordedAssets:Object = {};
+	private function recordImagesAndSounds(objList : Array<Dynamic>, uploading : Bool, proj : ScratchStage = null) : Void{
+		var recordedAssets : Dynamic = { };
 		images = [];
 		sounds = [];
 
 		app.clearCachedBitmaps();
-		if (!uploading && proj) proj.penLayerID = recordImage(proj.penLayerPNG, proj.penLayerMD5, recordedAssets, uploading);
+		if (!uploading && proj != null)             proj.penLayerID = recordImage(proj.penLayerPNG, proj.penLayerMD5, recordedAssets, uploading);
 
-		for each (var obj:ScratchObj in objList) {
-			for each (var c:ScratchCostume in obj.costumes) {
-				c.prepareToSave(); // encodes image and computes md5 if necessary
+		for (obj in objList){
+			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
+				c.prepareToSave();  // encodes image and computes md5 if necessary  
 				c.baseLayerID = recordImage(c.baseLayerData, c.baseLayerMD5, recordedAssets, uploading);
 				if (c.textLayerBitmap) {
 					c.textLayerID = recordImage(c.textLayerData, c.textLayerMD5, recordedAssets, uploading);
 				}
 			}
-			for each (var snd:ScratchSound in obj.sounds) {
-				snd.prepareToSave(); // compute md5 if necessary
+			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
+				snd.prepareToSave();  // compute md5 if necessary  
 				snd.soundID = recordSound(snd, snd.md5, recordedAssets, uploading);
 			}
 		}
 	}
 
-	public function convertSqueakSounds(scratchObj:ScratchObj, done:Function):void {
+	public function convertSqueakSounds(scratchObj : ScratchObj, done : Function) : Void{
 		// Pre-convert any Squeak sounds (asynch, with a progress bar) before saving a project.
 		// Note: If this is not called before recordImagesAndSounds(), sounds will
 		// be converted synchronously, but there may be a long delay without any feedback.
-		function convertASound():void {
+		function convertASound() : Void{
 			if (i < soundsToConvert.length) {
-				var sndToConvert:ScratchSound = soundsToConvert[i++] as ScratchSound;
+				var sndToConvert : ScratchSound = try cast(soundsToConvert[i++], ScratchSound) catch(e:Dynamic) null;
 				sndToConvert.prepareToSave();
 				app.lp.setProgress(i / soundsToConvert.length);
 				app.lp.setInfo(sndToConvert.soundName);
 				setTimeout(convertASound, 50);
-			} else {
+			}
+			else {
 				app.removeLoadProgressBox();
 				// Note: Must get user click in order to proceed with saving...
-				DialogBox.notify('', 'Sounds converted', app.stage, false, soundsConverted);
+				DialogBox.notify("", "Sounds converted", app.stage, false, soundsConverted);
+			}
+		};
+		function soundsConverted(ignore : Dynamic) : Void{done();
+		};
+		var soundsToConvert : Array<Dynamic> = [];
+		for (obj/* AS3HX WARNING could not determine type for var: obj exp: ECall(EField(EIdent(scratchObj),allObjects),[]) type: null */ in scratchObj.allObjects()){
+			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
+				if ("squeak" == snd.format)                     soundsToConvert.push(snd);
 			}
 		}
-		function soundsConverted(ignore:*):void { done() }
-		var soundsToConvert:Array = [];
-		for each (var obj:ScratchObj in scratchObj.allObjects()) {
-			for each (var snd:ScratchSound in obj.sounds) {
-				if ('squeak' == snd.format) soundsToConvert.push(snd);
-			}
-		}
-		var i:int;
+		var i : Int;
 		if (soundsToConvert.length > 0) {
-			app.addLoadProgressBox('Converting sounds...');
+			app.addLoadProgressBox("Converting sounds...");
 			setTimeout(convertASound, 50);
-		} else done();
+		}
+		else done();
 	}
 
-	private function recordImage(img:*, md5:String, recordedAssets:Object, uploading:Boolean):int {
-		var id:int = recordedAssetID(md5, recordedAssets, uploading);
-		if (id > -2) return id; // image was already added
+	private function recordImage(img : Dynamic, md5 : String, recordedAssets : Dynamic, uploading : Bool) : Int{
+		var id : Int = recordedAssetID(md5, recordedAssets, uploading);
+		if (id > -2)             return id ; // image was already added  ;
 		images.push([md5, img]);
 		id = images.length - 1;
-		recordedAssets[md5] = id;
+		Reflect.setField(recordedAssets, md5, id);
 		return id;
 	}
 
-	protected function recordedAssetID(md5:String, recordedAssets:Object, uploading:Boolean):int {
-		var id:* = recordedAssets[md5];
-		return id != undefined ? id : -2;
+	private function recordedAssetID(md5 : String, recordedAssets : Dynamic, uploading : Bool) : Int{
+		var id : Dynamic = Reflect.field(recordedAssets, md5);
+		return id != (null) ? id : -2;
 	}
 
-	private function recordSound(snd:ScratchSound, md5:String, recordedAssets:Object, uploading:Boolean):int {
-		var id:int = recordedAssetID(md5, recordedAssets, uploading);
-		if (id > -2) return id; // image was already added
+	private function recordSound(snd : ScratchSound, md5 : String, recordedAssets : Dynamic, uploading : Bool) : Int{
+		var id : Int = recordedAssetID(md5, recordedAssets, uploading);
+		if (id > -2)             return id;  // image was already added  ;
 		sounds.push([md5, snd.soundData]);
 		id = sounds.length - 1;
-		recordedAssets[md5] = id;
+		Reflect.setField(recordedAssets, md5, id);
 		return id;
 	}
-}}
+}

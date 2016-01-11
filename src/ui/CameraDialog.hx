@@ -17,29 +17,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package ui {
-	import flash.display.*;
-	import flash.media.*;
-	import translation.Translator;
-	import uiwidgets.*;
+package ui;
 
-public class CameraDialog extends DialogBox {
 
-	private var saveFunc:Function;
-	private var picture:Bitmap;
-	private var video:Video;
+import flash.display.*;
+import flash.media.*;
+import translation.Translator;
+import uiwidgets.*;
 
-	public static function strings():Array {
-		return ['Camera', 'Save', 'Close'];
+class CameraDialog extends DialogBox
+{
+
+	private var saveFunc : Dynamic->Void;
+	private var picture : Bitmap;
+	private var video : Video;
+
+	public static function strings() : Array<Dynamic>{
+		return ["Camera", "Save", "Close"];
 	}
 
-	public function CameraDialog(saveFunc:Function) {
+	public function new(saveFunc : Dynamic->Void)
+	{
 		super();
 		this.saveFunc = saveFunc;
 
-		addTitle(Translator.map('Camera'));
+		addTitle(Translator.map("Camera"));
 
-		var container:Sprite = new Sprite();
+		var container : Sprite = new Sprite();
 		addWidget(container);
 
 		picture = new Bitmap();
@@ -52,21 +56,20 @@ public class CameraDialog extends DialogBox {
 		video.attachCamera(Camera.getCamera());
 		container.addChild(video);
 
-		var b:Button;
-		addChild(b = new Button(Translator.map('Save'), savePicture));
+		var b : Button;
+		addChild(b = new Button(Translator.map("Save"), savePicture));
 		buttons.push(b);
-		addChild(b = new Button(Translator.map('Close'), closeDialog));
+		addChild(b = new Button(Translator.map("Close"), closeDialog));
 		buttons.push(b);
 	}
 
-	private function savePicture():void {
+	private function savePicture() : Void{
 		picture.bitmapData.draw(video);
-		if (saveFunc != null) (saveFunc(picture.bitmapData.clone()));
+		if (saveFunc != null)             (saveFunc(picture.bitmapData.clone()));
 	}
 
-	public function closeDialog():void {
-		if (video) video.attachCamera(null);
-		if (parent) parent.removeChild(this);
+	public function closeDialog() : Void{
+		if (video != null)             video.attachCamera(null);
+		if (parent != null)             parent.removeChild(this);
 	}
-
-}}
+}

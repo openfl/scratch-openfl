@@ -24,51 +24,54 @@
 // The mouse handling code detects when a Block's parent is a BlocksPalette and
 // creates a copy of that block when it is dragged out of the palette.
 
-package ui {
-	import flash.geom.*;
-	import blocks.Block;
-	import interpreter.Interpreter;
-	import uiwidgets.*;
-	import scratch.ScratchObj;
-	import scratch.ScratchComment;
+package ui;
 
-public class BlockPalette extends ScrollFrameContents {
 
-	public const isBlockPalette:Boolean = true;
+import flash.geom.*;
+import blocks.Block;
+import interpreter.Interpreter;
+import uiwidgets.*;
+import scratch.ScratchObj;
+import scratch.ScratchComment;
 
-	public function BlockPalette():void {
+class BlockPalette extends ScrollFrameContents
+{
+
+	public var isBlockPalette : Bool = true;
+
+	public function new()
+	{
 		super();
 		this.color = 0xE0E0E0;
 	}
 
-	override public function clear(scrollToOrigin:Boolean = true):void {
-		var interp:Interpreter = Scratch.app.interp;
-		var targetObj:ScratchObj = Scratch.app.viewedObj();
-		while (numChildren > 0) {
-			var b:Block = getChildAt(0) as Block;
-			if (interp.isRunning(b, targetObj)) interp.toggleThread(b, targetObj);
+	override public function clear(scrollToOrigin : Bool = true) : Void{
+		var interp : Interpreter = Scratch.app.interp;
+		var targetObj : ScratchObj = Scratch.app.viewedObj();
+		while (numChildren > 0){
+			var b : Block = try cast(getChildAt(0), Block) catch(e:Dynamic) null;
+			if (interp.isRunning(b, targetObj))                 interp.toggleThread(b, targetObj);
 			removeChildAt(0);
 		}
-		if (scrollToOrigin) x = y = 0;
+		if (scrollToOrigin)             x = y = 0;
 	}
 
-	public function handleDrop(obj:*):Boolean {
+	public function handleDrop(obj : Dynamic) : Bool{
 		// Delete blocks and stacks dropped onto the palette.
-		var c:ScratchComment = obj as ScratchComment;
-		if (c) {
-			c.x = c.y = 20; // position for undelete
+		var c : ScratchComment = try cast(obj, ScratchComment) catch(e:Dynamic) null;
+		if (c != null) {
+			c.x = c.y = 20;  // position for undelete  
 			c.deleteComment();
 			return true;
 		}
-		var b:Block = obj as Block;
-		if (b) {
+		var b : Block = try cast(obj, Block) catch(e:Dynamic) null;
+		if (b != null) {
 			return b.deleteStack();
 		}
 		return false;
 	}
 
-	public static function strings():Array {
-		return ['Cannot Delete', 'To delete a block definition, first remove all uses of the block.'];
+	public static function strings() : Array<Dynamic>{
+		return ["Cannot Delete", "To delete a block definition, first remove all uses of the block."];
 	}
-
-}}
+}

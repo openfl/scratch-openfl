@@ -17,28 +17,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package render3d {
-	import flash.display.BitmapData;
+package render3d;
 
-	public class SpriteStamp extends BitmapData {
-		private var fx:Object;
-		public function SpriteStamp(width:int, height:int, fx:Object) {
-			super(width, height, true, 0);
-			effects = fx;
+
+import flash.display.BitmapData;
+
+class SpriteStamp extends BitmapData
+{
+	public var effects(get, set) : Dynamic;
+
+	private var fx : Dynamic;
+	public function new(width : Int, height : Int, fx : Dynamic)
+	{
+		super(width, height, true, 0);
+		effects = fx;
+	}
+
+	private function set_effects(o : Dynamic) : Dynamic{
+		fx = null;
+
+		if (o != null) {
+			fx = { };
+			for (prop in Reflect.fields(o))
+			Reflect.setField(fx, prop, Reflect.field(o, prop));
 		}
+		return o;
+	}
 
-		public function set effects(o:Object):void {
-			fx = null;
-
-			if(o) {
-				fx = {};
-				for(var prop:String in o)
-					fx[prop] = o[prop];
-			}
-		}
-
-		public function get effects():Object {
-			return fx;
-		}
+	private function get_effects() : Dynamic{
+		return fx;
 	}
 }
+

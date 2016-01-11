@@ -25,7 +25,7 @@
 //	* to represent images, sounds, and sprites in the backpack (a BackpackPart)
 //	* to drag between the backpack and the media pane
 
-package ui.media {
+package ui.media;
 	import flash.display.*;
 	import flash.events.*;
 	import flash.geom.*;
@@ -38,27 +38,27 @@ package ui.media {
 	import ui.parts.*;
 	import uiwidgets.*;
 
-public class MediaInfo extends Sprite {
+class MediaInfo extends Sprite {
 
-	public var frameWidth:int = 81;
-	private var frameHeight:int = 94;
-	protected var thumbnailWidth:int = 68;
-	protected var thumbnailHeight:int = 51;
+	public var frameWidth:Int = 81;
+	private var frameHeight:Int = 94;
+	private var thumbnailWidth:Int = 68;
+	private var thumbnailHeight:Int = 51;
 
 	// at most one of the following is non-null:
 	public var mycostume:ScratchCostume;
 	public var mysprite:ScratchSprite;
 	public var mysound:ScratchSound;
-	public var scripts:Array;
+	public var scripts:Array<Dynamic>;
 
 	public var objType:String = 'unknown';
 	public var objName:String = '';
-	public var objWidth:int = 0;
+	public var objWidth:Int = 0;
 	public var md5:String;
 
 	public var owner:ScratchObj; // object owning a sound or costume in MediaPane; null for other cases
-	public var isBackdrop:Boolean;
-	public var forBackpack:Boolean;
+	public var isBackdrop:Bool;
+	public var forBackpack:Bool;
 
 	private var frame:Shape; // visible when selected
 	private var thumbnail:Bitmap;
@@ -66,30 +66,31 @@ public class MediaInfo extends Sprite {
 	private var info:TextField;
 	private var deleteButton:IconButton;
 
-	public function MediaInfo(obj:*, owningObj:ScratchObj = null) {
+	public function new(obj:Dynamic, owningObj:ScratchObj = null) {
+		super();
 		owner = owningObj;
-		mycostume = obj as ScratchCostume;
-		mysound = obj as ScratchSound;
-		mysprite = obj as ScratchSprite;
-		if (mycostume) {
+		mycostume = cast(obj, ScratchCostume);
+		mysound = cast(obj, ScratchSound);
+		mysprite = cast(obj, ScratchSprite);
+		if (mycostume != null) {
 			objType = 'image';
 			objName = mycostume.costumeName;
 			md5 = mycostume.baseLayerMD5;
-		} else if (mysound) {
+		} else if (mysound != null) {
 			objType = 'sound';
 			objName = mysound.soundName;
 			md5 = mysound.md5;
-			if (owner) frameHeight = 75; // use a shorter frame for sounds in a MediaPane
-		} else if (mysprite) {
+			if (owner != null) frameHeight = 75; // use a shorter frame for sounds in a MediaPane
+		} else if (mysprite != null) {
 			objType = 'sprite';
 			objName = mysprite.objName;
 			md5 = null; // initially null
-		} else if ((obj is Block) || (obj is Array)) {
+		} else if ((Std.is(obj, Block)) || (Std.is(obj, Array))) {
 			// scripts holds an array of blocks, stacks, and comments in Array form
 			// initialize script list from either a stack (Block) or an array of stacks already in array form
 			objType = 'script';
 			objName = '';
-			scripts = (obj is Block) ? [BlockIO.stackToArray(obj)] : obj;
+			scripts = (Std.is(obj, Block)) ? [BlockIO.stackToArray(obj)] : obj;
 			md5 = null; // scripts don't have an MD5 hash
 		} else {
 			// initialize from a JSON object
@@ -107,7 +108,7 @@ public class MediaInfo extends Sprite {
 		updateLabelAndInfo(false);
 	}
 
-	public static function strings():Array {
+	public static function strings():Array<String> {
 		return ['Backdrop', 'Costume', 'Script', 'Sound', 'Sprite', 'save to local file'];
 	}
 
@@ -115,18 +116,18 @@ public class MediaInfo extends Sprite {
 	// Highlighting (for MediaPane)
 	//------------------------------
 
-	public function highlight():void {
-		if (frame.alpha != 1) { frame.alpha = 1; showDeleteButton(true) }
+	public function highlight():Void {
+		if (frame.alpha != 1) { frame.alpha = 1; showDeleteButton(true); }
 	}
 
-	public function unhighlight():void {
-		if (frame.alpha != 0) { frame.alpha = 0; showDeleteButton(false) }
+	public function unhighlight():Void {
+		if (frame.alpha != 0) { frame.alpha = 0; showDeleteButton(false); }
 	}
 
-	private function showDeleteButton(flag:Boolean):void {
-		if (deleteButton) {
+	private function showDeleteButton(flag:Bool):Void {
+		if (deleteButton != null) {
 			deleteButton.visible = flag;
-			if (flag && mycostume && owner && (owner.costumes.length < 2)) deleteButton.visible = false;
+			if (flag && mycostume != null && owner != null && (owner.costumes.length < 2)) deleteButton.visible = false;
 		}
 	}
 
@@ -134,42 +135,42 @@ public class MediaInfo extends Sprite {
 	// Thumbnail
 	//------------------------------
 
-	public function updateMediaThumbnail():void { /* xxx */ }
-	public function thumbnailX():int { return thumbnail.x }
-	public function thumbnailY():int { return thumbnail.y }
+	public function updateMediaThumbnail():Void { /* xxx */ }
+	public function thumbnailX():Int { return Std.int(thumbnail.x); }
+	public function thumbnailY():Int { return Std.int(thumbnail.y); }
 
-	public function computeThumbnail():Boolean {
-		if (mycostume) setLocalCostumeThumbnail();
-		else if (mysprite) setLocalSpriteThumbnail();
-		else if (scripts) setScriptThumbnail();
+	public function computeThumbnail():Bool {
+		if (mycostume != null) setLocalCostumeThumbnail();
+		else if (mysprite != null) setLocalSpriteThumbnail();
+		else if (scripts != null) setScriptThumbnail();
 		else return false;
 
 		return true;
 	}
 
-	private function setLocalCostumeThumbnail():void {
+	private function setLocalCostumeThumbnail():Void {
 		// Set the thumbnail for a costume local to this project (and not necessarily saved to the server).
-		var forStage:Boolean = owner && owner.isStage;
+		var forStage:Bool = owner != null && owner.isStage;
 		var bm:BitmapData = mycostume.thumbnail(thumbnailWidth, thumbnailHeight, forStage);
 		isBackdrop = forStage;
 		setThumbnailBM(bm);
 	}
 
-	private function setLocalSpriteThumbnail():void {
+	private function setLocalSpriteThumbnail():Void {
 		// Set the thumbnail for a sprite local to this project (and not necessarily saved to the server).
 		setThumbnailBM(mysprite.currentCostume().thumbnail(thumbnailWidth, thumbnailHeight, false));
 	}
 
-	protected function fileType(s:String):String {
-		if (!s) return '';
-		var i:int = s.lastIndexOf('.');
+	private function fileType(s:String):String {
+		if (s == null) return '';
+		var i:Int = s.lastIndexOf('.');
 		return (i < 0) ? '' : s.slice(i + 1);
 	}
 
-	private function setScriptThumbnail():void {
-		if (!scripts || (scripts.length < 1)) return; // no scripts
+	private function setScriptThumbnail():Void {
+		if (scripts == null || (scripts.length < 1)) return; // no scripts
 		var script:Block = BlockIO.arrayToStack(scripts[0]);
-		var scale:Number = Math.min(thumbnailWidth / script.width, thumbnailHeight / script.height);
+		var scale:Float = Math.min(thumbnailWidth / script.width, thumbnailHeight / script.height);
 		var bm:BitmapData = new BitmapData(thumbnailWidth, thumbnailHeight, true, 0);
 		var m:Matrix = new Matrix();
 		m.scale(scale, scale);
@@ -177,12 +178,12 @@ public class MediaInfo extends Sprite {
 		setThumbnailBM(bm);
 	}
 
-	protected function setThumbnailBM(bm:BitmapData):void {
+	private function setThumbnailBM(bm:BitmapData):Void {
 		thumbnail.bitmapData = bm;
 		thumbnail.x = (frameWidth - thumbnail.width) / 2;
 	}
 
-	protected function setInfo(s:String):void {
+	private function setInfo(s:String):Void {
 		info.text = s;
 		info.x = Math.max(0, (frameWidth - info.textWidth) / 2);
 	}
@@ -191,7 +192,7 @@ public class MediaInfo extends Sprite {
 	// Label and Info
 	//------------------------------
 
-	public function updateLabelAndInfo(forBackpack:Boolean):void {
+	public function updateLabelAndInfo(forBackpack:Bool):Void {
 		this.forBackpack = forBackpack;
 		setText(label, (forBackpack ? backpackTitle() : objName));
 		label.x = ((frameWidth - label.textWidth) / 2) - 2;
@@ -200,7 +201,7 @@ public class MediaInfo extends Sprite {
 		info.x = Math.max(0, (frameWidth - info.textWidth) / 2);
 	}
 
-	public function hideTextFields():void {
+	public function hideTextFields():Void {
 		setText(label, '');
 		setText(info, '');
 	}
@@ -214,58 +215,58 @@ public class MediaInfo extends Sprite {
 	}
 
 	private function infoString():String {
-		if (mycostume) return costumeInfoString();
-		if (mysound) return soundInfoString(mysound.getLengthInMsec());
+		if (mycostume != null) return costumeInfoString();
+		if (mysound != null) return soundInfoString(mysound.getLengthInMsec());
 		return '';
 	}
 
 	private function costumeInfoString():String {
 		// Use the actual dimensions (rounded up to an integer) of my costume.
-		var w:int, h:int;
+		var w:Int, h:Int;
 		var dispObj:DisplayObject = mycostume.displayObj();
-		if (dispObj is Bitmap) {
-			w = dispObj.width;
-			h = dispObj.height;
+		if (Std.is(dispObj, Bitmap)) {
+			w = Std.int(dispObj.width);
+			h = Std.int(dispObj.height);
 		} else {
 			var r:Rectangle = dispObj.getBounds(dispObj);
-			w = Math.ceil(r.width);
-			h = Math.ceil(r.height);
+			w = Std.int(Math.ceil(r.width));
+			h = Std.int(Math.ceil(r.height));
 		}
 		return w + 'x' + h;
 	}
 
-	private function soundInfoString(msecs:Number):String {
+	private function soundInfoString(msecs:Float):String {
 		// Return a formatted time in MM:SS.HH (where HH is hundredths of a second).
-		function twoDigits(n:int):String { return (n < 10) ? '0' + n : '' + n }
+		function twoDigits(n:Int):String { return (n < 10) ? '0' + n : '' + n; }
 
-		var secs:int = msecs / 1000;
-		var hundredths:int = (msecs % 1000) / 10;
-		return twoDigits(secs / 60) + ':' + twoDigits(secs % 60) + '.' + twoDigits(hundredths);
+		var secs:Int = Std.int(msecs / 1000);
+		var hundredths:Int = Std.int((msecs % 1000) / 10);
+		return twoDigits(Std.int(secs / 60)) + ':' + twoDigits(secs % 60) + '.' + twoDigits(hundredths);
 	}
 
 	// -----------------------------
 	// Backpack Support
 	//------------------------------
 
-	public function objToGrab(evt:MouseEvent):* {
+	public function objToGrab(evt:MouseEvent):Dynamic {
 		var result:MediaInfo = Scratch.app.createMediaInfo({
 			type: objType,
 			name: objName,
 			width: objWidth,
 			md5: md5
 		});
-		if (mycostume) result = Scratch.app.createMediaInfo(mycostume, owner);
-		if (mysound) result = Scratch.app.createMediaInfo(mysound, owner);
-		if (mysprite) result = Scratch.app.createMediaInfo(mysprite);
-		if (scripts) result = Scratch.app.createMediaInfo(scripts);
+		if (mycostume != null) result = Scratch.app.createMediaInfo(mycostume, owner);
+		if (mysound != null) result = Scratch.app.createMediaInfo(mysound, owner);
+		if (mysprite != null) result = Scratch.app.createMediaInfo(mysprite);
+		if (scripts != null) result = Scratch.app.createMediaInfo(scripts);
 
 		result.removeDeleteButton();
-		if (thumbnail.bitmapData) result.thumbnail.bitmapData = thumbnail.bitmapData;
+		if (thumbnail.bitmapData != null) result.thumbnail.bitmapData = thumbnail.bitmapData;
 		result.hideTextFields();
 		return result;
 	}
 
-	public function addDeleteButton():void {
+	public function addDeleteButton():Void {
 		removeDeleteButton();
 		deleteButton = new IconButton(deleteMe, Resources.createBmp('removeItem'));
 		deleteButton.x = frame.width - deleteButton.width + 5;
@@ -274,30 +275,30 @@ public class MediaInfo extends Sprite {
 		addChild(deleteButton);
 	}
 
-	public function removeDeleteButton():void {
-		if (deleteButton) {
+	public function removeDeleteButton():Void {
+		if (deleteButton != null) {
 			removeChild(deleteButton);
 			deleteButton = null;
 		}
 	}
 
-	public function backpackRecord():Object {
+	public function backpackRecord():Dynamic {
 		// Return an object to be saved in the backpack.
-		var result:Object = {
+		var result:Dynamic = {
 			type: objType,
 			name: objName,
 			md5: md5
 		};
-		if (mycostume) {
+		if (mycostume != null) {
 			result.width = mycostume.width();
 			result.height = mycostume.height();
 		}
-		if (mysound) {
+		if (mysound != null) {
 			result.seconds = mysound.getLengthInMsec() / 1000;
 		}
-		if (scripts) {
+		if (scripts != null) {
 			result.scripts = scripts;
-			delete result.md5;
+			result.md5 = null; //delete result.md5;
 		}
 		return result;
 	}
@@ -306,7 +307,7 @@ public class MediaInfo extends Sprite {
 	// Parts
 	//------------------------------
 
-	private function addFrame():void {
+	private function addFrame():Void {
 		frame = new Shape();
 		var g:Graphics = frame.graphics;
 		g.lineStyle(3, CSS.overColor, 1, true);
@@ -316,7 +317,7 @@ public class MediaInfo extends Sprite {
 		addChild(frame);
 	}
 
-	private function addThumbnail():void {
+	private function addThumbnail():Void {
 		if ('sound' == objType) {
 			thumbnail = Resources.createBmp('speakerOff');
 			thumbnail.x = 18;
@@ -327,10 +328,10 @@ public class MediaInfo extends Sprite {
 			thumbnail.y = 13;
 		}
 		addChild(thumbnail);
-		if (owner) computeThumbnail();
+		if (owner != null) computeThumbnail();
 	}
 
-	private function addLabelAndInfo():void {
+	private function addLabelAndInfo():Void {
 		label = Resources.makeLabel('', CSS.thumbnailFormat);
 		label.y = frameHeight - 28;
 		addChild(label);
@@ -339,9 +340,9 @@ public class MediaInfo extends Sprite {
 		addChild(info);
 	}
 
-	private function setText(tf:TextField, s:String):void {
+	private function setText(tf:TextField, s:String):Void {
 		// Set the text of the given TextField, truncating if necessary.
-		var desiredWidth:int = frame.width - 6;
+		var desiredWidth:Int = Std.int(frame.width - 6);
 		tf.text = s;
 		while ((tf.textWidth > desiredWidth) && (s.length > 0)) {
 			s = s.substring(0, s.length - 1);
@@ -353,18 +354,18 @@ public class MediaInfo extends Sprite {
 	// User interaction
 	//------------------------------
 
-	public function click(evt:MouseEvent):void {
-		if (!getBackpack()) {
+	public function click(evt:MouseEvent):Void {
+		if (getBackpack() == null) {
 			var app:Scratch = Scratch.app;
-			if (mycostume) {
+			if (mycostume != null) {
 				app.viewedObj().showCostumeNamed(mycostume.costumeName);
 				app.selectCostume();
 			}
-			if (mysound) app.selectSound(mysound);
+			if (mysound != null) app.selectSound(mysound);
 		}
 	}
 
-	public function handleTool(tool:String, evt:MouseEvent):void {
+	public function handleTool(tool:String, evt:MouseEvent):Void {
 		if (tool == 'copy') duplicateMe();
 		if (tool == 'cut') deleteMe();
 		if (tool == 'help') Scratch.app.showTip('scratchUI');	}
@@ -375,55 +376,55 @@ public class MediaInfo extends Sprite {
 		return m;
 	}
 
-	protected function addMenuItems(m:Menu):void {
-		if (!getBackpack()) m.addItem('duplicate', duplicateMe);
+	private function addMenuItems(m:Menu):Void {
+		if (getBackpack() == null) m.addItem('duplicate', duplicateMe);
 		m.addItem('delete', deleteMe);
 		m.addLine();
-		if (mycostume) {
+		if (mycostume != null) {
 			m.addItem('save to local file', exportCostume);
 		}
-		if (mysound) {
+		if (mysound != null) {
 			m.addItem('save to local file', exportSound);
 		}
 	}
 
-	protected function duplicateMe():void {
-		if (owner && !getBackpack()) {
-			if (mycostume) Scratch.app.addCostume(mycostume.duplicate());
-			if (mysound) Scratch.app.addSound(mysound.duplicate());
+	private function duplicateMe():Void {
+		if (owner != null && getBackpack() == null) {
+			if (mycostume != null ) Scratch.app.addCostume(mycostume.duplicate());
+			if (mysound != null) Scratch.app.addSound(mysound.duplicate());
 		}
 	}
 
-	protected function deleteMe(ignore:* = null):void {
-		if (owner) {
+	private function deleteMe(ignore:Dynamic  = null):Void {
+		if (owner != null) {
 			Scratch.app.runtime.recordForUndelete(this, 0, 0, 0, owner);
-			if (mycostume) {
+			if (mycostume != null) {
 				owner.deleteCostume(mycostume);
 				Scratch.app.refreshImageTab(false);
 			}
-			if (mysound) {
+			if (mysound != null) {
 				owner.deleteSound(mysound);
 				Scratch.app.refreshSoundTab();
 			}
 		}
 	}
 
-	private function exportCostume():void {
-		if (!mycostume) return;
+	private function exportCostume():Void {
+		if (mycostume == null) return;
 		mycostume.prepareToSave();
 		var ext:String = ScratchCostume.fileExtension(mycostume.baseLayerData);
 		var defaultName:String = mycostume.costumeName + ext;
 		new FileReference().save(mycostume.baseLayerData, defaultName);
 	}
 
-	private function exportSound():void {
-		if (!mysound) return;
+	private function exportSound():Void {
+		if (mysound == null) return;
 		mysound.prepareToSave();
 		var defaultName:String = mysound.soundName + '.wav';
 		new FileReference().save(mysound.soundData, defaultName);
 	}
 
-	protected function getBackpack():UIPart {
+	private function getBackpack():UIPart {
 		return null;
 	}
-}}
+}

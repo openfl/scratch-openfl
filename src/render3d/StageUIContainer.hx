@@ -17,19 +17,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package render3d {
-	import flash.display.Sprite;
+package render3d;
 
-	public class StageUIContainer extends Sprite
-	{
-		public function step(runtime:Object):void {
-			for (var i:int = 0; i < numChildren; i++) {
-				var c:Object = getChildAt(i);
-				if (c.visible == true && c.hasOwnProperty('step')) {
-					if ('listName' in c) c.step();
-					else c.step(runtime);
-				}
+
+import flash.display.Sprite;
+
+class StageUIContainer extends Sprite
+{
+	public function step(runtime : Dynamic) : Void{
+		for (i in 0...numChildren){
+			var c : Dynamic = getChildAt(i);
+			if (c.visible == true && c.exists("step")) {
+				if (Lambda.has(c, "listName"))                     c.step()
+				else c.step(runtime);
 			}
 		}
 	}
+
+	public function new()
+	{
+		super();
+	}
 }
+

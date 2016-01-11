@@ -17,26 +17,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package logging {
+package logging;
 
-public class LogLevel {
+
+
+class LogLevel
+{
 	// Use this for problems that should be in our control
-	static public const ERROR:String = "err";
+	public static inline var ERROR : String = "err";
 
 	// Use this for unexpected conditions and problems outside our control (network, user data, etc.)
-	static public const WARNING:String = "wrn";
+	public static inline var WARNING : String = "wrn";
 
 	// These events will be communicated to JS so they can be handled by web UI, sent to GA, etc.
-	static public const TRACK:String = "trk";
+	public static inline var TRACK : String = "trk";
 
 	// Use this to report status information
-	static public const INFO:String = "inf";
+	public static inline var INFO : String = "inf";
 
 	// Use this to report information useful for debugging
-	static public const DEBUG:String = "dbg";
+	public static inline var DEBUG : String = "dbg";
 
-	static public const LEVEL:Array = [
-		ERROR, WARNING, TRACK, INFO, DEBUG
-	];
+	public static var LEVEL : Array<Dynamic> = [
+		ERROR, WARNING, TRACK, INFO, DEBUG];
+
+	public function new()
+	{
+	}
 }
-}
+

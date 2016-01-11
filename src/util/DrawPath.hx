@@ -17,40 +17,46 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package util {
-	import flash.display.Graphics;
+package util;
 
-public class DrawPath {
 
-	static public function drawPath(path:Array, g:Graphics):void {
-		var startx:Number = 0, starty:Number = 0;
-		var pathx:Number = 0, pathy:Number = 0;
-		for each (var item:Array in path) {
-			switch (item[0].toLowerCase()) {
-			case 'm':
-				startx = item[1];
-				starty = item[2];
-				g.moveTo(pathx = startx, pathy = starty);
-				break;
-			case 'l': g.lineTo(pathx += item[1], pathy += item[2]); break;
-			case 'h': g.lineTo(pathx += item[1], pathy); break;
-			case 'v': g.lineTo(pathx, pathy += item[1]); break;
-			case 'c':
-				var cx:Number = pathx + item[1];
-				var cy:Number = pathy + item[2];
-				var px:Number = pathx + item[3];
-				var py:Number = pathy + item[4];
-				g.curveTo(cx, cy, px, py);
-				pathx += item[3];
-				pathy += item[4];
-				break;
-			case 'z':
-				g.lineTo(pathx = startx, pathy = starty);
-				break;
-			default:
-				trace('DrawPath command not implemented' , item[0]);
+import flash.display.Graphics;
+
+class DrawPath
+{
+
+	public static function drawPath(path : Array<Dynamic>, g : Graphics) : Void{
+		var startx : Float = 0;
+		var starty : Float = 0;
+		var pathx : Float = 0;
+		var pathy : Float = 0;
+		for (item in path){
+			switch (item[0].toLowerCase())
+			{
+				case "m":
+					startx = item[1];
+					starty = item[2];
+					g.moveTo(pathx = startx, pathy = starty);
+				case "l":g.lineTo(pathx += item[1], pathy += item[2]);
+				case "h":g.lineTo(pathx += item[1], pathy);
+				case "v":g.lineTo(pathx, pathy += item[1]);
+				case "c":
+					var cx : Float = pathx + item[1];
+					var cy : Float = pathy + item[2];
+					var px : Float = pathx + item[3];
+					var py : Float = pathy + item[4];
+					g.curveTo(cx, cy, px, py);
+					pathx += item[3];
+					pathy += item[4];
+				case "z":
+					g.lineTo(pathx = startx, pathy = starty);
+				default:
+					trace("DrawPath command not implemented", item[0]);
 			}
 		}
 	}
 
-}}
+	public function new()
+	{
+	}
+}

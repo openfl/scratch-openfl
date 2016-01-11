@@ -24,55 +24,63 @@
 // and supports changing the selected category. When the category is changed,
 // the blocks palette is filled with the blocks for the selected category.
 
-package ui {
-	import flash.display.*;
-	import translation.Translator;
-	import scratch.PaletteBuilder;
+package ui;
 
-public class PaletteSelector extends Sprite {
 
-	private static const categories:Array = [
-		'Motion', 'Looks', 'Sound', 'Pen', 'Data', // column 1
-		'Events', 'Control', 'Sensing', 'Operators', 'More Blocks']; // column 2
+import flash.display.*;
+import translation.Translator;
+import scratch.PaletteBuilder;
 
-	public var selectedCategory:int = 0;
-	private var app:Scratch;
+class PaletteSelector extends Sprite
+{
 
-	public function PaletteSelector(app:Scratch) {
+	private static var categories : Array<Dynamic> = [
+		"Motion", "Looks", "Sound", "Pen", "Data",   // column 1  
+		"Events", "Control", "Sensing", "Operators", "More Blocks"];  // column 2  
+
+	public var selectedCategory : Int = 0;
+	private var app : Scratch;
+
+	public function new(app : Scratch)
+	{
+		super();
 		this.app = app;
 		initCategories();
 	}
 
-	public static function strings():Array { return categories }
-	public function updateTranslation():void { initCategories() }
+	public static function strings() : Array<Dynamic>{return categories;
+	}
+	public function updateTranslation() : Void{initCategories();
+	}
 
-	public function select(id:int, shiftKey:Boolean = false):void {
-		for (var i:int = 0; i < numChildren; i++) {
-			var item:PaletteSelectorItem = getChildAt(i) as PaletteSelectorItem;
+	public function select(id : Int, shiftKey : Bool = false) : Void{
+		for (i in 0...numChildren){
+			var item : PaletteSelectorItem = try cast(getChildAt(i), PaletteSelectorItem) catch(e:Dynamic) null;
 			item.setSelected(item.categoryID == id);
 		}
-		var oldID:int = selectedCategory;
+		var oldID : Int = selectedCategory;
 		selectedCategory = id;
 		app.getPaletteBuilder().showBlocksForCategory(selectedCategory, (id != oldID), shiftKey);
 	}
 
-	private function initCategories():void {
-		const numberOfRows:int = 5;
-		const w:int = 208;
-		const startY:int = 3;
-		var itemH:int;
-		var x:int, i:int;
-		var y:int = startY;
-		while (numChildren > 0) removeChildAt(0); // remove old contents
+	private function initCategories() : Void{
+		var numberOfRows : Int = 5;
+		var w : Int = 208;
+		var startY : Int = 3;
+		var itemH : Int;
+		var x : Int;
+		var i : Int;
+		var y : Int = startY;
+		while (numChildren > 0)removeChildAt(0);  // remove old contents  
 
-		for (i = 0; i < categories.length; i++) {
+		for (i in 0...categories.length){
 			if (i == numberOfRows) {
-				x = (w / 2) - 3;
+				x = Std.int((w / 2) - 3);
 				y = startY;
 			}
-			var entry:Array = Specs.entryForCategory(categories[i]);
-			var item:PaletteSelectorItem = new PaletteSelectorItem(entry[0], Translator.map(entry[1]), entry[2]);
-			itemH = item.height;
+			var entry : Array<Dynamic> = Specs.entryForCategory(categories[i]);
+			var item : PaletteSelectorItem = new PaletteSelectorItem(entry[0], Translator.map(entry[1]), entry[2]);
+			itemH = Std.int(item.height);
 			item.x = x;
 			item.y = y;
 			addChild(item);
@@ -81,11 +89,10 @@ public class PaletteSelector extends Sprite {
 		setWidthHeightColor(w, startY + (numberOfRows * itemH) + 5);
 	}
 
-	private function setWidthHeightColor(w:int, h:int):void {
-		var g:Graphics = graphics;
+	private function setWidthHeightColor(w : Int, h : Int) : Void{
+		var g : Graphics = graphics;
 		g.clear();
-		g.beginFill(0xFFFF00, 0); // invisible (alpha = 0) rectangle used to set size
+		g.beginFill(0xFFFF00, 0);  // invisible (alpha = 0) rectangle used to set size  
 		g.drawRect(0, 0, w, h);
 	}
-
-}}
+}

@@ -17,7 +17,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package watchers {
+package watchers;
+
+
 import flash.display.Sprite;
 import flash.events.*;
 import flash.utils.*;
@@ -25,48 +27,51 @@ import flash.text.*;
 import uiwidgets.*;
 import util.Color;
 
-public class ListCell extends Sprite {
+class ListCell extends Sprite
+{
 
-	private const format:TextFormat = new TextFormat(CSS.font, 11, 0xFFFFFF, true);
-	private static var normalColor:int = Specs.listColor;
-	private static var focusedColor:int = Color.mixRGB(Color.scaleBrightness(Specs.listColor, 2), 0xEEEEEE, 0.6);
+	private var format : TextFormat = new TextFormat(CSS.font, 11, 0xFFFFFF, true);
+	private static var normalColor : Int = Specs.listColor;
+	private static var focusedColor : Int = Color.mixRGB(Color.scaleBrightness(Specs.listColor, 2), 0xEEEEEE, 0.6);
 
-	public var tf:TextField;
-	private var frame:ResizeableFrame;
-	private var deleteButton:IconButton;
-	private var deleteItem:Function;
+	public var tf : TextField;
+	private var frame : ResizeableFrame;
+	private var deleteButton : IconButton;
+	private var deleteItem : Function;
 
-	public function ListCell(s:String, width:int, whenChanged:Function, keyPress:Function, deleteItem:Function) {
+	public function new(s : String, width : Int, whenChanged : Function, keyPress : Function, deleteItem : Function)
+	{
+		super();
 		frame = new ResizeableFrame(0xFFFFFF, normalColor, 6, true);
 		addChild(frame);
 		addTextField(whenChanged, keyPress);
 		tf.text = s;
-		deleteButton = new IconButton(deleteItem, 'deleteItem');
+		deleteButton = new IconButton(deleteItem, "deleteItem");
 		setWidth(width);
 	}
 
-	public function setText(s:String, w:int = 0):void {
+	public function setText(s : String, w : Int = 0) : Void{
 		// Set the text and, optionally, the width.
 		tf.text = s;
-		setWidth((w > 0) ? w : frame.w);
+		setWidth(((w > 0)) ? w : frame.w);
 		removeDeleteButton();
 	}
 
-	public function setEditable(isEditable:Boolean):void {
-		tf.type = isEditable ? 'input' : 'dynamic';
+	public function setEditable(isEditable : Bool) : Void{
+		tf.type = (isEditable) ? "input" : "dynamic";
 	}
 
-	public function setWidth(w:int):void {
-		tf.width = Math.max(w, 15); // forces line wrapping, possibly changing tf.height
-		var frameH:int = Math.max(tf.textHeight + 7, 20);
-		frame.setWidthHeight(tf.width, frameH);
+	public function setWidth(w : Int) : Void{
+		tf.width = Math.max(w, 15);  // forces line wrapping, possibly changing tf.height  
+		var frameH : Int = Std.int(Math.max(tf.textHeight + 7, 20));
+		frame.setWidthHeight(Std.int(tf.width), frameH);
 		deleteButton.x = tf.width - deleteButton.width - 3;
 		deleteButton.y = (frameH - deleteButton.height) / 2;
 	}
 
-	private function addTextField(whenChanged:Function, keyPress:Function):void {
+	private function addTextField(whenChanged : Function, keyPress : Function) : Void{
 		tf = new TextField();
-		tf.type = 'input';
+		tf.type = "input";
 		tf.wordWrap = true;
 		tf.autoSize = TextFieldAutoSize.LEFT;
 		tf.defaultTextFormat = format;
@@ -81,25 +86,25 @@ public class ListCell extends Sprite {
 		addChild(tf);
 	}
 
-	public function select():void {
+	public function select() : Void{
 		stage.focus = tf;
 		tf.setSelection(0, tf.text.length);
-		if (tf.type == 'input') addDeleteButton();
+		if (tf.type == "input")             addDeleteButton();
 	}
 
-	private function focusChange(e:FocusEvent):void {
-		var hasFocus:Boolean = e.type == FocusEvent.FOCUS_IN && tf.type == 'input';
-		frame.setColor(hasFocus ? focusedColor : normalColor);
-		tf.textColor = hasFocus ? 0 : 0xFFFFFF;
-		setTimeout(hasFocus ? addDeleteButton : removeDeleteButton, 1);
+	private function focusChange(e : FocusEvent) : Void{
+		var hasFocus : Bool = e.type == FocusEvent.FOCUS_IN && tf.type == "input";
+		frame.setColor((hasFocus) ? focusedColor : normalColor);
+		tf.textColor = (hasFocus) ? 0 : 0xFFFFFF;
+		setTimeout((hasFocus) ? addDeleteButton : removeDeleteButton, 1);
 	}
 
-	private function removeDeleteButton():void {
-		if (deleteButton.parent) removeChild(deleteButton);
+	private function removeDeleteButton() : Void{
+		if (deleteButton.parent != null)             removeChild(deleteButton);
 	}
 
-	private function addDeleteButton():void {
+	private function addDeleteButton() : Void{
 		addChild(deleteButton);
 		deleteButton.turnOff();
 	}
-}}
+}

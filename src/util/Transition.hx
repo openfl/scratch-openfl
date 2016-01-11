@@ -17,90 +17,98 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package util {
-	import flash.utils.getTimer;
+package util;
 
-public class Transition {
 
-	private static var activeTransitions:Array = [];
 
-	private var interpolate:Function;
-	private var setValue:Function;
-	private var startValue:*;
-	private var endValue:*;
-	private var delta:*;
-	private var whenDone:Function;
-	private var startMSecs:uint;
-	private var duration:uint;
 
-	public function Transition(interpolate:Function, setValue:Function, startValue:*, endValue:*, secs:Number, whenDone:Function) {
+class Transition
+{
+
+	private static var activeTransitions : Array<Dynamic> = [];
+
+	private var interpolate : Function;
+	private var setValue : Function;
+	private var startValue : Dynamic;
+	private var endValue : Dynamic;
+	private var delta : Dynamic;
+	private var whenDone : Function;
+	private var startMSecs : Int;
+	private var duration : Int;
+
+	public function new(interpolate : Function, setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function)
+	{
 		// Create a transition animation between two values (either scalars or Arrays).
 		this.interpolate = interpolate;
 		this.setValue = setValue;
 		this.startValue = startValue;
 		this.endValue = endValue;
 		this.whenDone = whenDone;
-		if (startValue is Array) {
+		if (Std.is(startValue, Array)) {
 			delta = [];
-			for (var i:int = 0; i < startValue.length; i++) {
+			for (i in 0...startValue.length){
 				this.delta.push(endValue[i] - startValue[i]);
 			}
-		} else {
+		}
+		else {
 			delta = endValue - startValue;
 		}
-		startMSecs = getTimer();
+		startMSecs = Math.round(haxe.Timer.stamp() * 1000);
 		duration = 1000 * secs;
 	}
 
-	public static function linear(setValue:Function, startValue:*, endValue:*, secs:Number, whenDone:Function = null):void {
+	public static function linear(setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function = null) : Void{
 		activeTransitions.push(new Transition(linearFunc, setValue, startValue, endValue, secs, whenDone));
 	}
 
-	public static function quadratic(setValue:Function, startValue:*, endValue:*, secs:Number, whenDone:Function = null):void {
+	public static function quadratic(setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function = null) : Void{
 		activeTransitions.push(new Transition(quadraticFunc, setValue, startValue, endValue, secs, whenDone));
 	}
 
-	public static function cubic(setValue:Function, startValue:*, endValue:*, secs:Number, whenDone:Function = null):void {
+	public static function cubic(setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function = null) : Void{
 		activeTransitions.push(new Transition(cubicFunc, setValue, startValue, endValue, secs, whenDone));
 	}
 
-	public static function step(evt:*):void {
-		if (activeTransitions.length == 0) return;
-		var now:uint = getTimer();
-		var newActive:Array = [];
-		for each (var t:Transition in activeTransitions) {
-			 if (t.apply(now)) newActive.push(t);
+	public static function step(evt : Dynamic) : Void{
+		if (activeTransitions.length == 0)             return;
+		var now : Int = Math.round(haxe.Timer.stamp() * 1000);
+		var newActive : Array<Dynamic> = [];
+		for (t in activeTransitions){
+			if (t.apply(now))                 newActive.push(t);
 		}
 		activeTransitions = newActive;
 	}
 
-	private function apply(now:uint):Boolean {
-		var msecs:int = now - startMSecs;
-		if (msecs < 50) { // ensure that start value is processed for at least one frame
+	private function apply(now : Int) : Bool{
+		var msecs : Int = now - startMSecs;
+		if (msecs < 50) {  // ensure that start value is processed for at least one frame  
 			setValue(startValue);
 			return true;
 		}
-		var t:Number = (now - startMSecs) / duration;
+		var t : Float = (now - startMSecs) / duration;
 		if (t > 1.0) {
 			setValue(endValue);
-			if (whenDone != null) whenDone();
+			if (whenDone != null)                 whenDone();
 			return false;
 		}
-		if (startValue is Array) {
-			var a:Array = [];
-			for (var i:int = 0; i < startValue.length; i++) {
+		if (Std.is(startValue, Array)) {
+			var a : Array<Dynamic> = [];
+			for (i in 0...startValue.length){
 				a.push(startValue[i] + (delta[i] * (1.0 - interpolate(1.0 - t))));
 			}
 			setValue(a);
-		} else {
+		}
+		else {
 			setValue(startValue + (delta * (1.0 - interpolate(1.0 - t))));
 		}
 		return true;
 	}
 
 	// Transition functions:
-	private static function linearFunc(t:Number):Number { return t }
-	private static function quadraticFunc(t:Number):Number { return t * t }
-	private static function cubicFunc(t:Number):Number { return t * t * t }
-
-}}
+	private static function linearFunc(t : Float) : Float{return t;
+	}
+	private static function quadraticFunc(t : Float) : Float{return t * t;
+	}
+	private static function cubicFunc(t : Float) : Float{return t * t * t;
+	}
+}

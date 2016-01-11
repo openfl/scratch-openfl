@@ -17,63 +17,72 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-package watchers {
-	import flash.display.Sprite;
-	import flash.text.*;
-	import uiwidgets.ResizeableFrame;
+package watchers;
 
-public class WatcherReadout extends Sprite {
 
-	private var smallFont:TextFormat = new TextFormat(CSS.font, 10, 0xFFFFFF, true);
-	private var largeFont:TextFormat = new TextFormat(CSS.font, 15, 0xFFFFFF, true);
+import flash.display.Sprite;
+import flash.text.*;
+import uiwidgets.ResizeableFrame;
 
-	private var frame:ResizeableFrame;
-	private var tf:TextField;
-	private var isLarge:Boolean;
+class WatcherReadout extends Sprite
+{
+	public var contents(get, never) : String;
 
-	public function WatcherReadout() {
+
+	private var smallFont : TextFormat = new TextFormat(CSS.font, 10, 0xFFFFFF, true);
+	private var largeFont : TextFormat = new TextFormat(CSS.font, 15, 0xFFFFFF, true);
+
+	private var frame : ResizeableFrame;
+	private var tf : TextField;
+	private var isLarge : Bool;
+
+	public function new()
+	{
+		super();
 		frame = new ResizeableFrame(0xFFFFFF, Specs.variableColor, 8, true);
 		addChild(frame);
 		addTextField();
 		beLarge(false);
 	}
 
-	public function getColor():int { return frame.getColor() }
-	public function setColor(color:int):void { frame.setColor(color) }
+	public function getColor() : Int{return frame.getColor();
+	}
+	public function setColor(color : Int) : Void{frame.setColor(color);
+	}
 
-	public function get contents():String { return tf.text }
+	private function get_contents() : String{return tf.text;
+	}
 
-	public function setContents(s:String):void {
-		if (s == tf.text) return; // no change
+	public function setContents(s : String) : Void{
+		if (s == tf.text)             return;  // no change  ;
 		tf.text = s;
 		fixLayout();
 	}
 
-	public function beLarge(newValue:Boolean):void {
+	public function beLarge(newValue : Bool) : Void{
 		isLarge = newValue;
-		var fmt:TextFormat = isLarge ? largeFont : smallFont;
+		var fmt : TextFormat = (isLarge) ? largeFont : smallFont;
 		fmt.align = TextFormatAlign.CENTER;
 		tf.defaultTextFormat = fmt;
-		tf.setTextFormat(fmt); // force font change
+		tf.setTextFormat(fmt);  // force font change  
 		fixLayout();
 	}
 
-	private function fixLayout():void {
-		var w:int = isLarge ? 48 : 40;
-		var h:int = isLarge ? 20 : 14;
-		var hPad:int = isLarge ? 12 : 5;
-		w = Math.max(w, tf.textWidth + hPad);
+	private function fixLayout() : Void{
+		var w : Int = (isLarge) ? 48 : 40;
+		var h : Int = (isLarge) ? 20 : 14;
+		var hPad : Int = (isLarge) ? 12 : 5;
+		w = Std.int(Math.max(w, tf.textWidth + hPad));
 		tf.width = w;
 		tf.height = h;
-		tf.y = isLarge ? 0 : -1;
-		if ((w != frame.w) || (h != frame.h)) frame.setWidthHeight(w, h);
+		tf.y = (isLarge) ? 0 : -1;
+		if ((w != frame.w) || (h != frame.h))             frame.setWidthHeight(w, h);
 	}
 
-	private function addTextField():void {
+	private function addTextField() : Void{
 		tf = new TextField();
 		tf.type = "dynamic";
 		tf.selectable = false;
 		addChild(tf);
 	}
-
-}}
+}
