@@ -25,7 +25,7 @@
 package;
 import blocks.*;
 
-import com.adobe.utils.StringUtil;
+//import com.adobe.utils.StringUtil;
 
 //import extensions.ExtensionDevManager;
 //import extensions.ExtensionManager;
@@ -256,11 +256,11 @@ class Scratch extends Sprite {
 	}
 
 	private function loadSingleGithubURL(url:String):Void {
-		url = StringUtil.trim(unescape(url));
+		url = StringTools.trim(unescape(url));
 
 		function handleComplete(e:Event):Void {
 			runtime.installProjectFromData(sbxLoader.data);
-			if (StringUtil.trim(projectName()).length == 0) {
+			if (StringTools.trim(projectName()).length == 0) {
 				var newProjectName:String = url;
 				var index = Std.int(newProjectName.indexOf('?'));
 				if (index > 0) newProjectName = newProjectName.slice(0, index);
@@ -1173,7 +1173,7 @@ class Scratch extends Sprite {
 		function squeakSoundsConverted():Void {
 			scriptsPane.saveScripts(false);
 			var projectType:String = /*extensionManager.hasExperimentalExtensions() ? '.sbx' : */'.sb2';
-			var defaultName:String = StringUtil.trim(projectName());
+			var defaultName:String = StringTools.trim(projectName());
 			defaultName = ((defaultName.length > 0) ? defaultName : 'project') + projectType;
 			var zipData:ByteArray = projIO.encodeProjectAsZipFile(stagePane);
 			var file:FileReference = new FileReference();
