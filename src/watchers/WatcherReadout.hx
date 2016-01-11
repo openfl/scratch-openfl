@@ -81,7 +81,7 @@ class WatcherReadout extends Sprite
 
 	private function addTextField() : Void{
 		tf = new TextField();
-		tf.type = "dynamic";
+		tf.type = TextFieldType.DYNAMIC;
 		tf.selectable = false;
 		addChild(tf);
 	}

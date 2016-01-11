@@ -122,10 +122,10 @@ class Primitives
 
 		var ba1 : BlockArg = try cast(b.args[0], BlockArg) catch(e:Dynamic) null;
 		var ba2 : BlockArg = try cast(b.args[1], BlockArg) catch(e:Dynamic) null;
-		var int1 : Bool = (ba1 != null) ? ba1.numberType == BlockArg.NT_INT : Std.parseInt(n1) == n1;
-		var int2 : Bool = (ba2 != null) ? ba2.numberType == BlockArg.NT_INT : Std.parseInt(n2) == n2;
+		var int1 : Bool = (ba1 != null) ? ba1.numberType == BlockArg.NT_INT : Std.int(n1) == n1;
+		var int2 : Bool = (ba2 != null) ? ba2.numberType == BlockArg.NT_INT : Std.int(n2) == n2;
 		if (int1 && int2) 
-			return low + Std.parseInt(Math.random() * ((hi + 1) - low));
+			return low + Std.int(Math.random() * ((hi + 1) - low));
 
 		return (Math.random() * (hi - low)) + low;
 	}
@@ -201,7 +201,7 @@ class Primitives
 	private function primCreateCloneOf(b : Block) : Void{
 		var objName : String = interp.arg(b, 0);
 		var proto : ScratchSprite = app.stagePane.spriteNamed(objName);
-		if ("_myself_" == objName)             proto = interp.activeThread.target;
+		if ("_myself_" == objName)             proto = cast(interp.activeThread.target, ScratchSprite);
 		if (proto == null)             return;
 		if (app.runtime.cloneCount > MaxCloneCount)             return;
 		var clone : ScratchSprite = new ScratchSprite();

@@ -556,12 +556,12 @@ class ScratchSprite extends ScratchObj {
 	}
 
 	private function saveToLocalFile():Void {
-		function success():Void {
+		var file:FileReference = new FileReference();
+		function success(param:Dynamic):Void {
 			Scratch.app.log(LogLevel.INFO, 'sprite saved to file', {filename: file.name});
 		}
 		var zipData:ByteArray = new ProjectIO(Scratch.app).encodeSpriteAsZipFile(copyToShare());
 		var defaultName:String = objName + '.sprite2';
-		var file:FileReference = new FileReference();
 		file.addEventListener(Event.COMPLETE, success);
 		file.save(zipData, defaultName);
 	}

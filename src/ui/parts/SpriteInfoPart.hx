@@ -359,10 +359,10 @@ class SpriteInfoPart extends UIPart implements DragClient
 	public function updateThumbnail() : Void{
 		var targetObj : ScratchObj = app.viewedObj();
 		if (targetObj == null)             return;
-		if (targetObj.img.numChildren == 0)             return  // shouldn't happen  ;
+		if (targetObj.img.numChildren == 0)             return;  // shouldn't happen  ;
 
 		var src : DisplayObject = targetObj.img.getChildAt(0);
-		if (src == lastSrcImg)             return  // thumbnail is up to date  ;
+		if (src == lastSrcImg)             return;  // thumbnail is up to date  ;
 
 		var c : ScratchCostume = targetObj.currentCostume();
 		thumbnail.bitmapData = c.thumbnail(80, 80, targetObj.isStage);

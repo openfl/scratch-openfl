@@ -204,6 +204,7 @@ class ScratchRuntime {
 	}
 
 	public function collectBroadcasts():Array<Dynamic> {
+		var result:Array<Dynamic> = [];
 		function addBlock(b:Block):Void {
 			if ((b.op == 'broadcast:') ||
 					(b.op == 'doBroadcastAndWait') ||
@@ -214,7 +215,6 @@ class ScratchRuntime {
 				}
 			}
 		}
-		var result:Array<Dynamic> = [];
 		allStacksAndOwnersDo(function (stack:Block, target:ScratchObj):Void {
 			stack.allBlocksDo(addBlock);
 		});
@@ -376,15 +376,15 @@ class ScratchRuntime {
 	public function selectProjectFile():Void {
 		// Prompt user for a file name and load that file.
 		var fileName:String, data:ByteArray;
+		function doInstall(ignore:Dynamic = null):Void {
+			installProjectFromFile(fileName, data);
+		}
 		function fileLoadHandler(event:Event):Void {
 			var file:FileReference = FileReference(event.target);
 			fileName = file.name;
 			data = file.data;
 			if (app.stagePane.isEmpty()) doInstall();
 			else DialogBox.confirm('Replace contents of the current project?', app.stage, doInstall);
-		}
-		function doInstall(ignore:Dynamic = null):Void {
-			installProjectFromFile(fileName, data);
 		}
 		stopAll();
 

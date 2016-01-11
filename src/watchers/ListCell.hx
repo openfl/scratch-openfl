@@ -58,7 +58,7 @@ class ListCell extends Sprite
 	}
 
 	public function setEditable(isEditable : Bool) : Void{
-		tf.type = (isEditable) ? "input" : "dynamic";
+		tf.type = (isEditable) ? TextFieldType.INPUT : TextFieldType.DYNAMIC;
 	}
 
 	public function setWidth(w : Int) : Void{
@@ -71,7 +71,7 @@ class ListCell extends Sprite
 
 	private function addTextField(whenChanged : Function, keyPress : Function) : Void{
 		tf = new TextField();
-		tf.type = "input";
+		tf.type = TextFieldType.INPUT;
 		tf.wordWrap = true;
 		tf.autoSize = TextFieldAutoSize.LEFT;
 		tf.defaultTextFormat = format;
@@ -89,11 +89,11 @@ class ListCell extends Sprite
 	public function select() : Void{
 		stage.focus = tf;
 		tf.setSelection(0, tf.text.length);
-		if (tf.type == "input")             addDeleteButton();
+		if (tf.type == TextFieldType.INPUT)             addDeleteButton();
 	}
 
 	private function focusChange(e : FocusEvent) : Void{
-		var hasFocus : Bool = e.type == FocusEvent.FOCUS_IN && tf.type == "input";
+		var hasFocus : Bool = e.type == FocusEvent.FOCUS_IN && tf.type == TextFieldType.INPUT;
 		frame.setColor((hasFocus) ? focusedColor : normalColor);
 		tf.textColor = (hasFocus) ? 0 : 0xFFFFFF;
 		setTimeout((hasFocus) ? addDeleteButton : removeDeleteButton, 1);

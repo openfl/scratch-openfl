@@ -28,6 +28,7 @@ package interpreter;
 
 
 import blocks.Block;
+import scratch.ScratchObj;
 
 
 import blocks.*;
@@ -36,7 +37,7 @@ import interpreter.*;
 class Thread
 {
 
-	public var target : Dynamic;  // object that owns the stack  
+	public var target : ScratchObj;  // object that owns the stack  
 	public var topBlock : Block;  // top block of the stack  
 	public var tmpObj : Dynamic;  // temporary object (not saved on stack)  
 	public var startDelayCount : Int;  // number of frames to delay before starting  

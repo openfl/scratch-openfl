@@ -28,7 +28,7 @@
 package util;
 
 
-import by.blooddy.crypto.serialization.JSON;
+//import by.blooddy.crypto.serialization.JSON;
 
 import flash.display.BitmapData;
 import flash.display.Loader;
@@ -62,12 +62,12 @@ class Server implements IServer
 		setDefaultURLs();
 
 		// Accept URL overrides from the flash variables
-		try{
-			var urlOverrides : String = Scratch.app.loaderInfo.parameters["urlOverrides"];
-			if (urlOverrides != null)                 overrideURLs(by.blooddy.crypto.serialization.JSON.decode(urlOverrides));
-		}        catch (e : Dynamic){
-
-		}
+		//try{
+			//var urlOverrides : String = Scratch.app.loaderInfo.parameters["urlOverrides"];
+			//if (urlOverrides != null)                 overrideURLs(by.blooddy.crypto.serialization.JSON.decode(urlOverrides));
+		//}        catch (e : Dynamic){
+//
+		//}
 	}
 
 	// No default URLs

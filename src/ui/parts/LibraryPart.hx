@@ -75,10 +75,10 @@ class LibraryPart extends UIPart
 		shape = new Shape();
 		addChild(shape);
 
-		spritesTitle = makeLabel(Translator.map("Sprites"), CSS.titleFormat, (app.isMicroworld) ? 10 : stageAreaWidth + 10, 5);
+		spritesTitle = UIPart.makeLabel(Translator.map("Sprites"), CSS.titleFormat, (app.isMicroworld) ? 10 : stageAreaWidth + 10, 5);
 		addChild(spritesTitle);
 
-		addChild(newSpriteLabel = makeLabel(Translator.map("New sprite:"), CSS.titleFormat, 10, 5));
+		addChild(newSpriteLabel = UIPart.makeLabel(Translator.map("New sprite:"), CSS.titleFormat, 10, 5));
 		addChild(libraryButton = makeButton(spriteFromLibrary, "library"));
 		addChild(paintButton = makeButton(paintSprite, "paintbrush"));
 		addChild(importButton = makeButton(spriteFromComputer, "import"));
@@ -164,7 +164,7 @@ class LibraryPart extends UIPart
 		this.h = h;
 		var g : Graphics = shape.graphics;
 		g.clear();
-		drawTopBar(g, CSS.titleBarColors, getTopBarPath(w, CSS.titleBarH), w, CSS.titleBarH);
+		UIPart.drawTopBar(g, CSS.titleBarColors, UIPart.getTopBarPath(w, CSS.titleBarH), w, CSS.titleBarH);
 		g.lineStyle(1, CSS.borderColor, 1, true);
 		g.drawRect(0, CSS.titleBarH, w, h - CSS.titleBarH);
 		g.lineStyle(1, CSS.borderColor);
@@ -177,7 +177,7 @@ class LibraryPart extends UIPart
 			g.endFill();
 		}
 		fixLayout();
-		if (app.viewedObj())             refresh();  // refresh, but not during initialization  ;
+		if (app.viewedObj() != null)             refresh();  // refresh, but not during initialization  ;
 	}
 
 	private function fixLayout() : Void{
@@ -304,7 +304,7 @@ class LibraryPart extends UIPart
 	}
 
 	private function addNewBackdropButtons() : Void{
-		addChild(newBackdropLabel = makeLabel(
+		addChild(newBackdropLabel = UIPart.makeLabel(
 								Translator.map("New backdrop:"), smallTextFormat, 3, 126));
 
 		// new backdrop buttons
@@ -345,7 +345,7 @@ class LibraryPart extends UIPart
 
 	public function showVideoButton() : Void{
 		// Show the video button. Turn on the camera the first time this is called.
-		if (videoButton.visible)             return  // already showing  ;
+		if (videoButton.visible)             return;  // already showing  ;
 		videoButton.visible = true;
 		videoLabel.visible = true;
 		if (!app.stagePane.isVideoOn()) {
@@ -363,7 +363,7 @@ class LibraryPart extends UIPart
 			app.stagePane.setVideoState((b.isOn()) ? "on" : "off");
 			app.setSaveNeeded();
 		};
-		addChild(videoLabel = makeLabel(
+		addChild(videoLabel = UIPart.makeLabel(
 								Translator.map("Video on:"), smallTextFormat,
 								1, backdropLibraryButton.y + 22));
 
@@ -462,8 +462,8 @@ class LibraryPart extends UIPart
 	private function addBackdrop(costumeOrList : Dynamic) : Void{
 		var c : ScratchCostume = try cast(costumeOrList, ScratchCostume) catch(e:Dynamic) null;
 		if (c != null) {
-			if (!c.baseLayerData)                 c.prepareToSave();
-			if (!app.okayToAdd(c.baseLayerData.length))                 return  // not enough room  ;
+			if (c.baseLayerData == null)                 c.prepareToSave();
+			if (!app.okayToAdd(c.baseLayerData.length))                 return;  // not enough room  ;
 			c.costumeName = app.stagePane.unusedCostumeName(c.costumeName);
 			app.stagePane.costumes.push(c);
 			app.stagePane.showCostumeNamed(c.costumeName);
@@ -472,7 +472,7 @@ class LibraryPart extends UIPart
 		if (list != null) {
 			for (c in list){
 				if (!c.baseLayerData)                     c.prepareToSave();
-				if (!app.okayToAdd(c.baseLayerData.length))                     return  // not enough room  ;
+				if (!app.okayToAdd(c.baseLayerData.length))                     return;  // not enough room  ;
 				app.stagePane.costumes.push(c);
 			}
 			app.stagePane.showCostumeNamed(list[0].costumeName);

@@ -203,7 +203,7 @@ class ScriptsPane extends ScrollFrameContents
 			else {
 				hideFeedbackShape();
 			}
-			if (b.base.canHaveSubstack1() && !b.subStack1) {
+			if (b.base.canHaveSubstack1() && b.subStack1 == null) {
 				updateHeight();
 			}
 		}
@@ -383,7 +383,7 @@ class ScriptsPane extends ScrollFrameContents
 			if (cast((target), Block).isEmbeddedParameter())                 return false;
 		}
 		var dropType : String = droppedBlock.type;
-		var targetType : String = Std.is(target, (Block) ? cast((target.parent), Block).argType(target).substring(1) : cast((target), BlockArg).type);
+		var targetType : String = Std.is(target, Block) ? cast((target.parent), Block).argType(target).substring(1) : cast((target), BlockArg).type;
 		if (targetType == "m") {
 			if (cast((target.parent), Block).type == "h")                 return false;
 			return Lambda.indexOf(menusThatAcceptReporters, cast((target), BlockArg).menuName) > -1;
@@ -426,7 +426,7 @@ class ScriptsPane extends ScrollFrameContents
 
 	private function addStacksFromBackpack(info : MediaInfo, dropP : Point) : Void{
 		if (info.scripts == null)             return;
-		var forStage : Bool = app.viewedObj() && app.viewedObj().isStage;
+		var forStage : Bool = app.viewedObj() != null && app.viewedObj().isStage;
 		for (a/* AS3HX WARNING could not determine type for var: a exp: EField(EIdent(info),scripts) type: null */ in info.scripts){
 			if (a.length < 1)                 continue;
 			var blockOrComment : Dynamic = 
@@ -560,7 +560,7 @@ class ScriptsPane extends ScrollFrameContents
 			var o : Dynamic = getChildAt(i);
 			if (Std.is(o, Block))                 stacks.push(o);
 		}
-		stacks.sort(function(b1 : Block, b2 : Block) : Int{return b1.x - b2.x;
+		stacks.sort(function(b1 : Block, b2 : Block) : Int{return Std.int(b1.x - b2.x);
 				});  // sort by increasing x  
 		return stacks;
 	}

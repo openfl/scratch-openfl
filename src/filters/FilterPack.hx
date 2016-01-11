@@ -80,7 +80,7 @@ class FilterPack
 	public function new(targetObj : ScratchObj)
 	{
 		this.targetObj = targetObj;
-		this.filterDict = new Dynamic();
+		this.filterDict = {};
 		resetAllFilters();
 	}
 

@@ -187,9 +187,9 @@ class Interpreter
 			if (skipActiveThread && (t == activeThread))                 {i++;continue;
 			};
 			if (t.target == target) {
-				if (Std.is(t.tmpObj, ScratchSoundPlayer)) {
-					(try cast(t.tmpObj, ScratchSoundPlayer) catch(e:Dynamic) null).stopPlaying();
-				}
+				//if (Std.is(t.tmpObj, ScratchSoundPlayer)) {
+					//(try cast(t.tmpObj, ScratchSoundPlayer) catch(e:Dynamic) null).stopPlaying();
+				//}
 				t.stop();
 			}
 		}
@@ -226,7 +226,7 @@ class Interpreter
 
 	public function stepThreads() : Void{
 		startTime = Math.round(haxe.Timer.stamp() * 1000);
-		var workTime : Int = (0.75 * 1000) / app.stage.frameRate;  // work for up to 75% of one frame time  
+		var workTime : Int = Std.int((0.75 * 1000) / app.stage.frameRate);  // work for up to 75% of one frame time  
 		doRedraw = false;
 		currentMSecs = Math.round(haxe.Timer.stamp() * 1000);
 		if (threads.length == 0)             return;
@@ -316,9 +316,9 @@ class Interpreter
 		if (b == null)             return 0;  // arg() and friends can pass null if arg index is out of range  ;
 		var op : String = b.op;
 		if (b.opFunction == null) {
-			if (op.indexOf(".") > -1)                 
-				b.opFunction = app.extensionManager.primExtensionOp;
-			else 
+			//if (op.indexOf(".") > -1)                 
+				//b.opFunction = app.extensionManager.primExtensionOp;
+			//else 
 			b.opFunction = ((Reflect.field(primTable, op) == null)) ? primNoop : Reflect.field(primTable, op);
 		}  // TODO: Optimize this into a cached check if the args *could* block at all  
 
@@ -401,7 +401,7 @@ class Interpreter
 				var code : Int = s.charCodeAt(i);
 				if (code >= 48 && code <= 57)                     return Std.parseFloat(s);
 			}
-			return NaN;
+			return Math.NaN;
 		}
 		return Std.parseFloat(n);
 	}
@@ -527,7 +527,7 @@ class Interpreter
 		}
 	}
 
-	public function primNoop(b : Block) : Void{
+	public function primNoop(b : Dynamic) : Dynamic { return null;
 	}
 
 	private function primForLoop(b : Block) : Void{
@@ -644,12 +644,12 @@ class Interpreter
 	public function startScene(sceneName : String, waitFlag : Bool) : Void{
 		var pair : Array<Dynamic>;
 		if (activeThread.firstTime) {
+			var receivers : Array<Dynamic> = [];
 			function findSceneHats(stack : Block, target : ScratchObj) : Void{
 				if ((stack.op == "whenSceneStarts") && (stack.args[0].argValue == sceneName)) {
 					receivers.push([stack, target]);
 				}
 			};
-			var receivers : Array<Dynamic> = [];
 			app.stagePane.showCostumeNamed(sceneName);
 			redraw();
 			app.runtime.allStacksAndOwnersDo(findSceneHats);
@@ -763,7 +763,7 @@ class Interpreter
 	private function primGetParam(b : Block) : Dynamic{
 		if (b.parameterIndex < 0) {
 			var proc : Block = b.topBlock();
-			if (proc.parameterNames)                 b.parameterIndex = proc.parameterNames.indexOf(b.spec);
+			if (proc.parameterNames != null)                 b.parameterIndex = proc.parameterNames.indexOf(b.spec);
 			if (b.parameterIndex < 0)                 return 0;
 		}
 		if ((activeThread.args == null) || (b.parameterIndex >= activeThread.args.length))             return 0;

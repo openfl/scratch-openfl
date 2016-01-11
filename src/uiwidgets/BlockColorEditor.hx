@@ -89,12 +89,7 @@ class BlockColorEditor extends Sprite
 	}
 
 	public function loadColors(b : IconButton) : Void{
-		function fileSelected(event : Event) : Void{
-			if (fileList.fileList.length == 0)                 return;
-			var file : FileReference = cast((fileList.fileList[0]), FileReference);
-			file.addEventListener(Event.COMPLETE, fileLoaded);
-			file.load();
-		};
+		var fileList : FileReferenceList = new FileReferenceList();
 		function fileLoaded(event : Event) : Void{
 			var data : ByteArray = cast((event.target), FileReference).data;
 			var colors : Dynamic = util.JSON.parse(Std.string(data));
@@ -104,7 +99,12 @@ class BlockColorEditor extends Sprite
 			selectCategory(categoryName.text);
 			Scratch.app.translationChanged();
 		};
-		var fileList : FileReferenceList = new FileReferenceList();
+		function fileSelected(event : Event) : Void{
+			if (fileList.fileList.length == 0)                 return;
+			var file : FileReference = cast((fileList.fileList[0]), FileReference);
+			file.addEventListener(Event.COMPLETE, fileLoaded);
+			file.load();
+		};
 		fileList.addEventListener(Event.SELECT, fileSelected);
 		fileList.browse();
 	}

@@ -121,7 +121,7 @@ class MediaLibrary extends Sprite {
 	}
 
 	public function importFromDisk():Void {
-		if (parent) close();
+		if (parent != null) close();
 		if (assetType == 'sound') importSoundsFromDisk();
 		else importImagesOrSpritesFromDisk();
 	}
@@ -285,12 +285,6 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	//------------------------------
 
 	private function viewLibrary():Void {
-		function gotLibraryData(data:ByteArray):Void {
-			if (data == null) return; // failure
-			var s:String = data.readUTFBytes(data.length);
-			libraryCache[assetType] = cast(util.JSON.parse(stripComments(s)), Array);
-			collectEntries();
-		}
 		function collectEntries():Void {
 			allItems = [];
 			for (entry in libraryCache[assetType]) {
@@ -316,6 +310,12 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 			}
 			showFilteredItems();
 			startLoadingThumbnails();
+		}
+		function gotLibraryData(data:ByteArray):Void {
+			if (data == null) return; // failure
+			var s:String = data.readUTFBytes(data.length);
+			libraryCache[assetType] = cast(util.JSON.parse(stripComments(s)), Array);
+			collectEntries();
 		}
 		if ('extension' == assetType) {
 			addScratchExtensions();
@@ -422,7 +422,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		close();
 		for (i in 0...resultsPane.numChildren) {
 			var item:MediaLibraryItem = cast(resultsPane.getChildAt(i), MediaLibraryItem);
-			if (item && item.isHighlighted()) {
+			if (item != null && item.isHighlighted()) {
 				var md5AndExt:String = item.dbObj.md5;
 				var obj:Object = null;
 				if (assetType == 'extension') {
@@ -458,6 +458,9 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	//------------------------------
 
 	private function startLoadingThumbnails():Void {
+		var next:Int = 0;
+		var inProgress:Int = 0;
+		function loadDone():Void { inProgress--; }
 		function loadSomeThumbnails():Void {
 			var count:Int = 10 - inProgress;
 			while ((next < allItems.length) && (count-- > 0)) {
@@ -466,17 +469,14 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 			}
 			if ((next < allItems.length) || inProgress) setTimeout(loadSomeThumbnails, 40);
 		}
-		function loadDone():Void { inProgress--; }
 
-		var next:Int = 0;
-		var inProgress:Int = 0;
 		loadSomeThumbnails();
 	}
 
 	private function stopLoadingThumbnails():Void {
 		for (i in 0...resultsPane.numChildren) {
 			var item:MediaLibraryItem = cast(resultsPane.getChildAt(i), MediaLibraryItem);
-			if (item) item.stopLoading();
+			if (item != null) item.stopLoading();
 		}
 	}
 
@@ -485,6 +485,12 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	//------------------------------
 
 	private function importImagesOrSpritesFromDisk():Void {
+		var costumeOrSprite:Dynamic;
+		var files:FileReferenceList = new FileReferenceList();
+		function fileLoaded(e:Event):Void {
+			var fRef:FileReference = cast(e.target, FileReference);
+			if (fRef != null) convertAndUploadImageOrSprite(fRef.name, fRef.data);
+		}
 		function fileSelected(e:Event):Void {
 			for (j in 0...files.fileList.length) {
 				var file:FileReference = FileReference(files.fileList[j]);
@@ -492,12 +498,6 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 				file.load();
 			}
 		}
-		function fileLoaded(e:Event):Void {
-			var fRef:FileReference = cast(e.target, FileReference);
-			if (fRef != null) convertAndUploadImageOrSprite(fRef.name, fRef.data);
-		}
-		var costumeOrSprite:Dynamic;
-		var files:FileReferenceList = new FileReferenceList();
 		files.addEventListener(Event.SELECT, fileSelected);
 		try {
 			// Ignore the exception that happens when you call browse() with the file browser open
@@ -514,6 +514,11 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	}
 
 	private function convertAndUploadImageOrSprite(fName:String, data:ByteArray):Void {
+		var costumeOrSprite:Dynamic;
+		function uploadComplete():Void {
+			app.removeLoadProgressBox();
+			whenDone(costumeOrSprite);
+		}
 		function imageDecoded(e:Event):Void {
 			var bm:BitmapData = ScratchCostume.scaleForScratch(e.target.content.bitmapData);
 			costumeOrSprite = new ScratchCostume(fName, bm);
@@ -523,21 +528,16 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 			costumeOrSprite = s;
 			uploadSprite(s, uploadComplete);
 		}
-		function imagesDecoded():Void {
-			sprite.updateScriptsAfterTranslation();
-			spriteDecoded(sprite);
-		}
-		function uploadComplete():Void {
-			app.removeLoadProgressBox();
-			whenDone(costumeOrSprite);
-		}
+		//function imagesDecoded():Void {
+			//sprite.updateScriptsAfterTranslation();
+			//spriteDecoded(sprite);
+		//}
 		function decodeError():Void {
 			DialogBox.notify('Error decoding image', 'Sorry, Scratch was unable to load the image '+fName+'.', Scratch.app.stage);
 		}
 		function spriteError():Void {
 			DialogBox.notify('Error decoding sprite', 'Sorry, Scratch was unable to load the sprite '+fName+'.', Scratch.app.stage);
 		}
-		var costumeOrSprite:Dynamic;
 		var fExt:String = '';
 		var i:Int = fName.lastIndexOf('.');
 		if (i > 0) {
@@ -643,6 +643,10 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	}
 
 	private function importSoundsFromDisk():Void {
+		var files:FileReferenceList = new FileReferenceList();
+		function fileLoaded(e:Event):Void {
+			convertAndUploadSound(FileReference(e.target).name, FileReference(e.target).data);
+		}
 		function fileSelected(e:Event):Void {
 			for (j in 0...files.fileList.length) {
 				var file:FileReference = FileReference(files.fileList[j]);
@@ -650,10 +654,6 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 				file.load();
 			}
 		}
-		function fileLoaded(e:Event):Void {
-			convertAndUploadSound(FileReference(e.target).name, FileReference(e.target).data);
-		}
-		var files:FileReferenceList = new FileReferenceList();
 		files.addEventListener(Event.SELECT, fileSelected);
 		try {
 			// Ignore the exception that happens when you call browse() with the file browser open
@@ -673,11 +673,11 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	}
 
 	private function convertAndUploadSound(sndName:String, data:ByteArray):Void {
+		var snd:ScratchSound;
 		function uploadComplete():Void {
 			app.removeLoadProgressBox();
 			whenDone(snd);
 		}
-		var snd:ScratchSound;
 		var origName:String = sndName;
 		var i:Int = sndName.lastIndexOf('.');
 		if (i > 0) sndName = sndName.slice(0, i); // remove extension

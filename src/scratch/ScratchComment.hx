@@ -256,7 +256,7 @@ class ScratchComment extends Sprite
 
 	private function addContents() : Void{
 		contents = new TextField();
-		contents.type = "input";
+		contents.type = TextFieldType.INPUT;
 		contents.wordWrap = true;
 		contents.multiline = true;
 		contents.autoSize = TextFieldAutoSize.LEFT;

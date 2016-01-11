@@ -143,7 +143,7 @@ class TranslatableStrings
 		if (removeParens)             s = removeParentheticals(s);
 		s = removeWhitespace(s);
 		if ((s.length < 2) || (Lambda.indexOf(exclude, s) > -1))             return;
-		if (Lambda.indexOf(strings, s) > -1)             return  // already added  ;
+		if (Lambda.indexOf(strings, s) > -1)             return ; // already added  ;
 		strings.push(s);
 	}
 

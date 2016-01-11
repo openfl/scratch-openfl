@@ -72,22 +72,22 @@ private static var Pop : Class<Dynamic>;
 	private var lastCostume : ScratchCostume;
 
 	// Caches used by the interpreter:
-	public var listCache : Dynamic = { };
-	public var procCache : Dynamic = { };
-	public var varCache : Dynamic = { };
+	public var listCache : Map <String, ListWatcher> = new Map<String,ListWatcher>();
+	public var procCache : Map <String, Block> = new Map<String,Block>();
+	public var varCache : Map<String,Variable> = new Map<String,Variable>();
 
 	public function clearCaches() : Void{
 		// Clear the list, procedure, and variable caches for this object.
-		listCache = { };
-		procCache = { };
-		varCache = { };
+		listCache = new Map<String,ListWatcher>();
+		procCache = new Map<String,Block>();
+		varCache = new Map<String,Variable>();
 	}
 
 	public function allObjects() : Array<Dynamic>{return [this];
 	}
 
 	public function deleteCostume(c : ScratchCostume) : Void{
-		if (costumes.length < 2)             return  // a sprite must have at least one costume  ;
+		if (costumes.length < 2)             return;  // a sprite must have at least one costume  ;
 		var i : Int = Lambda.indexOf(costumes, c);
 		if (i < 0)             return;
 		costumes.splice(i, 1);

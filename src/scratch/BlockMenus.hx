@@ -71,16 +71,16 @@ class BlockMenus implements DragClient
 		if (menuName == "colorPicker")             menuHandler.colorPicker(evt);
 		if (menuName == "costume")             menuHandler.costumeMenu(evt);
 		if (menuName == "direction")             menuHandler.dirMenu(evt);
-		if (menuName == "drum")             menuHandler.drumMenu(evt);
+		//if (menuName == "drum")             menuHandler.drumMenu(evt);
 		if (menuName == "effect")             menuHandler.effectMenu(evt);
-		if (menuName == "instrument")             menuHandler.instrumentMenu(evt);
+		//if (menuName == "instrument")             menuHandler.instrumentMenu(evt);
 		if (menuName == "key")             menuHandler.keyMenu(evt);
 		if (menuName == "list")             menuHandler.listMenu(evt);
 		if (menuName == "listDeleteItem")             menuHandler.listItem(evt, true);
 		if (menuName == "listItem")             menuHandler.listItem(evt, false);
 		if (menuName == "mathOp")             menuHandler.mathOpMenu(evt);
 		if (menuName == "motorDirection")             menuHandler.motorDirectionMenu(evt);
-		if (menuName == "note")             menuHandler.notePicker(evt);
+		//if (menuName == "note")             menuHandler.notePicker(evt);
 		if (menuName == "procMenu")             menuHandler.procMenu(evt);
 		if (menuName == "rotationStyle")             menuHandler.rotationStyleMenu(evt);
 		if (menuName == "scrollAlign")             menuHandler.scrollAlignMenu(evt);
@@ -113,10 +113,10 @@ class BlockMenus implements DragClient
 			handler.broadcastInfoMenu(evt);
 			handler.costumeMenu(evt);
 			handler.dirMenu(evt);
-			handler.drumMenu(evt);
+			//handler.drumMenu(evt);
 			handler.effectMenu(evt);
 			handler.genericBlockMenu(evt);
-			handler.instrumentMenu(evt);
+			//handler.instrumentMenu(evt);
 			handler.listMenu(evt);
 			handler.listItem(evt, true);
 			handler.listItem(evt, false);
@@ -194,7 +194,7 @@ class BlockMenus implements DragClient
 		m.itemHeight = 22;
 		if (blockArg != null) {
 			var p : Point = blockArg.localToGlobal(new Point(0, blockArg.height));
-			m.showOnStage(app.stage, p.x - 9, p.y);
+			m.showOnStage(app.stage, Std.int(p.x - 9), Std.int(p.y));
 		}
 		else {
 			m.showOnStage(app.stage);
@@ -204,8 +204,8 @@ class BlockMenus implements DragClient
 	private function setBlockArg(selection : Dynamic) : Void{
 		if (blockArg != null)             blockArg.setArgValue(selection);
 		Scratch.app.setSaveNeeded();
-		/* AS3HX WARNING namespace modifier SCRATCH::allow3d */{Scratch.app.runtime.checkForGraphicEffects();
-		}
+		///* AS3HX WARNING namespace modifier SCRATCH::allow3d */{Scratch.app.runtime.checkForGraphicEffects();
+		//}
 	}
 
 	private function attributeMenu(evt : MouseEvent) : Void{
@@ -213,7 +213,7 @@ class BlockMenus implements DragClient
 		if (block != null && block.args[1]) {
 			obj = app.stagePane.objNamed(block.args[1].argValue);
 		}
-		var attributes : Array<Dynamic> = Std.is(obj, (ScratchStage) ? stageAttributes : spriteAttributes);
+		var attributes : Array<Dynamic> = Std.is(obj, ScratchStage) ? stageAttributes : spriteAttributes;
 		var m : Menu = new Menu(setBlockArg, "attribute");
 		for (s in attributes)m.addItem(s);
 		if (Std.is(obj, ScratchObj)) {
@@ -266,13 +266,13 @@ class BlockMenus implements DragClient
 		showMenu(m);
 	}
 
-	private function drumMenu(evt : MouseEvent) : Void{
-		var m : Menu = new Menu(setBlockArg, "drum");
-		for (i in 1...SoundBank.drumNames.length + 1){
-			m.addItem("(" + i + ") " + Translator.map(SoundBank.drumNames[i - 1]), i);
-		}
-		showMenu(m);
-	}
+	//private function drumMenu(evt : MouseEvent) : Void{
+		//var m : Menu = new Menu(setBlockArg, "drum");
+		//for (i in 1...SoundBank.drumNames.length + 1){
+			//m.addItem("(" + i + ") " + Translator.map(SoundBank.drumNames[i - 1]), i);
+		//}
+		//showMenu(m);
+	//}
 
 	private function effectMenu(evt : MouseEvent) : Void{
 		var m : Menu = new Menu(setBlockArg, "effect");
@@ -291,13 +291,13 @@ class BlockMenus implements DragClient
 		return false;
 	}
 
-	private function instrumentMenu(evt : MouseEvent) : Void{
-		var m : Menu = new Menu(setBlockArg, "instrument");
-		for (i in 1...SoundBank.instrumentNames.length + 1){
-			m.addItem("(" + i + ") " + Translator.map(SoundBank.instrumentNames[i - 1]), i);
-		}
-		showMenu(m);
-	}
+	//private function instrumentMenu(evt : MouseEvent) : Void{
+		//var m : Menu = new Menu(setBlockArg, "instrument");
+		//for (i in 1...SoundBank.instrumentNames.length + 1){
+			//m.addItem("(" + i + ") " + Translator.map(SoundBank.instrumentNames[i - 1]), i);
+		//}
+		//showMenu(m);
+	//}
 
 	private function keyMenu(evt : MouseEvent) : Void{
 		var ch : Int;
@@ -339,14 +339,14 @@ class BlockMenus implements DragClient
 		showMenu(m);
 	}
 
-	private function notePicker(evt : MouseEvent) : Void{
-		var piano : Piano = new Piano(block.base.color, app.viewedObj().instrument, setBlockArg);
-		if (!Math.isNaN(blockArg.argValue)) {
-			piano.selectNote(Std.parseInt(blockArg.argValue));
-		}
-		var p : Point = blockArg.localToGlobal(new Point(blockArg.width, blockArg.height));
-		piano.showOnStage(app.stage, Std.parseInt(p.x - piano.width / 2), p.y);
-	}
+	//private function notePicker(evt : MouseEvent) : Void{
+		//var piano : Piano = new Piano(block.base.color, app.viewedObj().instrument, setBlockArg);
+		//if (!Math.isNaN(blockArg.argValue)) {
+			//piano.selectNote(Std.parseInt(blockArg.argValue));
+		//}
+		//var p : Point = blockArg.localToGlobal(new Point(blockArg.width, blockArg.height));
+		//piano.showOnStage(app.stage, Std.parseInt(p.x - piano.width / 2), p.y);
+	//}
 
 	private function rotationStyleMenu(evt : MouseEvent) : Void{
 		var rotationStyles : Array<Dynamic> = ["left-right", "don't rotate", "all around"];
@@ -374,7 +374,7 @@ class BlockMenus implements DragClient
 
 	private function soundMenu(evt : MouseEvent) : Void{
 		function setSoundArg(s : Dynamic) : Void{
-			if (Std.is(s, Function))                 s()
+			if (Std.is(s, Function))                 s();
 			else setBlockArg(s);
 		};
 		var m : Menu = new Menu(setSoundArg, "sound");

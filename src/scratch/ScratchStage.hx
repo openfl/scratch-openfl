@@ -376,8 +376,8 @@ class ScratchStage extends ScratchObj {
 		for (i in 0...uiContainer.numChildren) {
 			var c:DisplayObject = uiContainer.getChildAt(i);
 			if (c.visible == true) {
-				if (Std.is(c, Watcher)) Watcher(c).step(runtime);
-				if (Std.is(c, ListWatcher)) ListWatcher(c).step();
+				if (Std.is(c, Watcher)) cast(c, Watcher).step(runtime);
+				if (Std.is(c, ListWatcher)) cast(c, ListWatcher).step();
 			}
 		}
 	}
@@ -786,8 +786,9 @@ class ScratchStage extends ScratchObj {
 	public override function writeJSON(json:util.JSON):Void {
 		super.writeJSON(json);
 		var children:Array = [];
+		var c:DisplayObject;
 		for (i in 0...numChildren) {
-			var c:DisplayObject = getChildAt(i);
+			c = getChildAt(i);
 			if ((Std.is(c, ScratchSprite) && !ScratchSprite(c).isClone)
 				|| Std.is(c, Watcher) || Std.is(c, ListWatcher)) {
 				children.push(c);

@@ -78,11 +78,11 @@ class MediaFilter extends Sprite
 	}
 
 	private function addSelector(selName : String) : Void{
+		var sel : TextField = Resources.makeLabel(Translator.map(selName), selectorFormat);
 		function mouseDown(ignore : Dynamic) : Void{
 			select(Lambda.indexOf(selectorNames, selName));
 			if (whenChanged != null)                 whenChanged(sel.parent);
 		};
-		var sel : TextField = Resources.makeLabel(Translator.map(selName), selectorFormat);
 		sel.addEventListener(MouseEvent.MOUSE_OVER, mouseOver);
 		sel.addEventListener(MouseEvent.MOUSE_OUT, mouseOver);
 		sel.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);

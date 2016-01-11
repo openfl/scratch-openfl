@@ -146,7 +146,7 @@ class Watcher extends Sprite implements DragClient
 		// Set slider range. Make it discrete if min, max, and current value are all integral.
 		sliderMin = min;
 		sliderMax = max;
-		isDiscrete = (Std.parseInt(min) == min) && (Std.parseInt(max) == max) && (Std.parseInt(val) == val);
+		isDiscrete = (Std.int(min) == min) && (Std.int(max) == max) && (Std.int(val) == val);
 	}
 
 	override public function hitTestPoint(globalX : Float, globalY : Float, shapeFlag : Bool = true) : Bool{
@@ -192,10 +192,10 @@ class Watcher extends Sprite implements DragClient
 
 	private function specForCmd() : String{
 		var i : Int = cmd.indexOf(".");
-		if (i > -1) {
-			var spec : Array<Dynamic> = Scratch.app.extensionManager.specForCmd(cmd);
-			if (spec != null)                 return cmd.substr(0, i) + ": " + spec[0];
-		}
+		//if (i > -1) {
+			//var spec : Array<Dynamic> = Scratch.app.extensionManager.specForCmd(cmd);
+			//if (spec != null)                 return cmd.substr(0, i) + ": " + spec[0];
+		//}
 
 		for (entry/* AS3HX WARNING could not determine type for var: entry exp: EField(EIdent(Specs),commands) type: null */ in Specs.commands){
 			if (entry[3] == cmd)                 return Translator.map(entry[0]);
@@ -241,20 +241,20 @@ class Watcher extends Sprite implements DragClient
 			case "timer":return Math.round(10 * runtime.timer()) / 10;  // round to 10's of seconds  
 			case "soundLevel":return runtime.soundLevel();
 			case "isLoud":return runtime.isLoud();
-			case "sensor:":return runtime.getSensor(param);
+			//case "sensor:":return runtime.getSensor(param);
 			case "sensorPressed:":return runtime.getBooleanSensor(param);
 			case "timeAndDate":return runtime.getTimeString(param);
 			case "xScroll":return app.stagePane.xScroll;
 			case "yScroll":return app.stagePane.yScroll;
 		}
 
-		if (cmd.indexOf(".") > -1) {
-			var spec : Array<Dynamic> = Scratch.app.extensionManager.specForCmd(cmd);
-			if (spec != null) {
-				block = new Block(spec[0], spec[1], Specs.blockColor(spec[2]), spec[3]);
-				return Scratch.app.interp.evalCmd(block);
-			}
-		}
+		//if (cmd.indexOf(".") > -1) {
+			//var spec : Array<Dynamic> = Scratch.app.extensionManager.specForCmd(cmd);
+			//if (spec != null) {
+				//block = new Block(spec[0], spec[1], Specs.blockColor(spec[2]), spec[3]);
+				//return Scratch.app.interp.evalCmd(block);
+			//}
+		//}
 
 		return "unknown: " + cmd;
 	}
@@ -266,7 +266,7 @@ class Watcher extends Sprite implements DragClient
 
 	private function addLabel() : Void{
 		label = new TextField();
-		label.type = "dynamic";
+		label.type = TextFieldType.DYNAMIC;
 		label.selectable = false;
 		label.defaultTextFormat = format;
 		label.text = "";
@@ -278,7 +278,7 @@ class Watcher extends Sprite implements DragClient
 	}
 
 	private function setLabel(s : String) : Void{
-		if (!label.visible || label.text == s)             return  // no change  ;
+		if (!label.visible || label.text == s)             return;  // no change  ;
 		label.text = s;
 		label.width = label.textWidth + 5;
 		label.height = label.textHeight + 5;
@@ -397,6 +397,7 @@ class Watcher extends Sprite implements DragClient
 	}
 
 	private function sliderMinMaxDialog() : Void{
+		var d : DialogBox = new DialogBox(setMinMax);
 		function setMinMax() : Void{
 			var min : String = d.getField("Min");
 			var max : String = d.getField("Max");
@@ -409,9 +410,8 @@ class Watcher extends Sprite implements DragClient
 			setSliderValue(sliderMin);
 			Scratch.app.setSaveNeeded();
 		};
-		var d : DialogBox = new DialogBox(setMinMax);
 		d.addTitle("Slider Range");
-		d.addField("Min", 120, isDiscrete || Std.parseInt(sliderMin) != (sliderMin != 0) ? sliderMin : Std.parseInt(sliderMin) + ".0");
+		d.addField("Min", 120, isDiscrete || Std.int(sliderMin) != (sliderMin != 0) ? sliderMin : Std.int(sliderMin) + ".0");
 		d.addField("Max", 120, sliderMax);
 		d.addAcceptCancelButtons("OK");
 		d.showOnStage(stage);

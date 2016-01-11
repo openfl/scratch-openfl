@@ -180,10 +180,10 @@ class SpriteThumbnail extends Sprite
 		updateName();
 		if (targetObj.isStage)             updateSceneCount();
 
-		if (targetObj.img.numChildren == 0)             return  // shouldn't happen  ;
-		if (targetObj.currentCostume().svgLoading)             return  // don't update thumbnail while loading SVG bitmaps  ;
+		if (targetObj.img.numChildren == 0)             return;  // shouldn't happen  ;
+		if (targetObj.currentCostume().svgLoading)             return;  // don't update thumbnail while loading SVG bitmaps  ;
 		var src : DisplayObject = targetObj.img.getChildAt(0);
-		if (src == lastSrcImg)             return  // thumbnail is up to date  ;
+		if (src == lastSrcImg)             return;  // thumbnail is up to date  ;
 
 		var c : ScratchCostume = targetObj.currentCostume();
 		thumbnail.bitmapData = c.thumbnail(thumbnailW, thumbnailH, targetObj.isStage);
@@ -273,6 +273,8 @@ class SpriteThumbnail extends Sprite
 	}
 
 	public function menu(evt : MouseEvent) : Menu{
+		if (targetObj.isStage)             return null;
+		var t : ScratchSprite = try cast(targetObj, ScratchSprite) catch(e:Dynamic) null;
 		function hideInScene() : Void{
 			t.visible = false;
 			t.updateBubble();
@@ -281,8 +283,6 @@ class SpriteThumbnail extends Sprite
 			t.visible = true;
 			t.updateBubble();
 		};
-		if (targetObj.isStage)             return null;
-		var t : ScratchSprite = try cast(targetObj, ScratchSprite) catch(e:Dynamic) null;
 		var m : Menu = t.menu(evt);  // basic sprite menu  
 		m.addLine();
 		if (t.visible) {

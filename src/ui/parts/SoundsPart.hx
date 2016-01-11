@@ -63,7 +63,7 @@ class SoundsPart extends UIPart
 		this.app = app;
 		addChild(shape = new Shape());
 
-		addChild(newSoundLabel = makeLabel("", new TextFormat(CSS.font, 12, CSS.textColor, true)));
+		addChild(newSoundLabel = UIPart.makeLabel("", new TextFormat(CSS.font, 12, CSS.textColor, true)));
 		addNewSoundButtons();
 
 		addListFrame();

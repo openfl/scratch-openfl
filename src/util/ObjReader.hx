@@ -183,7 +183,7 @@ class ObjReader
 				}
 				return num;
 			case 8:
-				num = s.readDouble();
+				var num:Float = s.readDouble();
 				if (Std.is(num, Int))                     num += BlockArg.epsilon;  // ensure result is a float, even if it has no fractional part  ;
 				return num;
 			case 9, 10:
@@ -404,7 +404,7 @@ class ObjReader
 					listWatcher.x = box[0] + 1;
 					listWatcher.y = box[1] + 1;
 				}
-				listWatcher.setWidthHeight(box[2] - box[0] - 2, box[3] - box[1] - 2);
+				listWatcher.setWidthHeight(Std.int(box[2] - box[0] - 2), Std.int(box[3] - box[1] - 2));
 				listWatcher.listName = entry[11];
 				listWatcher.contents = entry[12];
 				listWatcher.target = entry[13];
@@ -429,7 +429,7 @@ class ObjReader
 					snd.format = "";
 					snd.rate = uncompressedSound[7];
 					snd.bitsPerSample = 16;
-					snd.sampleCount = sndData.length / 2;
+					snd.sampleCount = Std.int(sndData.length / 2);
 					if (Reflect.field(cache, Std.string(sndData)) != null) {
 						snd.soundData = Reflect.field(cache, Std.string(sndData));
 					}
@@ -527,9 +527,9 @@ class ObjReader
 
 	private function unpackPixels(words : Array<Int>, w : Int, h : Int, depth : Int, colormap : Array<Int>) : Array<Int>{
 		var result : Array<Int> = new Array<Int>();
-		var span : Int = words.length / h;
+		var span : Int = Std.int(words.length / h);
 		var mask : Int = (1 << depth) - 1;
-		var pixels_per_word : Int = 32 / depth;
+		var pixels_per_word : Int = Std.int(32 / depth);
 		var dst : Int = 0;
 
 		for (y in 0...h){

@@ -1138,6 +1138,7 @@ class Scratch extends Sprite {
 	}
 
 	private function saveProjectAndThen(postSaveAction:Function = null):Void {
+		var d:DialogBox = new DialogBox();
 		// Give the user a chance to save their project, if needed, then call postSaveAction.
 		function doNothing():Void {
 		}
@@ -1161,7 +1162,6 @@ class Scratch extends Sprite {
 			postSaveAction();
 			return;
 		}
-		var d:DialogBox = new DialogBox();
 		d.addTitle('Save project?');
 		d.addButton('Save', save);
 		d.addButton('Don\'t save', proceedWithoutSaving);
@@ -1170,6 +1170,16 @@ class Scratch extends Sprite {
 	}
 
 	public function exportProjectToFile(fromJS:Bool = false, saveCallback:Function = null):Void {
+		if (loadInProgress) return;
+		var projIO:ProjectIO = new ProjectIO(this);
+		function fileSaved(e:Event):Void {
+			if (!fromJS) setProjectName(e.target.name);
+			if (isExtensionDevMode) {
+				// Some versions of the editor think of this as an "export" and some think of it as a "save"
+				saveNeeded = false;
+			}
+			if (saveCallback != null) saveCallback();
+		}
 		function squeakSoundsConverted():Void {
 			scriptsPane.saveScripts(false);
 			var projectType:String = /*extensionManager.hasExperimentalExtensions() ? '.sbx' : */'.sb2';
@@ -1181,17 +1191,7 @@ class Scratch extends Sprite {
 			file.save(zipData, fixFileName(defaultName));
 		}
 
-		function fileSaved(e:Event):Void {
-			if (!fromJS) setProjectName(e.target.name);
-			if (isExtensionDevMode) {
-				// Some versions of the editor think of this as an "export" and some think of it as a "save"
-				saveNeeded = false;
-			}
-			if (saveCallback != null) saveCallback();
-		}
 
-		if (loadInProgress) return;
-		var projIO:ProjectIO = new ProjectIO(this);
 		projIO.convertSqueakSounds(stagePane, squeakSoundsConverted);
 	}
 
@@ -1303,7 +1303,7 @@ class Scratch extends Sprite {
 	}
 
 	private function revertToOriginalProject():Void {
-		function preDoRevert():Void {
+		function preDoRevert(param:Dynamic):Void {
 			revertUndo = new ProjectIO(Scratch.app).encodeProjectAsZipFile(stagePane);
 			doRevert();
 		}
@@ -1404,6 +1404,7 @@ class Scratch extends Sprite {
 	//------------------------------
 
 	public function flashSprite(spr:ScratchSprite):Void {
+		var box:Shape = new Shape();
 		function doFade(alpha:Float):Void {
 			box.alpha = alpha;
 		}
@@ -1415,7 +1416,6 @@ class Scratch extends Sprite {
 		}
 
 		var r:Rectangle = spr.getVisibleBounds(this);
-		var box:Shape = new Shape();
 		box.graphics.lineStyle(3, CSS.overColor, 1, true);
 		box.graphics.beginFill(0x808080);
 		box.graphics.drawRoundRect(0, 0, r.width, r.height, 12, 12);
@@ -1547,6 +1547,7 @@ class Scratch extends Sprite {
 	}
 
 	static public function loadSingleFile(fileLoaded:Function, filter:FileFilter = null):Void {
+		var fileList:FileReferenceList = new FileReferenceList();
 		function fileSelected(event:Event):Void {
 			if (fileList.fileList.length > 0) {
 				var file:FileReference = FileReference(fileList.fileList[0]);
@@ -1555,7 +1556,6 @@ class Scratch extends Sprite {
 			}
 		}
 
-		var fileList:FileReferenceList = new FileReferenceList();
 		fileList.addEventListener(Event.SELECT, fileSelected);
 		try {
 			// Ignore the exception that happens when you call browse() with the file browser open

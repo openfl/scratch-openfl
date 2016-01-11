@@ -111,7 +111,7 @@ class TalkBubble extends Sprite
 		result.autoSize = TextFieldAutoSize.LEFT;
 		result.defaultTextFormat = style == ("result") ? resultFormat : textFormat;
 		result.selectable = false;  // not selectable  
-		result.type = "dynamic";  // not editable  
+		result.type = TextFieldType.DYNAMIC;  // not editable  
 		result.wordWrap = true;
 		result.x = padding;
 		result.y = padding;

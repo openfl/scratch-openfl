@@ -169,12 +169,6 @@ class ListWatcher extends Sprite
 	}
 
 	private function importLines(lines : Array<Dynamic>) : Void{
-		function gotColumn(s : String) : Void{
-			var n : Float = Std.parseInt(s);
-			if (Math.isNaN(n) || (n < 1) || (n > columnCount))                 contents = lines
-			else contents = extractColumn(n, lines, delimiter);
-			scrollToIndex(0);
-		};
 		var delimiter : String = guessDelimiter(lines);
 		if (delimiter == null) {  // single column (or empty)  
 			contents = lines;
@@ -182,6 +176,12 @@ class ListWatcher extends Sprite
 			return;
 		}
 		var columnCount : Int = lines[0].split(delimiter).length;
+		function gotColumn(s : String) : Void{
+			var n : Float = Std.parseInt(s);
+			if (Math.isNaN(n) || (n < 1) || (n > columnCount))                 contents = lines
+			else contents = extractColumn(Std.int(n), lines, delimiter);
+			scrollToIndex(0);
+		};
 		DialogBox.ask(
 				Translator.map("Which column do you want to import") + "(1-" + columnCount + ")?",
 				"1", Scratch.app.stage, gotColumn);
@@ -356,7 +356,7 @@ class ListWatcher extends Sprite
 					updateContents();
 					updateScrollbar();
 				}
-				if (visibleCells.length) {
+				if (visibleCells.length != 0) {
 					selectCell(Std.int(Math.min(j, contents.length - 1)));
 				}
 				return;
@@ -454,7 +454,7 @@ class ListWatcher extends Sprite
 
 			var cellNum : TextField = allocateCellNum(Std.string(i + 1));
 			cellNum.x = cellNumRight - cellNum.width - 3;
-			cellNum.y = nextY + Std.parseInt((cell.height - cellNum.height) / 2);
+			cellNum.y = nextY + Std.int((cell.height - cellNum.height) / 2);
 			cellNum.textColor = 0;
 			visibleCellNums.push(cellNum);
 			cellPane.addChild(cellNum);
@@ -513,7 +513,7 @@ class ListWatcher extends Sprite
 
 	private function createTextField(s : String, format : TextFormat) : TextField{
 		var tf : TextField = new TextField();
-		tf.type = "dynamic";  // not editable  
+		tf.type = TextFieldType.DYNAMIC;  // not editable  
 		tf.selectable = false;
 		tf.defaultTextFormat = format;
 		tf.text = s;

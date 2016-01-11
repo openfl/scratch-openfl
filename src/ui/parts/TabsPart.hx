@@ -111,8 +111,8 @@ class TabsPart extends UIPart
 		var w : Int = Std.int(tf.width + 20);
 		var h : Int = 28;
 		var r : Int = 9;
-		if (isSelected)             drawTopBar(g, CSS.titleBarColors, getTopBarPath(w, h), w, h);
-		else drawSelected(g, [0xf2f2f2, 0xd1d2d3], getTopBarPath(w, h), w, h);
+		if (isSelected)             UIPart.drawTopBar(g, CSS.titleBarColors, UIPart.getTopBarPath(w, h), w, h);
+		else UIPart.drawSelected(g, [0xf2f2f2, 0xd1d2d3], UIPart.getTopBarPath(w, h), w, h);
 		return img;
 	}
 }

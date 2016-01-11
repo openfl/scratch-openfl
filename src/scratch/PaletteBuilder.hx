@@ -147,7 +147,7 @@ class PaletteBuilder {
 		updateCheckboxes();
 	}
 
-	private function addExtensionButtons():Void {
+	//private function addExtensionButtons():Void {
 		//addAddExtensionButton();
 		//if (Scratch.app.isExtensionDevMode) {
 			//var extensionDevManager:ExtensionDevManager = cast(Scratch.app.extensionManager, ExtensionDevManager);
@@ -155,10 +155,10 @@ class PaletteBuilder {
 				//addItem(extensionDevManager.makeLoadExperimentalExtensionButton());
 			//}
 		//}
-	}
+	//}
 
 	private function addAddExtensionButton():Void {
-		addItem(new Button(Translator.map('Add an Extension'), showAnExtension, false, '/help/studio/tips/blocks/add-an-extension/'));
+		//addItem(new Button(Translator.map('Add an Extension'), showAnExtension, false, '/help/studio/tips/blocks/add-an-extension/'));
 	}
 
 	private function showDataCategory():Void {
@@ -208,6 +208,8 @@ class PaletteBuilder {
 	}
 
 	private function makeVariable():Void {
+		var d:DialogBox ;
+		var varSettings:VariableSettings ;
 		function makeVar2():Void {
 			var n:String = d.getField('Variable name').replace(~/^\s+|\s+$/g, '');
 			if (n.length == 0) return;
@@ -215,8 +217,8 @@ class PaletteBuilder {
 			createVar(n, varSettings);
 		}
 
-		var d:DialogBox = new DialogBox(makeVar2);
-		var varSettings:VariableSettings = makeVarSettings(false, app.viewedObj().isStage);
+		d = new DialogBox(makeVar2);
+		varSettings = makeVarSettings(false, app.viewedObj().isStage);
 		d.addTitle('New Variable');
 		d.addField('Variable name', 150);
 		d.addWidget(varSettings);
@@ -225,6 +227,7 @@ class PaletteBuilder {
 	}
 
 	private function makeList():Void {
+		var varSettings:VariableSettings ;
 		function makeList2(d:DialogBox):Void {
 			var n:String = d.getField('List name').replace(~/^\s+|\s+$/g, '');
 			if (n.length == 0) return;
@@ -233,7 +236,7 @@ class PaletteBuilder {
 		}
 
 		var d:DialogBox = new DialogBox(makeList2);
-		var varSettings:VariableSettings = makeVarSettings(true, app.viewedObj().isStage);
+		varSettings = makeVarSettings(true, app.viewedObj().isStage);
 		d.addTitle('New List');
 		d.addField('List name', 150);
 		d.addWidget(varSettings);
@@ -246,6 +249,7 @@ class PaletteBuilder {
 	}
 
 	private function makeNewBlock():Void {
+		var specEditor:ProcedureSpecEditor = new ProcedureSpecEditor('', [], false);
 		function addBlockHat(dialog:DialogBox):Void {
 			var spec:String = specEditor.spec().replace(~/^\s+|\s+$/g, '');
 			if (spec.length == 0) return;
@@ -263,7 +267,6 @@ class PaletteBuilder {
 			app.setSaveNeeded();
 		}
 
-		var specEditor:ProcedureSpecEditor = new ProcedureSpecEditor('', [], false);
 		var d:DialogBox = new DialogBox(addBlockHat);
 		d.addTitle('New Block');
 		d.addWidget(specEditor);
@@ -273,17 +276,17 @@ class PaletteBuilder {
 	}
 
 	private function showAnExtension():Void {
-		function addExt(ext:ScratchExtension):Void {
-			if (ext.isInternal) {
-				app.extensionManager.setEnabled(ext.name, true);
-			} else {
-				app.extensionManager.loadCustom(ext);
-			}
-			app.updatePalette();
-		}
-
-		var lib:MediaLibrary = app.getMediaLibrary('extension', addExt);
-		lib.open();
+		//function addExt(ext:ScratchExtension):Void {
+			//if (ext.isInternal) {
+				//app.extensionManager.setEnabled(ext.name, true);
+			//} else {
+				//app.extensionManager.loadCustom(ext);
+			//}
+			//app.updatePalette();
+		//}
+//
+		//var lib:MediaLibrary = app.getMediaLibrary('extension', addExt);
+		//lib.open();
 	}
 
 	private function addReporterCheckbox(block:Block):Void {
@@ -364,7 +367,7 @@ class PaletteBuilder {
 	private function updateCheckboxes():Void {
 		for (i in 0...app.palette.numChildren) {
 			var b:IconButton = cast(app.palette.getChildAt(i), IconButton);
-			if (b && b.clientData) {
+			if (b != null && b.clientData) {
 				b.setOn(app.runtime.watcherShowing(b.clientData));
 			}
 		}

@@ -102,7 +102,7 @@ class TopBarPart extends UIPart
 	}
 
 	private function removeTextButtons() : Void{
-		if (fileMenu.parent) {
+		if (fileMenu.parent != null) {
 			removeChild(fileMenu);
 			removeChild(editMenu);
 		}
@@ -211,8 +211,8 @@ class TopBarPart extends UIPart
 	}
 
 	private function addTextButtons() : Void{
-		addChild(fileMenu = makeMenuButton("File", app.showFileMenu, true));
-		addChild(editMenu = makeMenuButton("Edit", app.showEditMenu, true));
+		addChild(fileMenu = UIPart.makeMenuButton("File", app.showFileMenu, true));
+		addChild(editMenu = UIPart.makeMenuButton("Edit", app.showEditMenu, true));
 	}
 
 	private function addToolButtons() : Void{
