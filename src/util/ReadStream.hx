@@ -119,7 +119,7 @@ class ReadStream
 	}
 
 	public static function escape(s : String) : String{
-		return s.replace(new EReg('[\\\\%@]', "g"), "\\$&");
+		return new EReg('[\\\\%@]', "g").replace(s, "\\$&");
 	}
 
 	public static function unescape(s : String) : String{

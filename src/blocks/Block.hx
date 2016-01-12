@@ -433,8 +433,10 @@ class Block extends Sprite
 		}
 	}
 
-	public function originalPositionIn(p : DisplayObject) : Point{
-		return originalPosition != null && p.globalToLocal(originalPosition);
+	public function originalPositionIn(p : DisplayObject) : Point {
+		if (originalPosition == null) return null;
+		var posIn = p.globalToLocal(originalPosition);
+		return posIn;
 	}
 
 	private function setDefaultArgs(defaults : Array<Dynamic>) : Void{
@@ -1002,7 +1004,8 @@ class Block extends Sprite
 					target = p;
 					continue;
 				}
-				var nested : Block = p.nextBlock == (target != null) ? (p.subStack2 != null ? p.subStack2 : p.subStack1) : p.subStack2 == (target != null) ? p.subStack1 : null;
+				//var nested:Block = p.nextBlock == target ? p.subStack2 || p.subStack1 : p.subStack2 == target ? p.subStack1 : null;
+				var nested : Block = p.nextBlock == target ? (p.subStack2 != null ? p.subStack2 : p.subStack1) : (p.subStack2 == target ? p.subStack1 : null);
 				if (nested != null) {
 										while (true){
 						nested = nested.bottomBlock();
@@ -1042,19 +1045,19 @@ class Block extends Sprite
 				s += " ";
 			}
 			space = true;
-			var ba : BlockArg;
-			var b : Block;
-			var tf : TextField;
-			if ((ba != null = try cast(x, BlockArg) catch(e:Dynamic) null)) {
-				s += (ba.numberType) ? "(" : "[";
+			if (Std.is(x, BlockArg)) {
+				var ba : BlockArg = cast(x, BlockArg);
+				s += (ba.numberType != 0) ? "(" : "[";
 				s += ba.argValue;
 				if (!ba.isEditable)                     s += " v";
-				s += (ba.numberType) ? ")" : "]";
+				s += (ba.numberType != 0) ? ")" : "]";
 			}
-			else if ((b != null = try cast(x, Block) catch(e:Dynamic) null)) {
+			else if (Std.is(x, Block)) {
+				var b : Block = cast(x, Block);
 				s += b.getSummary();
 			}
-			else if ((tf != null = try cast(x, TextField) catch(e:Dynamic) null)) {
+			else if (Std.is(x, TextField)) {
+				var tf : TextField = cast(x, TextField);
 				s += cast((x), TextField).text;
 			}
 			else {
@@ -1077,6 +1080,6 @@ class Block extends Sprite
 	}
 
 	private static function indent(s : String) : String{
-		return s.replace(new EReg('^', "gm"), "    ");
+		return new EReg('^', "gm").replace(s, "    ");
 	}
 }

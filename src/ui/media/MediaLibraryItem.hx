@@ -64,9 +64,9 @@ class MediaLibraryItem extends Sprite
 	private var playButton : IconButton;
 
 	private var sndData : ByteArray;
-	private var sndPlayer : ScratchSoundPlayer;
+	//private var sndPlayer : ScratchSoundPlayer;
 
-	private var loaders : Array<Dynamic> = [];  // list of URLLoaders for stopLoading()  
+	private var loaders : Array<URLLoader> = [];  // list of URLLoaders for stopLoading()  
 
 	public function new(dbObject : Dynamic = null)
 	{
@@ -94,7 +94,7 @@ class MediaLibraryItem extends Sprite
 	// Thumbnail
 	//------------------------------
 
-	public function loadThumbnail(done : Function) : Void{
+	public function loadThumbnail(done : Void->Void) : Void{
 		var ext : String = fileType(dbObj.md5);
 		if (["gif", "png", "jpg", "jpeg", "svg"].indexOf(ext) > -1)             setImageThumbnail(dbObj.md5, done)
 		else if (ext == "json")             setSpriteThumbnail(done);
@@ -113,7 +113,7 @@ class MediaLibraryItem extends Sprite
 	}
 
 	// all paths must call done() even on failure!
-	private function setImageThumbnail(md5 : String, done : Function, spriteMD5 : String = null) : Void{
+	private function setImageThumbnail(md5 : String, done : Void->Void, spriteMD5 : String = null) : Void{
 		var forStage : Bool = (dbObj.width == 480);  // if width is 480, format thumbnail for stage  
 		var importer : SVGImporter;
 		function gotSVGData(data : ByteArray) : Void{
@@ -151,7 +151,7 @@ class MediaLibraryItem extends Sprite
 	}
 
 	// all paths must call done() even on failure!
-	private function setSpriteThumbnail(done : Function) : Void{
+	private function setSpriteThumbnail(done : Void->Void) : Void{
 		function gotJSONData(data : String) : Void{
 			var md5 : String;
 			if (data != null) {
@@ -313,41 +313,41 @@ class MediaLibraryItem extends Sprite
 	//------------------------------
 
 	private function toggleSoundPlay(b : IconButton) : Void{
-		if (sndPlayer != null)             stopPlayingSound(null)
-		else startPlayingSound();
+		//if (sndPlayer != null)             stopPlayingSound(null)
+		//else startPlayingSound();
 	}
 
 	private function stopPlayingSound(ignore : Dynamic) : Void{
-		if (sndPlayer != null)             sndPlayer.stopPlaying();
-		sndPlayer = null;
-		playButton.turnOff();
+		//if (sndPlayer != null)             sndPlayer.stopPlaying();
+		//sndPlayer = null;
+		//playButton.turnOff();
 	}
 
 	private function startPlayingSound() : Void{
-		if (sndData != null) {
-			if (ScratchSound.isWAV(sndData)) {
-				sndPlayer = new ScratchSoundPlayer(sndData);
-			}
-			else {
-				sndPlayer = new MP3SoundPlayer(sndData);
-			}
-		}
-		if (sndPlayer != null) {
-			sndPlayer.startPlaying(stopPlayingSound);
-			playButton.turnOn();
-		}
-		else {
-			downloadAndPlay();
-		}
+		//if (sndData != null) {
+			//if (ScratchSound.isWAV(sndData)) {
+				//sndPlayer = new ScratchSoundPlayer(sndData);
+			//}
+			//else {
+				//sndPlayer = new MP3SoundPlayer(sndData);
+			//}
+		//}
+		//if (sndPlayer != null) {
+			//sndPlayer.startPlaying(stopPlayingSound);
+			//playButton.turnOn();
+		//}
+		//else {
+			//downloadAndPlay();
+		//}
 	}
 
 	private function downloadAndPlay() : Void{
-		// Download and play a library sound.
-		function gotSoundData(wavData : ByteArray) : Void{
-			if (wavData == null)                 return;
-			sndData = wavData;
-			startPlayingSound();
-		};
-		Scratch.app.server.getAsset(dbObj.md5, gotSoundData);
+		//// Download and play a library sound.
+		//function gotSoundData(wavData : ByteArray) : Void{
+			//if (wavData == null)                 return;
+			//sndData = wavData;
+			//startPlayingSound();
+		//};
+		//Scratch.app.server.getAsset(dbObj.md5, gotSoundData);
 	}
 }

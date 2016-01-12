@@ -46,7 +46,7 @@ class DialogBox extends Sprite
 	private var textLines : Array<Dynamic> = [];
 	private var maxLabelWidth : Int = 0;
 	private var maxFieldWidth : Int = 0;
-	private var heightPerField : Int = Std.int(Math.max(makeLabel("foo").height, makeField(10).height) + 10);
+	private var heightPerField : Int;// = Std.int(Math.max(makeLabel("foo").height, makeField(10).height) + 10);
 	private inline static var spaceAfterText : Int = 18;
 	private inline static var blankLineSpace : Int = 7;
 
@@ -56,6 +56,7 @@ class DialogBox extends Sprite
 	public function new(acceptFunction : Dynamic->Void = null, cancelFunction : Dynamic -> Void = null)
 	{
 		super();
+		heightPerField = Std.int(Math.max(makeLabel("foo").height, makeField(10).height) + 10);
 		this.acceptFunction = acceptFunction;
 		this.cancelFunction = cancelFunction;
 		addFilters();

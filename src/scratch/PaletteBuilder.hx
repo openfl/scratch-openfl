@@ -251,7 +251,7 @@ class PaletteBuilder {
 	private function makeNewBlock():Void {
 		var specEditor:ProcedureSpecEditor = new ProcedureSpecEditor('', [], false);
 		function addBlockHat(dialog:DialogBox):Void {
-			var spec:String = specEditor.spec().replace(~/^\s+|\s+$/g, '');
+			var spec:String = (~/^\s+|\s+$/g).replace(specEditor.spec(), '');
 			if (spec.length == 0) return;
 			var newHat:Block = new Block(spec, 'p', Specs.procedureColor, Specs.PROCEDURE_DEF);
 			newHat.parameterNames = specEditor.inputNames();

@@ -21,7 +21,6 @@ package logging;
 
 
 
-
 class LogEntry
 {
 	public var timeStamp : Float;
@@ -44,8 +43,8 @@ class LogEntry
 
 	private static var tempDate : Date = Date.now();
 	private function makeTimeStampString() : String{
-		tempDate.time = timeStamp;
-		return tempDate.toLocaleTimeString();
+		tempDate = Date.fromTime(timeStamp);
+		return tempDate.toString(); //  tempDate.toLocaleTimeString();
 	}
 
 	// Generate a string representing this event. Does not include extraData.

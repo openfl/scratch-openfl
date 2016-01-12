@@ -87,7 +87,7 @@ class ImagesPart extends UIPart
 		addListFrame();
 		addChild(nameField = new EditableLabel(nameChanged));
 
-		addEditor(true);
+		//addEditor(true);
 
 		addUndoButtons();
 		addFlipButtons();
@@ -458,14 +458,14 @@ class ImagesPart extends UIPart
 	public function refreshUndoButtons() : Void{
 		//undoButton.setDisabled(!editor.canUndo(), 0.5);
 		//redoButton.setDisabled(!editor.canRedo(), 0.5);
-		if (editor.canClearCanvas()) {
-			clearButton.alpha = 1;
-			clearButton.mouseEnabled = true;
-		}
-		else {
+		//if (editor.canClearCanvas()) {
+			//clearButton.alpha = 1;
+			//clearButton.mouseEnabled = true;
+		//}
+		//else {
 			clearButton.alpha = 0.5;
 			clearButton.mouseEnabled = false;
-		}
+		//}
 	}
 
 	public function setCanCrop(enabled : Bool) : Void{

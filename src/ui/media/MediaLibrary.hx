@@ -35,31 +35,31 @@ import flash.xml.XML;
 
 class MediaLibrary extends Sprite {
 
-	private static inline var titleFormat:TextFormat = new TextFormat(CSS.font, 24, 0x444143);
+	private static var titleFormat:TextFormat = new TextFormat(CSS.font, 24, 0x444143);
 
-	private static inline var backdropCategories:Array<String> = [
+	private static var backdropCategories:Array<String> = [
 		'All', 'Indoors', 'Outdoors', 'Other'];
-	private static inline var costumeCategories:Array<String> = [
+	private static var costumeCategories:Array<String> = [
 		'All', 'Animals', 'Fantasy', 'Letters', 'People', 'Things', 'Transportation'];
-	private static inline var extensionCategories:Array<String> = [
+	private static var extensionCategories:Array<String> = [
 		'All', 'Hardware'];
-	private static inline var soundCategories:Array<String> = [
+	private static var soundCategories:Array<String> = [
 		'All', 'Animal', 'Effects', 'Electronic', 'Human', 'Instruments',
 		'Music Loops', 'Percussion', 'Vocals'];
 
-	private static inline var backdropThemes:Array<String> = [
+	private static var backdropThemes:Array<String> = [
 		'Castle', 'City', 'Flying', 'Holiday', 'Music and Dance', 'Nature', 'Space', 'Sports', 'Underwater'];
-	private static inline var costumeThemes:Array<String> = [
+	private static var costumeThemes:Array<String> = [
 		'Castle', 'City', 'Flying', 'Holiday', 'Music and Dance', 'Space', 'Sports', 'Underwater', 'Walking'];
 
-	private static inline var imageTypes:Array<String> = ['All', 'Bitmap', 'Vector'];
+	private static var imageTypes:Array<String> = ['All', 'Bitmap', 'Vector'];
 
-	private static inline var spriteFeatures:Array<String> = ['All', 'Scripts', 'Costumes > 1', 'Sounds'];
+	private static var spriteFeatures:Array<String> = ['All', 'Scripts', 'Costumes > 1', 'Sounds'];
 
 	private var app:Scratch;
 	private var assetType:String;
 	private var whenDone:Function;
-	private var allItems:Array<Dynamic> = [];
+	private var allItems:Array<MediaLibraryItem> = [];
 
 	private var title:TextField;
 	private var outerFrame:Shape;
@@ -360,7 +360,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		var tag:String = '';
 		if (categoryFilter.currentSelection != '') tag = categoryFilter.currentSelection;
 		if (themeFilter.currentSelection != '') tag = themeFilter.currentSelection;
-		tag = tag.replace(new RegExp(' ', 'g'), '-'); // e.g., change 'Music and Dance' -> 'Music-and-Dance'
+		tag = new RegExp(' ', 'g').replace(tag, '-'); // e.g., change 'Music and Dance' -> 'Music-and-Dance'
 		tag = tag.toLowerCase();
 		var showAll:Bool = ('all' == tag);
 		var filtered:Array = [];
