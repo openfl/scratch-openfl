@@ -30,9 +30,9 @@ class Color
 
 	// Convert hue (0-360), saturation (0-1), and brightness (0-1) to RGB.
 	public static function fromHSV(h : Float, s : Float, v : Float) : Int{
-		var r : Float;
-		var g : Float;
-		var b : Float;
+		var r : Float = 0;
+		var g : Float = 0;
+		var b : Float = 0;
 		h = h % 360;
 		if (h < 0)             h += 360;
 		s = Math.max(0, Math.min(s, 1));

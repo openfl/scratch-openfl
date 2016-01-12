@@ -67,7 +67,7 @@ class DialogBox extends Sprite
 	}
 
 	public static function ask(question : String, defaultAnswer : String, stage : Stage = null, resultFunction : String->Void = null, context : Dictionary = null) : Void {
-		var d : DialogBox;	
+		var d : DialogBox = null;	
 		function done(param:Dynamic) : Void{if (resultFunction != null)                 resultFunction(d.fields["answer"].text);
 		};
 		d = new DialogBox(done);

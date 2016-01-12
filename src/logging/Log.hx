@@ -63,14 +63,14 @@ class Log
 			nextIndex %= logBuffer.length;
 		}
 
-		var entryString : String;
+		var entryString : String = null;
 		function getEntryString() : String {
 			if (entryString == null)
 				entryString = Std.string(entry);
 			return entryString;
 		};
 
-		var extraString : String;
+		var extraString : String = null;
 		function getExtraString() : String {
 			if (extraString == null)
 				extraString = util.JSON.stringify(extraData);

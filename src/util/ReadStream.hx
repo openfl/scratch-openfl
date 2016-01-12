@@ -94,7 +94,7 @@ class ReadStream
 		skipWhiteSpace();
 		if (atEnd())             return "";
 		var token : String = "";
-		var isArg : Bool;
+		var isArg : Bool = false;
 		var start : Int = i;
 		while (i < src.length){
 			if (src.charCodeAt(i) <= 32)                 break;

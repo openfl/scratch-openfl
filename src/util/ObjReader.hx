@@ -200,7 +200,7 @@ class ObjReader
 				return bytes;
 			case 13:  // bitmap  
 				count = s.readInt();
-				objList = new Array<Dynamic>(count);
+				objList = Compat.newArray(count, null); // new Array<Dynamic>(count);
 				for (i in 0...count){
 					objList[i] = s.readUnsignedInt();
 				}
@@ -210,14 +210,14 @@ class ObjReader
 				return s.readMultiByte(count, "utf-8");
 			case 20, 21, 22, 23:  // array  
 				count = s.readInt();
-				objList = new Array<Dynamic>(count);
+				objList = Compat.newArray(count, null); // new Array<Dynamic>(count);
 				for (i in 0...count){
 					objList[i] = readField();
 				}
 				return objList;
 			case 24, 25:  // dictionary  
 				count = s.readInt();
-				objList = new Array<Dynamic>(2 * count);
+				objList = Compat.newArray(2 * count, null); // new Array<Dynamic>(2 * count);
 				for (i in 0...2 * count){
 					objList[i] = readField();
 				}
@@ -230,12 +230,12 @@ class ObjReader
 				var b : Int = (rgb >> 2) & 0xFF;
 				return (alpha << 24) | (r << 16) | (g << 8) | b;
 			case 32:  // point  
-				objList = new Array<Dynamic>(2);
+				objList = Compat.newArray(2, null); // new Array<Dynamic>(2);
 				objList[0] = readField();
 				objList[1] = readField();
 				return objList;
 			case 33:  // rectangle  
-				objList = new Array<Dynamic>(4);
+				objList = Compat.newArray(4, null); //  new Array<Dynamic>(4);
 				objList[0] = readField();
 				objList[1] = readField();
 				objList[2] = readField();
@@ -535,7 +535,7 @@ class ObjReader
 
 		for (y in 0...h){
 			var src : Int = y * span;
-			var word : Int;
+			var word : Int = 0;
 			var shift : Int = -1;
 			for (x in 0...w){
 				if (shift < 0) {
@@ -551,11 +551,11 @@ class ObjReader
 
 	private function raster16to32(raster16 : Array<UInt>, w : Int, h : Int) : Array<UInt>{
 		var result : Array<UInt> = new Array<UInt>();
-		var shift : Int;
-		var word : Int;
-		var pix : Int;
-		var src : Int;
-		var dst : Int;
+		var shift : Int = 0;
+		var word : Int = 0;
+		var pix : Int = 0;
+		var src : Int = 0;
+		var dst : Int = 0;
 		for (y in 0...h){
 			shift = -1;
 			for (x in 0...w){

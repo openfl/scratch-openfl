@@ -67,9 +67,9 @@ class PaletteSelector extends Sprite
 		var numberOfRows : Int = 5;
 		var w : Int = 208;
 		var startY : Int = 3;
-		var itemH : Int;
-		var x : Int;
-		var i : Int;
+		var itemH : Int = 0;
+		var x : Int = 0;
+		var i : Int = 0;
 		var y : Int = startY;
 		while (numChildren > 0)removeChildAt(0);  // remove old contents  
 

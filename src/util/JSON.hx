@@ -353,7 +353,7 @@ class JSON
 	private function needsMultipleLines(arrayValue : Array<Dynamic>, limit : Int) : Bool{
 		// Return true if this array is short enough to fit on one line.
 		// (This is simply to make the JSON representation of stacks more readable.)
-		var count : Int;
+		var count : Int = 0;
 		var toDo : Array<Dynamic> = [arrayValue];
 		while (toDo.length > 0){
 			var a : Array<Dynamic> = toDo.pop();

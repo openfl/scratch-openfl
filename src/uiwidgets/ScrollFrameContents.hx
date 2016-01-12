@@ -61,9 +61,9 @@ class ScrollFrameContents extends Sprite
 		// Make my size a little bigger necessary to subsume all my children.
 		// Also ensure that the x and y positions of all children are positive.
 		var minX : Int = 5;
-		var maxX : Int;
+		var maxX : Int = 0;
 		var minY : Int = 5;
-		var maxY : Int;
+		var maxY : Int = 0;
 		var child : DisplayObject;
 		var i : Int;
 		for (i in 0...numChildren){

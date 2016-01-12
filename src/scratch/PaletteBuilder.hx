@@ -86,7 +86,7 @@ class PaletteBuilder {
 	}
 
 	private function addBlocksForCategory(category:Int, catColor:Int):Void {
-		var cmdCount:Int;
+		var cmdCount:Int = 0;
 		var targetObj:ScratchObj = app.viewedObj();
 		for (spec in Specs.commands) {
 			if ((spec.length > 3) && (spec[2] == category)) {
@@ -221,8 +221,8 @@ class PaletteBuilder {
 	}
 
 	private function makeVariable():Void {
-		var d:DialogBox ;
-		var varSettings:VariableSettings ;
+		var d:DialogBox = null;
+		var varSettings:VariableSettings = null;
 		function makeVar2(param: Dynamic):Void {
 			var n:String = d.getField('Variable name').replace(~/^\s+|\s+$/g, '');
 			if (n.length == 0) return;
@@ -240,7 +240,7 @@ class PaletteBuilder {
 	}
 
 	private function makeList():Void {
-		var varSettings:VariableSettings ;
+		var varSettings:VariableSettings = null;
 		function makeList2(d:DialogBox):Void {
 			var n:String = d.getField('List name').replace(~/^\s+|\s+$/g, '');
 			if (n.length == 0) return;

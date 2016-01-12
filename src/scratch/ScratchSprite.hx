@@ -686,7 +686,7 @@ class ScratchSprite extends ScratchObj {
 	}
 
 	public function getVisibleBounds(space:DisplayObject):Rectangle {
-		var rot:Float;
+		var rot:Float = 0;
 		if(space == this) {
 			rot= rotation;
 			rotation = 0;

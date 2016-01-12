@@ -326,8 +326,8 @@ class ScratchCostume {
 		m.scale(image.width / r.width, image.height / r.height);
 		image.draw(dispObj, m);
 
-		var L:Array<Point> = new Array<Point>(image.height); //stack of left-side hull;
-		var R:Array<Point> = new Array<Point>(image.height); //stack of right side hull;
+		var L:Array<Point> = Compat.newArray(image.height, null); // new Array<Point>(image.height); //stack of left-side hull;
+		var R:Array<Point> = Compat.newArray(image.height, null); // new Array<Point>(image.height); //stack of right side hull;
 		//var H:Vector.<Point> = new Vector.<Point>();
 		var H:Array<Point> = [];
 		var rr:Int=-1, ll:Int=-1;

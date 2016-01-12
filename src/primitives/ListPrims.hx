@@ -124,7 +124,7 @@ class ListPrims
 	}
 
 	private function listInsert(list : ListWatcher, i : Int, item : Dynamic) : Void{
-		list.contents.splice(i - 1, 0, item);
+		list.contents.insert(i - 1, item);
 	}
 
 	private function primReplace(b : Block) : Dynamic{

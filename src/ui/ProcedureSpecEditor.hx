@@ -444,8 +444,14 @@ class ProcedureSpecEditor extends Sprite
 
 	private function uniqueName(taken : Array<Dynamic>, name : String) : String{
 		if (Lambda.indexOf(taken, name) == -1)             return name;
-		var e : Array<Dynamic> = new EReg('\\d+$', "").exec(name);
-		var n : String = (e != null) ? e[0] : "";
+		var regex = new EReg('\\d+$', "");
+		var n: String;
+		if (regex.match(name))
+			n = regex.matched(0);
+		else
+			n = "";
+		//var e : Array<Dynamic> = new EReg('\\d+$', "").exec(name);
+		//var n : String = (e != null) ? e[0] : "";
 		var base : String = name.substring(0, name.length - n.length);
 		var i : Int = Std.parseInt(n != null ? n : "1") + 1;
 		while (Lambda.indexOf(taken, base + i) != -1){

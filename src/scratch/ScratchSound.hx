@@ -195,7 +195,7 @@ class ScratchSound {
 	public function getSamples():Array<Int> {
 		//if (format == 'squeak') prepareToSave(); // convert to WAV
 		//if ((format == '') || (format == 'adpcm')) return WAVFile.extractSamples(soundData);
-		return new Array<Int>(0); // dummy data
+		return Compat.newArray(0, 0); // new Array<Int>(0); // dummy data
 	}
 
 	public function getLengthInMsec():Float { return (1000.0 * sampleCount) / rate;  };

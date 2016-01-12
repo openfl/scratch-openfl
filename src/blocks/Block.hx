@@ -64,7 +64,7 @@ class Block extends Sprite
 	//	private static const blockLabelFormat:TextFormat = new TextFormat('LucidaBoldEmbedded', 10, 0xFFFFFF, true);
 	private static var useEmbeddedFont : Bool = false;
 
-	public static var MenuHandlerFunction : MouseEvent->Block->Null<BlockArg>->Null<String>->Void;  // optional function to handle block and blockArg menus  
+	public static var MenuHandlerFunction : MouseEvent->DisplayObjectContainer->BlockArg->String->Void;  // optional function to handle block and blockArg menus  
 
 	public var spec : String;
 	public var type : String;
@@ -127,7 +127,7 @@ class Block extends Sprite
 			this.spec = spec;
 		}
 
-		if (color == -1)             return  // copy for clone; omit graphics  ;
+		if (color == -1)             return;  // copy for clone; omit graphics  ;
 
 		var shape : Int;
 		if ((type == " ") || (type == "") || (type == "w")) {
@@ -504,7 +504,7 @@ class Block extends Sprite
 		for (i in 0...labelsAndArgs.length){
 			item = labelsAndArgs[i];
 			item.y = indentTop + ((maxH - item.height) / 2) + vOffset;
-			if ((Std.is(item, BlockArg) != null) && (cast((item), BlockArg).numberType != 0))                 item.y += 1;
+			if (Std.is(item, BlockArg)  && (cast((item), BlockArg).numberType != 0))                 item.y += 1;
 		}
 
 		if ([" ", "", "o"].indexOf(type) >= 0)             x = Std.int(Math.max(x, minCommandWidth));  // minimum width for command blocks  ;
@@ -834,8 +834,8 @@ class Block extends Sprite
 		// Note: Unlike most menu() methods, this method invokes
 		// the menu itself rather than returning a menu to the caller.
 		if (MenuHandlerFunction == null)             return;
-		if (isEmbeddedInProcHat())             MenuHandlerFunction(null, parent)
-		else MenuHandlerFunction(null, this);
+		if (isEmbeddedInProcHat())             MenuHandlerFunction(null, parent, null, null)
+		else MenuHandlerFunction(null, this, null, null);
 	}
 
 	public function handleTool(tool : String, evt : MouseEvent) : Void{

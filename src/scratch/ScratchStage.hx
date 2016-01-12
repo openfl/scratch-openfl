@@ -585,17 +585,17 @@ class ScratchStage extends ScratchObj {
 
 		var bm1:BitmapData;
 		var mask:UInt = 0x00F8F8F0;
-		if (Scratch.app.isIn3D) {
+		//if (Scratch.app.isIn3D) {
 			/*
 			SCRATCH::allow3d {
 				bm1 = Scratch.app.render3D.getOtherRenderedChildren(s, 1);
 			}
 			*/
-		}
-		else {
+		//}
+		//else {
 			// OLD code here
 			bm1 = bitmapWithoutSprite(s);
-		}
+		//}
 
 		var bm2:BitmapData = new BitmapData(bm1.width, bm1.height, true, 0);
 		bm2.threshold(bm1, bm1.rect, bm1.rect.topLeft, '==', c, 0xFF000000, mask); // match only top five bits of each component
@@ -618,7 +618,7 @@ class ScratchStage extends ScratchObj {
 		return bm2;
 	}
 
-	private function getNumberAsHexString(number:UInt, minimumLength:UInt = 1, showHexDenotation:Bool = true):String {
+	private function getNumberAsHexString(number:UInt, minimumLength:Int = 1, showHexDenotation:Bool = true):String {
 		// The string that will be output at the end of the function.
 		var string:String = StringTools.hex(number).toUpperCase();
 
@@ -744,7 +744,7 @@ class ScratchStage extends ScratchObj {
 	}
 
 	public function scriptCount():Int {
-		var scriptCount:Int;
+		var scriptCount:Int = 0;
 		for (obj in allObjects()) {
 			for (b in obj.scripts) {
 				if (Std.is(b, Block) && b.isHat) scriptCount++;

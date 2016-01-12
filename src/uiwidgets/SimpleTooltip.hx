@@ -106,24 +106,24 @@ class SimpleTooltip
 		switch (_sw2_)
 		{
 			case MouseEvent.MOUSE_OVER:
-				startShowTimer(try cast(evt.currentTarget, DisplayObject) catch(e:Dynamic) null);
+				startShowTimer(cast(evt.currentTarget, DisplayObject));
 			case MouseEvent.MOUSE_OUT:
-				(try cast(evt.currentTarget, DisplayObject) catch(e:Dynamic) null).removeEventListener(MouseEvent.MOUSE_OUT, eventHandler);
+				(cast(evt.currentTarget, DisplayObject)).removeEventListener(MouseEvent.MOUSE_OUT, eventHandler);
 
 				if (showTimer.running) {
 					showTimer.reset();
 					nextTipObj = null;
 				}
 
-				startHideTimer(try cast(evt.currentTarget, DisplayObject) catch(e:Dynamic) null);
+				startHideTimer(cast(evt.currentTarget, DisplayObject));
 			case TimerEvent.TIMER:
 				if (evt.target == showTimer) {
 					startShow();
 				}
 				else {
-					startHide(try cast(evt.target, Timer) catch(e:Dynamic) null);
+					startHide(cast(evt.target, Timer));
 					if (evt.target != hideTimer) {
-						(try cast(evt.target, Timer) catch(e:Dynamic) null).removeEventListener(TimerEvent.TIMER, eventHandler);
+						(cast(evt.target, Timer)).removeEventListener(TimerEvent.TIMER, eventHandler);
 					}
 				}
 		}
@@ -174,7 +174,7 @@ class SimpleTooltip
 
 	private function getPos(direction : String) : Point{
 		var rect : Rectangle = currentTipObj.getBounds(stage);
-		var pos : Point;
+		var pos : Point = null;
 		switch (direction)
 		{
 			case "right":

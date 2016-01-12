@@ -167,15 +167,15 @@ class Primitives
 			case "acos":return (Math.acos(n) * 180) / Math.PI;
 			case "atan":return (Math.atan(n) * 180) / Math.PI;
 			case "ln":return Math.log(n);
-			case "log":return Math.log(n) / Math.LN10;
+			case "log":return Math.log(n) / Math.log(10);
 			case "e ^":return Math.exp(n);
 			case "10 ^":return Math.pow(10, n);
 		}
 		return 0;
 	}
 
-	private static var emptyDict : Map<Dynamic, Dynamic> = new Map<Dynamic, Dynamic>();
-	private static var lcDict : Map<Dynamic, String> = new Map<Dynamic, String>();
+	//private static var emptyDict : Map<String, Dynamic> = new Map<String, Dynamic>();
+	//private static var lcDict : Map<Dynamic, String> = new Map<Dynamic, String>();
 	public static function compare(a1 : Dynamic, a2 : Dynamic) : Int{
 		// This is static so it can be used by the list "contains" primitive.
 		var n1 : Float = Interpreter.asNumber(a1);
@@ -183,15 +183,17 @@ class Primitives
 		// X != X is faster than isNaN()
 		if (n1 != n1 || n2 != n2) {
 			// Suffix the strings to avoid properties and methods of the Dictionary class (constructor, hasOwnProperty, etc)
-			if (Std.is(a1, String) && emptyDict.exists(a1))                 a1 += "_";
-			if (Std.is(a2, String) && emptyDict.exists(a2))                 a2 += "_";  // at least one argument can't be converted to a number: compare as strings  ;
-
-
-
-			var s1 : String = lcDict[a1];
-			if (s1 == null)                 s1 = lcDict[a1] = Std.string(a1).toLowerCase();
-			var s2 : String = lcDict[a2];
-			if (s2 == null)                 s2 = lcDict[a2] = Std.string(a2).toLowerCase();
+			//if (Std.is(a1, String) && emptyDict.exists(a1))                 a1 += "_";
+			//if (Std.is(a2, String) && emptyDict.exists(a2))                 a2 += "_";  // at least one argument can't be converted to a number: compare as strings  ;
+//
+//
+//
+			//var s1 : String = lcDict[a1];
+			//if (s1 == null)                 s1 = lcDict[a1] = Std.string(a1).toLowerCase();
+			//var s2 : String = lcDict[a2];
+			//if (s2 == null)                 s2 = lcDict[a2] = Std.string(a2).toLowerCase();
+			var s1 = Std.string(a1).toLowerCase();
+			var s2 = Std.string(a2).toLowerCase();
 			//return s1.localeCompare(s2);
 			if (s1 < s2) return -1;
 			if (s1 > s2) return 1;

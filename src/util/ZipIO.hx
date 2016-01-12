@@ -118,7 +118,7 @@ class ZipIO
 		e.data = new ByteArray();
 		if (compressedSize > 0)             buf.readBytes(e.data, 0, compressedSize);
 		if (compressionMethod == 8)             e.data.inflate();
-		if (e.data.length != uncompressedSize)             throw cast(("Bad uncompressed size"), Error);
+		if (Std.int(e.data.length) != uncompressedSize)             throw cast(("Bad uncompressed size"), Error);
 		if (crc != computeCRC(e.data))             throw cast(("Bad CRC"), Error);
 	}
 
@@ -301,7 +301,7 @@ class ZipIO
 
 	/* CRC table, computed at load time. */
 	private static function makeCrcTable() : Array<Dynamic>{
-		var crcTable : Array<Dynamic> = new Array<Dynamic>(256);
+		var crcTable : Array<Dynamic> = Compat.newArray(256, null); // new Array<Dynamic>(256);
 		for (n in 0...256){
 			var c : Int = n;
 			for (i in 0...8){

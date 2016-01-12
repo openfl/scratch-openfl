@@ -155,7 +155,7 @@ class Menu extends Sprite
 
 		maxHeight = Std.int(Math.min(500, stage.stageHeight - 50));
 		// compute max scrollIndex
-		var totalH : Int;
+		var totalH : Int = 0;
 		maxScrollIndex = allItems.length - 1;
 		while (maxScrollIndex > 0){
 			totalH += allItems[maxScrollIndex].height;

@@ -357,7 +357,7 @@ class ScriptsPane extends ScrollFrameContents
 		var threshold : Int = (b.isReporter) ? 15 : 30;
 		var i : Int;
 		var minDist : Int = 100000;
-		var nearest : Array<Dynamic>;
+		var nearest : Array<Dynamic> = null;
 		var bTopLeft : Point = new Point(b.x, b.y);
 		var bBottomLeft : Point = new Point(b.x, b.y + b.height - 3);
 
@@ -445,7 +445,7 @@ class ScriptsPane extends ScrollFrameContents
 
 	private function blockAtPoint(p : Point) : Block{
 		// Return the block at the given point (local) or null.
-		var result : Block;
+		var result : Block = null;
 		for (stack/* AS3HX WARNING could not determine type for var: stack exp: ECall(EIdent(allStacks),[]) type: null */ in allStacks()){
 			stack.allBlocksDo(function(b : Block) : Void{
 						if (!b.isReporter) {

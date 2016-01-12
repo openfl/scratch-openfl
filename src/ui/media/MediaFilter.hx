@@ -37,9 +37,9 @@ class MediaFilter extends Sprite
 	private var titleFormat : TextFormat = new TextFormat(CSS.font, 15, CSS.buttonLabelOverColor, false);
 	private var selectorFormat : TextFormat = new TextFormat(CSS.font, 14, CSS.textColor);
 
-	private var unselectedColor : Int = CSS.overColor;  // 0x909090;  
-	private var selectedColor : Int = CSS.textColor;
-	private var rolloverColor : Int = CSS.buttonLabelOverColor;
+	private var unselectedColor : UInt = CSS.overColor;  // 0x909090;  
+	private var selectedColor : UInt = CSS.textColor;
+	private var rolloverColor : UInt = CSS.buttonLabelOverColor;
 
 	private var title : TextField;
 	private var selectorNames : Array<Dynamic> = [];  // strings representing tags/themes/categories  

@@ -100,7 +100,7 @@ class Specs
 
 	public static function IconNamed(name : String) : Dynamic{
 		// Block icons are 2x resolution to look better when scaled.
-		var icon : Bitmap;
+		var icon : Bitmap = null;
 		if (name == "greenFlag")             icon = Resources.createBmp("flagIcon");
 		if (name == "stop")             icon = Resources.createBmp("stopIcon");
 		if (name == "turnLeft")             icon = Resources.createBmp("turnLeftIcon");

@@ -47,7 +47,7 @@ class Watcher extends Sprite implements DragClient
 	public static function formatValue(value : Dynamic) : String{
 		if (Std.is(value, Float) || (Std.is(value, String) && Std.string(Std.parseFloat(value)) == value)) {
 			// show at most N digits after the decimal point
-			value = Std.parseFloat(Std.parseFloat(value).toFixed(decimalPlaces));
+			value = Std.parseFloat(Compat.toFixed(Std.parseFloat(value), decimalPlaces));
 		}
 		return "" + value;
 	}
@@ -397,7 +397,7 @@ class Watcher extends Sprite implements DragClient
 	}
 
 	private function sliderMinMaxDialog() : Void{
-		var d : DialogBox;
+		var d : DialogBox = null;
 		function setMinMax(param:Dynamic) : Void{
 			var min : String = d.getField("Min");
 			var max : String = d.getField("Max");

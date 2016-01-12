@@ -162,7 +162,7 @@ class GestureHandler
 		Menu.removeMenusFrom(stage);
 		var menuTarget : Dynamic = findTargetFor("menu", app, x, y);
 		if (menuTarget == null)             return;
-		var menu : Menu;
+		var menu : Menu = null;
 		try{menu = menuTarget.menu(new MouseEvent("right click"));
 		}        catch (e : Error){ };
 		if (menu != null)             menu.showOnStage(stage, x, y);
@@ -458,7 +458,7 @@ class GestureHandler
 
 	private function handleMenu(evt : MouseEvent) : Void{
 		if (mouseTarget == null)             return;
-		var menu : Menu;
+		var menu : Menu = null;
 		try{menu = mouseTarget.menu(evt);
 		}        catch (e : Error){ };
 		if (menu != null)             menu.showOnStage(stage, Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY));

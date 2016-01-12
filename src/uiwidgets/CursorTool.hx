@@ -110,14 +110,14 @@ class CursorTool
 		if (Lambda.indexOf(standardCursors, name) != -1) {Mouse.cursor = name;return;
 		}
 
-		if (("" == name) && reuse == null) {
+		if (("" == name) && !reuse) {
 			// disposable cursors for bitmap pen and eraser (sometimes they are too large for hardware cursor)
 			showSoftwareCursor(new Bitmap(bmp), Std.int(hotSpot.x), Std.int(hotSpot.y));
 			return;
 		}
 
 		var saved : Array<Dynamic> = Reflect.field(registeredCursors, name);
-		if (saved != null && reuse != null) {
+		if (saved != null && reuse) {
 			if (isLinux())                 showSoftwareCursor(new Bitmap(saved[0]), cast(saved[1].x, Int), cast(saved[1].y, Int))
 			else Mouse.cursor = name;  // use previously registered hardware cursor  
 			return;

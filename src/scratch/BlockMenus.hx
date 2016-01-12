@@ -47,7 +47,8 @@ class BlockMenus implements DragClient
 	private static var spriteAttributes : Array<Dynamic> = ["x position", "y position", "direction", "costume #", "costume name", "size", "volume"];
 	private static var stageAttributes : Array<Dynamic> = ["backdrop #", "backdrop name", "volume"];
 
-	public static function BlockMenuHandler(evt : MouseEvent, block : Block, blockArg : BlockArg = null, menuName : String = null) : Void{
+	public static function BlockMenuHandler(evt : MouseEvent, parent: Dynamic, blockArg : BlockArg = null, menuName : String = null) : Void {
+		var block : Block = parent;
 		var menuHandler : BlockMenus = new BlockMenus(block, blockArg);
 		var op : String = block.op;
 		if (menuName == null) {  // menu gesture on a block (vs. an arg)  
@@ -209,7 +210,7 @@ class BlockMenus implements DragClient
 	}
 
 	private function attributeMenu(evt : MouseEvent) : Void{
-		var obj : ScratchObj;
+		var obj : ScratchObj = null;
 		if (block != null && block.args[1]) {
 			obj = app.stagePane.objNamed(block.args[1].argValue);
 		}

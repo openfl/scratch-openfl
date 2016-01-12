@@ -75,7 +75,7 @@ class Server implements IServer
 	}
 
 	public function overrideURLs(overrides : Dynamic) : Void{
-		var forceProtocol : String;
+		var forceProtocol : String = null;
 		var swfURL : String = Scratch.app.loaderInfo.url;
 		if (swfURL != null && URLUtil.isHttpURL(swfURL)) {  // "isHttpURL" is true if the protocol is either HTTP or HTTPS  
 			forceProtocol = URLUtil.getProtocol(swfURL);
@@ -176,7 +176,7 @@ class Server implements IServer
 	private function callServer(url : String, data : Dynamic, mimeType : String, whenDone : Dynamic->Void,
 			queryParams : Dynamic = null) : URLLoader{
 		var loader : URLLoader = new URLLoader();
-		var removeListeners: Void->Void;
+		var removeListeners: Void->Void = null;
 		
 		function completeHandler(event : Event) : Void{
 			removeListeners();

@@ -266,7 +266,7 @@ class LibraryPart extends UIPart
 
 	private function scrollToSelectedSprite() : Void{
 		var viewedObj : ScratchObj = app.viewedObj();
-		var sel : SpriteThumbnail;
+		var sel : SpriteThumbnail = null;
 		for (i in 0...spritesPane.numChildren){
 			var tn : SpriteThumbnail = try cast(spritesPane.getChildAt(i), SpriteThumbnail) catch(e:Dynamic) null;
 			if (tn != null && (tn.targetObj == viewedObj))                 sel = tn;

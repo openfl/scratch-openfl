@@ -268,7 +268,7 @@ class SpriteThumbnail extends Sprite
 	//------------------------------
 
 	public function click(evt : Event) : Void{
-		if (!targetObj.isStage && Std.is(targetObj, ScratchSprite))             app.flashSprite(try cast(targetObj, ScratchSprite) catch(e:Dynamic) null);
+		if (!targetObj.isStage && Std.is(targetObj, ScratchSprite))             app.flashSprite(cast(targetObj, ScratchSprite));
 		app.selectSprite(targetObj);
 	}
 

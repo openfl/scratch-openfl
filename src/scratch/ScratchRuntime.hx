@@ -46,7 +46,7 @@ class ScratchRuntime {
 	public var app:Scratch;
 	public var interp:Interpreter;
 	//public var motionDetector:VideoMotionPrims;
-	public var keyIsDown:Array<Dynamic> = new Array<Dynamic>(128); // records key up/down state
+	public var keyIsDown:Array<Dynamic> = Compat.newArray(128, null); // new Array<Dynamic>(128); // records key up/down state
 	public var shiftIsDown:Bool;
 	public var lastAnswer:String = '';
 	public var cloneCount:Int;
@@ -380,7 +380,7 @@ class ScratchRuntime {
 
 	public function selectProjectFile():Void {
 		// Prompt user for a file name and load that file.
-		var fileName:String, data:ByteArray;
+		var fileName:String = null, data:ByteArray = null;
 		function doInstall(ignore:Dynamic = null):Void {
 			installProjectFromFile(fileName, data);
 		}
@@ -424,8 +424,8 @@ class ScratchRuntime {
 				return;
 			}
 		} else {
-			var info:Object;
-			var objTable:Array<Dynamic>;
+			var info:Object = null;
+			var objTable:Array<Dynamic> = null;
 			data.position = 0;
 			var reader:ObjReader = new ObjReader(data);
 			try { info = reader.readInfo(); } catch (e:flash.errors.Error) { data.position = 0; }
@@ -805,7 +805,7 @@ class ScratchRuntime {
 
 	private function sendsBroadcast(obj:ScratchObj, msg:String):Bool {
 		for  (stack in obj.scripts) {
-			var found:Bool;
+			var found:Bool = false;
 			stack.allBlocksDo(function (b:Block):Void {
 				if (b.op == 'broadcast:' || b.op == 'doBroadcastAndWait') {
 					if (b.broadcastMsg == msg) found = true;
@@ -819,7 +819,7 @@ class ScratchRuntime {
 	private function receivesBroadcast(obj:ScratchObj, msg:String):Bool {
 		msg = msg.toLowerCase();
 		for (stack in obj.scripts) {
-			var found:Bool;
+			var found:Bool = false;
 			stack.allBlocksDo(function (b:Block):Void {
 				if (b.op == 'whenIReceive') {
 					if (b.broadcastMsg.toLowerCase() == msg) found = true;

@@ -402,11 +402,11 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		var colNum:Int = 0;
 		var nextX:Int = 2;
 		var nextY:Int = 2;
-		var item: Dynamic;
+		var item: Dynamic = null;
 		var it: Iterator<Dynamic> = items.iterator();
 		while (it.hasNext())
 		{
-			it = it.next();
+			item = it.next();
 			item.x = nextX;
 			item.y = nextY;
 			resultsPane.addChild(item);
@@ -519,7 +519,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	}
 
 	private function convertAndUploadImageOrSprite(fName:String, data:ByteArray):Void {
-		var costumeOrSprite:Dynamic;
+		var costumeOrSprite:Dynamic = null;
 		function uploadComplete():Void {
 			app.removeLoadProgressBox();
 			whenDone(costumeOrSprite);
@@ -569,8 +569,8 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		} else {
 			data.position = 0;
 			if (data.bytesAvailable > 4 && data.readUTFBytes(4) == 'ObjS') {
-				var info:Object;
-				var objTable:Array<Dynamic>;
+				var info:Object = null;
+				var objTable:Array<Dynamic> = null;
 				data.position = 0;
 				var reader:ObjReader = new ObjReader(data);
 				try { info = reader.readInfo(); } catch (e:flash.errors.Error) { data.position = 0; }
@@ -678,7 +678,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	}
 
 	private function convertAndUploadSound(sndName:String, data:ByteArray):Void {
-		var snd:ScratchSound;
+		var snd:ScratchSound = null;
 		function uploadComplete():Void {
 			app.removeLoadProgressBox();
 			whenDone(snd);

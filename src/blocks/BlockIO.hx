@@ -39,7 +39,7 @@ class BlockIO
 	}
 
 	public static function stringToStack(s : String, forStage : Bool = false) : Block{
-		return arrayToStack(try cast(util.JSON.parse(s), Array<Dynamic/*AS3HX WARNING no type*/>) catch(e:Dynamic) null, forStage);
+		return arrayToStack(cast(util.JSON.parse(s), Array<Dynamic>), forStage);
 	}
 
 	public static function stackToArray(b : Block) : Array<Dynamic>{
@@ -55,8 +55,8 @@ class BlockIO
 
 	public static function arrayToStack(cmdList : Array<Dynamic>, forStage : Bool = false) : Block{
 		// Return the stack represented by an array structure.
-		var topBlock : Block;
-		var lastBlock : Block;
+		var topBlock : Block = null;
+		var lastBlock : Block = null;
 		for (cmd in cmdList){
 			var b : Block = null;
 			try{b = arrayToBlock(cmd, "", forStage);
@@ -122,7 +122,7 @@ class BlockIO
 
 		var args : Array<Dynamic> = argsForCmd(cmd, b.rightToLeft);
 		var substacks : Array<Dynamic> = substacksForCmd(cmd);
-		var hadSpriteRef : Bool;
+		var hadSpriteRef : Bool = false;
 		for (i in 0...args.length){
 			var a : Dynamic = args[i];
 			if (Std.is(a, ScratchObj)) {
@@ -193,7 +193,7 @@ class BlockIO
 	private static function specialCmd(cmd : Array<Dynamic>, forStage : Bool) : Block{
 		// If the given command is special (e.g. a reporter or old-style a hat blocK), return a block for it.
 		// Otherwise, return null.
-		var b : Block;
+		var b : Block = null;
 		var _sw0_ = (cmd[0]);        
 
 		switch (_sw0_)
@@ -314,7 +314,7 @@ class BlockIO
 		"createCloneOf", "distanceTo:", "getAttribute:of:", 
 		"gotoSpriteOrMouse:", "pointTowards:", "touching:"];
 		if (Lambda.indexOf(refCmds, b.op) < 0)             return;
-		var arg : BlockArg;
+		var arg : BlockArg = null;
 		if ((b.args.length == 1) && (Std.is(b.args[0], BlockArg)))             arg = b.args[0];
 		if ((b.args.length == 2) && (Std.is(b.args[1], BlockArg)))             arg = b.args[1];
 		if (arg != null) {

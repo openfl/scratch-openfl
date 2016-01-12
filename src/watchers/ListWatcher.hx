@@ -296,10 +296,10 @@ class ListWatcher extends Sprite
 		// Ensure that lastAccess is the same length as contents.
 		if (lastAccess.length == contents.length)             return;
 		if (lastAccess.length < contents.length) {
-			lastAccess = lastAccess.concat(new Array<Int>());
+			lastAccess = lastAccess.concat(util.Compat.newArray(contents.length - lastAccess.length, 0));
 		}
 		else if (lastAccess.length > contents.length) {
-			lastAccess = lastAccess.substring(0, contents.length);
+			lastAccess = lastAccess.slice(0, contents.length);
 		}
 	}
 
@@ -309,9 +309,9 @@ class ListWatcher extends Sprite
 
 	private function addItem(b : IconButton = null) : Void{
 		// Called when addItemButton is clicked.
-		if ((Std.is(root, Scratch)) && !(try cast(root, Scratch) catch(e:Dynamic) null).editMode)             return;
+		if ((Std.is(root, Scratch)) && !(cast(root, Scratch).editMode) )            return;
 		if (insertionIndex < 0)             insertionIndex = contents.length;
-		contents.splice(insertionIndex, 0, "");
+		contents.insert(insertionIndex, "");
 		updateContents();
 		updateScrollbar();
 		selectCell(insertionIndex);
@@ -321,7 +321,7 @@ class ListWatcher extends Sprite
 		// When the user clicks on a cell, it gets keyboard focus.
 		// Record that list index for possibly inserting a new cell.
 		// Note: focus is lost when the addItem button is clicked.
-		var newFocus : DisplayObject = try cast(e.target, DisplayObject) catch(e:Dynamic) null;
+		var newFocus : DisplayObject = cast(e.target, DisplayObject);
 		if (newFocus == null)             return;
 		insertionIndex = -1;
 		for (i in 0...visibleCells.length){
@@ -342,7 +342,7 @@ class ListWatcher extends Sprite
 	//------------------------------
 
 	private function deleteItem(b : IconButton) : Void{
-		var cell : ListCell = try cast(b.lastEvent.target.parent, ListCell) catch(e:Dynamic) null;
+		var cell : ListCell = cast(b.lastEvent.target.parent, ListCell);
 		if (cell == null)             return;
 		for (i in 0...visibleCells.length){
 			var c : ListCell = visibleCells[i];

@@ -154,7 +154,7 @@ class MediaLibraryItem extends Sprite
 	private function setSpriteThumbnail(done : Void->Void) : Void{
 		var spriteMD5 : String = dbObj.md5;
 		function gotJSONData(data : String) : Void{
-			var md5 : String;
+			var md5 : String = null;
 			if (data != null) {
 				var sprObj : Dynamic = util.JSON.parse(data);
 				Reflect.setField(spriteCache, spriteMD5, data);

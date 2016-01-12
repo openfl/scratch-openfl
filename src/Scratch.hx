@@ -1334,7 +1334,7 @@ class Scratch extends Sprite {
 	}
 
 	public function addNewSprite(spr:ScratchSprite, showImages:Bool = false, atMouse:Bool = false):Void {
-		var c:ScratchCostume, byteCount:Int;
+		var c:ScratchCostume, byteCount:Int = 0;
 		for (c in spr.costumes) {
 			if (!c.baseLayerData) c.prepareToSave();
 			byteCount += c.baseLayerData.length;

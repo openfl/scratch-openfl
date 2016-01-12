@@ -138,7 +138,7 @@ class ProjectIO
 	}
 
 	private function decodeFromZipFile(zipData : ByteArray) : ScratchObj{
-		var jsonData : String;
+		var jsonData : String = null;
 		images = [];
 		sounds = [];
 		var files : Array<Dynamic> ;
@@ -378,7 +378,7 @@ class ProjectIO
 						});
 				return;
 			}
-			var snd : ScratchSound;
+			var snd : ScratchSound = null;
 			try{
 				snd = new ScratchSound(sndName, sndData);
 			}            catch (e : Dynamic){ };
@@ -516,7 +516,7 @@ class ProjectIO
 
 	public function convertSqueakSounds(scratchObj : ScratchObj, done : Function) : Void{
 		var soundsToConvert : Array<Dynamic> = [];
-		var i : Int;
+		var i : Int = 0;
 		// Pre-convert any Squeak sounds (asynch, with a progress bar) before saving a project.
 		// Note: If this is not called before recordImagesAndSounds(), sounds will
 		// be converted synchronously, but there may be a long delay without any feedback.
