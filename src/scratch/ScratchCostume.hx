@@ -264,7 +264,7 @@ class ScratchCostume {
 		return bitmapObj;
 	}
 
-	private static var shapeDict:Object = {};
+	private static var shapeDict:Map<String,Shape> = new Map<String,Shape>();
 	public function getShape():Shape {
 		if (baseLayerMD5 == null) prepareToSave();
 		var id:String = baseLayerMD5;
@@ -274,7 +274,7 @@ class ScratchCostume {
 		var s:Shape = shapeDict[id];
 		if(s == null) {
 			s = new Shape();
-			var pts:Array = RasterHull();
+			var pts:Array<Point> = RasterHull();
 			s.graphics.clear();
 
 			if(pts.length) {
@@ -304,7 +304,7 @@ class ScratchCostume {
 	 object is composed of
 	 ** a single point
 	 */
-	private function RasterHull():Array<Dynamic>
+	private function RasterHull():Array<Point>
 	{
 		var dispObj:DisplayObject = displayObj();
 		var r:Rectangle = dispObj.getBounds(dispObj);
@@ -316,7 +316,7 @@ class ScratchCostume {
 		r.left = Math.floor(r.left);
 		r.height += Math.floor(r.top) - r.top;
 		r.top = Math.floor(r.top);
-		var image:BitmapData = new BitmapData(Math.max(1, Math.ceil(r.width)+1), Math.max(1, Math.ceil(r.height)+1), true, 0);
+		var image:BitmapData = new BitmapData(Std.int(Math.max(1, Math.ceil(r.width)+1)), Std.int(Math.max(1, Math.ceil(r.height)+1)), true, 0);
 //trace('bitmap rect: '+image.rect);
 
 		var m:Matrix = new Matrix();
@@ -327,7 +327,7 @@ class ScratchCostume {
 		var L:Array<Point> = new Array<Point>(image.height); //stack of left-side hull;
 		var R:Array<Point> = new Array<Point>(image.height); //stack of right side hull;
 		//var H:Vector.<Point> = new Vector.<Point>();
-		var H:Array = [];
+		var H:Array<Point> = [];
 		var rr:Int=-1, ll:Int=-1;
 		var Q:Point = new Point();
 		var w:Int = image.width;
@@ -337,10 +337,12 @@ class ScratchCostume {
 //		var maxX:Int = 0;
 //		var maxY:Int = 0;
 		var c:UInt;
-		for(y=0...h) {
-			for(x=0...w){
+		for (y in 0...h) {
+			var x: Int = 0;
+			while (x < w) {
 				c = (image.getPixel32(x, y) >> 24) & 0xff;
-				if(c > 0) break;
+				if (c > 0) break;
+				x++;
 			}
 			if(x==w) continue;
 
@@ -377,7 +379,7 @@ class ScratchCostume {
 		}
 
 		/* collect final results*/
-		for(i=0...(ll+1))
+		for(i in 0...(ll+1))
 			H[i] = L[i]; //left part;
 
 		var j:Int = rr;

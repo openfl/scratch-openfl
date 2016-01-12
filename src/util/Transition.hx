@@ -27,16 +27,16 @@ class Transition
 
 	private static var activeTransitions : Array<Dynamic> = [];
 
-	private var interpolate : Function;
-	private var setValue : Function;
+	private var interpolate : Float->Float;
+	private var setValue : Dynamic->Void;
 	private var startValue : Dynamic;
 	private var endValue : Dynamic;
 	private var delta : Dynamic;
-	private var whenDone : Function;
+	private var whenDone : Void->Void;
 	private var startMSecs : Int;
 	private var duration : Int;
 
-	public function new(interpolate : Function, setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function)
+	public function new(interpolate : Float->Float, setValue : Dynamic->Void, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Void->Void)
 	{
 		// Create a transition animation between two values (either scalars or Arrays).
 		this.interpolate = interpolate;
@@ -54,18 +54,18 @@ class Transition
 			delta = endValue - startValue;
 		}
 		startMSecs = Math.round(haxe.Timer.stamp() * 1000);
-		duration = 1000 * secs;
+		duration = Std.int(1000 * secs);
 	}
 
-	public static function linear(setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function = null) : Void{
+	public static function linear(setValue : Dynamic->Void, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Void->Void = null) : Void{
 		activeTransitions.push(new Transition(linearFunc, setValue, startValue, endValue, secs, whenDone));
 	}
 
-	public static function quadratic(setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function = null) : Void{
+	public static function quadratic(setValue : Dynamic->Void, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Void->Void = null) : Void{
 		activeTransitions.push(new Transition(quadraticFunc, setValue, startValue, endValue, secs, whenDone));
 	}
 
-	public static function cubic(setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function = null) : Void{
+	public static function cubic(setValue : Dynamic->Void, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Void->Void = null) : Void{
 		activeTransitions.push(new Transition(cubicFunc, setValue, startValue, endValue, secs, whenDone));
 	}
 

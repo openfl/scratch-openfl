@@ -162,9 +162,9 @@ class OldProjectReader
 		return result;
 	}
 
-	private function buildLists(pairs : Array<Dynamic>, targetObj : ScratchObj) : Array<Dynamic>{
+	private function buildLists(pairs : Array<Dynamic>, targetObj : ScratchObj) : Array<ListWatcher>{
 		if (pairs == null)             return [];
-		var result : Array<Dynamic> = [];
+		var result : Array<ListWatcher> = [];
 		var i : Int = 0;
 		while (i < (pairs.length - 1)){
 			var listW : ListWatcher = cast((pairs[i + 1]), ListWatcher);

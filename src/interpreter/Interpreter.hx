@@ -149,9 +149,10 @@ class Interpreter
 				var reporter : Block = b;
 				var interp : Interpreter = this;
 				b = new Block("%s", "", -1);
-				b.opFunction = function(b : Block) : Void{
+				b.opFunction = function(b : Block) : Dynamic{
 							var p : Point = reporter.localToGlobal(new Point(0, 0));
 							app.showBubble(Std.string(interp.arg(b, 0)), p.x, p.y, reporter.getRect(app.stage).width);
+							return null;
 						};
 				b.args[0] = reporter;
 			}

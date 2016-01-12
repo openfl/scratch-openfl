@@ -467,7 +467,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 				inProgress++;
 				allItems[next++].loadThumbnail(loadDone);
 			}
-			if ((next < allItems.length) || inProgress) setTimeout(loadSomeThumbnails, 40);
+			if ((next < allItems.length) || inProgress) haxe.Timer.delay(loadSomeThumbnails, 40);
 		}
 
 		loadSomeThumbnails();
@@ -649,7 +649,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		}
 		function fileSelected(e:Event):Void {
 			for (j in 0...files.fileList.length) {
-				var file:FileReference = FileReference(files.fileList[j]);
+				var file:FileReference = files.fileList[j];
 				file.addEventListener(Event.COMPLETE, fileLoaded);
 				file.load();
 			}
@@ -711,7 +711,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 			*/
 
 			if (sound == null)
-				setTimeout(function():Void {
+				haxe.Timer.delay(function():Void {
 					MP3Loader.convertToScratchSound(sndName, data, function(s:ScratchSound):Void {
 						snd = s;
 						startSoundUpload(s, origName, uploadComplete);

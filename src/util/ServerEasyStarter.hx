@@ -17,7 +17,7 @@ class ServerEasyStarter extends Server
 		return resourcePrefix;
 	}
 
-	override public function getAsset(md5 : String, whenDone : Function) : URLLoader{
+	override public function getAsset(md5 : String, whenDone : Dynamic->Void) : URLLoader{
 		//		if (BackpackPart.localAssets[md5] && BackpackPart.localAssets[md5].length > 0) {
 		//			whenDone(BackpackPart.localAssets[md5]);
 		//			return null;

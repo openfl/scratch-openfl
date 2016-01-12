@@ -32,7 +32,7 @@ import ui.parts.UIPart;
 class DialogBox extends Sprite
 {
 
-	private var fields : Dictionary = new Dictionary();
+	private var fields : Map<String,Dynamic> = new Map<String,Dynamic>();
 	private var booleanFields : Dictionary = new Dictionary();
 	public var widget : DisplayObject;
 	private var w : Int;private var h : Int;
@@ -138,7 +138,7 @@ class DialogBox extends Sprite
 		var f : TextField = makeField(width);
 		if (defaultValue != null)             f.text = defaultValue;
 		addChild(f);
-		Reflect.setField(fields, fieldName, f);
+		fields[fieldName] = f;
 		labelsAndFields.push([l, f]);
 	}
 
@@ -238,13 +238,13 @@ class DialogBox extends Sprite
 	}
 
 	public function getField(fieldName : String) : Dynamic{
-		if (Reflect.field(fields, fieldName) != null)             return Reflect.field(fields, fieldName).text;
+		if (fields.exists(fieldName))             return fields[fieldName].text;
 		if (Reflect.field(booleanFields, fieldName) != null)             return Reflect.field(booleanFields, fieldName).isOn();
 		return null;
 	}
 
 	public function setPasswordField(fieldName : String, flag : Bool = true) : Void{
-		var field : Dynamic = Reflect.field(fields, fieldName);
+		var field : Dynamic = fields[fieldName];
 		if (Std.is(field, TextField)) {
 			(try cast(field, TextField) catch(e:Dynamic) null).displayAsPassword = flag;
 		}
@@ -398,7 +398,7 @@ class DialogBox extends Sprite
 	}
 
 	private function drawBackground() : Void{
-		var titleBarColors : Array<Dynamic> = [0xE0E0E0, 0xD0D0D0];  // old: CSS.titleBarColors;  
+		var titleBarColors : Array<UInt> = [0xE0E0E0, 0xD0D0D0];  // old: CSS.titleBarColors;  
 		var borderColor : Int = 0xB0B0B0;  // old: CSS.borderColor;  
 		var g : Graphics = graphics;
 		g.clear();

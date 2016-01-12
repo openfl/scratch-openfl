@@ -169,7 +169,7 @@ class ScratchRuntime {
 		}
 		clearEdgeTriggeredHats();
 		timerReset();
-		setTimeout(function():Void {
+		haxe.Timer.delay(function():Void {
 			allStacksAndOwnersDo(startIfGreenFlag);
 		}, 0);
 	}
@@ -502,7 +502,7 @@ class ScratchRuntime {
 		p.x = 15;
 		p.y = ScratchObj.STAGEH - p.height - 5;
 		app.stagePane.addChild(p);
-		setTimeout(p.grabKeyboardFocus, 100); // workaround for Window keyboard event handling
+		haxe.Timer.delay(p.grabKeyboardFocus, 100); // workaround for Window keyboard event handling
 	}
 
 	public function hideAskPrompt(p:AskPrompter):Void {
@@ -619,8 +619,8 @@ class ScratchRuntime {
 		clearAllCaches();
 	}
 
-	public function allVarNames():Array<Dynamic> {
-		var result:Array<Dynamic> = [], v:Variable;
+	public function allVarNames():Array<String> {
+		var result:Array<String> = [], v:Variable;
 		for (v in app.stageObj().variables) result.push(v.name);
 		if (!app.viewedObj().isStage) {
 			for (v in app.viewedObj().variables) result.push(v.name);

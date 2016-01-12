@@ -277,7 +277,7 @@ class SoundsPart extends UIPart
 		m.addItem("Record", recordSound);
 		m.addItem("Import", soundFromComputer);
 		var p : Point = b.localToGlobal(new Point(0, 0));
-		m.showOnStage(stage, p.x - 1, p.y + b.height - 2);
+		m.showOnStage(stage, Std.int(p.x - 1), Std.int(p.y + b.height - 2));
 	}
 
 	public function soundFromLibrary(b : Dynamic = null) : Void{

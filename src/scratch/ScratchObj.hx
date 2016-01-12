@@ -57,7 +57,7 @@ private static var Pop : Class<Dynamic>;
 	public var objName : String = "no name";
 	public var isStage : Bool = false;
 	public var variables : Array<Dynamic> = [];
-	public var lists : Array<Dynamic> = [];
+	public var lists : Array<ListWatcher> = [];
 	public var scripts : Array<Dynamic> = [];
 	public var scriptComments : Array<Dynamic> = [];
 	public var sounds : Array<Dynamic> = [];
@@ -83,7 +83,7 @@ private static var Pop : Class<Dynamic>;
 		varCache = new Map<String,Variable>();
 	}
 
-	public function allObjects() : Array<Dynamic>{return [this];
+	public function allObjects() : Array<ScratchObj>{return [this];
 	}
 
 	public function deleteCostume(c : ScratchCostume) : Void{
@@ -536,10 +536,10 @@ private static var Pop : Class<Dynamic>;
 	}
 
 	public function deleteList(listName : String) : Void{
-		var newLists : Array<Dynamic> = [];
+		var newLists : Array<ListWatcher> = [];
 		for (w in lists){
 			if (w.listName == listName) {
-				if (w.parent)                     w.parent.removeChild(w);
+				if (w.parent != null)                     w.parent.removeChild(w);
 			}
 			else {
 				newLists.push(w);
@@ -696,7 +696,7 @@ private static var Pop : Class<Dynamic>;
 		if (lists.length != 0) {
 			s.push(h2(Translator.map("Lists")));
 			for (list in lists){
-				s.push("- " + list.listName + ((list.contents.length) ? ":" : ""));
+				s.push("- " + list.listName + ((list.contents.length != 0) ? ":" : ""));
 				for (item/* AS3HX WARNING could not determine type for var: item exp: EField(EIdent(list),contents) type: null */ in list.contents){
 					s.push("    - " + item);
 				}

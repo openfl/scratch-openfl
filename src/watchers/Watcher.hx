@@ -216,7 +216,7 @@ class Watcher extends Sprite implements DragClient
 		}
 		var app : Scratch = runtime.app;
 		if (cmd == "senseVideoMotion") {
-			var prim : Function = app.interp.getPrim(cmd);
+			var prim : Block->Dynamic = app.interp.getPrim(cmd);
 			if (prim == null)                 return 0;
 			var block : Block = new Block("video %s on %s", "r", 0, "senseVideoMotion", [param, target.objName]);
 			return prim(block);
@@ -398,7 +398,7 @@ class Watcher extends Sprite implements DragClient
 
 	private function sliderMinMaxDialog() : Void{
 		var d : DialogBox;
-		function setMinMax() : Void{
+		function setMinMax(param:Dynamic) : Void{
 			var min : String = d.getField("Min");
 			var max : String = d.getField("Max");
 			var minVal : Float = Std.parseFloat(min);

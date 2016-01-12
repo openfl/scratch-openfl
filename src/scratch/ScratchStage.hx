@@ -107,7 +107,7 @@ class ScratchStage extends ScratchObj {
 
 	public function spritesAndClonesNamed(spriteName:String):Array<Dynamic> {
 		// Return all sprites and clones with the given name.
-		var result:Array = [];
+		var result:Array<Dynamic> = [];
 		for (i in 0...numChildren) {
 			var c:Dynamic = getChildAt(i);
 			if (Std.is(c, ScratchSprite) && (c.objName == spriteName)) result.push(c);
@@ -121,7 +121,7 @@ class ScratchStage extends ScratchObj {
 	}
 
 	public function unusedSpriteName(baseName:String):String {
-		var existingNames:Array = ['_mouse_', '_stage_', '_edge_', '_myself_'];
+		var existingNames:Array<String> = ['_mouse_', '_stage_', '_edge_', '_myself_'];
 		for (s in sprites()) {
 			existingNames.push(s.objName.toLowerCase());
 		}
@@ -678,7 +678,7 @@ class ScratchStage extends ScratchObj {
 	public function isEmpty():Bool {
 		// Return true if this project has no scripts, no variables, no lists,
 		// at most one sprite, and only the default costumes and sound media.
-		var defaultMedia:Array = [
+		var defaultMedia:Array<String> = [
 			'510da64cf172d53750dffd23fbf73563.png',
 			'b82f959ab7fa28a70b06c8162b7fef83.svg',
 			'df0e59dcdea889efae55eb77902edc1c.svg',
@@ -727,11 +727,11 @@ class ScratchStage extends ScratchObj {
 		if (Scratch.app.isOffline) {
 			info.userAgent = 'Scratch 2.0 Offline Editor';
 		}
-		else if (Scratch.app.jsEnabled) {
-			Scratch.app.externalCall('window.navigator.userAgent.toString', function(userAgent:String):Void {
-				if (userAgent != null) info.userAgent = userAgent;
-			});
-		}
+		//else if (Scratch.app.jsEnabled) {
+			//Scratch.app.externalCall('window.navigator.userAgent.toString', function(userAgent:String):Void {
+				//if (userAgent != null) info.userAgent = userAgent;
+			//});
+		//}
 	}
 
 	public function updateListWatchers():Void {
@@ -785,7 +785,7 @@ class ScratchStage extends ScratchObj {
 
 	public override function writeJSON(json:util.JSON):Void {
 		super.writeJSON(json);
-		var children:Array = [];
+		var children:Array<Dynamic> = [];
 		var c:DisplayObject;
 		for (i in 0...numChildren) {
 			c = getChildAt(i);
@@ -816,7 +816,7 @@ class ScratchStage extends ScratchObj {
 	}
 
 	public override function readJSON(jsonObj:Dynamic):Void {
-		var children:Array, i:Int, o:Dynamic;
+		var children:Array<Dynamic>, i:Int, o:Dynamic;
 
 		// read stage fields
 		super.readJSON(jsonObj);
@@ -827,11 +827,11 @@ class ScratchStage extends ScratchObj {
 		info = jsonObj.info;
 
 		// instantiate sprites and record their names
-		var spriteNameMap:Dynamic = {};
+		var spriteNameMap:Map<String,ScratchObj> = new Map<String,ScratchObj>();
 		spriteNameMap[objName] = this; // record stage's name
 		for (i in 0...children.length) {
 			o = children[i];
-			if (o.objName != undefined) { // o is a sprite record
+			if (o.objName != null) { // o is a sprite record
 				var s:ScratchSprite = new ScratchSprite();
 				s.readJSON(o);
 				spriteNameMap[s.objName] = s;
@@ -844,12 +844,12 @@ class ScratchStage extends ScratchObj {
 			o = children[i];
 			if (Std.is(o, ScratchSprite)) {
 				addChild(cast(o,ScratchSprite));
-			} else if (o.sliderMin != undefined) { // o is a watcher record
+			} else if (o.sliderMin != null) { // o is a watcher record
 				o.target = spriteNameMap[o.target]; // update target before instantiating
 				if (o.target) {
 					if (o.cmd == "senseVideoMotion" && o.param && o.param.indexOf(',')) {
 						// fix old video motion/direction watchers
-						var args:Array = o.param.split(',');
+						var args:Array<String> = o.param.split(',');
 						if (args[1] == 'this sprite') continue;
 						o.param = args[0];
 					}

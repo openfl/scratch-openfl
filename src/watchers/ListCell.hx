@@ -96,7 +96,7 @@ class ListCell extends Sprite
 		var hasFocus : Bool = e.type == FocusEvent.FOCUS_IN && tf.type == TextFieldType.INPUT;
 		frame.setColor((hasFocus) ? focusedColor : normalColor);
 		tf.textColor = (hasFocus) ? 0 : 0xFFFFFF;
-		setTimeout((hasFocus) ? addDeleteButton : removeDeleteButton, 1);
+		haxe.Timer.delay((hasFocus) ? addDeleteButton : removeDeleteButton, 1);
 	}
 
 	private function removeDeleteButton() : Void{

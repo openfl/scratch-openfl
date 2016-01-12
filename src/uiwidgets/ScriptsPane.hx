@@ -535,9 +535,9 @@ class ScriptsPane extends ScrollFrameContents
 		//	3. Compute the column widths
 		//	4. Move stacks into place
 
-		var stacks : Array<Dynamic> = stacksSortedByX();
-		var columns : Array<Dynamic> = assignStacksToColumns(stacks);
-		var columnWidths : Array<Dynamic> = computeColumnWidths(columns);
+		var stacks : Array<Block> = stacksSortedByX();
+		var columns : Array<Array<Block>> = assignStacksToColumns(stacks);
+		var columnWidths : Array<Int> = computeColumnWidths(columns);
 
 		var nextX : Int = padding;
 		for (i in 0...columns.length){
@@ -553,9 +553,9 @@ class ScriptsPane extends ScrollFrameContents
 		saveScripts();
 	}
 
-	private function stacksSortedByX() : Array<Dynamic>{
+	private function stacksSortedByX() : Array<Block>{
 		// Get all stacks and sorted by x.
-		var stacks : Array<Dynamic> = [];
+		var stacks : Array<Block> = [];
 		for (i in 0...numChildren){
 			var o : Dynamic = getChildAt(i);
 			if (Std.is(o, Block))                 stacks.push(o);
@@ -565,11 +565,11 @@ class ScriptsPane extends ScrollFrameContents
 		return stacks;
 	}
 
-	private function assignStacksToColumns(stacks : Array<Dynamic>) : Array<Dynamic>{
+	private function assignStacksToColumns(stacks : Array<Block>) : Array<Array<Block>>{
 		// Assign stacks to columns. Assume stacks is sorted by increasing x.
 		// A stack is placed in the first column where it does not overlap vertically with
 		// another stack in that column. New columns are created as needed.
-		var columns : Array<Dynamic> = [];
+		var columns : Array<Array<Block>> = [];
 		for (b in stacks){
 			var assigned : Bool = false;
 			for (c in columns){
@@ -593,8 +593,8 @@ class ScriptsPane extends ScrollFrameContents
 		return true;
 	}
 
-	private function computeColumnWidths(columns : Array<Dynamic>) : Array<Dynamic>{
-		var widths : Array<Dynamic> = [];
+	private function computeColumnWidths(columns : Array<Array<Block>>) : Array<Int>{
+		var widths : Array<Int> = [];
 		for (c in columns){
 			c.sort(function(b1 : Block, b2 : Block) : Int{return Std.int(b1.y - b2.y);
 					});  // sort by increasing y  

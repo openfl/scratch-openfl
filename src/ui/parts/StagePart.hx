@@ -159,7 +159,7 @@ class StagePart extends UIPart
 	//------------------------------
 
 	private function drawOutline() : Void{
-		var topBarColors : Array<Dynamic> = (app.isSmallPlayer) ? [CSS.tabColor, CSS.tabColor] : CSS.titleBarColors;
+		var topBarColors : Array<UInt> = (app.isSmallPlayer) ? [CSS.tabColor, CSS.tabColor] : CSS.titleBarColors;
 
 		var g : Graphics = outline.graphics;
 		g.clear();

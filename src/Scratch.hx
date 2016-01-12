@@ -1550,7 +1550,7 @@ class Scratch extends Sprite {
 		var fileList:FileReferenceList = new FileReferenceList();
 		function fileSelected(event:Event):Void {
 			if (fileList.fileList.length > 0) {
-				var file:FileReference = FileReference(fileList.fileList[0]);
+				var file:FileReference = fileList.fileList[0];
 				file.addEventListener(Event.COMPLETE, fileLoaded);
 				file.load();
 			}
@@ -1568,28 +1568,28 @@ class Scratch extends Sprite {
 	// External Interface abstraction
 	//------------------------------
 
-	public function externalInterfaceAvailable():Bool {
-		return ExternalInterface.available;
-	}
-
-	public function externalCall(functionName:String, returnValueCallback:Function = null, args:Array<Dynamic>):Void {
-		args.unshift(functionName);
-		var retVal:Dynamic = ExternalInterface.call.apply(ExternalInterface, args);
-		if (returnValueCallback != null) {
-			returnValueCallback(retVal);
-		}
-	}
-
-	public function addExternalCallback(functionName:String, closure:Function):Void {
-		ExternalInterface.addCallback(functionName, closure);
-	}
-
-	// jsCallbackArray is: [functionName, arg1, arg2...] where args are optional.
-	// TODO: rewrite all versions of externalCall in terms of this
-	public function externalCallArray(jsCallbackArray:Array<Dynamic>, returnValueCallback:Dynamic->Void = null):Void {
-		var args:Array<Dynamic> = jsCallbackArray.concat(); // clone
-		args.splice(1, 0, returnValueCallback);
-		externalCall.apply(this, args);
-	}
+	//public function externalInterfaceAvailable():Bool {
+		//return ExternalInterface.available;
+	//}
+//
+	//public function externalCall(functionName:String, returnValueCallback:Function = null, args:Array<Dynamic>):Void {
+		//args.unshift(functionName);
+		//var retVal:Dynamic = ExternalInterface.call.apply(ExternalInterface, args);
+		//if (returnValueCallback != null) {
+			//returnValueCallback(retVal);
+		//}
+	//}
+//
+	//public function addExternalCallback(functionName:String, closure:Function):Void {
+		//ExternalInterface.addCallback(functionName, closure);
+	//}
+//
+	//// jsCallbackArray is: [functionName, arg1, arg2...] where args are optional.
+	//// TODO: rewrite all versions of externalCall in terms of this
+	//public function externalCallArray(jsCallbackArray:Array<Dynamic>, returnValueCallback:Dynamic->Void = null):Void {
+		//var args:Array<Dynamic> = jsCallbackArray.concat(); // clone
+		//args.splice(1, 0, returnValueCallback);
+		//externalCall.apply(this, args);
+	//}
 }
 

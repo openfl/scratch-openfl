@@ -197,7 +197,7 @@ class ProjectIO
 		return s.substring(start + 1, end);
 	}
 
-	private function installImagesAndSounds(objList : Array<Dynamic>) : Void{
+	private function installImagesAndSounds(objList : Array<ScratchObj>) : Void{
 		// Install the images and sounds for the given list of ScratchObj objects.
 		for (obj in objList){
 			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
@@ -214,9 +214,10 @@ class ProjectIO
 		}
 	}
 
-	public function decodeAllImages(objList : Array<Dynamic>, whenDone : Function, fail : Function = null) : Void{
+	public function decodeAllImages(objList : Array<ScratchObj>, whenDone : Function, fail : Function = null) : Void{
 		var allCostumes : Array<Dynamic> = [];
-		var imageDict : Dictionary = new Dictionary();  // maps image data to BitmapData  
+		var imageDict : Map<ByteArray,Dynamic> = new Map<ByteArray,Dynamic>();  // maps image data to BitmapData  
+		var error : Bool = false;
 		// Load all images in all costumes from their image data, then call whenDone.
 		function allImagesLoaded() : Void{
 			if (error)                 return;
@@ -237,7 +238,6 @@ class ProjectIO
 			}
 			allImagesLoaded();
 		};
-		var error : Bool = false;
 		function decodeError() : Void{
 			if (error)                 return;
 			error = true;
@@ -295,7 +295,7 @@ class ProjectIO
 	}
 
 	public function downloadProjectAssets(projectData : ByteArray) : Void{
-		var assetDict : Dynamic = {};
+		var assetDict : Map<String, ByteArray> = new Map<String, ByteArray>();
 		var assetCount : Int = 0;
 		projectData.position = 0;
 		var projObject : Dynamic = util.JSON.parse(projectData.readUTFBytes(projectData.length));
@@ -405,7 +405,7 @@ class ProjectIO
 			spr.setDirection(spr.direction);
 			whenDone(spr);
 		};
-		function assetsReceived(assetDict : Dynamic) : Void{
+		function assetsReceived(assetDict : Map<String,ByteArray>) : Void{
 			installAssets([spr], assetDict);
 			decodeAllImages([spr], done);
 		};
@@ -418,9 +418,9 @@ class ProjectIO
 		app.server.getAsset(md5AndExt, jsonReceived);
 	}
 
-	private function fetchSpriteAssets(objList : Array<Dynamic>, whenDone : Function) : Void{
+	private function fetchSpriteAssets(objList : Array<ScratchObj>, whenDone : Map<String,ByteArray>->Void) : Void{
 		// Download all media for the given list of ScratchObj objects.
-		var assetDict : Dynamic = {};
+		var assetDict : Map<String, ByteArray> = new Map<String, ByteArray>();
 		var assetCount : Int = 0;
 		var assetsToFetch : Array<Dynamic> = collectAssetsToFetch(objList);
 		function assetReceived(md5 : String, data : ByteArray) : Void{
@@ -437,7 +437,7 @@ class ProjectIO
 		for (md5 in assetsToFetch)fetchAsset(md5, assetReceived);
 	}
 
-	private function collectAssetsToFetch(objList : Array<Dynamic>) : Array<Dynamic>{
+	private function collectAssetsToFetch(objList : Array<ScratchObj>) : Array<Dynamic>{
 		// Return list of MD5's for all project assets.
 		var list : Array<Dynamic> = new Array<Dynamic>();
 		for (obj in objList){
@@ -454,7 +454,7 @@ class ProjectIO
 		return list;
 	}
 
-	private function installAssets(objList : Array<Dynamic>, assetDict : Dynamic) : Void{
+	private function installAssets(objList : Array<ScratchObj>, assetDict : Dynamic) : Void{
 		var data : ByteArray;
 		for (obj in objList){
 			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
@@ -491,7 +491,7 @@ class ProjectIO
 	// Record unique images and sounds
 	//----------------------------
 
-	private function recordImagesAndSounds(objList : Array<Dynamic>, uploading : Bool, proj : ScratchStage = null) : Void{
+	private function recordImagesAndSounds(objList : Array<ScratchObj>, uploading : Bool, proj : ScratchStage = null) : Void{
 		var recordedAssets : Dynamic = { };
 		images = [];
 		sounds = [];
@@ -528,7 +528,7 @@ class ProjectIO
 				sndToConvert.prepareToSave();
 				app.lp.setProgress(i / soundsToConvert.length);
 				app.lp.setInfo(sndToConvert.soundName);
-				setTimeout(convertASound, 50);
+				haxe.Timer.delay(convertASound, 50);
 			}
 			else {
 				app.removeLoadProgressBox();
@@ -536,14 +536,14 @@ class ProjectIO
 				DialogBox.notify("", "Sounds converted", app.stage, false, soundsConverted);
 			}
 		};
-		for (obj/* AS3HX WARNING could not determine type for var: obj exp: ECall(EField(EIdent(scratchObj),allObjects),[]) type: null */ in scratchObj.allObjects()){
+		for (obj in scratchObj.allObjects()){
 			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
 				if ("squeak" == snd.format)                     soundsToConvert.push(snd);
 			}
 		}
 		if (soundsToConvert.length > 0) {
 			app.addLoadProgressBox("Converting sounds...");
-			setTimeout(convertASound, 50);
+			haxe.Timer.delay(convertASound, 50);
 		}
 		else done();
 	}

@@ -69,7 +69,7 @@ class BlockShape extends Shape
 	private var topH : Int;
 	private var substack1H : Int = EmptySubstackH;
 	private var substack2H : Int = EmptySubstackH;
-	private var drawFunction : Graphics->Void = drawRectShape;
+	private var drawFunction : Graphics->Void;
 	private var redrawNeeded : Bool = true;
 
 	public function new(shape : Int = 1, color : Int = 0xFFFFFF)
@@ -79,6 +79,7 @@ class BlockShape extends Shape
 		this.shape = shape;
 		setShape(shape);
 		filters = blockShapeFilters();
+		drawFunction = drawRectShape;
 	}
 
 	public function setWidthAndTopHeight(newW : Int, newTopH : Int, doRedraw : Bool = false) : Void{

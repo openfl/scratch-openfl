@@ -35,7 +35,7 @@ import assets.Resources;
 import scratch.*;
 //import sound.ScratchSoundPlayer;
 //import sound.mp3.MP3SoundPlayer;
-import svgutils.SVGImporter;
+//import svgutils.SVGImporter;
 import translation.Translator;
 import uiwidgets.*;
 import util.*;

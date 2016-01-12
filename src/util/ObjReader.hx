@@ -56,7 +56,7 @@ import watchers.*;
 
 class ObjReader
 {
-	private inline var OBJ_REF : Int = 99;
+	private static inline var OBJ_REF : Int = 99;
 
 	private var s : IDataInput;
 	private var objTable : Array<Dynamic> = [];
@@ -84,7 +84,7 @@ class ObjReader
 		readObjTable();
 
 		// convert the array of names and values into a dictionary
-		var infoDict : Dynamic = new Dynamic();
+		var infoDict : Dynamic = {};
 		var keysAndValues : Array<Dynamic> = objTable[0][0];
 		var i : Int = 0;
 		while (i < (keysAndValues.length - 1)){

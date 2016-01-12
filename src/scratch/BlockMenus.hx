@@ -209,7 +209,7 @@ class BlockMenus implements DragClient
 	}
 
 	private function attributeMenu(evt : MouseEvent) : Void{
-		var obj : Dynamic;
+		var obj : ScratchObj;
 		if (block != null && block.args[1]) {
 			obj = app.stagePane.objNamed(block.args[1].argValue);
 		}
@@ -374,7 +374,7 @@ class BlockMenus implements DragClient
 
 	private function soundMenu(evt : MouseEvent) : Void{
 		function setSoundArg(s : Dynamic) : Void{
-			if (Std.is(s, Function))                 s();
+			if (Reflect.isFunction(s))                 s();
 			else setBlockArg(s);
 		};
 		var m : Menu = new Menu(setSoundArg, "sound");
@@ -526,7 +526,7 @@ class BlockMenus implements DragClient
 
 	private function changeOpMenu(evt : MouseEvent, opList : Array<Dynamic>) : Void{
 		function opMenu(selection : Dynamic) : Void{
-			if (Std.is(selection, Function)) {selection();return;
+			if (Reflect.isFunction(selection)) {selection();return;
 			}
 			block.changeOperator(selection);
 		};
@@ -665,7 +665,7 @@ class BlockMenus implements DragClient
 	}
 
 	private function varOrListSelection(selection : Dynamic) : Void{
-		if (Std.is(selection, Function)) {selection();return;
+		if (Reflect.isFunction(selection)) {selection();return;
 		}
 		setBlockVarOrListName(selection);
 	}
@@ -790,7 +790,7 @@ class BlockMenus implements DragClient
 
 	private function broadcastMenu(evt : MouseEvent) : Void{
 		function broadcastMenuSelection(selection : Dynamic) : Void{
-			if (Std.is(selection, Function))                 selection()
+			if (Reflect.isFunction(selection))                 selection()
 			else setBlockArg(selection);
 		};
 		var msgNames : Array<Dynamic> = app.runtime.collectBroadcasts();
@@ -819,7 +819,7 @@ class BlockMenus implements DragClient
 
 	private function broadcastInfoMenu(evt : MouseEvent) : Void{
 		function showBroadcasts(selection : Dynamic) : Void{
-			if (Std.is(selection, Function)) {selection();return;
+			if (Reflect.isFunction(selection)) {selection();return;
 			}
 			var msg : String = block.args[0].argValue;
 			var sprites : Array<Dynamic> = [];

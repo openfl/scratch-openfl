@@ -173,22 +173,11 @@ class Server implements IServer
 	// The whenDone() function is called when the request is done, either with the
 	// data returned by the server or with a null argument if the request failed.
 	// The request includes site and session authentication headers.
-	private function callServer(url : String, data : Dynamic, mimeType : String, whenDone : Function,
+	private function callServer(url : String, data : Dynamic, mimeType : String, whenDone : Dynamic->Void,
 			queryParams : Dynamic = null) : URLLoader{
-		function addListeners() : Void{
-			loader.addEventListener(Event.COMPLETE, completeHandler);
-			loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler);
-			loader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
-			loader.addEventListener(HTTPStatusEvent.HTTP_STATUS, statusHandler);
-		};
-
-		function removeListeners() : Void{
-			loader.removeEventListener(Event.COMPLETE, completeHandler);
-			loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler);
-			loader.removeEventListener(IOErrorEvent.IO_ERROR, errorHandler);
-			loader.removeEventListener(HTTPStatusEvent.HTTP_STATUS, statusHandler);
-		};
-
+		var loader : URLLoader = new URLLoader();
+		var removeListeners: Void->Void;
+		
 		function completeHandler(event : Event) : Void{
 			removeListeners();
 			callServerErrorInfo = null;
@@ -221,7 +210,20 @@ class Server implements IServer
 			onCallServerHttpStatus(url, data, e);
 		};
 
-		var loader : URLLoader = new URLLoader();
+		function addListeners() : Void{
+			loader.addEventListener(Event.COMPLETE, completeHandler);
+			loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler);
+			loader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+			loader.addEventListener(HTTPStatusEvent.HTTP_STATUS, statusHandler);
+		};
+
+		removeListeners = function removeListeners() : Void{
+			loader.removeEventListener(Event.COMPLETE, completeHandler);
+			loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler);
+			loader.removeEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+			loader.removeEventListener(HTTPStatusEvent.HTTP_STATUS, statusHandler);
+		};
+
 		loader.dataFormat = URLLoaderDataFormat.BINARY;
 		addListeners();
 
@@ -233,7 +235,7 @@ class Server implements IServer
 		}
 		for (key in Reflect.fields(queryParams)){
 			if (queryParams.exists(key)) {
-				url += nextSeparator + encodeURIComponent(key) + "=" + encodeURIComponent(Reflect.field(queryParams, key));
+				url += nextSeparator + StringTools.urlEncode(key) + "=" + StringTools.urlEncode(Reflect.field(queryParams, key));
 				nextSeparator = "&";
 			}
 		}
@@ -266,14 +268,14 @@ class Server implements IServer
 	}
 
 	// Make a simple GET. Uses the same callbacks as callServer().
-	public function serverGet(url : String, whenDone : Function) : URLLoader{
+	public function serverGet(url : String, whenDone : Dynamic->Void) : URLLoader{
 		return callServer(url, null, null, whenDone);
 	}
 
 	// -----------------------------
 	// Asset API
 	//------------------------------
-	public function getAsset(md5 : String, whenDone : Function) : URLLoader{
+	public function getAsset(md5 : String, whenDone : Dynamic->Void) : URLLoader{
 		//		if (BackpackPart.localAssets[md5] && BackpackPart.localAssets[md5].length > 0) {
 		//			whenDone(BackpackPart.localAssets[md5]);
 		//			return null;
@@ -282,14 +284,24 @@ class Server implements IServer
 		return serverGet(url, whenDone);
 	}
 
-	public function getMediaLibrary(libraryType : String, whenDone : Function) : URLLoader{
+	public function getMediaLibrary(libraryType : String, whenDone : Dynamic->Void) : URLLoader{
 		var url : String = getCdnStaticSiteURL() + "medialibraries/" + libraryType + "Library.json";
 		return serverGet(url, whenDone);
 	}
 
-	private function downloadThumbnail(url : String, w : Int, h : Int, whenDone : Function) : URLLoader{
+	private function downloadThumbnail(url : String, w : Int, h : Int, whenDone : Dynamic->Void) : URLLoader{
+		function imageError(e : IOErrorEvent) : Void{
+			Scratch.app.log(LogLevel.WARNING, "ServerOnline failed to decode image", {
+						url : url
+
+					});
+		};
+
+		function imageDecoded(e : Event) : Void{
+			whenDone(makeThumbnail(e.target.content.bitmapData));
+		};
 		function decodeImage(data : ByteArray) : Void{
-			if (data == null || data.length == 0)                 return  // no data  ;
+			if (data == null || data.length == 0)                 return;  // no data  ;
 			var decoder : Loader = new Loader();
 			decoder.contentLoaderInfo.addEventListener(Event.COMPLETE, imageDecoded);
 			decoder.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, imageError);
@@ -305,16 +317,6 @@ class Server implements IServer
 			}
 		};
 
-		function imageError(e : IOErrorEvent) : Void{
-			Scratch.app.log(LogLevel.WARNING, "ServerOnline failed to decode image", {
-						url : url
-
-					});
-		};
-
-		function imageDecoded(e : Event) : Void{
-			whenDone(makeThumbnail(e.target.content.bitmapData));
-		};
 
 		return serverGet(url, decodeImage);
 	}
@@ -332,7 +334,7 @@ class Server implements IServer
 		return result;
 	}
 
-	public function getThumbnail(idAndExt : String, w : Int, h : Int, whenDone : Function) : URLLoader{
+	public function getThumbnail(idAndExt : String, w : Int, h : Int, whenDone : Dynamic->Void) : URLLoader{
 		var url : String = getCdnStaticSiteURL() + "medialibrarythumbnails/" + idAndExt;
 		return downloadThumbnail(url, w, h, whenDone);
 	}
@@ -341,15 +343,15 @@ class Server implements IServer
 	// Translation Support
 	//------------------------------
 
-	public function getLanguageList(whenDone : Function) : Void{
+	public function getLanguageList(whenDone : Dynamic->Void) : Void{
 		serverGet("locale/lang_list.txt", whenDone);
 	}
 
-	public function getPOFile(lang : String, whenDone : Function) : Void{
+	public function getPOFile(lang : String, whenDone : Dynamic->Void) : Void{
 		serverGet("locale/" + lang + ".po", whenDone);
 	}
 
-	public function getSelectedLang(whenDone : Function) : Void{
+	public function getSelectedLang(whenDone : Dynamic->Void) : Void{
 		// Get the language setting.
 		var sharedObj : SharedObject = SharedObject.getLocal("Scratch");
 		if (sharedObj.data.lang)             whenDone(sharedObj.data.lang);

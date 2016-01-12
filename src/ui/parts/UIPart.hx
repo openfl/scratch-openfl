@@ -65,7 +65,7 @@ class UIPart extends Sprite
 		return tf;
 	}
 
-	public static function drawTopBar(g : Graphics, colors : Array<Dynamic>, path : Array<Dynamic>, w : Int, h : Int, borderColor : Int = -1) : Void{
+	public static function drawTopBar(g : Graphics, colors : Array<UInt>, path : Array<Dynamic>, w : Int, h : Int, borderColor : Int = -1) : Void{
 		if (borderColor < 0)             borderColor = CSS.borderColor;
 		g.clear();
 		drawBoxBkgGradientShape(g, Math.PI / 2, colors, [0x00, 0xFF], path, w, h);
@@ -73,7 +73,7 @@ class UIPart extends Sprite
 		DrawPath.drawPath(path, g);
 	}
 
-	private static function drawSelected(g : Graphics, colors : Array<Dynamic>, path : Array<Dynamic>, w : Int, h : Int) : Void{
+	private static function drawSelected(g : Graphics, colors : Array<UInt>, path : Array<Dynamic>, w : Int, h : Int) : Void{
 		g.clear();
 		drawBoxBkgGradientShape(g, Math.PI / 2, colors, [0xDC, 0xFF], path, w, h);
 		g.lineStyle(0.5, CSS.borderColor, 1, true);

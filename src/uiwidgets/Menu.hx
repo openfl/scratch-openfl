@@ -117,7 +117,7 @@ class Menu extends Sprite
 			clientFunction(itemValue);
 		}
 		else {
-			if (Std.is(itemValue, Function))                 itemValue();
+			if (Reflect.isFunction(itemValue))                 itemValue();
 		}
 		if (parent != null)             parent.removeChild(this);
 	}
