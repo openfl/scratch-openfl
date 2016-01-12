@@ -161,7 +161,7 @@ class Server implements IServer
 	// This will be called if callServer encounters an exception, before whenDone(null) is called.
 	// The url and data parameters match those passed to callServer.
 	private function onCallServerException(url : String, data : Dynamic, exception : Dynamic) : Void{
-		if (Std.is(exception, Error)) {
+		if (Std.is(exception, flash.errors.Error)) {
 			Scratch.app.logException(exception);
 		}
 	}
@@ -308,7 +308,7 @@ class Server implements IServer
 			try{
 				decoder.loadBytes(data);
 			}            catch (e : Dynamic){
-				if (Std.is(e, Error)) {
+				if (Std.is(e, flash.errors.Error)) {
 					Scratch.app.logException(e);
 				}
 				else {

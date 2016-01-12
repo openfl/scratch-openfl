@@ -182,10 +182,14 @@ class Interpreter
 		threads.push(new Thread(b, clone));
 	}
 
-	public function stopThreadsFor(target : Dynamic, skipActiveThread : Bool = false) : Void{
-		for (i in 0...threads.length){
+	public function stopThreadsFor(target : Dynamic, skipActiveThread : Bool = false) : Void {
+		var i = 0;
+		while (i < threads.length) {
 			var t : Thread = threads[i];
-			if (skipActiveThread && (t == activeThread))                 {i++;continue;
+			if (skipActiveThread && (t == activeThread))                 {
+				i++;
+				i++;
+				continue;
 			};
 			if (t.target == target) {
 				//if (Std.is(t.tmpObj, ScratchSoundPlayer)) {
@@ -193,6 +197,7 @@ class Interpreter
 				//}
 				t.stop();
 			}
+			i++;
 		}
 		if ((activeThread.target == target) && !skipActiveThread)             yield = true;
 	}
@@ -567,8 +572,8 @@ class Interpreter
 			if ((Std.is(listArg, Float)) && !Math.isNaN(listArg)) {
 				var last : Int = Std.parseInt(listArg);
 				if (last >= 1) {
-					list = new Array<Dynamic>(last - 1);
-					for (i in 0...last){list[i] = i + 1;
+					list = new Array<Dynamic>();
+					for (i in 0...last){list.push(i + 1);
 					}
 				}
 			}

@@ -422,8 +422,8 @@ class GestureHandler
 		// Return true if the given object is hit by the mouse and has a
 		// method named click, doubleClick, menu or objToGrab.
 		if (!o.hitTestPoint(globalX, globalY, true))             return false;
-		if ((Lambda.has(o, "click")) || (Lambda.has(o, "doubleClick")))             return true;
-		if ((Lambda.has(o, "menu")) || (Lambda.has(o, "objToGrab")))             return true;
+		if ((Reflect.hasField(o, "click")) || (Reflect.hasField(o, "doubleClick")))             return true;
+		if ((Reflect.hasField(o, "menu")) || (Reflect.hasField(o, "objToGrab")))             return true;
 		return false;
 	}
 

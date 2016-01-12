@@ -312,7 +312,7 @@ class Block extends Sprite
 	public function isInPalette() : Bool{
 		var o : DisplayObject = parent;
 		while (o != null){
-			if (Lambda.has(o, "isBlockPalette"))                 return true;
+			if (Reflect.hasField(o, "isBlockPalette"))                 return true;
 			o = o.parent;
 		}
 		return false;
@@ -417,23 +417,21 @@ class Block extends Sprite
 	public function restoreOriginalState() : Void{
 		var b : Block = try cast(originalParent, Block) catch(e:Dynamic) null;
 		scaleX = scaleY = 1;
-		switch (originalRole)
-		{
-			case ROLE_NONE:
-				if (parent)                     parent.removeChild(this);
-			case ROLE_ABSOLUTE:
-				originalParent.addChild(this);
-				var p : Point = originalParent.globalToLocal(originalPosition);
-				x = p.x;
-				y = p.y;
-			case ROLE_EMBEDDED:
-				b.replaceArgWithBlock(b.args[originalIndex], this, Scratch.app.scriptsPane);
-			case ROLE_NEXT:
-				b.insertBlock(this);
-			case ROLE_SUBSTACK1:
-				b.insertBlockSub1(this);
-			case ROLE_SUBSTACK2:
-				b.insertBlockSub2(this);
+		if (originalRole == ROLE_NONE) {
+			if (parent!= null)                     parent.removeChild(this);
+		} else if (originalRole == ROLE_ABSOLUTE) {
+			originalParent.addChild(this);
+			var p : Point = originalParent.globalToLocal(originalPosition);
+			x = p.x;
+			y = p.y;
+		} else if (originalRole ==  ROLE_EMBEDDED) {
+			b.replaceArgWithBlock(b.args[originalIndex], this, Scratch.app.scriptsPane);
+		} else if (originalRole ==  ROLE_NEXT) {
+			b.insertBlock(this);
+		} else if (originalRole ==  ROLE_SUBSTACK1) {
+			b.insertBlockSub1(this);
+		} else if (originalRole ==  ROLE_SUBSTACK2) {
+			b.insertBlockSub2(this);
 		}
 	}
 

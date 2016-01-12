@@ -136,6 +136,9 @@ class ResizeableFrame extends Sprite implements DragClient
 		var newW : Int = Std.int(Math.max(minWidth, pt.x + 3));
 		var newH : Int = Std.int(Math.max(minHeight, pt.y + 3));
 		setWidthHeight(newW, newH);
-		if (parent != null && (Lambda.has(parent, "fixLayout")))             (try cast(parent, Dynamic) catch(e:Dynamic) null).fixLayout();
+		if (parent != null && (Reflect.hasField(parent, "fixLayout"))) {
+			var unknownParent :Dynamic = parent;
+            unknownParent.fixLayout();
+		}
 	}
 }

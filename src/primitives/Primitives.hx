@@ -192,7 +192,10 @@ class Primitives
 			if (s1 == null)                 s1 = lcDict[a1] = Std.string(a1).toLowerCase();
 			var s2 : String = lcDict[a2];
 			if (s2 == null)                 s2 = lcDict[a2] = Std.string(a2).toLowerCase();
-			return s1.localeCompare(s2);
+			//return s1.localeCompare(s2);
+			if (s1 < s2) return -1;
+			if (s1 > s2) return 1;
+			return 0;
 		}
 		else {
 			// compare as numbers

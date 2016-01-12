@@ -55,7 +55,7 @@ class TranslatableStrings
 	private static var uiExtras : Array<String> = ["Backpack"];
 	private static var commandExtras : Array<String> = ["define", "else"];
 
-	private static var strings : Array<Dynamic> = [];
+	private static var strings : Array<String> = [];
 
 	public static function exportCommands() : Void{
 		strings = commandExtras.copy();
@@ -73,7 +73,7 @@ class TranslatableStrings
 	public static function exportHelpScreenNames() : Void{
 		// Generate a file mapping block specs to ops, used as keys for help screens.
 		var dict : Dynamic = { };
-		var keys : Array<Dynamic> = [];
+		var keys : Array<String> = [];
 		Reflect.setField(dict, "variable reporter", "readVariable");
 		Reflect.setField(dict, "set variable to", "setVar:to:");
 		Reflect.setField(dict, "change variable by", "changeVar:by:");
@@ -91,7 +91,13 @@ class TranslatableStrings
 			}
 		}
 		var data : String = "";
-		keys.sort(Array.CASEINSENSITIVE);
+		keys.sort(function(a, b) {
+			if (a.toLowerCase() < b.toLowerCase()) return -1;
+			if (a.toLowerCase() > b.toLowerCase()) return 1;
+			return 0;
+		});
+//
+		//keys.sort(Array.CASEINSENSITIVE);
 		for (k in keys){
 			data += "\t  '" + Reflect.field(dict, Std.string(k)) + "': '/help/studio/tips/blocks/FILENAME',\n";
 		}
@@ -153,7 +159,11 @@ class TranslatableStrings
 	private static function export(defaultName : String) : Void{
 		// Save the collected strings to a file, one string per line.
 		var data : String = "";
-		strings.sort(Array.CASEINSENSITIVE);
+		strings.sort(function(a, b) {
+			if (a.toLowerCase() < b.toLowerCase()) return -1;
+			if (a.toLowerCase() > b.toLowerCase()) return 1;
+			return 0;
+		});
 		for (s in strings)data += s + "\n";
 		data += "\n";
 		new FileReference().save(data, defaultName + ".txt");

@@ -127,14 +127,14 @@ class ProjectIO
 		return try cast(decodeFromZipFile(zipData), ScratchStage) catch(e:Dynamic) null;
 	}
 
-	public function decodeSpriteFromZipFile(zipData : ByteArray, whenDone : Function, fail : Function = null) : Void{
+	public function decodeSpriteFromZipFile(zipData : ByteArray, whenDone : Function, fail : Void->Void = null) : Void{
 		var spr : ScratchSprite = try cast(decodeFromZipFile(zipData), ScratchSprite) catch(e:Dynamic) null;
 		function imagesDecoded() : Void{
 			spr.showCostume(spr.currentCostumeIndex);
 			whenDone(spr);
 		};
 		if (spr != null)             decodeAllImages([spr], imagesDecoded, fail)
-		else if (fail != null)             Assert.fail();
+		else if (fail != null)             fail();
 	}
 
 	private function decodeFromZipFile(zipData : ByteArray) : ScratchObj{
@@ -214,7 +214,7 @@ class ProjectIO
 		}
 	}
 
-	public function decodeAllImages(objList : Array<ScratchObj>, whenDone : Function, fail : Function = null) : Void{
+	public function decodeAllImages(objList : Array<ScratchObj>, whenDone : Function, fail : Void->Void = null) : Void{
 		var allCostumes : Array<Dynamic> = [];
 		var imageDict : Map<ByteArray,Dynamic> = new Map<ByteArray,Dynamic>();  // maps image data to BitmapData  
 		var error : Bool = false;
@@ -241,7 +241,7 @@ class ProjectIO
 		function decodeError() : Void{
 			if (error)                 return;
 			error = true;
-			if (fail != null)                 Assert.fail();
+			if (fail != null)                 fail();
 		};
 
 		var c : ScratchCostume;
@@ -258,17 +258,17 @@ class ProjectIO
 		imageDecoded();
 	}
 
-	private function decodeImage(imageData : ByteArray, imageDict : Dictionary, doneFunction : Function, fail : Function) : Void{
+	private function decodeImage(imageData : ByteArray, imageDict : Dictionary, doneFunction : Function, fail : Void->Void) : Void{
 		function loadDone(e : Event) : Void{
 			Reflect.setField(imageDict, Std.string(imageData), e.target.content.bitmapData);
 			doneFunction();
 		};
 		function loadError(e : Event) : Void{
-			if (fail != null)                 Assert.fail();
+			if (fail != null)                 fail();
 		};
 		if (Reflect.field(imageDict, Std.string(imageData)) != null)             return  // already loading or loaded  ;
 		if (imageData == null || imageData.length == 0) {
-			if (fail != null)                 Assert.fail();
+			if (fail != null)                 fail();
 			return;
 		}
 		Reflect.setField(imageDict, Std.string(imageData), "loading...");

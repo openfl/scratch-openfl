@@ -278,7 +278,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	private function addButtons():Void {
 		addChild(closeButton = new IconButton(close, 'close'));
 		addChild(okayButton = new Button(Translator.map('OK'), addSelected));
-		addChild(cancelButton = new Button(Translator.map('Cancel'), close));
+		addChild(cancelButton = new Button(Translator.map('Cancel'), function() { close(null);} ));
 	}
 
 	// -----------------------------
@@ -402,7 +402,11 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		var colNum:Int = 0;
 		var nextX:Int = 2;
 		var nextY:Int = 2;
-		for (item in items) {
+		var item: Dynamic;
+		var it: Iterator<Dynamic> = items.iterator();
+		while (it.hasNext())
+		{
+			it = it.next();
 			item.x = nextX;
 			item.y = nextY;
 			resultsPane.addChild(item);
@@ -569,8 +573,8 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 				var objTable:Array<Dynamic>;
 				data.position = 0;
 				var reader:ObjReader = new ObjReader(data);
-				try { info = reader.readInfo(); } catch (e:Error) { data.position = 0; }
-				try { objTable = reader.readObjTable(); } catch (e:Error) { }
+				try { info = reader.readInfo(); } catch (e:flash.errors.Error) { data.position = 0; }
+				try { objTable = reader.readObjTable(); } catch (e:flash.errors.Error) { }
 				if (objTable == null) {
 					spriteError();
 					return;
@@ -686,7 +690,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		app.addLoadProgressBox('Importing sound...');
 		try {
 			snd = new ScratchSound(sndName, data); // try reading the data as a WAV file
-		} catch (e:Error) { }
+		} catch (e:flash.errors.Error) { }
 
 		if (snd != null && snd.sampleCount > 0) { // WAV data
 			startSoundUpload(snd, origName, uploadComplete);

@@ -394,7 +394,7 @@ class ScratchCostume {
 			j--;
 		}
 
-		R.length = L.length = 0;
+		//R.length = L.length = 0;  // Not sure why this is necessary
 		image.dispose();
 
 //trace('found bounds: '+new Rectangle(minX, minY, maxX - minX, maxY - minY));

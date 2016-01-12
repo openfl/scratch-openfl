@@ -428,8 +428,8 @@ class ScratchRuntime {
 			var objTable:Array<Dynamic>;
 			data.position = 0;
 			var reader:ObjReader = new ObjReader(data);
-			try { info = reader.readInfo(); } catch (e:Error) { data.position = 0; }
-			try { objTable = reader.readObjTable(); } catch (e:Error) { }
+			try { info = reader.readInfo(); } catch (e:flash.errors.Error) { data.position = 0; }
+			try { objTable = reader.readObjTable(); } catch (e:flash.errors.Error) { }
 			if (objTable == null) {
 				projectLoadFailed();
 				return;
@@ -1167,7 +1167,8 @@ class ScratchRuntime {
 			if (Std.is(b, Block)) b.cacheAsBitmap = true;
 			app.scriptsPane.addChild(b);
 			if (Std.is(obj, Array)) {
-				for (c in obj[1]) {
+				var comments:Array<Dynamic> = obj[1];
+				for (c in comments) {
 					app.scriptsPane.addChild(c);
 				}
 			}

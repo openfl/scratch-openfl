@@ -620,7 +620,7 @@ class ScratchStage extends ScratchObj {
 
 	private function getNumberAsHexString(number:UInt, minimumLength:UInt = 1, showHexDenotation:Bool = true):String {
 		// The string that will be output at the end of the function.
-		var string:String = number.toString(16).toUpperCase();
+		var string:String = StringTools.hex(number).toUpperCase();
 
 		// While the minimumLength argument is higher than the length of the string, add a leading zero.
 		while (minimumLength > string.length) {

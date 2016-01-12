@@ -28,6 +28,7 @@ package interpreter;
 
 
 import blocks.Block;
+import flash.sampler.StackFrame;
 import scratch.ScratchObj;
 
 
@@ -145,9 +146,11 @@ class Thread
 		// When growing, the current size is doubled.
 		var s : Int = stack.length;
 		var n : Int = s + s;
-		stack.length = n;
-		for (i in s...n){stack[i] = new StackFrame();
-		}
+		for (i in 0...s)
+			stack.push(new StackFrame());
+		//stack.length = n;
+		//for (i in s...n){stack[i] = new StackFrame();
+		//}
 	}
 }
 

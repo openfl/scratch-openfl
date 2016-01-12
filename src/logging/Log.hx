@@ -41,7 +41,7 @@ class Log
 	{
 		fixedBuffer = (messageCount > 0);
 		if (fixedBuffer) {
-			logBuffer.length = messageCount;
+			logBuffer.splice(messageCount, logBuffer.length - messageCount);
 		}
 		nextIndex = 0;
 	}

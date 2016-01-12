@@ -725,8 +725,10 @@ private static var Pop : Class<Dynamic>;
 		return s.join("\n");
 	}
 
-	private static function h1(s : String, ch : String = "=") : String{
-		return s + "\n" + new Array<Dynamic>(s.length + 1).join(ch) + "\n";
+	private static function h1(s : String, ch : String = "=") : String {
+		var underline = "";
+		for (i in 0...s.length) underline += ch;
+		return s + "\n" + underline + "\n";
 	}
 	private static function h2(s : String) : String{
 		return h1(s, "-");

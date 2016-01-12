@@ -365,7 +365,7 @@ class LibraryPart extends UIPart
 		};
 		addChild(videoLabel = UIPart.makeLabel(
 								Translator.map("Video on:"), smallTextFormat,
-								1, backdropLibraryButton.y + 22));
+								1, Std.int(backdropLibraryButton.y + 22)));
 
 		videoButton = makeButton(turnVideoOn, "checkbox");
 		videoButton.x = videoLabel.x + videoLabel.width + 1;

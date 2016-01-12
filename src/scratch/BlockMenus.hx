@@ -417,7 +417,7 @@ class BlockMenus implements DragClient
 			}
 			Scratch.app.setSaveNeeded();
 		};
-		var spriteNames : Array<Dynamic> = [];
+		var spriteNames : Array<String> = [];
 		var m : Menu = new Menu(setSpriteArg, "sprite");
 		if (includeMouse)             m.addItem(Translator.map("mouse-pointer"), "mouse-pointer");
 		if (includeEdge)             m.addItem(Translator.map("edge"), "edge");
@@ -434,7 +434,11 @@ class BlockMenus implements DragClient
 		for (sprite/* AS3HX WARNING could not determine type for var: sprite exp: ECall(EField(EField(EIdent(app),stagePane),sprites),[]) type: null */ in app.stagePane.sprites()){
 			if (sprite != app.viewedObj())                 spriteNames.push(sprite.objName);
 		}
-		spriteNames.sort(Array.CASEINSENSITIVE);
+		spriteNames.sort(function(a, b) {
+			if (a.toLowerCase() < b.toLowerCase()) return -1;
+			if (a.toLowerCase() > b.toLowerCase()) return 1;
+			return 0;
+		});
 		for (spriteName in spriteNames){
 			m.addItem(spriteName);
 		}

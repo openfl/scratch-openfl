@@ -165,15 +165,20 @@ class MediaPane extends ScrollFrameContents
 		var inserted : Bool = false;
 		var newItems : Array<Dynamic> = [];
 		var dropY : Int = Std.int(globalToLocal(new Point(dropped.x, dropped.y)).y);
-		for (i in 0...numChildren){
+		var i: Int = 0;
+		while (i < numChildren) {
 			var item : MediaInfo = try cast(getChildAt(i), MediaInfo) catch(e:Dynamic) null;
-			if (item == null)                 {i++;continue;
+			if (item == null)                 {
+				i++;
+				i++;
+				continue;
 			}  // skip item numbers  ;
 			if (!inserted && (dropY < item.y)) {
 				newItems.push(dropped);
 				inserted = true;
 			}
 			if (!sameMedia(item, dropped))                 newItems.push(item);
+			i++;
 		}
 		if (!inserted)             newItems.push(dropped);
 		replacedMedia(newItems);
@@ -191,14 +196,14 @@ class MediaPane extends ScrollFrameContents
 		var el : MediaInfo;
 		var scratchObj : ScratchObj = app.viewedObj();
 		if (isSound) {
-			scratchObj.sounds.splice(0);  // remove all  
+			scratchObj.sounds.splice(0, scratchObj.sounds.length);  // remove all  
 			for (el in newList){
 				if (el.mysound)                     scratchObj.sounds.push(el.mysound);
 			}
 		}
 		else {
 			var oldCurrentCostume : ScratchCostume = scratchObj.currentCostume();
-			scratchObj.costumes.splice(0);  // remove all  
+			scratchObj.costumes.splice(0, scratchObj.costumes.length);  // remove all  
 			for (el in newList){
 				if (el.mycostume)                     scratchObj.costumes.push(el.mycostume);
 			}
