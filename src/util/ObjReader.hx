@@ -50,6 +50,7 @@ import flash.errors.IOError;
 import flash.geom.Rectangle;
 import flash.utils.*;
 import blocks.BlockArg;
+import flash.Vector;
 import scratch.*;
 import sound.*;
 import watchers.*;
@@ -274,7 +275,7 @@ class ObjReader
 				var depth : Int = fields[2];
 
 				var rect : Rectangle = new Rectangle(0, 0, w, h);
-				var raster : Array<Int> = decodePixels(objTable[fields[4].index][0], (depth == 32));
+				var raster : Array<UInt> = decodePixels(objTable[fields[4].index][0], (depth == 32));
 				var bmpData : BitmapData = new BitmapData(w, h);
 
 				if (depth <= 8) {
@@ -283,13 +284,13 @@ class ObjReader
 						var colors : Array<Dynamic> = objTable[fields[5].index][0];
 						colormap = buildCustomColormap(depth, colors);
 					}
-					bmpData.setVector(rect, unpackPixels(raster, w, h, depth, colormap));
+					bmpData.setVector(rect, Vector.ofArray(unpackPixels(raster, w, h, depth, colormap)));
 				}
 				if (depth == 16) {
-					bmpData.setVector(rect, raster16to32(raster, w, h));
+					bmpData.setVector(rect, Vector.ofArray(raster16to32(raster, w, h)));
 				}
 				if (depth == 32) {
-					bmpData.setVector(rect, raster);
+					bmpData.setVector(rect, Vector.ofArray(raster));
 				}
 				objTable[i][0] = bmpData;
 			}
@@ -416,38 +417,38 @@ class ObjReader
 		// Convert SoundMedia objects to ScratchSound objects.
 		// To speed up reading old Scratch projects, compressed sounds
 		// are kept in Squeak format until the project is saved.
-		var cache : Dictionary = new Dictionary();  // used to avoid converting multiple identical copies of a sound to WAV  
-		var sndData : ByteArray;
-		for (entry in objTable){
-			if (entry[1] == 164) {  // SoundMedia  
-				var snd : ScratchSound = entry[0];
-				snd.soundName = entry[3];
-
-				if (entry[9] == null) {
-					var uncompressedSound : Array<Dynamic> = entry[4];
-					sndData = uncompressedSound[6];
-					snd.format = "";
-					snd.rate = uncompressedSound[7];
-					snd.bitsPerSample = 16;
-					snd.sampleCount = Std.int(sndData.length / 2);
-					if (Reflect.field(cache, Std.string(sndData)) != null) {
-						snd.soundData = Reflect.field(cache, Std.string(sndData));
-					}
-					else {
-						snd.soundData = WAVFile.encode(reverseBytes(sndData), snd.sampleCount, snd.rate, false);
-						Reflect.setField(cache, Std.string(sndData), snd.soundData);
-					}
-				}
-				else {
-					sndData = entry[9];
-					snd.format = "squeak";
-					snd.rate = entry[7];
-					snd.bitsPerSample = entry[8];
-					snd.sampleCount = Math.floor((8 * sndData.length) / snd.bitsPerSample);
-					snd.soundData = sndData;
-				}
-			}
-		}
+		//var cache : Dictionary = new Dictionary();  // used to avoid converting multiple identical copies of a sound to WAV  
+		//var sndData : ByteArray;
+		//for (entry in objTable){
+			//if (entry[1] == 164) {  // SoundMedia  
+				//var snd : ScratchSound = entry[0];
+				//snd.soundName = entry[3];
+//
+				//if (entry[9] == null) {
+					//var uncompressedSound : Array<Dynamic> = entry[4];
+					//sndData = uncompressedSound[6];
+					//snd.format = "";
+					//snd.rate = uncompressedSound[7];
+					//snd.bitsPerSample = 16;
+					//snd.sampleCount = Std.int(sndData.length / 2);
+					//if (Reflect.field(cache, Std.string(sndData)) != null) {
+						//snd.soundData = Reflect.field(cache, Std.string(sndData));
+					//}
+					//else {
+						//snd.soundData = WAVFile.encode(reverseBytes(sndData), snd.sampleCount, snd.rate, false);
+						//Reflect.setField(cache, Std.string(sndData), snd.soundData);
+					//}
+				//}
+				//else {
+					//sndData = entry[9];
+					//snd.format = "squeak";
+					//snd.rate = entry[7];
+					//snd.bitsPerSample = entry[8];
+					//snd.sampleCount = Math.floor((8 * sndData.length) / snd.bitsPerSample);
+					//snd.soundData = sndData;
+				//}
+			//}
+		//}
 	}
 
 	private function reverseBytes(orig : ByteArray) : ByteArray{
@@ -463,8 +464,8 @@ class ObjReader
 		return out;
 	}
 
-	private function decodePixels(data : Dynamic, addAlpha : Bool) : Array<Int>{
-		var result : Array<Int>;
+	private function decodePixels(data : Dynamic, addAlpha : Bool) : Array<UInt>{
+		var result : Array<UInt>;
 		var i : Int;
 		var w : Int;
 		if (Std.is(data, Array)) {
@@ -479,7 +480,7 @@ class ObjReader
 
 		var s : ByteArray = cast((data), ByteArray);
 		var n : Int = decodeInt(s);
-		result = new Array<Int>();
+		result = new Array<UInt>();
 		i = 0;
 		while ((s.bytesAvailable > 0) && (i < n)){
 			var runLengthAndCode : Int = decodeInt(s);
@@ -525,8 +526,8 @@ class ObjReader
 		return s.readUnsignedInt();
 	}
 
-	private function unpackPixels(words : Array<Int>, w : Int, h : Int, depth : Int, colormap : Array<Int>) : Array<Int>{
-		var result : Array<Int> = new Array<Int>();
+	private function unpackPixels(words : Array<UInt>, w : Int, h : Int, depth : Int, colormap : Array<Int>) : Array<UInt>{
+		var result : Array<UInt> = new Array<UInt>();
 		var span : Int = Std.int(words.length / h);
 		var mask : Int = (1 << depth) - 1;
 		var pixels_per_word : Int = Std.int(32 / depth);
@@ -548,8 +549,8 @@ class ObjReader
 		return result;
 	}
 
-	private function raster16to32(raster16 : Array<Int>, w : Int, h : Int) : Array<Int>{
-		var result : Array<Int> = new Array<Int>();
+	private function raster16to32(raster16 : Array<UInt>, w : Int, h : Int) : Array<UInt>{
+		var result : Array<UInt> = new Array<UInt>();
 		var shift : Int;
 		var word : Int;
 		var pix : Int;
@@ -659,14 +660,3 @@ class ObjReader
 	}
 }
 
-class Ref
-{
-	@:allow(util)
-	private var index : Int;
-	private function new(i : Int)
-	{index = i - 1;
-	}
-	@:allow(util)
-	private function toString() : String{return "Ref(" + index + ")";
-	}
-}

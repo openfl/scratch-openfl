@@ -413,8 +413,8 @@ private static var Pop : Class<Dynamic>;
 
 	/* Procedures */
 
-	public function procedureDefinitions() : Array<Dynamic>{
-		var result : Array<Dynamic> = [];
+	public function procedureDefinitions() : Array<Block>{
+		var result : Array<Block> = [];
 		for (i in 0...scripts.length){
 			var b : Block = try cast(scripts[i], Block) catch(e:Dynamic) null;
 			if (b != null && (b.op == Specs.PROCEDURE_DEF))                 result.push(b);

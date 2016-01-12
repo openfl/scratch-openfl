@@ -142,7 +142,7 @@ class ListWatcher extends Sprite
 		function fileLoaded(event : Event) : Void{
 			var file : FileReference = cast((event.target), FileReference);
 			var s : String = file.data.readUTFBytes(file.data.length);
-			importLines(removeTrailingEmptyLines(s.split(new EReg('\\r\\n|[\\r\\n]', ""))));
+			importLines(removeTrailingEmptyLines(new EReg('\\r\\n|[\\r\\n]', "").split(s)));
 		};
 
 		Scratch.loadSingleFile(fileLoaded);

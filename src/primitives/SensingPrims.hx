@@ -329,11 +329,11 @@ class SensingPrims
 
 	private function primTimestamp(b : Block) : Dynamic{
 		var millisecondsPerDay : Int = 24 * 60 * 60 * 1000;
-		var epoch : Date = new Date(2000, 0, 1);  // Jan 1, 2000 (Note: Months are zero-based.)  
+		var epoch : Date = new Date(2000, 0, 1, 0, 0, 0);  // Jan 1, 2000 (Note: Months are zero-based.)  
 		var now : Date = Date.now();
-		var dstAdjust : Int = now.timezoneOffset - epoch.timezoneOffset;
-		var mSecsSinceEpoch : Float = now.time - epoch.time;
-		mSecsSinceEpoch += ((now.timezoneOffset - dstAdjust) * 60 * 1000);  // adjust to UTC (GMT)  
+		var dstAdjust : Int = 0; // now.timezoneOffset - epoch.timezoneOffset;
+		var mSecsSinceEpoch : Float = now.getTime() - epoch.getTime();
+		mSecsSinceEpoch += 0; // ((now.timezoneOffset - dstAdjust) * 60 * 1000);  // adjust to UTC (GMT)  
 		return mSecsSinceEpoch / millisecondsPerDay;
 	}
 }

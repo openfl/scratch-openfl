@@ -277,7 +277,7 @@ class ScratchCostume {
 			var pts:Array<Point> = RasterHull();
 			s.graphics.clear();
 
-			if(pts.length) {
+			if(pts.length != 0) {
 				s.graphics.lineStyle(1);
 				s.graphics.moveTo(pts[Std.int(pts.length-1)].x, pts[Std.int(pts.length-1)].y);
 				for (pt in pts)
@@ -379,12 +379,16 @@ class ScratchCostume {
 		}
 
 		/* collect final results*/
-		for(i in 0...(ll+1))
+		var i:Int = 0;
+		while (i < ll+1) {
 			H[i] = L[i]; //left part;
+			i++;
+		}
 
 		var j:Int = rr;
 		while (j >= 0) {
-			H[i++] = R[j]; //right part;
+			H[i] = R[j]; //right part;
+			i++;
 			j--;
 		}
 

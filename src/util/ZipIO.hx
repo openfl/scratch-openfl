@@ -209,7 +209,7 @@ class ZipIO
 		}
 		var e : Entry = new Entry();
 		e.name = fileName;
-		e.time = dosTime(Date.now().time);
+		e.time = dosTime(Date.now().getTime());
 		e.offset = buf.position;
 		e.compressionMethod = 0;
 		e.data = new ByteArray();
@@ -287,8 +287,8 @@ class ZipIO
 	}
 
 	public function dosTime(time : Float) : Int{
-		var d : Date = new Date(time);
-		return (d.fullYear - 1980 & 0x7F) << 25 | (d.month + 1) << 21 | d.day << 16 | d.hours << 11 | d.minutes << 5 | d.seconds >> 1;
+		var d : Date = Date.fromTime(time);
+		return (d.getFullYear() - 1980 & 0x7F) << 25 | (d.getMonth() + 1) << 21 | d.getDay() << 16 | d.getHours() << 11 | d.getMinutes() << 5 | d.getSeconds() >> 1;
 	}
 
 	private function computeCRC(buf : ByteArray) : Int{

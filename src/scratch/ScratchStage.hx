@@ -143,7 +143,7 @@ class ScratchStage extends ScratchObj {
 
 	private function initMedia():Void {
 		costumes.push(ScratchCostume.emptyBitmapCostume(Translator.map('backdrop1'), true));
-		sounds.push(new ScratchSound(Translator.map('pop'), new Pop()));
+		sounds.push(new ScratchSound(Translator.map('pop'), Type.createInstance(ScratchObj.Pop, [])));
 		sounds[0].prepareToSave();
 	}
 

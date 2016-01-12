@@ -252,8 +252,12 @@ class Block extends Sprite
 		return listName;
 	}
 
-	public function normalizedArgs() : Array<Dynamic>{
-		return (rightToLeft) ? args.concat().reverse() : args;
+	public function normalizedArgs() : Array<Dynamic> {
+		if (!rightToLeft) return args;
+		var reversed = args.copy();
+		reversed.reverse();
+		return reversed;
+		//return (rightToLeft) ? args.concat([]).reverse() : args;
 	}
 
 	public function changeOperator(newOp : String) : Void{

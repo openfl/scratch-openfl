@@ -203,8 +203,8 @@ class ScratchRuntime {
 		allStacksAndOwnersDo(startMatchingKeyHats);
 	}
 
-	public function collectBroadcasts():Array<Dynamic> {
-		var result:Array<Dynamic> = [];
+	public function collectBroadcasts():Array<String> {
+		var result:Array<String> = [];
 		function addBlock(b:Block):Void {
 			if ((b.op == 'broadcast:') ||
 					(b.op == 'doBroadcastAndWait') ||
@@ -380,7 +380,7 @@ class ScratchRuntime {
 			installProjectFromFile(fileName, data);
 		}
 		function fileLoadHandler(event:Event):Void {
-			var file:FileReference = FileReference(event.target);
+			var file:FileReference = cast(event.target, FileReference);
 			fileName = file.name;
 			data = file.data;
 			if (app.stagePane.isEmpty()) doInstall();
@@ -470,7 +470,7 @@ class ScratchRuntime {
 		app.installStage(project);
 		app.updateSpriteLibrary(true);
 		// set the active sprite
-		var allSprites:Array<Dynamic> = app.stagePane.sprites();
+		var allSprites:Array<ScratchSprite> = app.stagePane.sprites();
 		if (allSprites.length > 0) {
 			allSprites = allSprites.sortOn('indexInLibrary');
 			app.selectSprite(allSprites[0]);

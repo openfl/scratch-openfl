@@ -135,7 +135,8 @@ class Scratch extends Sprite {
 
 	public var logger:Log = new Log(16);
 
-	public function Scratch() {
+	public function new() {
+		super();
 		//SVGTool.setStage(stage);
 		loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		app = this;
@@ -628,8 +629,8 @@ class Scratch extends Sprite {
 	}
 
 	public function setProjectName(s:String):Void {
-		if (s.slice(-3) == '.sb') s = s.slice(0, -3);
-		if (s.slice(-4) == '.sb2') s = s.slice(0, -4);
+		if (s.substr(-3) == '.sb') s = s.substr(0, s.length-3);
+		if (s.substr(-4) == '.sb2') s = s.substr(0, s.length-4);
 		stagePart.setProjectName(s);
 	}
 
@@ -1252,7 +1253,7 @@ class Scratch extends Sprite {
 			m.addItem(entry[1], entry[0]);
 		}
 		var p:Point = b.localToGlobal(new Point(0, 0));
-		m.showOnStage(stage, b.x, topBarPart.bottom() - 1);
+		m.showOnStage(stage, Std.int(b.x), Std.int(topBarPart.bottom() - 1));
 	}
 
 	public function startNewProject(newOwner:String, newID:String):Void {
@@ -1410,7 +1411,7 @@ class Scratch extends Sprite {
 		}
 
 		function deleteBox():Void {
-			if (box.parent) {
+			if (box.parent != null) {
 				box.parent.removeChild(box);
 			}
 		}

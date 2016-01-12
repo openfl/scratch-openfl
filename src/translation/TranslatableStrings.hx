@@ -52,13 +52,13 @@ class TranslatableStrings
 		"1", 
 		"%n * %n", "%n + %n", "%n - %n", "%n / %n", 
 		"%s < %s", "%s = %s", "%s > %s"];
-	private static var uiExtras : Array<Dynamic> = ["Backpack"];
-	private static var commandExtras : Array<Dynamic> = ["define", "else"];
+	private static var uiExtras : Array<String> = ["Backpack"];
+	private static var commandExtras : Array<String> = ["define", "else"];
 
 	private static var strings : Array<Dynamic> = [];
 
 	public static function exportCommands() : Void{
-		strings = commandExtras.concat();
+		strings = commandExtras.copy();
 		for (r/* AS3HX WARNING could not determine type for var: r exp: EField(EIdent(Specs),commands) type: null */ in Specs.commands){
 			if ((r[2] < 90) || (r[2] > 100)) {  // ignore obsolete and experiment specs (categories 90-100)  
 				var spec : String = r[0];
@@ -99,16 +99,16 @@ class TranslatableStrings
 	}
 
 	public static function exportUIStrings() : Void{
-		strings = uiExtras.concat();
+		strings = uiExtras.copy();
 
 		// collect strings from various UI classes
 		Menu.stringCollectionMode = true;
 		//addAll(BackpackPart.strings());
 		addAll(BlockMenus.strings());
 		addAll(BlockPalette.strings());
-		addAll(ColorPicker.strings());
-		addAll(DrawPropertyUI.strings());
-		addAll(ImageEdit.strings());
+		//addAll(ColorPicker.strings());
+		//addAll(DrawPropertyUI.strings());
+		//addAll(ImageEdit.strings());
 		addAll(ImagesPart.strings());
 		addAll(LibraryPart.strings());
 		addAll(ListWatcher.strings());

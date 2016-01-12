@@ -117,8 +117,8 @@ class ScriptsPane extends ScrollFrameContents
 	public function saveScripts(saveNeeded : Bool = true) : Void{
 		// Save the blocks in this pane in the viewed objects scripts list.
 		if (viewedObj == null)             return;
-		viewedObj.scripts.splice(0);  // remove all  
-		viewedObj.scriptComments.splice(0);  // remove all  
+		viewedObj.scripts.splice(0,viewedObj.scripts.length);  // remove all  
+		viewedObj.scriptComments.splice(0,viewedObj.scriptComments.length);  // remove all  
 		for (i in 0...numChildren){
 			var o : Dynamic = getChildAt(i);
 			if (Std.is(o, Block))                 viewedObj.scripts.push(o);

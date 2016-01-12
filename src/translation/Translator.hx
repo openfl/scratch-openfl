@@ -208,16 +208,19 @@ class Translator
 		var i : Int = s.indexOf("\"");  // find first double-quote  
 		if (i < 0)             i = s.indexOf(" ");  // if no double-quote, start after first space  ;
 		var result : String = "";
-		for (i in i + 1...s.length){
+		i = i + 1;
+		while (i < s.length) {
 			var ch : String = s.charAt(i);
 			if ((ch == "\\") && (i < (s.length - 1))) {
-				ch = s.charAt(++i);
+				i++;
+				ch = s.charAt(i);
 				if (ch == "n")                     ch = "\n";
 				if (ch == "r")                     ch = "\r";
 				if (ch == "t")                     ch = "\t";
 			}
 			if (ch == "\"")                 return result;  // closing double-quote  ;
 			result += ch;
+			i++;
 		}
 		return result;
 	}

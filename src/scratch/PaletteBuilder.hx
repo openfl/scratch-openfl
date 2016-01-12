@@ -91,7 +91,7 @@ class PaletteBuilder {
 		for (spec in Specs.commands) {
 			if ((spec.length > 3) && (spec[2] == category)) {
 				var blockColor:Int = (app.interp.isImplemented(spec[3])) ? catColor : 0x505050;
-				var defaultArgs:Array = targetObj.defaultArgsFor(spec[3], spec.slice(4));
+				var defaultArgs:Array<String> = targetObj.defaultArgsFor(spec[3], spec.slice(4));
 				var label:String = spec[0];
 				if (targetObj.isStage && spec[3] == 'whenClicked') label = 'when Stage clicked';
 				var block:Block = new Block(label, spec[1], blockColor, spec[3], defaultArgs);
@@ -128,7 +128,7 @@ class PaletteBuilder {
 		// show creation button, hat, and call blocks
 		var catColor:Int = Specs.blockColor(Specs.procedureColor);
 		addItem(new Button(Translator.map('Make a Block'), makeNewBlock, false, '/help/studio/tips/blocks/make-a-block/'));
-		var definitions:Array = app.viewedObj().procedureDefinitions();
+		var definitions:Array<Block> = app.viewedObj().procedureDefinitions();
 		if (definitions.length > 0) {
 			nextY += 5;
 			for (proc in definitions) {
@@ -181,7 +181,7 @@ class PaletteBuilder {
 		catColor = Specs.listColor;
 		addItem(new Button(Translator.map('Make a List'), makeList));
 
-		var listNames:Array = app.runtime.allListNames().sort();
+		var listNames:Array<String> = app.runtime.allListNames().sort();
 		if (listNames.length > 0) {
 			for (n in listNames) {
 				addVariableCheckbox(n, true);

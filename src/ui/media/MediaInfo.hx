@@ -164,7 +164,7 @@ class MediaInfo extends Sprite {
 	private function fileType(s:String):String {
 		if (s == null) return '';
 		var i:Int = s.lastIndexOf('.');
-		return (i < 0) ? '' : s.slice(i + 1);
+		return (i < 0) ? '' : s.substr(i + 1);
 	}
 
 	private function setScriptThumbnail():Void {

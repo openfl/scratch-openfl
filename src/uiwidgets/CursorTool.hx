@@ -26,6 +26,7 @@ import flash.geom.Point;
 import flash.system.Capabilities;
 import flash.ui.*;
 import assets.Resources;
+import flash.Vector;
 
 class CursorTool
 {
@@ -141,7 +142,7 @@ class CursorTool
 		images[0] = bmp;
 
 		var cursorData : MouseCursorData = new MouseCursorData();
-		cursorData.data = images;
+		cursorData.data = Vector.ofArray(images);
 		cursorData.hotSpot = hotSpot;
 		Mouse.registerCursor(name, cursorData);
 	}

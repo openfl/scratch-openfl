@@ -79,6 +79,7 @@ class MediaLibrary extends Sprite {
 	private static var libraryCache:Object = {}; // cache of all mediaLibrary entries
 
 	public function new(app:Scratch, type:String, whenDone:Function) {
+		super();
 		this.app = app;
 		this.assetType = type;
 		this.whenDone = whenDone;
@@ -427,7 +428,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 				var obj:Object = null;
 				if (assetType == 'extension') {
 					whenDone(item.dbObj.extension);
-				} else if (md5AndExt.slice(-5) == '.json') {
+				} else if (md5AndExt.substr(-5) == '.json') {
 					io.fetchSprite(md5AndExt, whenDone);
 				} else if (assetType == 'sound') {
 					io.fetchSound(md5AndExt, item.dbObj.name, whenDone);
@@ -541,8 +542,8 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		var fExt:String = '';
 		var i:Int = fName.lastIndexOf('.');
 		if (i > 0) {
-			fExt = fName.slice(i).toLowerCase();
-			fName = fName.slice(0, i);
+			fExt = fName.substring(i).toLowerCase();
+			fName = fName.substring(0, i);
 		}
 
 		if ((fExt == '.png') || (fExt == '.jpg') || (fExt == '.jpeg')) {
@@ -645,7 +646,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	private function importSoundsFromDisk():Void {
 		var files:FileReferenceList = new FileReferenceList();
 		function fileLoaded(e:Event):Void {
-			convertAndUploadSound(FileReference(e.target).name, FileReference(e.target).data);
+			convertAndUploadSound(cast(e.target, FileReference).name, cast(e.target, FileReference).data);
 		}
 		function fileSelected(e:Event):Void {
 			for (j in 0...files.fileList.length) {
@@ -680,7 +681,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		}
 		var origName:String = sndName;
 		var i:Int = sndName.lastIndexOf('.');
-		if (i > 0) sndName = sndName.slice(0, i); // remove extension
+		if (i > 0) sndName = sndName.substring(0, i); // remove extension
 
 		app.addLoadProgressBox('Importing sound...');
 		try {

@@ -225,7 +225,7 @@ class ProjectIO
 				if ((c.baseLayerData != null) && (c.baseLayerBitmap == null)) {
 					var img : Dynamic = imageDict[c.baseLayerData];
 					if (Std.is(img, BitmapData))                         c.baseLayerBitmap = img;
-					if (Std.is(img, SVGElement))                         c.setSVGRoot(img, false);
+					//if (Std.is(img, SVGElement))                         c.setSVGRoot(img, false);
 				}
 				if ((c.textLayerData != null) && (c.textLayerBitmap == null))                     c.textLayerBitmap = imageDict[c.textLayerData];
 			}
@@ -250,8 +250,8 @@ class ProjectIO
 		}
 		for (c in allCostumes){
 			if ((c.baseLayerData != null) && (c.baseLayerBitmap == null)) {
-				if (ScratchCostume.isSVGData(c.baseLayerData))                     decodeSVG(c.baseLayerData, imageDict, imageDecoded)
-				else decodeImage(c.baseLayerData, imageDict, imageDecoded, decodeError);
+				//if (ScratchCostume.isSVGData(c.baseLayerData))                     decodeSVG(c.baseLayerData, imageDict, imageDecoded)
+				/*else*/ decodeImage(c.baseLayerData, imageDict, imageDecoded, decodeError);
 			}
 			if ((c.textLayerData != null) && (c.textLayerBitmap == null))                 decodeImage(c.textLayerData, imageDict, imageDecoded, decodeError);
 		}
@@ -279,19 +279,19 @@ class ProjectIO
 	}
 
 	private function decodeSVG(svgData : ByteArray, imageDict : Dictionary, doneFunction : Function) : Void{
-		function loadDone(svgRoot : SVGElement) : Void{
-			Reflect.setField(imageDict, Std.string(svgData), svgRoot);
-			doneFunction();
-		};
-		if (Reflect.field(imageDict, Std.string(svgData)) != null)             return  // already loading or loaded  ;
-		var importer : SVGImporter = new SVGImporter(cast((svgData), XML));
-		if (importer.hasUnloadedImages()) {
-			Reflect.setField(imageDict, Std.string(svgData), "loading...");
-			importer.loadAllImages(loadDone);
-		}
-		else {
-			Reflect.setField(imageDict, Std.string(svgData), importer.root);
-		}
+		//function loadDone(svgRoot : SVGElement) : Void{
+			//Reflect.setField(imageDict, Std.string(svgData), svgRoot);
+			//doneFunction();
+		//};
+		//if (Reflect.field(imageDict, Std.string(svgData)) != null)             return  // already loading or loaded  ;
+		//var importer : SVGImporter = new SVGImporter(cast((svgData), XML));
+		//if (importer.hasUnloadedImages()) {
+			//Reflect.setField(imageDict, Std.string(svgData), "loading...");
+			//importer.loadAllImages(loadDone);
+		//}
+		//else {
+			//Reflect.setField(imageDict, Std.string(svgData), importer.root);
+		//}
 	}
 
 	public function downloadProjectAssets(projectData : ByteArray) : Void{
@@ -387,7 +387,7 @@ class ProjectIO
 				whenDone(snd);
 			}
 			else {  // try to read data as an MP3 file  
-				MP3Loader.convertToScratchSound(sndName, sndData, whenDone);
+				//MP3Loader.convertToScratchSound(sndName, sndData, whenDone);
 			}
 		};
 		app.server.getAsset(id, gotSoundData);
@@ -475,9 +475,9 @@ class ProjectIO
 					snd.soundData = data;
 					snd.convertMP3IfNeeded();
 				}
-				else {
-					snd.soundData = WAVFile.empty();
-				}
+				//else {
+					//snd.soundData = WAVFile.empty();
+				//}
 			}
 		}
 	}

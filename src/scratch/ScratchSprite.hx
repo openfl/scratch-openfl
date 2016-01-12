@@ -71,7 +71,7 @@ class ScratchSprite extends ScratchObj {
 	public var spriteInfo:Object = {};
 	private var geomShape:Shape;
 
-	public function ScratchSprite(name:String = 'Sprite1') {
+	public function new(name:String = 'Sprite1') {
 		objName = name;
 		filterPack = new FilterPack(this);
 		initMedia();
@@ -88,7 +88,7 @@ class ScratchSprite extends ScratchObj {
 	private function initMedia():Void {
 		var graySquare:BitmapData = new BitmapData(4, 4, true, 0x808080);
 		costumes.push(new ScratchCostume(Translator.map('costume1'), graySquare));
-		sounds.push(new ScratchSound(Translator.map('pop'), new Pop()));
+		sounds.push(new ScratchSound(Translator.map('pop'), Type.createInstance(ScratchObj.Pop, [])));
 		sounds[0].prepareToSave();
 	}
 
@@ -449,7 +449,7 @@ class ScratchSprite extends ScratchObj {
 		return newR;
 	}
 
-	public override function defaultArgsFor(op:String, specDefaults:Array<Dynamic>):Array<String> {
+	public override function defaultArgsFor(op:String, specDefaults:Array<Dynamic>):Array<Dynamic> {
 		if ('gotoSpriteOrMouse:' == op) return ['_mouse_'];
 		if ('gotoX:y:' == op) return [Math.round(scratchX), Math.round(scratchY)];
 		if ('glideSecs:toX:y:elapsed:from:' == op) return [1, Math.round(scratchX), Math.round(scratchY)];
