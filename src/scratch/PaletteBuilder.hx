@@ -91,7 +91,7 @@ class PaletteBuilder {
 		for (spec in Specs.commands) {
 			if ((spec.length > 3) && (spec[2] == category)) {
 				var blockColor:Int = (app.interp.isImplemented(spec[3])) ? catColor : 0x505050;
-				var defaultArgs:Array<String> = targetObj.defaultArgsFor(spec[3], spec.slice(4));
+				var defaultArgs:Array<Dynamic> = targetObj.defaultArgsFor(spec[3], spec.slice(4));
 				var label:String = spec[0];
 				if (targetObj.isStage && spec[3] == 'whenClicked') label = 'when Stage clicked';
 				var block:Block = new Block(label, spec[1], blockColor, spec[3], defaultArgs);
@@ -166,7 +166,14 @@ class PaletteBuilder {
 
 		// variable buttons, reporters, and set/change blocks
 		addItem(new Button(Translator.map('Make a Variable'), makeVariable));
-		var varNames:Array<String> = app.runtime.allVarNames().sort();
+		var sortedVarNames = app.runtime.allVarNames();
+		sortedVarNames.sort(
+			function(a, b) { 
+				if (a < b) return -1;
+				if (b > a) return 1;
+				return 0;
+			});
+		var varNames:Array<String> = sortedVarNames;
 		if (varNames.length > 0) {
 			for (n in varNames) {
 				addVariableCheckbox(n, false);
@@ -181,7 +188,13 @@ class PaletteBuilder {
 		catColor = Specs.listColor;
 		addItem(new Button(Translator.map('Make a List'), makeList));
 
-		var listNames:Array<String> = app.runtime.allListNames().sort();
+		var listNames:Array<String> = app.runtime.allListNames();
+		listNames.sort(
+			function(a, b) { 
+				if (a < b) return -1;
+				if (b > a) return 1;
+				return 0;
+			});
 		if (listNames.length > 0) {
 			for (n in listNames) {
 				addVariableCheckbox(n, true);
@@ -355,7 +368,7 @@ class PaletteBuilder {
 				case 'sensorPressed:':
 				case 'timeAndDate':
 					data.param = getBlockArg(data.block, 0);
-					break;
+					//break;
 			}
 		}
 		var showFlag:Bool = !app.runtime.watcherShowing(data);

@@ -12,7 +12,7 @@ class ScratchEasyStarter extends Scratch
 	}
 
 	override private function initServer() : Void{
-		var cdnPrefix : String = loaderInfo.parameters["cdnPrefix"];
+		var cdnPrefix : String = Reflect.field(loaderInfo.parameters, "cdnPrefix");
 		//ExternalInterface.call("console.log", cdnPrefix);
 		if (cdnPrefix != null) 
 			server = new ServerEasyStarter(cdnPrefix)

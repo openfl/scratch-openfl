@@ -238,7 +238,8 @@ class ScrollFrame extends Sprite implements DragClient
 	private function mouseDown(evt : MouseEvent) : Void{
 		if (evt.shiftKey || !dragScrolling)             return;
 		if (evt.target == contents) {
-			cast(root, Dynamic).gh.setDragClient(this, evt);
+			var unknownRoot:Dynamic = root;
+			unknownRoot.gh.setDragClient(this, evt);
 			contents.mouseChildren = false;
 		}
 	}

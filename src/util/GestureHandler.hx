@@ -162,7 +162,8 @@ class GestureHandler
 		Menu.removeMenusFrom(stage);
 		var menuTarget : Dynamic = findTargetFor("menu", app, x, y);
 		if (menuTarget == null)             return;
-		try{var menu : Menu = menuTarget.menu(new MouseEvent("right click"));
+		var menu : Menu;
+		try{menu = menuTarget.menu(new MouseEvent("right click"));
 		}        catch (e : Error){ };
 		if (menu != null)             menu.showOnStage(stage, x, y);
 		if (!isChrome)             Menu.removeMenusFrom(stage);  // hack: clear menuJustCreated because there's no rightMouseUp  ;
@@ -486,7 +487,7 @@ class GestureHandler
 			return;
 		}
 		if (t != null && Lambda.has(t, "handleTool"))             t.handleTool(CursorTool.tool, evt);
-		if (isGrowShrink && (Std.is(t, Block) && t.isInPalette || Std.is(t, ImageCanvas)))             return  // grow/shrink sticky for scripting area  ;
+		if (isGrowShrink && (Std.is(t, Block) && t.isInPalette /*|| Std.is(t, ImageCanvas)*/))             return;  // grow/shrink sticky for scripting area  ;
 
 		if (!evt.shiftKey)             app.clearTool();  // don't clear if shift pressed  ;
 	}

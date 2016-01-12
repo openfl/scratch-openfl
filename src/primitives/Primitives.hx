@@ -174,8 +174,8 @@ class Primitives
 		return 0;
 	}
 
-	private static var emptyDict : Dictionary = new Dictionary();
-	private static var lcDict : Dictionary = new Dictionary();
+	private static var emptyDict : Map<Dynamic, Dynamic> = new Map<Dynamic, Dynamic>();
+	private static var lcDict : Map<Dynamic, String> = new Map<Dynamic, String>();
 	public static function compare(a1 : Dynamic, a2 : Dynamic) : Int{
 		// This is static so it can be used by the list "contains" primitive.
 		var n1 : Float = Interpreter.asNumber(a1);
@@ -183,15 +183,15 @@ class Primitives
 		// X != X is faster than isNaN()
 		if (n1 != n1 || n2 != n2) {
 			// Suffix the strings to avoid properties and methods of the Dictionary class (constructor, hasOwnProperty, etc)
-			if (Std.is(a1, String) && Reflect.field(emptyDict, Std.string(a1)))                 a1 += "_";
-			if (Std.is(a2, String) && Reflect.field(emptyDict, Std.string(a2)))                 a2 += "_";  // at least one argument can't be converted to a number: compare as strings  ;
+			if (Std.is(a1, String) && emptyDict.exists(a1))                 a1 += "_";
+			if (Std.is(a2, String) && emptyDict.exists(a2))                 a2 += "_";  // at least one argument can't be converted to a number: compare as strings  ;
 
 
 
-			var s1 : String = Reflect.field(lcDict, Std.string(a1));
-			if (s1 == null)                 s1 = Reflect.setField(lcDict, Std.string(a1), Std.string(a1).toLowerCase());
-			var s2 : String = Reflect.field(lcDict, Std.string(a2));
-			if (s2 == null)                 s2 = Reflect.setField(lcDict, Std.string(a2), Std.string(a2).toLowerCase());
+			var s1 : String = lcDict[a1];
+			if (s1 == null)                 s1 = lcDict[a1] = Std.string(a1).toLowerCase();
+			var s2 : String = lcDict[a2];
+			if (s2 == null)                 s2 = lcDict[a2] = Std.string(a2).toLowerCase();
 			return s1.localeCompare(s2);
 		}
 		else {

@@ -56,7 +56,7 @@ private static var Pop : Class<Dynamic>;
 
 	public var objName : String = "no name";
 	public var isStage : Bool = false;
-	public var variables : Array<Dynamic> = [];
+	public var variables : Array<Variable> = [];
 	public var lists : Array<ListWatcher> = [];
 	public var scripts : Array<Dynamic> = [];
 	public var scriptComments : Array<Dynamic> = [];
@@ -432,8 +432,8 @@ private static var Pop : Class<Dynamic>;
 
 	/* Variables */
 
-	public function varNames() : Array<Dynamic>{
-		var varList : Array<Dynamic> = [];
+	public function varNames() : Array<String>{
+		var varList : Array<String> = [];
 		for (v in variables)varList.push(v.name);
 		return varList;
 	}
@@ -482,7 +482,7 @@ private static var Pop : Class<Dynamic>;
 	}
 
 	public function deleteVar(varToDelete : String) : Void{
-		var newVars : Array<Dynamic> = [];
+		var newVars : Array<Variable> = [];
 		for (v in variables){
 			if (v.name == varToDelete) {
 				if ((v.watcher != null) && (v.watcher.parent != null)) {
@@ -497,8 +497,8 @@ private static var Pop : Class<Dynamic>;
 
 	/* Lists */
 
-	public function listNames() : Array<Dynamic>{
-		var result : Array<Dynamic> = [];
+	public function listNames() : Array<String>{
+		var result : Array<String> = [];
 		for (list in lists)result.push(list.listName);
 		return result;
 	}

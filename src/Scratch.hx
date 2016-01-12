@@ -24,6 +24,7 @@
 
 package;
 import blocks.*;
+import flash.Lib;
 
 //import com.adobe.utils.StringUtil;
 
@@ -256,43 +257,43 @@ class Scratch extends Sprite {
 		//}
 	}
 
-	private function loadSingleGithubURL(url:String):Void {
-		url = StringTools.trim(unescape(url));
-
-		function handleComplete(e:Event):Void {
-			runtime.installProjectFromData(sbxLoader.data);
-			if (StringTools.trim(projectName()).length == 0) {
-				var newProjectName:String = url;
-				var index = Std.int(newProjectName.indexOf('?'));
-				if (index > 0) newProjectName = newProjectName.slice(0, index);
-				index = newProjectName.lastIndexOf('/');
-				if (index > 0) newProjectName = newProjectName.substr(index + 1);
-				index = newProjectName.lastIndexOf('.sbx');
-				if (index > 0) newProjectName = newProjectName.slice(0, index);
-				setProjectName(newProjectName);
-			}
-		}
-
-		function handleError(e:ErrorEvent):Void {
-			jsThrowError('Failed to load SBX: ' + e.toString());
-		}
-
-		var fileExtension:String = url.substr(url.lastIndexOf('.')).toLowerCase();
-		if (fileExtension == '.js') {
-			externalCall('ScratchExtensions.loadExternalJS', null, url);
-			return;
-		}
-
-		// Otherwise assume it's a project (SB2, SBX, etc.)
-		loadInProgress = true;
-		var request:URLRequest = new URLRequest(url);
-		var sbxLoader:URLLoader = new URLLoader(request);
-		sbxLoader.dataFormat = URLLoaderDataFormat.BINARY;
-		sbxLoader.addEventListener(Event.COMPLETE, handleComplete);
-		sbxLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, handleError);
-		sbxLoader.addEventListener(IOErrorEvent.IO_ERROR, handleError);
-		sbxLoader.load(request);
-	}
+	//private function loadSingleGithubURL(url:String):Void {
+		//url = StringTools.trim(unescape(url));
+//
+		//function handleComplete(e:Event):Void {
+			//runtime.installProjectFromData(sbxLoader.data);
+			//if (StringTools.trim(projectName()).length == 0) {
+				//var newProjectName:String = url;
+				//var index = Std.int(newProjectName.indexOf('?'));
+				//if (index > 0) newProjectName = newProjectName.slice(0, index);
+				//index = newProjectName.lastIndexOf('/');
+				//if (index > 0) newProjectName = newProjectName.substr(index + 1);
+				//index = newProjectName.lastIndexOf('.sbx');
+				//if (index > 0) newProjectName = newProjectName.slice(0, index);
+				//setProjectName(newProjectName);
+			//}
+		//}
+//
+		//function handleError(e:ErrorEvent):Void {
+			//jsThrowError('Failed to load SBX: ' + e.toString());
+		//}
+//
+		//var fileExtension:String = url.substr(url.lastIndexOf('.')).toLowerCase();
+		//if (fileExtension == '.js') {
+			//externalCall('ScratchExtensions.loadExternalJS', null, url);
+			//return;
+		//}
+//
+		//// Otherwise assume it's a project (SB2, SBX, etc.)
+		//loadInProgress = true;
+		//var request:URLRequest = new URLRequest(url);
+		//var sbxLoader:URLLoader = new URLLoader(request);
+		//sbxLoader.dataFormat = URLLoaderDataFormat.BINARY;
+		//sbxLoader.addEventListener(Event.COMPLETE, handleComplete);
+		//sbxLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, handleError);
+		//sbxLoader.addEventListener(IOErrorEvent.IO_ERROR, handleError);
+		//sbxLoader.load(request);
+	//}
 
 	private var pendingExtensionURLs:Array<Dynamic>;
 	/*
@@ -545,10 +546,10 @@ class Scratch extends Sprite {
 	public function showDebugRect(r:Rectangle):Void {
 		// Used during debugging...
 		var p:Point = stagePane.localToGlobal(new Point(0, 0));
-		if (!debugRect) debugRect = new Shape();
+		if (debugRect == null) debugRect = new Shape();
 		var g:Graphics = debugRect.graphics;
 		g.clear();
-		if (r) {
+		if (r != null) {
 			g.lineStyle(2, 0xFFFF00);
 			g.drawRect(p.x + r.x, p.y + r.y, r.width, r.height);
 			addChild(debugRect);
@@ -604,7 +605,7 @@ class Scratch extends Sprite {
 	}
 
 	public function tabsRight():Int {
-		return tabsPart.x + tabsPart.w;
+		return Std.int(tabsPart.x + tabsPart.w);
 	}
 
 	public function enableEditorTools(flag:Bool):Void {
@@ -616,9 +617,10 @@ class Scratch extends Sprite {
 		return _usesUserNameBlock;
 	}
 
-	public function set_usesUserNameBlock(value:Bool):Void {
+	public function set_usesUserNameBlock(value:Bool):Bool {
 		_usesUserNameBlock = value;
 		stagePart.refresh();
+		return value;
 	}
 
 	public function updatePalette(clearCaches:Bool = true):Void {
@@ -972,7 +974,7 @@ class Scratch extends Sprite {
 	private var modalOverlay:Sprite;
 
 	public function setModalOverlay(enableOverlay:Bool):Void {
-		var currentlyEnabled:Bool = !!modalOverlay;
+		var currentlyEnabled:Bool = (modalOverlay != null);
 		if (enableOverlay != currentlyEnabled) {
 			if (enableOverlay) {
 				function eatEvent(event:MouseEvent):Void {
@@ -1132,11 +1134,11 @@ class Scratch extends Sprite {
 		createNewProjectAndThen();
 	}
 
-	private function createNewProjectScratchX(jsCallback:Array<Dynamic>):Void {
-		createNewProjectAndThen(function():Void {
-			externalCallArray(jsCallback);
-		});
-	}
+	//private function createNewProjectScratchX(jsCallback:Array<Dynamic>):Void {
+		//createNewProjectAndThen(function():Void {
+			//externalCallArray(jsCallback);
+		//});
+	//}
 
 	private function saveProjectAndThen(postSaveAction:Function = null):Void {
 		var d:DialogBox = new DialogBox();
@@ -1474,8 +1476,8 @@ class Scratch extends Sprite {
 
 	private function updateFrameRate(e:Event):Void {
 		frameCount++;
-		if (!frameRateReadout) return;
-		var now:Int = getTimer();
+		if (frameRateReadout == null) return;
+		var now:Int = Lib.getTimer();
 		var msecs:Int = now - firstFrameTime;
 		if (msecs > 500) {
 			var fps:Float = Math.round((1000 * frameCount) / msecs);
@@ -1507,7 +1509,7 @@ class Scratch extends Sprite {
 	}
 
 	private function updateFrameRateGraph(evt:Dynamic):Void {
-		var now:Int = getTimer();
+		var now:Int = Lib.getTimer();
 		var msecs:Int = now - lastFrameTime;
 		lastFrameTime = now;
 		var c:Int = 0x505050;
@@ -1517,7 +1519,7 @@ class Scratch extends Sprite {
 		if (nextFrameRateX > stage.stageWidth) clearFrameRateGraph();
 		var g:Graphics = frameRateGraph.graphics;
 		g.beginFill(c);
-		var barH:Int = Math.min(frameRateGraphH, msecs / 2);
+		var barH:Int = Std.int(Math.min(frameRateGraphH, msecs / 2));
 		g.drawRect(nextFrameRateX, frameRateGraphH - barH, 1, barH);
 		nextFrameRateX++;
 	}

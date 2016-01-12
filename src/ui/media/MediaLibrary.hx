@@ -76,7 +76,7 @@ class MediaLibrary extends Sprite {
 	private var okayButton:Button;
 	private var cancelButton:Button;
 
-	private static var libraryCache:Object = {}; // cache of all mediaLibrary entries
+	private static var libraryCache:Map<String, Array<Dynamic>> = new Map<String, Array<Dynamic>>(); // cache of all mediaLibrary entries
 
 	public function new(app:Scratch, type:String, whenDone:Function) {
 		super();
@@ -93,7 +93,7 @@ class MediaLibrary extends Sprite {
 	}
 
 	public static function strings():Array<String> {
-		var result:Array = [
+		var result:Array<String> = [
 			'Backdrop Library', 'Costume Library', 'Sprite Library', 'Sound Library',
 			'Category', 'Theme', 'Type', 'Features',
 			'Uploading image...', 'Uploading sprite...', 'Uploading sound...',
@@ -227,7 +227,7 @@ class MediaLibrary extends Sprite {
 	}
 
 	private function addFilters():Void {
-		var categories:Array = [];
+		var categories:Array<String> = [];
 		if ('backdrop' == assetType) categories = backdropCategories;
 		if ('costume' == assetType) categories = costumeCategories;
 		if ('extension' == assetType) categories = extensionCategories;
@@ -291,8 +291,8 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 			for (entry in libraryCache[assetType]) {
 				if (entry.type == assetType) {
 					if (Std.is(entry.tags, Array)) entry.category = entry.tags[0];
-					var info:Array = cast(entry.info, Array);
-					if (info) {
+					var info:Array<Dynamic> = cast(entry.info, Array<Dynamic>);
+					if (info != null) {
 						if (entry.type == 'backdrop') {
 							entry.width = info[0];
 							entry.height = info[1];
@@ -315,14 +315,14 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		function gotLibraryData(data:ByteArray):Void {
 			if (data == null) return; // failure
 			var s:String = data.readUTFBytes(data.length);
-			libraryCache[assetType] = cast(util.JSON.parse(stripComments(s)), Array);
+			libraryCache[assetType] = cast(util.JSON.parse(stripComments(s)), Array<Dynamic>);
 			collectEntries();
 		}
 		if ('extension' == assetType) {
 			addScratchExtensions();
 			return;
 		}
-		if (!libraryCache[assetType]) app.server.getMediaLibrary(assetType, gotLibraryData);
+		if (libraryCache[assetType] == null) app.server.getMediaLibrary(assetType, gotLibraryData);
 		else collectEntries();
 	}
 
@@ -364,7 +364,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		tag = new RegExp(' ', 'g').replace(tag, '-'); // e.g., change 'Music and Dance' -> 'Music-and-Dance'
 		tag = tag.toLowerCase();
 		var showAll:Bool = ('all' == tag);
-		var filtered:Array = [];
+		var filtered:Array<MediaLibraryItem> = [];
 		for (item in allItems) {
 			if ((showAll || (item.dbObj.tags.indexOf(tag) > -1)) && hasSelectedFeatures(item.dbObj)) {
 				filtered.push(item);
@@ -468,7 +468,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 				inProgress++;
 				allItems[next++].loadThumbnail(loadDone);
 			}
-			if ((next < allItems.length) || inProgress) haxe.Timer.delay(loadSomeThumbnails, 40);
+			if ((next < allItems.length) || inProgress != 0) haxe.Timer.delay(loadSomeThumbnails, 40);
 		}
 
 		loadSomeThumbnails();
@@ -529,10 +529,6 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 			costumeOrSprite = s;
 			uploadSprite(s, uploadComplete);
 		}
-		//function imagesDecoded():Void {
-			//sprite.updateScriptsAfterTranslation();
-			//spriteDecoded(sprite);
-		//}
 		function decodeError():Void {
 			DialogBox.notify('Error decoding image', 'Sorry, Scratch was unable to load the image '+fName+'.', Scratch.app.stage);
 		}
@@ -562,20 +558,20 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 				//decodeError();
 			//}
 		//} else if (ScratchCostume.isSVGData(data)) {
-			data = svgAddGroupIfNeeded(data); // wrap group around imported elements
-			costumeOrSprite = new ScratchCostume(fName, null);
-			costumeOrSprite.setSVGData(data, true);
-			uploadCostume(cast(costumeOrSprite, ScratchCostume), uploadComplete);
+			//data = svgAddGroupIfNeeded(data); // wrap group around imported elements
+			//costumeOrSprite = new ScratchCostume(fName, null);
+			//costumeOrSprite.setSVGData(data, true);
+			//uploadCostume(cast(costumeOrSprite, ScratchCostume), uploadComplete);
 		} else {
 			data.position = 0;
 			if (data.bytesAvailable > 4 && data.readUTFBytes(4) == 'ObjS') {
 				var info:Object;
-				var objTable:Array;
+				var objTable:Array<Dynamic>;
 				data.position = 0;
 				var reader:ObjReader = new ObjReader(data);
 				try { info = reader.readInfo(); } catch (e:Error) { data.position = 0; }
 				try { objTable = reader.readObjTable(); } catch (e:Error) { }
-				if (!objTable) {
+				if (objTable == null) {
 					spriteError();
 					return;
 				}
@@ -584,6 +580,10 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 				if (sprite == null) {
 					spriteError();
 					return;
+				}
+				function imagesDecoded():Void {
+					sprite.updateScriptsAfterTranslation();
+					spriteDecoded(sprite);
 				}
 				new ProjectIO(app).decodeAllImages(newProject.allObjects(), imagesDecoded, spriteError);
 			} else {
@@ -609,39 +609,39 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		//whenDone(newCostumes);
 	//}
 
-	private function svgAddGroupIfNeeded(svgData:ByteArray):ByteArray {
-		var xml:XML = XML(svgData);
-		if (!svgNeedsGroup(xml)) return svgData;
-
-		var groupNode:XML = new XML('<g></g>');
-		for (el in xml.elements()) {
-			if (el.localName() != 'defs') {
-//				delete xml.children()[el.childIndex()];
-				groupNode.appendChild(el); // move all non-def elements into group
-			}
-		}
-		xml.appendChild(groupNode);
-
-		// fix for an apparent bug in Flash XML parser (changes 'xml' namespace to 'aaa')
-		for (k in xml.attributes()) {
-//			if (k.localName() == 'space') delete xml.@[k.name()];
-		}
-//		xml.@['xml:space'] = 'preserve';
-
-		var newSVG:XML = xml;
-		var data: ByteArray = new ByteArray();
-		data.writeUTFBytes(newSVG.toXMLString());
-		return data;
-	}
-
-	private function svgNeedsGroup(xml:XML):Bool {
-		// Return true if the given SVG contains more than one non-defs element.
-		var nonDefsCount:Int;
-		for (el in xml.elements()) {
-			if (el.localName() != 'defs') nonDefsCount++;
-		}
-		return nonDefsCount > 1;
-	}
+	//private function svgAddGroupIfNeeded(svgData:ByteArray):ByteArray {
+		//var xml:XML = XML(svgData);
+		//if (!svgNeedsGroup(xml)) return svgData;
+//
+		//var groupNode:XML = new XML('<g></g>');
+		//for (el in xml.elements()) {
+			//if (el.localName() != 'defs') {
+////				delete xml.children()[el.childIndex()];
+				//groupNode.appendChild(el); // move all non-def elements into group
+			//}
+		//}
+		//xml.appendChild(groupNode);
+//
+		//// fix for an apparent bug in Flash XML parser (changes 'xml' namespace to 'aaa')
+		//for (k in xml.attributes()) {
+////			if (k.localName() == 'space') delete xml.@[k.name()];
+		//}
+////		xml.@['xml:space'] = 'preserve';
+//
+		//var newSVG:XML = xml;
+		//var data: ByteArray = new ByteArray();
+		//data.writeUTFBytes(newSVG.toXMLString());
+		//return data;
+	//}
+//
+	//private function svgNeedsGroup(xml:XML):Bool {
+		//// Return true if the given SVG contains more than one non-defs element.
+		//var nonDefsCount:Int;
+		//for (el in xml.elements()) {
+			//if (el.localName() != 'defs') nonDefsCount++;
+		//}
+		//return nonDefsCount > 1;
+	//}
 
 	private function importSoundsFromDisk():Void {
 		var files:FileReferenceList = new FileReferenceList();
@@ -711,13 +711,13 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 			}
 			*/
 
-			if (sound == null)
-				haxe.Timer.delay(function():Void {
-					MP3Loader.convertToScratchSound(sndName, data, function(s:ScratchSound):Void {
-						snd = s;
-						startSoundUpload(s, origName, uploadComplete);
-					});
-				}, 1);
+			//if (sound == null)
+				//haxe.Timer.delay(function():Void {
+					//MP3Loader.convertToScratchSound(sndName, data, function(s:ScratchSound):Void {
+						//snd = s;
+						//startSoundUpload(s, origName, uploadComplete);
+					//});
+				//}, 1);
 		}
 	}
 

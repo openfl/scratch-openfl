@@ -109,9 +109,10 @@ class ScratchCostume {
 		return __baseLayerData;
 	}
 
-	public function set_baseLayerData(data:ByteArray):Void {
+	public function set_baseLayerData(data:ByteArray):ByteArray {
 		__baseLayerData = data;
 		baseLayerMD5 = null;
+		return data;
 	}
 
 	public var textLayerData (get, set) : ByteArray;
@@ -119,9 +120,10 @@ class ScratchCostume {
 		return __textLayerData;
 	}
 
-	public function set_textLayerData(data:ByteArray):Void {
+	public function set_textLayerData(data:ByteArray):ByteArray {
 		__textLayerData = data;
 		textLayerMD5 = null;
+		return data;
 	}
 
 	public static function scaleForScratch(bm:BitmapData):BitmapData {
@@ -180,7 +182,7 @@ class ScratchCostume {
 		bitmapResolution = 2;
 		rotationCenterX = centerX;
 		rotationCenterY = centerY;
-		if (Scratch.app && Scratch.app.viewedObj() && (Scratch.app.viewedObj().currentCostume() == this)) {
+		if (Scratch.app != null && Scratch.app.viewedObj() != null && (Scratch.app.viewedObj().currentCostume() == this)) {
 			Scratch.app.viewedObj().updateCostume();
 			Scratch.app.refreshImageTab(true);
 		}
@@ -445,9 +447,9 @@ class ScratchCostume {
 		clone.scaleY = spr.scaleY;
 		clone.rotation = spr.rotation;
 
-		for(i=0...spr.numChildren) {
+		for(i in 0...spr.numChildren) {
 			var dispObj:DisplayObject = spr.getChildAt(i);
-			if(Std(dispObj, Sprite))
+			if(Std.is(dispObj, Sprite))
 				clone.addChild(cloneSprite(cast(dispObj, Sprite)));
 			else if(Std.is(dispObj, Shape)) {
 				var shape:Shape = new Shape();
@@ -522,7 +524,7 @@ class ScratchCostume {
 
 		var scale:Float = 2 / bitmapResolution;
 		var bgColor:Int = forStage ? 0xFFFFFFFF : 0;
-		var bm:BitmapData = new BitmapData(scale * w, scale * h, true, bgColor);
+		var bm:BitmapData = new BitmapData(Std.int(scale * w), Std.int(scale * h), true, bgColor);
 		var m:Matrix = new Matrix();
 		if (!forStage) m.translate(-dispR.x, -dispR.y);
 		m.scale(scale, scale);
@@ -534,7 +536,7 @@ class ScratchCostume {
 		else {
 		*/
 			Scratch.app.ignoreResize = true;
-			var oldQuality:String = Scratch.app.stage.quality;
+			var oldQuality:StageQuality = Scratch.app.stage.quality;
 			Scratch.app.stage.quality = StageQuality.LOW;
 			bm.draw(dispObj, m);
 			Scratch.app.stage.quality = oldQuality;
@@ -574,7 +576,7 @@ class ScratchCostume {
 	public function readJSON(jsonObj:Object):Void {
 		costumeName = jsonObj.costumeName;
 		baseLayerID = jsonObj.baseLayerID;
-		if (jsonObj.baseLayerID == undefined) {
+		if (jsonObj.baseLayerID == null) {
 			if (jsonObj.imageID) baseLayerID = jsonObj.imageID; // slightly older .sb2 format
 		}
 		baseLayerMD5 = jsonObj.baseLayerMD5;

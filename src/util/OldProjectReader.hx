@@ -151,9 +151,9 @@ class OldProjectReader
 		}
 	}
 
-	private function buildVars(pairs : Array<Dynamic>) : Array<Dynamic>{
+	private function buildVars(pairs : Array<Dynamic>) : Array<Variable>{
 		if (pairs == null)             return [];
-		var result : Array<Dynamic> = [];
+		var result : Array<Variable> = [];
 		var i : Int = 0;
 		while (i < (pairs.length - 1)){
 			result.push(new Variable(pairs[i], pairs[i + 1]));

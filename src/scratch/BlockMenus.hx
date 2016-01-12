@@ -218,7 +218,14 @@ class BlockMenus implements DragClient
 		for (s in attributes)m.addItem(s);
 		if (Std.is(obj, ScratchObj)) {
 			m.addLine();
-			for (s/* AS3HX WARNING could not determine type for var: s exp: ECall(EField(ECall(EField(EIdent(obj),varNames),[]),sort),[]) type: null */ in obj.varNames().sort())m.addItem(s);
+			var varNames = obj.varNames();
+			varNames.sort(function(a, b) { 
+				if (a < b) return -1;
+				if (b > a) return 1;
+				return 0;
+			});
+			for (s in varNames)
+				m.addItem(s);
 		}
 		showMenu(m);
 	}
@@ -793,9 +800,13 @@ class BlockMenus implements DragClient
 			if (Reflect.isFunction(selection))                 selection()
 			else setBlockArg(selection);
 		};
-		var msgNames : Array<Dynamic> = app.runtime.collectBroadcasts();
+		var msgNames : Array<String> = app.runtime.collectBroadcasts();
 		if (Lambda.indexOf(msgNames, "message1") <= -1)             msgNames.push("message1");
-		msgNames.sort();
+		msgNames.sort(function(a, b) { 
+				if (a < b) return -1;
+				if (b > a) return 1;
+				return 0;
+			});
 
 		var m : Menu = new Menu(broadcastMenuSelection, "broadcast");
 		for (msg in msgNames)m.addItem(msg);

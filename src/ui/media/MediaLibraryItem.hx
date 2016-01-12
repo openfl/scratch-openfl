@@ -115,22 +115,22 @@ class MediaLibraryItem extends Sprite
 	// all paths must call done() even on failure!
 	private function setImageThumbnail(md5 : String, done : Void->Void, spriteMD5 : String = null) : Void{
 		var forStage : Bool = (dbObj.width == 480);  // if width is 480, format thumbnail for stage  
-		var importer : SVGImporter;
-		function gotSVGData(data : ByteArray) : Void{
-			if (data != null) {
-				importer = new SVGImporter(cast((data), XML));
-				importer.loadAllImages(svgImagesLoaded);
-			}
-			else {
-				done();
-			}
-		};
-		function svgImagesLoaded() : Void{
-			var c : ScratchCostume = new ScratchCostume("", null);
-			c.setSVGRoot(importer.root, false);
-			setThumbnail(c.thumbnail(thumbnailWidth, thumbnailHeight, forStage));
-			done();
-		};
+		//var importer : SVGImporter;
+		//function gotSVGData(data : ByteArray) : Void{
+			//if (data != null) {
+				//importer = new SVGImporter(cast((data), XML));
+				//importer.loadAllImages(svgImagesLoaded);
+			//}
+			//else {
+				//done();
+			//}
+		//};
+		//function svgImagesLoaded() : Void{
+			//var c : ScratchCostume = new ScratchCostume("", null);
+			//c.setSVGRoot(importer.root, false);
+			//setThumbnail(c.thumbnail(thumbnailWidth, thumbnailHeight, forStage));
+			//done();
+		//};
 		function setThumbnail(bm : BitmapData) : Void{
 			if (bm != null) {
 				Reflect.setField(thumbnailCache, md5, bm);
@@ -146,12 +146,13 @@ class MediaLibraryItem extends Sprite
 
 
 
-		if (fileType(md5) == "svg")             loaders.push(Scratch.app.server.getAsset(md5, gotSVGData))
+		//if (fileType(md5) == "svg")             loaders.push(Scratch.app.server.getAsset(md5, gotSVGData))
 		else loaders.push(Scratch.app.server.getThumbnail(md5, thumbnailWidth, thumbnailHeight, setThumbnail));
 	}
 
 	// all paths must call done() even on failure!
 	private function setSpriteThumbnail(done : Void->Void) : Void{
+		var spriteMD5 : String = dbObj.md5;
 		function gotJSONData(data : String) : Void{
 			var md5 : String;
 			if (data != null) {
@@ -177,7 +178,6 @@ class MediaLibraryItem extends Sprite
 			}
 		}  // first, check the thumbnail cache  ;
 
-		var spriteMD5 : String = dbObj.md5;
 		var cachedBM : BitmapData = Reflect.field(thumbnailCache, spriteMD5);
 		if (cachedBM != null) {setThumbnailBM(cachedBM);done();return;
 		}
@@ -250,7 +250,7 @@ class MediaLibraryItem extends Sprite
 
 	private function setText(tf : TextField, s : String) : Void{
 		// Set the text of the given TextField, truncating if necessary.
-		var desiredWidth : Int = frame.width - 6;
+		var desiredWidth : Int = Std.int(frame.width - 6);
 		tf.text = s;
 		while ((tf.textWidth > desiredWidth) && (s.length > 0)){
 			s = s.substring(0, s.length - 1);

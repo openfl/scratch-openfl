@@ -72,6 +72,7 @@ class ScratchSprite extends ScratchObj {
 	private var geomShape:Shape;
 
 	public function new(name:String = 'Sprite1') {
+		super();
 		objName = name;
 		filterPack = new FilterPack(this);
 		initMedia();
@@ -125,7 +126,7 @@ class ScratchSprite extends ScratchObj {
 		for (i in 0...spr.lists.length) {
 			var lw:ListWatcher = spr.lists[i];
 			var lwDup:ListWatcher;
-			lists.push(lwDup = new ListWatcher(lw.listName, lw.contents.concat(), spr));
+			lists.push(lwDup = new ListWatcher(lw.listName, lw.contents.copy(), spr));
 			lwDup.visible = false;
 		}
 
@@ -135,7 +136,7 @@ class ScratchSprite extends ScratchObj {
 			sounds = spr.sounds;
 		} else {
 			for (i in 0...spr.scripts.length) scripts.push(spr.scripts[i].duplicate(forClone));
-			sounds = spr.sounds.concat();
+			sounds = spr.sounds.copy();
 		}
 
 		// To support vector costumes, every sprite must have its own costume copies, even clones.
@@ -538,7 +539,11 @@ class ScratchSprite extends ScratchObj {
 				var sprites:Array<ScratchSprite> = app.stagePane.sprites();
 				if (sprites.length > 0) {
 					// Pick the sprite just before the deleted sprite in the sprite library to select next.
-					sprites.sortOn('indexInLibrary');
+					sprites.sort(function(a, b) {
+						if (a.indexInLibrary < b.indexInLibrary) return -1;
+						if (a.indexInLibrary > b.indexInLibrary) return 1;
+						return 0;
+					});
 					var nextSelection:ScratchSprite = sprites[0];
 					for (spr in sprites) {
 						if (spr.indexInLibrary > this.indexInLibrary) break;

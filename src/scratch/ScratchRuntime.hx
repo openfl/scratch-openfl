@@ -223,7 +223,12 @@ class ScratchRuntime {
 			var b:Block = cast(palette.getChildAt(i), Block);
 			if (b != null) addBlock(b);
 		}
-		result.sort();
+		result.sort(
+			function(a, b) { 
+				if (a < b) return -1;
+				if (b > a) return 1;
+				return 0;
+			});
 		return result;
 	}
 
@@ -472,7 +477,11 @@ class ScratchRuntime {
 		// set the active sprite
 		var allSprites:Array<ScratchSprite> = app.stagePane.sprites();
 		if (allSprites.length > 0) {
-			allSprites = allSprites.sortOn('indexInLibrary');
+			allSprites.sort(function(a, b) {
+				if (a.indexInLibrary < b.indexInLibrary) return -1;
+				if (a.indexInLibrary > b.indexInLibrary) return 1;
+				return 0;
+			});
 			app.selectSprite(allSprites[0]);
 		} else {
 			app.selectSprite(app.stagePane);
@@ -668,8 +677,8 @@ class ScratchRuntime {
 	// Lists
 	//------------------------------
 
-	public function allListNames():Array<Dynamic> {
-		var result:Array<Dynamic> = app.stageObj().listNames();
+	public function allListNames():Array<String> {
+		var result:Array<String> = app.stageObj().listNames();
 		if (!app.viewedObj().isStage) {
 			result = result.concat(app.viewedObj().listNames());
 		}

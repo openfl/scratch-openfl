@@ -51,7 +51,7 @@ class Watcher extends Sprite implements DragClient
 		}
 		return "" + value;
 	}
-
+	
 	private var format : TextFormat = new TextFormat(CSS.font, 11, 0, true);
 
 	private static inline var NORMAL_MODE : Int = 1;
@@ -412,7 +412,7 @@ class Watcher extends Sprite implements DragClient
 		};
 		d = new DialogBox(setMinMax);
 		d.addTitle("Slider Range");
-		d.addField("Min", 120, isDiscrete || Std.int(sliderMin) != (sliderMin != 0) ? sliderMin : Std.int(sliderMin) + ".0");
+		d.addField('Min', 120, isDiscrete || Std.int(sliderMin) != sliderMin ? sliderMin : Std.int(sliderMin) + '.0');
 		d.addField("Max", 120, sliderMax);
 		d.addAcceptCancelButtons("OK");
 		d.showOnStage(stage);

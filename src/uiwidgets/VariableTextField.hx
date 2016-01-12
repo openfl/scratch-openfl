@@ -29,10 +29,10 @@ class VariableTextField extends TextField
 {
 	private var originalText : String;
 
-	override private function set_text(value : String) : String{
-		throw cast(("Call setText() instead"), Error);
-		return value;
-	}
+	//override private function set_text(value : String) : String{
+		//throw cast(("Call setText() instead"), Error);
+		//return value;
+	//}
 
 	public function setText(t : String, context : Dictionary = null) : Void{
 		originalText = t;

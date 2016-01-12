@@ -95,9 +95,10 @@ class ScratchSound {
 		return __soundData;
 	}
 
-	public function set_soundData(data:ByteArray):Void {
+	public function set_soundData(data:ByteArray):ByteArray {
 		__soundData = data;
 		md5 = null;
+		return data;
 	}
 
 	private function reduceSizeIfNeeded(channels:Int):Void {
