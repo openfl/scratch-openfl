@@ -17,10 +17,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-package mx.utils
-{
-    
-    import mx.messaging.config.LoaderConfig;
+package mx.utils;
+
+	using StringTools;
+	
+	import flash.Lib;
     
     /**
      *  The URLUtil class is a static class with methods for working with
@@ -33,7 +34,7 @@ package mx.utils
      *  @playerversion AIR 1.1
      *  @productversion Flex 3
      */
-    public class URLUtil
+    class URLUtil
     {
         //--------------------------------------------------------------------------
         //
@@ -44,10 +45,10 @@ package mx.utils
         /**
          *  @private 
          */
-        private static const SQUARE_BRACKET_LEFT:String = "]";
-        private static const SQUARE_BRACKET_RIGHT:String = "[";
-        private static const SQUARE_BRACKET_LEFT_ENCODED:String = encodeURIComponent(SQUARE_BRACKET_LEFT);
-        private static const SQUARE_BRACKET_RIGHT_ENCODED:String = encodeURIComponent(SQUARE_BRACKET_RIGHT);
+        private static inline var SQUARE_BRACKET_LEFT:String = "]";
+        private static inline var SQUARE_BRACKET_RIGHT:String = "[";
+        private static var SQUARE_BRACKET_LEFT_ENCODED:String = StringTools.urlEncode(SQUARE_BRACKET_LEFT);
+        private static var SQUARE_BRACKET_RIGHT_ENCODED:String = StringTools.urlDecode(SQUARE_BRACKET_RIGHT);
         
         //--------------------------------------------------------------------------
         //
@@ -57,9 +58,8 @@ package mx.utils
         /**
          *  @private
          */
-        public function URLUtil()
+        public function new()
         {
-            super();
         }
         
         //--------------------------------------------------------------------------
@@ -82,8 +82,8 @@ package mx.utils
         public static function getServerNameWithPort(url:String):String
         {
             // Find first slash; second is +1, start 1 after.
-            var start:int = url.indexOf("/") + 2;
-            var length:int = url.indexOf("/", start);
+            var start:Int = url.indexOf("/") + 2;
+            var length:Int = url.indexOf("/", start);
             return length == -1 ? url.substring(start) : url.substring(start, length);
         }
         
@@ -103,7 +103,7 @@ package mx.utils
             var sp:String = getServerNameWithPort(url);
             
             // If IPv6 is in use, start looking after the square bracket.
-            var delim:int = URLUtil.indexOfLeftSquareBracket(sp);
+            var delim:Int = URLUtil.indexOfLeftSquareBracket(sp);
             delim = (delim > -1)? sp.indexOf(":", delim) : sp.indexOf(":");   
             
             if (delim > 0)
@@ -122,18 +122,18 @@ package mx.utils
          *  @playerversion AIR 1.1
          *  @productversion Flex 3
          */
-        public static function getPort(url:String):uint
+        public static function getPort(url:String):UInt
         {
             var sp:String = getServerNameWithPort(url);
             // If IPv6 is in use, start looking after the square bracket.
-            var delim:int = URLUtil.indexOfLeftSquareBracket(sp);
+            var delim:Int = URLUtil.indexOfLeftSquareBracket(sp);
             delim = (delim > -1)? sp.indexOf(":", delim) : sp.indexOf(":");          
-            var port:uint = 0;
+            var port:UInt = 0;
             if (delim > 0)
             {
-                var p:Number = Number(sp.substring(delim + 1));
-                if (!isNaN(p))
-                    port = int(p);
+                var p:Float = Std.parseFloat(sp.substring(delim + 1));
+                if (!Math.isNaN(p))
+                    port = Std.int(p);
             }
             
             return port;
@@ -166,7 +166,7 @@ package mx.utils
                 }
                 if (URLUtil.isHttpURL(rootURL))
                 {
-                    var slashPos:Number;
+                    var slashPos:Float;
                     
                     if (url.charAt(0) == '/')
                     {
@@ -187,7 +187,7 @@ package mx.utils
                     }
                     
                     if (slashPos > 0)
-                        url = rootURL.substring(0, slashPos) + url;
+                        url = rootURL.substring(0, Std.int(slashPos)) + url;
                 }
             }
             
@@ -212,7 +212,7 @@ package mx.utils
          *  @playerversion AIR 1.1
          *  @productversion Flex 3
          */
-        public static function isHttpURL(url:String):Boolean
+        public static function isHttpURL(url:String):Bool
         {
             return url != null &&
                 (url.indexOf("http://") == 0 ||
@@ -231,7 +231,7 @@ package mx.utils
          *  @playerversion AIR 1.1
          *  @productversion Flex 3
          */
-        public static function isHttpsURL(url:String):Boolean
+        public static function isHttpsURL(url:String):Bool
         {
             return url != null && url.indexOf("https://") == 0;
         }
@@ -258,8 +258,8 @@ package mx.utils
          */
         public static function getProtocol(url:String):String
         {
-            var slash:int = url.indexOf("/");
-            var indx:int = url.indexOf(":/");
+            var slash:Int = url.indexOf("/");
+            var indx:Int = url.indexOf(":/");
             if (indx > -1 && indx < slash)
             {
                 return url.substring(0, indx);
@@ -312,19 +312,19 @@ package mx.utils
          *  @playerversion AIR 1.1
          *  @productversion Flex 3
          */
-        public static function replacePort(uri:String, newPort:uint):String
+        public static function replacePort(uri:String, newPort:UInt):String
         {
             var result:String = "";
             
             // First, determine if IPv6 is in use by looking for square bracket
-            var indx:int = uri.indexOf("]");
+            var indx:Int = uri.indexOf("]");
             
             // If IPv6 is not in use, reset indx to the first colon
             if (indx == -1)
                 indx = uri.indexOf(":");
             
-            var portStart:int = uri.indexOf(":", indx+1);
-            var portEnd:int;
+            var portStart:Int = uri.indexOf(":", indx+1);
+            var portEnd:Int;
             
             // If we have a port
             if (portStart > -1)
@@ -333,7 +333,7 @@ package mx.utils
                 portEnd = uri.indexOf("/", portStart);
                 //@TODO: need to throw an invalid uri here if no slash was found
                 result = uri.substring(0, portStart) +
-                    newPort.toString() +
+                    Std.string(newPort) +
                     uri.substring(portEnd, uri.length);
             }
             else
@@ -350,17 +350,17 @@ package mx.utils
                     if (portEnd > 0)
                     {
                         result = uri.substring(0, portEnd) +
-                            ":"+ newPort.toString() +
+                            ":"+ Std.string(newPort) +
                             uri.substring(portEnd, uri.length);
                     }
                     else
                     {
-                        result = uri + ":" + newPort.toString();
+                        result = uri + ":" + Std.string(newPort);
                     }
                 }
                 else
                 {
-                    result = uri + ":"+ newPort.toString();
+                    result = uri + ":"+ Std.string(newPort);
                 }
             }
             
@@ -383,7 +383,8 @@ package mx.utils
          */
         public static function replaceTokens(url:String):String
         {             
-            var loaderURL:String = LoaderConfig.url == null ? "" : LoaderConfig.url;
+			
+            var loaderURL:String = Lib.current.loaderInfo.url == null ? "" : Lib.current.loaderInfo.url;
             
             // if the LoaderConfig.url hasn't been configured yet we need to 
             // throw, informing the user that this value must be setup first
@@ -400,26 +401,26 @@ package mx.utils
                 if (loaderProtocol.toLowerCase() != "file")
                     loaderServerName = URLUtil.getServerName(loaderURL);
                 
-                url = url.replace(SERVER_NAME_REGEX, loaderServerName);
+                url = SERVER_NAME_REGEX.replace(url, loaderServerName);
             }
             
             // Replace {server.port} either with the loader's port, or
             // remove it and the proceeding token if a port is not
             // specified for the SWF Loader.
-            var portToken:int = url.indexOf(SERVER_PORT_TOKEN);
+            var portToken:Int = url.indexOf(SERVER_PORT_TOKEN);
             if (portToken > 0)
             {
-                var loaderPort:uint = URLUtil.getPort(loaderURL);
+                var loaderPort:UInt = URLUtil.getPort(loaderURL);
                 if (loaderPort > 0)
                 {
-                    url = url.replace(SERVER_PORT_REGEX, loaderPort);
+                    url = SERVER_PORT_REGEX.replace(url, Std.string(loaderPort));
                 }
                 else
                 {
                     if (url.charAt(portToken - 1) == ":")
                         url = url.substring(0, portToken - 1) + url.substring(portToken);
                     
-                    url = url.replace(SERVER_PORT_REGEX, "");
+                    url = SERVER_PORT_REGEX.replace(url, "");
                 }
             }
             
@@ -440,12 +441,12 @@ package mx.utils
          *  @playerversion AIR 1.1
          *  @productversion Flex 3
          */
-        public static function urisEqual(uri1:String, uri2:String):Boolean
+        public static function urisEqual(uri1:String, uri2:String):Bool
         {
             if (uri1 != null && uri2 != null)
             {
-                uri1 = StringUtil.trim(uri1).toLowerCase();
-                uri2 = StringUtil.trim(uri2).toLowerCase();
+                uri1 = StringTools.trim(uri1).toLowerCase();
+                uri2 = StringTools.trim(uri2).toLowerCase();
                 
                 if (uri1.charAt(uri1.length - 1) != "/")
                     uri1 = uri1 + "/";
@@ -470,7 +471,7 @@ package mx.utils
          *  @playerversion AIR 1.5
          *  @productversion Flex 4
          */ 
-        public static function hasTokens(url:String):Boolean
+        public static function hasTokens(url:String):Bool
         {
             if (url == null || url == "")
                 return false;
@@ -492,9 +493,9 @@ package mx.utils
          *  @playerversion AIR 1.1
          *  @productversion Flex 3
          */  
-        public static function hasUnresolvableTokens():Boolean
+        public static function hasUnresolvableTokens():Bool
         {
-            return LoaderConfig.url != null;
+            return Lib.current.loaderInfo.url != null;
         }
         
         /**
@@ -506,7 +507,7 @@ package mx.utils
          *  @playerversion AIR 1.1
          *  @productversion Flex 3
          */
-        public static const SERVER_NAME_TOKEN:String = "{server.name}";
+        public static inline var SERVER_NAME_TOKEN:String = "{server.name}";
         
         /**
          *  The pattern in the String that is passed to the <code>replaceTokens()</code> method that 
@@ -517,257 +518,32 @@ package mx.utils
          *  @playerversion AIR 1.1
          *  @productversion Flex 3
          */
-        public static const SERVER_PORT_TOKEN:String = "{server.port}";
+        public static inline var SERVER_PORT_TOKEN:String = "{server.port}";
         
-        /**
-         *  Enumerates an object's dynamic properties (by using a <code>for..in</code> loop)
-         *  and returns a String. You typically use this method to convert an ActionScript object to a String that you then append to the end of a URL.
-         *  By default, invalid URL characters are URL-encoded (converted to the <code>%XX</code> format).
-         *
-         *  <p>For example:
-         *  <pre>
-         *  var o:Object = { name: "Alex", age: 21 };
-         *  var s:String = URLUtil.objectToString(o,";",true);
-         *  trace(s);
-         *  </pre>
-         *  Prints "name=Alex;age=21" to the trace log.
-         *  </p>
-         *  
-         *  @param object The object to convert to a String.
-         *  @param separator The character that separates each of the object's <code>property:value</code> pair in the String.
-         *  @param encodeURL Whether or not to URL-encode the String.
-         *  
-         *  @return The object that was passed to the method.
-         *  
-         *  @langversion 3.0
-         *  @playerversion Flash 9
-         *  @playerversion AIR 1.1
-         *  @productversion Flex 3
-         */
-        public static function objectToString(object:Object, separator:String=';',
-                                              encodeURL:Boolean = true):String
+		private static function indexOfLeftSquareBracket(value:String):Int
         {
-            var s:String = internalObjectToString(object, separator, null, encodeURL);
-            return s;
-        }
-        
-        private static function indexOfLeftSquareBracket(value:String):int
-        {
-            var delim:int = value.indexOf(SQUARE_BRACKET_LEFT);
+            var delim:Int = value.indexOf(SQUARE_BRACKET_LEFT);
             if (delim == -1)
                 delim = value.indexOf(SQUARE_BRACKET_LEFT_ENCODED);
             return delim;
         }
-        
-        private static function internalObjectToString(object:Object, separator:String, prefix:String, encodeURL:Boolean):String
-        {
-            var s:String = "";
-            var first:Boolean = true;
-            
-            for (var p:String in object)
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                    s += separator;
-                
-                var value:Object = object[p];
-                var name:String = prefix ? prefix + "." + p : p;
-                if (encodeURL)
-                    name = encodeURIComponent(name);
-                
-                if (value is String)
-                {
-                    s += name + '=' + (encodeURL ? encodeURIComponent(value as String) : value);
-                }
-                else if (value is Number)
-                {
-                    value = value.toString();
-                    if (encodeURL)
-                        value = encodeURIComponent(value as String);
-                    
-                    s += name + '=' + value;
-                }
-                else if (value is Boolean)
-                {
-                    s += name + '=' + (value ? "true" : "false");
-                }
-                else
-                {
-                    if (value is Array)
-                    {
-                        s += internalArrayToString(value as Array, separator, name, encodeURL);
-                    }
-                    else // object
-                    {
-                        s += internalObjectToString(value, separator, name, encodeURL);
-                    }
-                }
-            }
-            return s;
-        }
-        
+		
         private static function replaceEncodedSquareBrackets(value:String):String
         {
-            var rightIndex:int = value.indexOf(SQUARE_BRACKET_RIGHT_ENCODED);
+            var rightIndex:Int = value.indexOf(SQUARE_BRACKET_RIGHT_ENCODED);
             if (rightIndex > -1)
             {
                 value = value.replace(SQUARE_BRACKET_RIGHT_ENCODED, SQUARE_BRACKET_RIGHT);
-                var leftIndex:int = value.indexOf(SQUARE_BRACKET_LEFT_ENCODED);
+                var leftIndex:Int = value.indexOf(SQUARE_BRACKET_LEFT_ENCODED);
                 if (leftIndex > -1)
                     value = value.replace(SQUARE_BRACKET_LEFT_ENCODED, SQUARE_BRACKET_LEFT);
             }
             return value;
         }
         
-        private static function internalArrayToString(array:Array, separator:String, prefix:String, encodeURL:Boolean):String
-        {
-            var s:String = "";
-            var first:Boolean = true;
-            
-            var n:int = array.length;
-            for (var i:int = 0; i < n; i++)
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                    s += separator;
-                
-                var value:Object = array[i];
-                var name:String = prefix + "." + i;
-                if (encodeURL)
-                    name = encodeURIComponent(name);
-                
-                if (value is String)
-                {
-                    s += name + '=' + (encodeURL ? encodeURIComponent(value as String) : value);
-                }
-                else if (value is Number)
-                {
-                    value = value.toString();
-                    if (encodeURL)
-                        value = encodeURIComponent(value as String);
-                    
-                    s += name + '=' + value;
-                }
-                else if (value is Boolean)
-                {
-                    s += name + '=' + (value ? "true" : "false");
-                }
-                else
-                {
-                    if (value is Array)
-                    {
-                        s += internalArrayToString(value as Array, separator, name, encodeURL);
-                    }
-                    else // object
-                    {
-                        s += internalObjectToString(value, separator, name, encodeURL);
-                    }
-                }
-            }
-            return s;
-        }
-        
-        /**
-         *  Returns an object from a String. The String contains <code>name=value</code> pairs, which become dynamic properties
-         *  of the returned object. These property pairs are separated by the specified <code>separator</code>.
-         *  This method converts Numbers and Booleans, Arrays (defined by "[]"), 
-         *  and sub-objects (defined by "{}"). By default, URL patterns of the format <code>%XX</code> are converted
-         *  to the appropriate String character.
-         *
-         *  <p>For example:
-         *  <pre>
-         *  var s:String = "name=Alex;age=21";
-         *  var o:Object = URLUtil.stringToObject(s, ";", true);
-         *  </pre>
-         *  
-         *  Returns the object: <code>{ name: "Alex", age: 21 }</code>.
-         *  </p>
-         *  
-         *  @param string The String to convert to an object.
-         *  @param separator The character that separates <code>name=value</code> pairs in the String.
-         *  @param decodeURL Whether or not to decode URL-encoded characters in the String.
-         * 
-         *  @return The object containing properties and values extracted from the String passed to this method.
-         *  
-         *  @langversion 3.0
-         *  @playerversion Flash 9
-         *  @playerversion AIR 1.1
-         *  @productversion Flex 3
-         */
-        public static function stringToObject(string:String, separator:String = ";",
-                                              decodeURL:Boolean = true):Object
-        {
-            var o:Object = {};
-            
-            var arr:Array = string.split(separator);
-            
-            // if someone has a name or value that contains the separator 
-            // this will not work correctly, nor will it work well if there are 
-            // '=' or '.' in the name or value
-            
-            var n:int = arr.length;
-            for (var i:int = 0; i < n; i++)
-            {
-                var pieces:Array = arr[i].split('=');
-                var name:String = pieces[0];
-                if (decodeURL)
-                    name = decodeURIComponent(name);
-                
-                var value:Object = pieces[1];
-                if (decodeURL)
-                    value = decodeURIComponent(value as String);
-                
-                if (value == "true")
-                    value = true;
-                else if (value == "false")
-                    value = false;
-                else 
-                {
-                    var temp:Object = int(value);
-                    if (temp.toString() == value)
-                        value = temp;
-                    else
-                    {
-                        temp = Number(value)
-                        if (temp.toString() == value)
-                            value = temp;
-                    }
-                }
-                
-                var obj:Object = o;
-                
-                pieces = name.split('.');
-                var m:int = pieces.length;
-                for (var j:int = 0; j < m - 1; j++)
-                {
-                    var prop:String = pieces[j];
-                    if (obj[prop] == null && j < m - 1)
-                    {
-                        var subProp:String = pieces[j + 1];
-                        var idx:Object = int(subProp);
-                        if (idx.toString() == subProp)
-                            obj[prop] = [];
-                        else
-                            obj[prop] = {};
-                    }
-                    obj = obj[prop];
-                }
-                obj[pieces[j]] = value;
-            }
-            
-            return o;
-        }
-        
         // Reusable reg-exp for token replacement. The . means any char, so this means
         // we should handle server.name and server-name, etc...
-        private static const SERVER_NAME_REGEX:RegExp = new RegExp("\\{server.name\\}", "g");
-        private static const SERVER_PORT_REGEX:RegExp = new RegExp("\\{server.port\\}", "g");    
+        private static var SERVER_NAME_REGEX:EReg = new EReg("\\{server.name\\}", "g");
+        private static var SERVER_PORT_REGEX:EReg = new EReg("\\{server.port\\}", "g");    
     }
     
-}
