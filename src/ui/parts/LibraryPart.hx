@@ -114,47 +114,47 @@ class LibraryPart extends UIPart
 			stageThumbnail.updateThumbnail(true);
 		spriteDetails.updateTranslation();
 
-		SimpleTooltips.add(libraryButton, {
-					text : "Choose sprite from library",
-					direction : "bottom",
+		SimpleTooltips.add(libraryButton, [
+					'text' => "Choose sprite from library",
+					'direction' => "bottom",
 
-				});
-		SimpleTooltips.add(paintButton, {
-					text : "Paint new sprite",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(paintButton, [
+					"text" => "Paint new sprite",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(importButton, {
-					text : "Upload sprite from file",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(importButton, [
+					"text" => "Upload sprite from file",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(photoButton, {
-					text : "New sprite from camera",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(photoButton, [
+					"text" => "New sprite from camera",
+					"direction" => "bottom",
 
-				});
+				]);
 
-		SimpleTooltips.add(backdropLibraryButton, {
-					text : "Choose backdrop from library",
-					direction : "bottom",
+		SimpleTooltips.add(backdropLibraryButton, [
+					"text" => "Choose backdrop from library",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(backdropPaintButton, {
-					text : "Paint new backdrop",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(backdropPaintButton, [
+					"text" => "Paint new backdrop",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(backdropImportButton, {
-					text : "Upload backdrop from file",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(backdropImportButton, [
+					"text" => "Upload backdrop from file",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(backdropCameraButton, {
-					text : "New backdrop from camera",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(backdropCameraButton, [
+					"text" => "New backdrop from camera",
+					"direction" => "bottom",
 
-				});
+				]);
 
 		fixLayout();
 	}

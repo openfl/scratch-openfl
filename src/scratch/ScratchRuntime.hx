@@ -464,9 +464,12 @@ class ScratchRuntime {
 
 		for (obj in project.allObjects()) {
 			obj.showCostume(obj.currentCostumeIndex);
-			if(Scratch.app.isIn3D) obj.updateCostume();
-			var spr:ScratchSprite = cast(obj, ScratchSprite);
-			if (spr != null) spr.setDirection(spr.direction);
+			if (Scratch.app.isIn3D) obj.updateCostume();
+			if (Std.is(obj, ScratchSprite))
+			{
+				var spr:ScratchSprite = cast(obj, ScratchSprite);
+				spr.setDirection(spr.direction);
+			}
 		}
 
 		app.resetPlugin();

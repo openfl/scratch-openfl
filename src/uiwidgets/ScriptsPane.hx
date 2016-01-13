@@ -496,9 +496,13 @@ class ScriptsPane extends ScrollFrameContents
 		var g : Graphics = commentLines.graphics;
 		g.clear();
 		g.lineStyle(2, commentLineColor);
-		for (i in 0...numChildren){
-			var c : ScratchComment = try cast(getChildAt(i), ScratchComment) catch(e:Dynamic) null;
-			if (c != null && c.blockRef != null)                 updateCommentConnection(c, g);
+		for (i in 0...numChildren) {
+			var child : DisplayObject = getChildAt(i);
+			if (Std.is(child, ScratchComment))
+			{
+				var c : ScratchComment = cast(child, ScratchComment);
+				if (c.blockRef != null) updateCommentConnection(c, g);
+			}
 		}
 	}
 

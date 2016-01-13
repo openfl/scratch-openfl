@@ -2,6 +2,9 @@ import Scratch;
 
 import util.ServerEasyStarter;
 //import flash.external.ExternalInterface;
+import flash.display.StageAlign;
+import flash.display.StageScaleMode;
+import flash.Lib;
 
 class ScratchEasyStarter extends Scratch
 {
@@ -12,7 +15,7 @@ class ScratchEasyStarter extends Scratch
 	}
 
 	override private function initServer() : Void{
-		var cdnPrefix : String = Reflect.field(loaderInfo.parameters, "cdnPrefix");
+		var cdnPrefix : String = Reflect.field(flash.Lib.current.root.loaderInfo.parameters, "cdnPrefix");
 		//ExternalInterface.call("console.log", cdnPrefix);
 		if (cdnPrefix != null) 
 			server = new ServerEasyStarter(cdnPrefix)
@@ -26,6 +29,15 @@ class ScratchEasyStarter extends Scratch
 		// JS functions to exist when the Scratch SWF is embedded in a
 		// web page. So it seems easier for setup to simply disable it.
 		initialize();
+	}
+	
+	static function main() 
+	{
+		var stage = Lib.current.stage;
+		stage.scaleMode = StageScaleMode.NO_SCALE;
+		stage.align = StageAlign.TOP_LEFT;
+		// Entry point
+		new ScratchEasyStarter();
 	}
 }
 

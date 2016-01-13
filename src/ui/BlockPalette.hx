@@ -48,8 +48,9 @@ class BlockPalette extends ScrollFrameContents
 	override public function clear(scrollToOrigin : Bool = true) : Void{
 		var interp : Interpreter = Scratch.app.interp;
 		var targetObj : ScratchObj = Scratch.app.viewedObj();
-		while (numChildren > 0){
-			var b : Block = try cast(getChildAt(0), Block) catch(e:Dynamic) null;
+		while (numChildren > 0) {
+			var child = getChildAt(0);
+			var b : Block = try cast(child, Block) catch(e:Dynamic) null;
 			if (interp.isRunning(b, targetObj))                 interp.toggleThread(b, targetObj);
 			removeChildAt(0);
 		}

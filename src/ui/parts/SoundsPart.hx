@@ -84,21 +84,21 @@ class SoundsPart extends UIPart
 	public function updateTranslation() : Void{
 		newSoundLabel.text = Translator.map("New sound:");
 		//editor.updateTranslation();
-		SimpleTooltips.add(libraryButton, {
-					text : "Choose sound from library",
-					direction : "bottom",
+		SimpleTooltips.add(libraryButton, [
+					"text" => "Choose sound from library",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(recordButton, {
-					text : "Record new sound",
-					direction : "bottom",
+			]);
+		SimpleTooltips.add(recordButton, [
+					"text" => "Record new sound",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(importButton, {
-					text : "Upload sound from file",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(importButton, [
+					"text" => "Upload sound from file",
+					"direction" => "bottom",
 
-				});
+				]);
 		fixlayout();
 	}
 
@@ -179,9 +179,9 @@ class SoundsPart extends UIPart
 		nameField.y = 15;
 
 		// undo buttons
-		undoButton.x = nameField.x + nameField.width + 30;
-		redoButton.x = undoButton.right() + 8;
-		undoButton.y = redoButton.y = nameField.y - 2;
+		//undoButton.x = nameField.x + nameField.width + 30;
+		//redoButton.x = undoButton.right() + 8;
+		//undoButton.y = redoButton.y = nameField.y - 2;
 
 		//editor.setWidthHeight(contentsW, 200);
 		//editor.x = contentsX;
@@ -231,8 +231,8 @@ class SoundsPart extends UIPart
 	private function addUndoButtons() : Void{
 		//addChild(undoButton = new IconButton(editor.waveform.undo, makeButtonImg("undo", true), makeButtonImg("undo", false)));
 		//addChild(redoButton = new IconButton(editor.waveform.redo, makeButtonImg("redo", true), makeButtonImg("redo", false)));
-		undoButton.isMomentary = true;
-		redoButton.isMomentary = true;
+		//undoButton.isMomentary = true;
+		//redoButton.isMomentary = true;
 	}
 
 	public function refreshUndoButtons() : Void{

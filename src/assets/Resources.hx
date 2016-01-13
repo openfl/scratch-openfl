@@ -22,6 +22,7 @@ package assets;
 
 import flash.display.*;
 import flash.text.*;
+import flash.utils.ByteArray;
 
 class Resources
 {

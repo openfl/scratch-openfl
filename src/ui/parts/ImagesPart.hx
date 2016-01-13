@@ -134,49 +134,49 @@ class ImagesPart extends UIPart
 	private function updateLabel() : Void{
 		newCostumeLabel.text = Translator.map((isStage()) ? "New backdrop:" : "New costume:");
 
-		SimpleTooltips.add(backdropLibraryButton, {
-					text : "Choose backdrop from library",
-					direction : "bottom",
+		SimpleTooltips.add(backdropLibraryButton, [
+					"text" => "Choose backdrop from library",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(costumeLibraryButton, {
-					text : "Choose costume from library",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(costumeLibraryButton, [
+					"text" => "Choose costume from library",
+					"direction" => "bottom",
 
-				});
+				]);
 		if (isStage()) {
-			SimpleTooltips.add(paintButton, {
-						text : "Paint new backdrop",
-						direction : "bottom",
+			SimpleTooltips.add(paintButton, [
+						"text" => "Paint new backdrop",
+						"direction" => "bottom",
 
-					});
-			SimpleTooltips.add(importButton, {
-						text : "Upload backdrop from file",
-						direction : "bottom",
+					]);
+			SimpleTooltips.add(importButton, [
+						"text" => "Upload backdrop from file",
+						"direction" => "bottom",
 
-					});
-			SimpleTooltips.add(cameraButton, {
-						text : "New backdrop from camera",
-						direction : "bottom",
+					]);
+			SimpleTooltips.add(cameraButton, [
+						"text" => "New backdrop from camera",
+						"direction" => "bottom",
 
-					});
+					]);
 		}
 		else {
-			SimpleTooltips.add(paintButton, {
-						text : "Paint new costume",
-						direction : "bottom",
+			SimpleTooltips.add(paintButton, [
+						"text" => "Paint new costume",
+						"direction" => "bottom",
 
-					});
-			SimpleTooltips.add(importButton, {
-						text : "Upload costume from file",
-						direction : "bottom",
+					]);
+			SimpleTooltips.add(importButton, [
+						"text" => "Upload costume from file",
+						"direction" => "bottom",
 
-					});
-			SimpleTooltips.add(cameraButton, {
-						text : "New costume from camera",
-						direction : "bottom",
+					]);
+			SimpleTooltips.add(cameraButton, [
+						"text" => "New costume from camera",
+						"direction" => "bottom",
 
-					});
+					]);
 		}
 	}
 
@@ -409,21 +409,21 @@ class ImagesPart extends UIPart
 		addChild(editorImportButton = new Button(Translator.map("Import"), importIntoEditor, true));
 		undoButton.isMomentary = true;
 		redoButton.isMomentary = true;
-		SimpleTooltips.add(undoButton, {
-					text : "Undo",
-					direction : "bottom",
+		SimpleTooltips.add(undoButton, [
+					"text" => "Undo",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(redoButton, {
-					text : "Redo",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(redoButton, [
+					"text" => "Redo",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(clearButton, {
-					text : "Erase all",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(clearButton, [
+					"text" => "Erase all",
+					"direction" => "bottom",
 
-				});
+				]);
 	}
 
 	private function undo(b : Dynamic) : Void{//editor.undo(b);
@@ -490,21 +490,21 @@ class ImagesPart extends UIPart
 		cropButton.isMomentary = true;
 		flipHButton.isMomentary = true;
 		flipVButton.isMomentary = true;
-		SimpleTooltips.add(cropButton, {
-					text : "Crop to selection",
-					direction : "bottom",
+		SimpleTooltips.add(cropButton, [
+					"text" => "Crop to selection",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(flipHButton, {
-					text : "Flip left-right",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(flipHButton, [
+					"text" => "Flip left-right",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(flipVButton, {
-					text : "Flip up-down",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(flipVButton, [
+					"text" => "Flip up-down",
+					"direction" => "bottom",
 
-				});
+				]);
 		setCanCrop(false);
 	}
 
@@ -529,8 +529,8 @@ class ImagesPart extends UIPart
 		};
 		centerButton = makeTopButton(setCostumeCenter, "setCenter", true);
 		SimpleTooltips.add(centerButton, {
-					text : "Set costume center",
-					direction : "bottom",
+					"text" => "Set costume center",
+					"direction" => "bottom",
 
 				});
 		editor.registerToolButton("setCenter", centerButton);

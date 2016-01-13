@@ -87,9 +87,9 @@ class SimpleTooltip
 	}
 
 	private static var instance : Dynamic;
-	public function addTooltip(dObj : DisplayObject, opts : Dynamic) : Void{
+	public function addTooltip(dObj : DisplayObject, opts : Map<String, String>) : Void{
 		if (!opts.exists("text") || !opts.exists("direction") ||
-			["top", "bottom", "left", "right"].indexOf(opts.direction) == -1) {
+			["top", "bottom", "left", "right"].indexOf(opts.get('direction')) == -1) {
 			trace("Invalid parameters!");
 			return;
 		}

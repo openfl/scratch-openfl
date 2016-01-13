@@ -49,7 +49,7 @@ class SimpleTooltips
 		 * @param opts Options (just 'text' and 'direction' right now)
 		 *
 		 */
-	public static function add(dObj : DisplayObject, opts : Dynamic) : Void{
+	public static function add(dObj : DisplayObject, opts : Map<String, String>) : Void{
 		if (instance == null)             instance = new SimpleTooltip();
 		if (dObj == null)             return;
 		instance.addTooltip(dObj, opts);

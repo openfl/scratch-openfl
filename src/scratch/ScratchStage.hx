@@ -65,7 +65,8 @@ class ScratchStage extends ScratchObj {
 	private var videoAlpha:Float = 0.5;
 	private var flipVideo:Bool = true;
 
-	public function ScratchStage() {
+	public function new() {
+		super();
 		objName = 'Stage';
 		isStage = true;
 		scrollRect = new Rectangle(0, 0, ScratchObj.STAGEW, ScratchObj.STAGEH); // clip drawing to my bounds
@@ -143,7 +144,7 @@ class ScratchStage extends ScratchObj {
 
 	private function initMedia():Void {
 		costumes.push(ScratchCostume.emptyBitmapCostume(Translator.map('backdrop1'), true));
-		sounds.push(new ScratchSound(Translator.map('pop'), Type.createInstance(ScratchObj.Pop, [])));
+		sounds.push(new ScratchSound(Translator.map('pop'), ScratchObj.makePop()));
 		sounds[0].prepareToSave();
 	}
 

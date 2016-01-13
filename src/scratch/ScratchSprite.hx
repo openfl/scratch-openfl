@@ -89,7 +89,7 @@ class ScratchSprite extends ScratchObj {
 	private function initMedia():Void {
 		var graySquare:BitmapData = new BitmapData(4, 4, true, 0x808080);
 		costumes.push(new ScratchCostume(Translator.map('costume1'), graySquare));
-		sounds.push(new ScratchSound(Translator.map('pop'), Type.createInstance(ScratchObj.Pop, [])));
+		sounds.push(new ScratchSound(Translator.map('pop'), ScratchObj.makePop()));
 		sounds[0].prepareToSave();
 	}
 

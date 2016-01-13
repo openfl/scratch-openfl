@@ -239,31 +239,31 @@ class TopBarPart extends UIPart
 		addChild(shrinkTool = makeToolButton("shrinkTool", selectTool));
 		addChild(helpTool = makeToolButton("helpTool", selectTool));
 
-		SimpleTooltips.add(copyTool, {
-					text : "Duplicate",
-					direction : "bottom",
+		SimpleTooltips.add(copyTool, [
+					"text" => "Duplicate",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(cutTool, {
-					text : "Delete",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(cutTool, [
+					"text" => "Delete",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(growTool, {
-					text : "Grow",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(growTool, [
+					"text" => "Grow",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(shrinkTool, {
-					text : "Shrink",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(shrinkTool, [
+					"text" => "Shrink",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(helpTool, {
-					text : "Block help",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(helpTool, [
+					"text" => "Block help",
+					"direction" => "bottom",
 
-				});
+				]);
 	}
 
 	public function clearToolButtons() : Void{

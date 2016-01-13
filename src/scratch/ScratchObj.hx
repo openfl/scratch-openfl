@@ -45,11 +45,13 @@ import util.*;
 
 import watchers.*;
 
+
 class ScratchObj extends Sprite
 {
+	private static function makePop() : ByteArray { return new Pop(); }
 
-	@:meta(Embed(source="../assets/pop.wav",mimeType="application/octet-stream"))
-private static var Pop : Class<Dynamic>;
+	//@:meta(Embed(source="../assets/pop.wav",mimeType="application/octet-stream"))
+//private static var Pop : Class<Dynamic>;
 
 	public static inline var STAGEW : Int = 480;
 	public static inline var STAGEH : Int = 360;
@@ -739,3 +741,5 @@ private static var Pop : Class<Dynamic>;
 		super();
 	}
 }
+
+@:file("assets/pop.wav") class Pop extends ByteArray { }

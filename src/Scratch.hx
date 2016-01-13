@@ -75,7 +75,7 @@ import util.*;
 
 import watchers.ListWatcher;
 
-class Scratch extends Sprite {
+class Scratch /*extends Sprite*/ {
 	// Version
 	public static inline var versionString/*:String*/ = 'v440.1';
 	public static var app:Scratch; // static reference to the app, used for debugging
@@ -137,14 +137,33 @@ class Scratch extends Sprite {
 	public var logger:Log = new Log(16);
 
 	public function new() {
-		super();
+		//super();
 		//SVGTool.setStage(stage);
-		loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
+		flash.Lib.current.root.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		app = this;
 
 		// This one must finish before most other queries can start, so do it separately
 		determineJSAccess();
 	}
+
+	// Certain Sprite variables don't seem to be configured properly when using Haxe, so I'll
+	// simply pretend to be a Sprite variable instead (requiring me to supply all the needed variables
+	// in another way)
+	public var stage(get, never):Stage;
+	public function get_stage() return flash.Lib.current.root.stage;
+	public var loaderInfo(get, never):LoaderInfo;
+	public function get_loaderInfo() return flash.Lib.current.root.loaderInfo;
+	public var scaleX(get, never) :Float;
+	public function get_scaleX() return flash.Lib.current.root.scaleX;
+	public var scaleY(get, never) :Float;
+	public function get_scaleY() return flash.Lib.current.root.scaleY;
+	public var mouseX(get, never) :Float;
+	public function get_mouseX() return flash.Lib.current.root.mouseX;
+	public var mouseY(get, never) :Float;
+	public function get_mouseY() return flash.Lib.current.root.mouseY;
+	public function addChild(child : DisplayObject) : DisplayObject { return flash.Lib.current.addChild(child); }
+	public function addChildAt(child : DisplayObject, index : Int) : DisplayObject { return Lib.current.addChildAt(child, index); }
+	public function rootDisplayObject() : DisplayObject { return flash.Lib.current.root; }
 
 	private function determineJSAccess():Void {
 		//if (externalInterfaceAvailable()) {
@@ -164,8 +183,8 @@ class Scratch extends Sprite {
 	}
 
 	private function initialize():Void {
-		isOffline = !URLUtil.isHttpURL(loaderInfo.url);
-		hostProtocol = URLUtil.getProtocol(loaderInfo.url);
+		isOffline = !URLUtil.isHttpURL(flash.Lib.current.root.loaderInfo.url);
+		hostProtocol = URLUtil.getProtocol(flash.Lib.current.root.loaderInfo.url);
 
 		isExtensionDevMode = false; // (loaderInfo.parameters['extensionDevMode'] == 'true');
 		isMicroworld = false; //  (loaderInfo.parameters['microworldMode'] == 'true');
@@ -173,6 +192,7 @@ class Scratch extends Sprite {
 		checkFlashVersion();
 		initServer();
 
+		
 		stage.align = StageAlign.TOP_LEFT;
 		stage.scaleMode = StageScaleMode.NO_SCALE;
 		stage.frameRate = 30;
@@ -1418,7 +1438,7 @@ class Scratch extends Sprite {
 			}
 		}
 
-		var r:Rectangle = spr.getVisibleBounds(this);
+		var r:Rectangle = spr.getVisibleBounds(rootDisplayObject());
 		box.graphics.lineStyle(3, CSS.overColor, 1, true);
 		box.graphics.beginFill(0x808080);
 		box.graphics.drawRoundRect(0, 0, r.width, r.height, 12, 12);
