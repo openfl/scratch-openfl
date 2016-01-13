@@ -671,7 +671,7 @@ class ScratchSprite extends ScratchObj {
 		json.writeKeyValue('spriteInfo', spriteInfo);
 	}
 
-	public override function readJSON(jsonObj:Object):Void {
+	public override function readJSON(jsonObj:Dynamic):Void {
 		super.readJSON(jsonObj);
 		scratchX = jsonObj.scratchX;
 		scratchY = jsonObj.scratchY;
