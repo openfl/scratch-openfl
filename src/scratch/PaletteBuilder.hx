@@ -379,9 +379,13 @@ class PaletteBuilder {
 
 	private function updateCheckboxes():Void {
 		for (i in 0...app.palette.numChildren) {
-			var b:IconButton = cast(app.palette.getChildAt(i), IconButton);
-			if (b != null && b.clientData) {
-				b.setOn(app.runtime.watcherShowing(b.clientData));
+			var child = app.palette.getChildAt(i);
+			if (Std.is(child, IconButton))
+			{
+				var b:IconButton = cast(child, IconButton);
+				if (b.clientData != null) {
+					b.setOn(app.runtime.watcherShowing(b.clientData));
+				}
 			}
 		}
 	}

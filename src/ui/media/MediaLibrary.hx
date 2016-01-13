@@ -361,7 +361,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		var tag:String = '';
 		if (categoryFilter.currentSelection != '') tag = categoryFilter.currentSelection;
 		if (themeFilter.currentSelection != '') tag = themeFilter.currentSelection;
-		tag = new RegExp(' ', 'g').replace(tag, '-'); // e.g., change 'Music and Dance' -> 'Music-and-Dance'
+		tag = new EReg(' ', 'g').replace(tag, '-'); // e.g., change 'Music and Dance' -> 'Music-and-Dance'
 		tag = tag.toLowerCase();
 		var showAll:Bool = ('all' == tag);
 		var filtered:Array<MediaLibraryItem> = [];

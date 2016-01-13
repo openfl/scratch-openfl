@@ -69,19 +69,19 @@ class MediaInfo extends Sprite {
 	public function new(obj:Dynamic, owningObj:ScratchObj = null) {
 		super();
 		owner = owningObj;
-		mycostume = cast(obj, ScratchCostume);
-		mysound = cast(obj, ScratchSound);
-		mysprite = cast(obj, ScratchSprite);
-		if (mycostume != null) {
+		if (Std.is(obj, ScratchCostume)) {
+			mycostume = cast(obj, ScratchCostume);
 			objType = 'image';
 			objName = mycostume.costumeName;
 			md5 = mycostume.baseLayerMD5;
-		} else if (mysound != null) {
+		} else if (Std.is(obj, ScratchSound)) {
+			mysound = cast(obj, ScratchSound);
 			objType = 'sound';
 			objName = mysound.soundName;
 			md5 = mysound.md5;
 			if (owner != null) frameHeight = 75; // use a shorter frame for sounds in a MediaPane
-		} else if (mysprite != null) {
+		} else if (Std.is(obj, ScratchSprite)) {
+			mysprite = cast(obj, ScratchSprite);
 			objType = 'sprite';
 			objName = mysprite.objName;
 			md5 = null; // initially null

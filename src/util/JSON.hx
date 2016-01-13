@@ -277,8 +277,8 @@ class JSON
 			var lastWasAsterisk : Bool = false;
 			while (true){
 				ch = src.next();
-				if (ch == "")                     return  // end of stream  ;
-				if (lastWasAsterisk && (ch == "/"))                     return  // end of comment  ;
+				if (ch == "")                     return;  // end of stream  ;
+				if (lastWasAsterisk && (ch == "/"))                     return;  // end of comment  ;
 				if (ch == "*")                     lastWasAsterisk = true;
 			}
 		}

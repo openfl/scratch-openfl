@@ -101,7 +101,7 @@ class MediaLibraryItem extends Sprite
 	}
 
 	public function stopLoading() : Void{
-		var app : Scratch = try cast(root, Scratch) catch(e:Dynamic) null;
+		//var app : Scratch = try cast(root, Scratch) catch(e:Dynamic) null;
 		for (loader in loaders)if (loader != null)             loader.close();
 		loaders = [];
 	}

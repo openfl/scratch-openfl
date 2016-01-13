@@ -1356,7 +1356,7 @@ class Scratch /*extends Sprite*/ {
 	public function addNewSprite(spr:ScratchSprite, showImages:Bool = false, atMouse:Bool = false):Void {
 		var c:ScratchCostume, byteCount:Int = 0;
 		for (c in spr.costumes) {
-			if (!c.baseLayerData) c.prepareToSave();
+			if (c.baseLayerData == null) c.prepareToSave();
 			byteCount += c.baseLayerData.length;
 		}
 		if (!okayToAdd(byteCount)) return; // not enough room
@@ -1405,8 +1405,10 @@ class Scratch /*extends Sprite*/ {
 		var assetByteCount:Int = newAssetBytes;
 		for (obj in stagePane.allObjects()) {
 			for (c in obj.costumes) {
-				if (!c.baseLayerData) c.prepareToSave();
-				assetByteCount += Std.int(c.baseLayerData.length);
+				if (c.baseLayerData == null) 
+					c.prepareToSave();
+				else
+					assetByteCount += Std.int(c.baseLayerData.length);
 			}
 			for (snd in obj.sounds) assetByteCount += snd.soundData.length;
 		}

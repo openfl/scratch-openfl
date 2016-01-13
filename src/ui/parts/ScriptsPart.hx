@@ -139,9 +139,13 @@ class ScriptsPart extends UIPart
 
 	private function updateExtensionIndicators() : Void{
 		if ((Math.round(haxe.Timer.stamp() * 1000) - lastUpdateTime) < 500)             return;
-		for (i in 0...app.palette.numChildren){
-			var indicator : IndicatorLight = try cast(app.palette.getChildAt(i), IndicatorLight) catch(e:Dynamic) null;
-			//if (indicator != null)                 app.extensionManager.updateIndicator(indicator, indicator.target);
+		for (i in 0...app.palette.numChildren) {
+			var child = app.palette.getChildAt(i);
+			if (Std.is(child, IndicatorLight))
+			{
+				var indicator : IndicatorLight = cast(child, IndicatorLight);
+				//app.extensionManager.updateIndicator(indicator, indicator.target);
+			}
 		}
 		lastUpdateTime = Math.round(haxe.Timer.stamp() * 1000);
 	}

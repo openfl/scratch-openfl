@@ -1074,8 +1074,12 @@ class ScratchRuntime {
 	private function findReporterWatcher(data:Object):Watcher {
 		var uiLayer:Sprite = app.stagePane.getUILayer();
 		for (i in 0...uiLayer.numChildren) {
-			var w:Watcher = cast(uiLayer.getChildAt(i), Watcher);
-			if (w != null && w.isReporterWatcher(data.targetObj, data.cmd, data.param)) return w;
+			var child = uiLayer.getChildAt(i);
+			if (Std.is(child, Watcher))
+			{
+				var w:Watcher = cast(child, Watcher);
+				if (w.isReporterWatcher(data.targetObj, data.cmd, data.param)) return w;
+			}
 		}
 		return null;
 	}

@@ -62,8 +62,8 @@ class ScratchObj extends Sprite
 	public var lists : Array<ListWatcher> = [];
 	public var scripts : Array<Dynamic> = [];
 	public var scriptComments : Array<Dynamic> = [];
-	public var sounds : Array<Dynamic> = [];
-	public var costumes : Array<Dynamic> = [];
+	public var sounds : Array<ScratchSound> = [];
+	public var costumes : Array<ScratchCostume> = [];
 	public var currentCostumeIndex : Float;
 	public var volume : Float = 100;
 	public var instrument : Int = 0;
@@ -306,7 +306,7 @@ class ScratchObj extends Sprite
 	}
 
 	public function setMedia(media : Array<Dynamic>, currentCostume : ScratchCostume) : Void{
-		var newCostumes : Array<Dynamic> = [];
+		var newCostumes : Array<ScratchCostume> = [];
 		sounds = [];
 		for (m in media){
 			if (Std.is(m, ScratchSound))                 sounds.push(m);
@@ -555,9 +555,9 @@ class ScratchObj extends Sprite
 	private static inline var DOUBLE_CLICK_MSECS : Int = 300;
 	private var lastClickTime : Int;
 
-	public function click(evt : MouseEvent) : Void{
-		var app : Scratch = try cast(root, Scratch) catch(e:Dynamic) null;
-		if (app == null)             return;
+	public function click(evt : MouseEvent) : Void {
+		if (!Std.is(root, Scratch)) return;
+		var app : Scratch = cast(root, Scratch);
 		var now : Int = Math.round(haxe.Timer.stamp() * 1000);
 		app.runtime.startClickedHats(this);
 		if ((now - lastClickTime) < DOUBLE_CLICK_MSECS) {
@@ -613,20 +613,86 @@ class ScratchObj extends Sprite
 		json.writeKeyValue("currentCostumeIndex", currentCostumeIndex);
 	}
 
-	public function readJSON(jsonObj : Dynamic) : Void{
+	//public function readJSON(jsonObj : Dynamic) : Void{
+		//objName = jsonObj.objName;
+		//variables = jsonObj.variables != null ?  jsonObj.variables: [];
+		//for (i in 0...variables.length){
+			//var varObj : Dynamic = variables[i];
+			//variables[i] = Scratch.app.runtime.makeVariable(varObj);
+		//}
+		//lists = jsonObj.lists != null ? jsonObj.lists : [];
+		//scripts = jsonObj.scripts != null ? jsonObj.scripts: [];
+		//scriptComments = jsonObj.scriptComments != null ? jsonObj.scriptComments: [];
+		//sounds = jsonObj.sounds != null ? jsonObj.sounds: [];
+		//costumes = jsonObj.costumes != null ? jsonObj.costumes: [];
+		//currentCostumeIndex = jsonObj.currentCostumeIndex;
+		//if (isNaNOrInfinity(currentCostumeIndex))             currentCostumeIndex = 0;
+	//}
+
+	public function readJSONAndInstantiate(jsonObj : Dynamic, newStage : ScratchStage) : Void{
 		objName = jsonObj.objName;
-		variables = jsonObj.variables != null ?  jsonObj.variables: [];
-		for (i in 0...variables.length){
-			var varObj : Dynamic = variables[i];
+		var jsonVariables = jsonObj.variables != null ?  jsonObj.variables: [];
+		variables = Compat.newArray(jsonVariables.length, null);
+		for (i in 0...jsonVariables.length){
+			var varObj : Dynamic = jsonVariables[i];
 			variables[i] = Scratch.app.runtime.makeVariable(varObj);
 		}
-		lists = jsonObj.lists != null ? jsonObj.lists : [];
-		scripts = jsonObj.scripts != null ? jsonObj.scripts: [];
-		scriptComments = jsonObj.scriptComments != null ? jsonObj.scriptComments: [];
-		sounds = jsonObj.sounds != null ? jsonObj.sounds: [];
-		costumes = jsonObj.costumes != null ? jsonObj.costumes: [];
+		var jsonLists = jsonObj.lists != null ? jsonObj.lists : [];
+		var jsonScripts = jsonObj.scripts != null ? jsonObj.scripts: [];
+		var jsonScriptComments = jsonObj.scriptComments != null ? jsonObj.scriptComments: [];
+		var jsonSounds = jsonObj.sounds != null ? jsonObj.sounds: [];
+		var jsonCostumes = jsonObj.costumes != null ? jsonObj.costumes: [];
 		currentCostumeIndex = jsonObj.currentCostumeIndex;
 		if (isNaNOrInfinity(currentCostumeIndex))             currentCostumeIndex = 0;
+		
+		// lists
+		lists = Compat.newArray(jsonLists.length, null);
+		for (i in 0...jsonLists.length){
+			var jsonObj = jsonLists[i];
+			var newList : ListWatcher = new ListWatcher();
+			newList.readJSON(jsonObj);
+			newList.target = this;
+			newStage.addChild(newList);
+			newList.updateTitleAndContents();
+			lists[i] = newList;
+		}  
+		
+		// scripts  
+		scripts = Compat.newArray(jsonScripts.length, null);
+		for (i in 0...jsonScripts.length){
+			// entries are of the form: [x y stack]
+			var entry : Array<Dynamic> = jsonScripts[i];
+			var b : Block = BlockIO.arrayToStack(entry[2], isStage);
+			b.x = entry[0];
+			b.y = entry[1];
+			scripts[i] = b;
+		}  
+
+
+		// script comments  
+		scriptComments = Compat.newArray(jsonScriptComments.length, null);
+		for (i in 0...jsonScriptComments.length){
+			scriptComments[i] = ScratchComment.fromArray(jsonScriptComments[i]);
+		}  
+
+
+		// sounds  
+		sounds = Compat.newArray(jsonSounds.length, null);
+		for (i in 0...jsonSounds.length){
+			jsonObj = jsonSounds[i];
+			sounds[i] = new ScratchSound("json temp", null);
+			sounds[i].readJSON(jsonObj);
+		}  
+
+
+		// costumes  
+		costumes = Compat.newArray(jsonCostumes.length, null);
+		for (i in 0...jsonCostumes.length){
+			jsonObj = jsonCostumes[i];
+			costumes[i] = new ScratchCostume("json temp", null);
+			costumes[i].readJSON(jsonObj);
+		}
+
 	}
 
 	private function isNaNOrInfinity(n : Float) : Bool{
@@ -636,55 +702,55 @@ class ScratchObj extends Sprite
 		return false;
 	}
 
-	public function instantiateFromJSON(newStage : ScratchStage) : Void{
-		var i : Int;
-		var jsonObj : Dynamic;
-
-		// lists
-		for (i in 0...lists.length){
-			jsonObj = lists[i];
-			var newList : ListWatcher = new ListWatcher();
-			newList.readJSON(jsonObj);
-			newList.target = this;
-			newStage.addChild(newList);
-			newList.updateTitleAndContents();
-			lists[i] = newList;
-		}  // scripts  
-
-
-
-		for (i in 0...scripts.length){
-			// entries are of the form: [x y stack]
-			var entry : Array<Dynamic> = scripts[i];
-			var b : Block = BlockIO.arrayToStack(entry[2], isStage);
-			b.x = entry[0];
-			b.y = entry[1];
-			scripts[i] = b;
-		}  // script comments  
-
-
-
-		for (i in 0...scriptComments.length){
-			scriptComments[i] = ScratchComment.fromArray(scriptComments[i]);
-		}  // sounds  
-
-
-
-		for (i in 0...sounds.length){
-			jsonObj = sounds[i];
-			sounds[i] = new ScratchSound("json temp", null);
-			sounds[i].readJSON(jsonObj);
-		}  // costumes  
-
-
-
-		for (i in 0...costumes.length){
-			jsonObj = costumes[i];
-			costumes[i] = new ScratchCostume("json temp", null);
-			costumes[i].readJSON(jsonObj);
-		}
-	}
-
+	//public function instantiateFromJSON(newStage : ScratchStage) : Void{
+		//var i : Int;
+		//var jsonObj : Dynamic;
+//
+		//// lists
+		//for (i in 0...lists.length){
+			//jsonObj = lists[i];
+			//var newList : ListWatcher = new ListWatcher();
+			//newList.readJSON(jsonObj);
+			//newList.target = this;
+			//newStage.addChild(newList);
+			//newList.updateTitleAndContents();
+			//lists[i] = newList;
+		//}  // scripts  
+//
+//
+//
+		//for (i in 0...scripts.length){
+			//// entries are of the form: [x y stack]
+			//var entry : Array<Dynamic> = scripts[i];
+			//var b : Block = BlockIO.arrayToStack(entry[2], isStage);
+			//b.x = entry[0];
+			//b.y = entry[1];
+			//scripts[i] = b;
+		//}  // script comments  
+//
+//
+//
+		//for (i in 0...scriptComments.length){
+			//scriptComments[i] = ScratchComment.fromArray(scriptComments[i]);
+		//}  // sounds  
+//
+//
+//
+		//for (i in 0...sounds.length){
+			//jsonObj = sounds[i];
+			//sounds[i] = new ScratchSound("json temp", null);
+			//sounds[i].readJSON(jsonObj);
+		//}  // costumes  
+//
+//
+//
+		//for (i in 0...costumes.length){
+			//jsonObj = costumes[i];
+			//costumes[i] = new ScratchCostume("json temp", null);
+			//costumes[i].readJSON(jsonObj);
+		//}
+	//}
+//
 	public function getSummary() : String{
 		var s : Array<Dynamic> = [];
 		s.push(h1(objName));

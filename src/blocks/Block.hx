@@ -953,7 +953,7 @@ class Block extends Sprite
 	private function focusChange(evt : FocusEvent) : Void{
 		evt.preventDefault();
 		var p : Block ;
-		if (evt.target.parent.parent != this)             return  // make sure the target TextField is in this block, not a child block  ;
+		if (evt.target.parent.parent != this)             return;  // make sure the target TextField is in this block, not a child block  ;
 		if (args.length == 0)             return;
 		var i : Int;
 		var focusIndex : Int = -1;

@@ -50,8 +50,12 @@ class BlockPalette extends ScrollFrameContents
 		var targetObj : ScratchObj = Scratch.app.viewedObj();
 		while (numChildren > 0) {
 			var child = getChildAt(0);
-			var b : Block = try cast(child, Block) catch(e:Dynamic) null;
-			if (interp.isRunning(b, targetObj))                 interp.toggleThread(b, targetObj);
+			if (Std.is(child, Block))
+			{
+				var b : Block = cast(child, Block);
+				if (interp.isRunning(b, targetObj))
+					interp.toggleThread(b, targetObj);
+			}
 			removeChildAt(0);
 		}
 		if (scrollToOrigin)             x = y = 0;

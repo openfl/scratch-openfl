@@ -328,7 +328,7 @@ class GestureHandler
 		drop(evt);
 		Menu.removeMenusFrom(stage);
 		if (gesture == "unknown") {
-			if (mouseTarget != null && (Lambda.has(mouseTarget, "doubleClick")))                 gesture = "clickOrDoubleClick"
+			if (mouseTarget != null && Reflect.hasField(mouseTarget, "doubleClick"))                 gesture = "clickOrDoubleClick"
 			else {
 				handleClick(evt);
 				mouseTarget = null;
@@ -430,10 +430,10 @@ class GestureHandler
 	private function handleDrag(evt : MouseEvent) : Void{
 		// Note: Called with a null event if gesture is click and hold.
 		Menu.removeMenusFrom(stage);
-		if (!(Lambda.has(mouseTarget, "objToGrab")))             return;
+		if (!Reflect.hasField(mouseTarget, "objToGrab"))             return;
 		if (!app.editMode) {
 			if (app.loadInProgress)                 return;
-			if ((Std.is(mouseTarget, ScratchSprite)) && !cast((mouseTarget), ScratchSprite).isDraggable)                 return  // don't drag locked sprites in presentation mode  ;
+			if ((Std.is(mouseTarget, ScratchSprite)) && !cast((mouseTarget), ScratchSprite).isDraggable)                 return;  // don't drag locked sprites in presentation mode  ;
 			if ((Std.is(mouseTarget, Watcher)) || (Std.is(mouseTarget, ListWatcher)))                 return;  // don't drag watchers in presentation mode  ;
 		}
 		grab(mouseTarget, evt);
@@ -446,7 +446,7 @@ class GestureHandler
 	private function handleClick(evt : MouseEvent) : Void{
 		if (mouseTarget == null)             return;
 		evt.updateAfterEvent();
-		if (Lambda.has(mouseTarget, "click"))             mouseTarget.click(evt);
+		if (Reflect.hasField(mouseTarget, "click"))             mouseTarget.click(evt);
 		gesture = "click";
 	}
 
@@ -498,7 +498,7 @@ class GestureHandler
 
 		var globalP : Point = obj.localToGlobal(new Point(0, 0));  // record the original object's global position  
 		obj = obj.objToGrab((evt != null) ? evt : new MouseEvent(""));  // can return the original object, a new object, or null  
-		if (obj == null)             return  // not grabbable  ;
+		if (obj == null)             return;  // not grabbable  ;
 		if (obj.parent)             globalP = obj.localToGlobal(new Point(0, 0));  // update position if not a copy  ;
 
 		originalParent = obj.parent;  // parent is null if objToGrab() returns a new object  
@@ -559,7 +559,7 @@ class GestureHandler
 		for (o in possibleTargets){
 			while (o){  // see if some parent can handle the drop  
 				if (Lambda.indexOf(tried, o) == -1) {
-					if ((Lambda.has(o, "handleDrop")) && o.handleDrop(droppedObj))                         return true;
+					if (Reflect.hasField(o, "handleDrop") && o.handleDrop(droppedObj))                         return true;
 					tried.push(o);
 				}
 				o = o.parent;

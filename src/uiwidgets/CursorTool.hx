@@ -104,7 +104,7 @@ class CursorTool
 	public static function setCustomCursor(name : String, bmp : BitmapData = null, hotSpot : Point = null, reuse : Bool = true) : Void{
 		var standardCursors : Array<Dynamic> = ["arrow", "auto", "button", "hand", "ibeam"];
 
-		if (tool != null)             return  // don't let point editor cursors override top bar tools  ;
+		if (tool != null)             return;  // don't let point editor cursors override top bar tools  ;
 
 		hideSoftwareCursor();
 		if (Lambda.indexOf(standardCursors, name) != -1) {Mouse.cursor = name;return;

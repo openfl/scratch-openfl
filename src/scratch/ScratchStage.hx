@@ -816,11 +816,11 @@ class ScratchStage extends ScratchObj {
 		json.writeKeyValue('info', info);
 	}
 
-	public override function readJSON(jsonObj:Dynamic):Void {
+	public override function readJSONAndInstantiate(jsonObj : Dynamic, newStage : ScratchStage) : Void{
 		var children:Array<Dynamic>, i:Int, o:Dynamic;
 
 		// read stage fields
-		super.readJSON(jsonObj);
+		super.readJSONAndInstantiate(jsonObj, newStage);
 		penLayerMD5 = jsonObj.penLayerMD5;
 		tempoBPM = jsonObj.tempoBPM;
 		if (jsonObj.videoAlpha) videoAlpha = jsonObj.videoAlpha;
@@ -834,7 +834,7 @@ class ScratchStage extends ScratchObj {
 			o = children[i];
 			if (o.objName != null) { // o is a sprite record
 				var s:ScratchSprite = new ScratchSprite();
-				s.readJSON(o);
+				s.readJSONAndInstantiate(o, this);
 				spriteNameMap[s.objName] = s;
 				children[i] = s;
 			}
@@ -862,9 +862,9 @@ class ScratchStage extends ScratchObj {
 		}
 
 		// instantiate lists, variables, scripts, costumes, and sounds
-		for (scratchObj in allObjects()) {
-			scratchObj.instantiateFromJSON(this);
-		}
+		//for (scratchObj in allObjects()) {
+			//scratchObj.instantiateFromJSON(this);
+		//}
 	}
 
 	public override function getSummary():String {

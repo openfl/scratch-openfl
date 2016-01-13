@@ -104,9 +104,10 @@ class MediaPane extends ScrollFrameContents
 		var current : ScratchCostume = viewedObj.currentCostume();
 		if (current == lastCostume)             return false;
 		var oldCostume : ScratchCostume = lastCostume;
-		for (i in 0...numChildren){
-			var ci : MediaInfo = try cast(getChildAt(i), MediaInfo) catch(e:Dynamic) null;
-			if (ci != null) {
+		for (i in 0...numChildren) {
+			var child = getChildAt(i);
+			if (Std.is(getChildAt(i), MediaInfo)) {
+				var ci : MediaInfo = cast(getChildAt(i), MediaInfo);
 				if (ci.mycostume == current) {
 					ci.highlight();
 					scrollToItem(ci);

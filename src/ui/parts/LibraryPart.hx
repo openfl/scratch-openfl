@@ -404,16 +404,15 @@ class LibraryPart extends UIPart
 
 	private function importSprite(fromComputer : Bool) : Void{
 		function addSprite(costumeOrSprite : Dynamic) : Void{
-			var spr : ScratchSprite;
-			var c : ScratchCostume = try cast(costumeOrSprite, ScratchCostume) catch(e:Dynamic) null;
-			if (c != null) {
-				spr = new ScratchSprite(c.costumeName);
+			if (Std.is(costumeOrSprite, ScratchCostume)) {
+				var c : ScratchCostume = cast(costumeOrSprite, ScratchCostume);
+				var spr = new ScratchSprite(c.costumeName);
 				spr.setInitialCostume(c);
 				app.addNewSprite(spr);
 				return;
 			}
-			spr = try cast(costumeOrSprite, ScratchSprite) catch(e:Dynamic) null;
-			if (spr != null) {
+			if (Std.is(costumeOrSprite, ScratchSprite)) {
+				var spr = cast(costumeOrSprite, ScratchSprite);
 				app.addNewSprite(spr);
 				return;
 			}
@@ -421,7 +420,7 @@ class LibraryPart extends UIPart
 			if (list != null) {
 				var sprName : String = list[0].costumeName;
 				if (sprName.length > 3)                     sprName = sprName.substring(0, sprName.length - 2);
-				spr = new ScratchSprite(sprName);
+				var spr = new ScratchSprite(sprName);
 				for (c in list)spr.costumes.push(c);
 				if (spr.costumes.length > 1)                     spr.costumes.shift();  // remove default costume  ;
 				spr.showCostumeNamed(list[0].costumeName);
@@ -462,8 +461,15 @@ class LibraryPart extends UIPart
 	private function addBackdrop(costumeOrList : Dynamic) : Void{
 		var c : ScratchCostume = try cast(costumeOrList, ScratchCostume) catch(e:Dynamic) null;
 		if (c != null) {
-			if (c.baseLayerData == null)                 c.prepareToSave();
-			if (!app.okayToAdd(c.baseLayerData.length))                 return;  // not enough room  ;
+			if (c.baseLayerData == null)
+			{
+				c.prepareToSave();
+			}
+			else
+			{
+				if (!app.okayToAdd(c.baseLayerData.length))
+					return;  // not enough room 
+			}
 			c.costumeName = app.stagePane.unusedCostumeName(c.costumeName);
 			app.stagePane.costumes.push(c);
 			app.stagePane.showCostumeNamed(c.costumeName);

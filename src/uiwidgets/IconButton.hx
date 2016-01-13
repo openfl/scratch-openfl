@@ -165,9 +165,9 @@ class IconButton extends Sprite
 
 	private function mouseDown(e : MouseEvent) : Void{
 		if (isDisabled())             return;
-		if (CursorTool.tool == "help")             return  // ignore mouseDown events with help tool (this doesn't apply to 'actOnMouseUp' buttons)  ;
+		if (CursorTool.tool == "help")             return;  // ignore mouseDown events with help tool (this doesn't apply to 'actOnMouseUp' buttons)  ;
 		if (isRadioButton) {
-			if (buttonIsOn)                 return  // user must click on another radio button to turn this button off  ;
+			if (buttonIsOn)                 return;  // user must click on another radio button to turn this button off  ;
 			turnOffOtherRadioButtons();
 		}
 		buttonIsOn = !buttonIsOn;

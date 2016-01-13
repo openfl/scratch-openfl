@@ -232,7 +232,7 @@ class Translator
 
 	private static function checkBlockSpec(spec : String) : Void{
 		var translatedSpec : String = map(spec);
-		if (translatedSpec == spec)             return  // not translated  ;
+		if (translatedSpec == spec)             return;  // not translated  ;
 		if (!argsMatch(extractArgs(spec), extractArgs(translatedSpec))) {
 			Scratch.app.log(
 					LogLevel.WARNING, "Block argument mismatch",

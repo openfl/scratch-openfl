@@ -169,7 +169,7 @@ class ProjectIO
 		var jsonObj : Dynamic = util.JSON.parse(jsonData);
 		if (Reflect.field(jsonObj, "children")) {  // project JSON  
 			var proj : ScratchStage = getScratchStage();
-			proj.readJSON(jsonObj);
+			proj.readJSONAndInstantiate(jsonObj, proj);
 			if (proj.penLayerID >= 0)                 proj.penLayerPNG = images[proj.penLayerID];
 			else if (proj.penLayerMD5 != null)                 proj.penLayerPNG = images[0];
 			installImagesAndSounds(proj.allObjects());
@@ -177,8 +177,8 @@ class ProjectIO
 		}
 		if (Reflect.field(jsonObj, "direction") != null) {  // sprite JSON  
 			var sprite : ScratchSprite = new ScratchSprite();
-			sprite.readJSON(jsonObj);
-			sprite.instantiateFromJSON(app.stagePane);
+			sprite.readJSONAndInstantiate(jsonObj, app.stagePane);
+			//sprite.instantiateFromJSON(app.stagePane);
 			installImagesAndSounds([sprite]);
 			return sprite;
 		}
@@ -215,7 +215,7 @@ class ProjectIO
 	}
 
 	public function decodeAllImages(objList : Array<ScratchObj>, whenDone : Function, fail : Void->Void = null) : Void{
-		var allCostumes : Array<Dynamic> = [];
+		var allCostumes : Array<ScratchCostume> = [];
 		var imageDict : Map<ByteArray,Dynamic> = new Map<ByteArray,Dynamic>();  // maps image data to BitmapData  
 		var error : Bool = false;
 		// Load all images in all costumes from their image data, then call whenDone.
@@ -244,7 +244,6 @@ class ProjectIO
 			if (fail != null)                 fail();
 		};
 
-		var c : ScratchCostume;
 		for (o in objList){
 			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(o),costumes) type: null */ in o.costumes)allCostumes.push(c);
 		}
@@ -258,20 +257,21 @@ class ProjectIO
 		imageDecoded();
 	}
 
-	private function decodeImage(imageData : ByteArray, imageDict : Dictionary, doneFunction : Function, fail : Void->Void) : Void{
+	private function decodeImage(imageData : ByteArray, imageDict : Map<ByteArray,Dynamic>, doneFunction : Function, fail : Void->Void) : Void{
 		function loadDone(e : Event) : Void{
-			Reflect.setField(imageDict, Std.string(imageData), e.target.content.bitmapData);
+			imageDict[imageData] = e.target.content.bitmapData;
 			doneFunction();
 		};
 		function loadError(e : Event) : Void{
 			if (fail != null)                 fail();
 		};
-		if (Reflect.field(imageDict, Std.string(imageData)) != null)             return  // already loading or loaded  ;
+		if (imageDict.exists(imageData))
+			return;  // already loading or loaded  ;
 		if (imageData == null || imageData.length == 0) {
 			if (fail != null)                 fail();
 			return;
 		}
-		Reflect.setField(imageDict, Std.string(imageData), "loading...");
+		imageDict[imageData] = "loading...";
 		var loader : Loader = new Loader();
 		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadDone);
 		loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError);
@@ -283,7 +283,7 @@ class ProjectIO
 			//Reflect.setField(imageDict, Std.string(svgData), svgRoot);
 			//doneFunction();
 		//};
-		//if (Reflect.field(imageDict, Std.string(svgData)) != null)             return  // already loading or loaded  ;
+		//if (Reflect.field(imageDict, Std.string(svgData)) != null)             return;  // already loading or loaded  ;
 		//var importer : SVGImporter = new SVGImporter(cast((svgData), XML));
 		//if (importer.hasUnloadedImages()) {
 			//Reflect.setField(imageDict, Std.string(svgData), "loading...");
@@ -300,7 +300,7 @@ class ProjectIO
 		projectData.position = 0;
 		var projObject : Dynamic = util.JSON.parse(projectData.readUTFBytes(projectData.length));
 		var proj : ScratchStage = getScratchStage();
-		proj.readJSON(projObject);
+		proj.readJSONAndInstantiate(projObject, proj);
 		var assetsToFetch : Array<Dynamic> = collectAssetsToFetch(proj.allObjects());
 		function assetReceived(md5 : String, data : ByteArray) : Void{
 			assetDict[md5] = data;
@@ -411,8 +411,8 @@ class ProjectIO
 		};
 		function jsonReceived(data : ByteArray) : Void{
 			if (data == null)                 return;
-			spr.readJSON(util.JSON.parse(data.readUTFBytes(data.length)));
-			spr.instantiateFromJSON(app.stagePane);
+			spr.readJSONAndInstantiate(util.JSON.parse(data.readUTFBytes(data.length)), app.stagePane);
+			//spr.instantiateFromJSON(app.stagePane);
 			fetchSpriteAssets([spr], assetsReceived);
 		};
 		app.server.getAsset(md5AndExt, jsonReceived);
@@ -441,37 +441,43 @@ class ProjectIO
 		// Return list of MD5's for all project assets.
 		var list : Array<Dynamic> = new Array<Dynamic>();
 		for (obj in objList){
-			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
+			for (c in obj.costumes){
 				if (Lambda.indexOf(list, c.baseLayerMD5) < 0)                     list.push(c.baseLayerMD5);
-				if (c.textLayerMD5) {
+				if (c.textLayerMD5 != null) {
 					if (Lambda.indexOf(list, c.textLayerMD5) < 0)                         list.push(c.textLayerMD5);
 				}
 			}
-			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
+			for (snd in obj.sounds){
 				if (Lambda.indexOf(list, snd.md5) < 0)                     list.push(snd.md5);
 			}
 		}
 		return list;
 	}
 
-	private function installAssets(objList : Array<ScratchObj>, assetDict : Dynamic) : Void{
-		var data : ByteArray;
+	private function installAssets(objList : Array<ScratchObj>, assetDict : Map<String, ByteArray>) : Void{
+		var data : ByteArray = null;
 		for (obj in objList){
-			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
-				data = assetDict[c.baseLayerMD5];
-				if (data != null)                     c.baseLayerData = data
-				else {
+			for (c in obj.costumes) {
+				if (assetDict.exists(c.baseLayerMD5))
+				{
+					data = assetDict[c.baseLayerMD5];
+					c.baseLayerData = data;
+				}
+				else
+				{
+					data = null;
 					// Asset failed to load so use an empty costume
 					// BUT retain the original MD5 and don't break the reference to the costume that failed to load.
 					var origMD5 : String = c.baseLayerMD5;
 					c.baseLayerData = ScratchCostume.emptySVG();
 					c.baseLayerMD5 = origMD5;
 				}
-				if (c.textLayerMD5)                     c.textLayerData = assetDict[c.textLayerMD5];
+				if (c.textLayerMD5 != null)                     c.textLayerData = assetDict[c.textLayerMD5];
 			}
-			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
-				data = assetDict[snd.md5];
-				if (data != null) {
+			for (snd in obj.sounds){
+				if (assetDict.exists(snd.md5))
+				{
+					data = assetDict[snd.md5];
 					snd.soundData = data;
 					snd.convertMP3IfNeeded();
 				}
@@ -482,7 +488,7 @@ class ProjectIO
 		}
 	}
 
-	public function fetchAsset(md5 : String, whenDone : Function) : URLLoader{
+	public function fetchAsset(md5 : String, whenDone : String->ByteArray->Void) : URLLoader{
 		return app.server.getAsset(md5, function(data : Dynamic) : Void{whenDone(md5, data);
 				});
 	}
@@ -503,7 +509,7 @@ class ProjectIO
 			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
 				c.prepareToSave();  // encodes image and computes md5 if necessary  
 				c.baseLayerID = recordImage(c.baseLayerData, c.baseLayerMD5, recordedAssets, uploading);
-				if (c.textLayerBitmap) {
+				if (c.textLayerBitmap != null) {
 					c.textLayerID = recordImage(c.textLayerData, c.textLayerMD5, recordedAssets, uploading);
 				}
 			}
