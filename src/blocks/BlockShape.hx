@@ -79,7 +79,6 @@ class BlockShape extends Shape
 		this.shape = shape;
 		setShape(shape);
 		filters = blockShapeFilters();
-		drawFunction = drawRectShape;
 	}
 
 	public function setWidthAndTopHeight(newW : Int, newTopH : Int, doRedraw : Bool = false) : Void{

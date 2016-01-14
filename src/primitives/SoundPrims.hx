@@ -26,7 +26,6 @@ package primitives;
 
 
 import blocks.Block;
-import flash.utils.Dictionary;
 import interpreter.*;
 import scratch.*;
 import sound.*;

@@ -58,7 +58,7 @@ class Specs
 
 	private static inline var undefinedColor : Int = 0xD42828;
 
-	public static var categories : Array<Dynamic> = [
+	public static var categories : Array<Array<Dynamic>> = [
 		// id   category name	color
 		[0, "undefined", 0xD42828], 
 		[1, "Motion", 0x4a6cd4], 
@@ -98,7 +98,7 @@ class Specs
 		return "Unknown";
 	}
 
-	public static function IconNamed(name : String) : Dynamic{
+	public static function IconNamed(name : String) : Bitmap{
 		// Block icons are 2x resolution to look better when scaled.
 		var icon : Bitmap = null;
 		if (name == "greenFlag")             icon = Resources.createBmp("flagIcon");
@@ -109,7 +109,7 @@ class Specs
 		return icon;
 	}
 
-	public static var commands : Array<Dynamic> = [
+	public static var commands : Array<Array<Dynamic>> = [
 		// block specification					type, cat, opcode			default args (optional)
 		// motion
 		["move %n steps", " ", 1, "forward:", 10], 
@@ -394,7 +394,7 @@ class Specs
 		["hide all sprites", " ", 99, "hideAll"], 
 		["user id", "r", 99, "getUserId"]];
 
-	public static var extensionSpecs : Array<Dynamic> = ["when %m.booleanSensor", "when %m.sensor %m.lessMore %n", "sensor %m.booleanSensor?", "%m.sensor sensor value", "turn %m.motor on for %n secs", "turn %m.motor on", "turn %m.motor off", "set %m.motor power to %n", "set %m.motor2 direction to %m.motorDirection", "when distance %m.lessMore %n", "when tilt %m.eNe %n", "distance", "tilt"];
+	public static var extensionSpecs : Array<String> = ["when %m.booleanSensor", "when %m.sensor %m.lessMore %n", "sensor %m.booleanSensor?", "%m.sensor sensor value", "turn %m.motor on for %n secs", "turn %m.motor on", "turn %m.motor off", "set %m.motor power to %n", "set %m.motor2 direction to %m.motorDirection", "when distance %m.lessMore %n", "when tilt %m.eNe %n", "distance", "tilt"];
 
 	public function new()
 	{

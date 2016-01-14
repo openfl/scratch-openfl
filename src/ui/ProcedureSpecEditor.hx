@@ -82,7 +82,7 @@ class ProcedureSpecEditor extends Sprite
 		showButtons(false);
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return [
 		"Options", "Run without screen refresh", 
 		"Add number input:", 

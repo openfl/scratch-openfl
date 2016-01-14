@@ -501,7 +501,7 @@ class ScratchSprite extends ScratchObj {
 		}
 		if (parent != null) {
 			parent.addChild(dup);
-			var app:Scratch = cast(root, Scratch);
+			var app:Scratch = Scratch.app;
 			if (app != null) {
 				app.setSaveNeeded();
 				app.updateSpriteLibrary();

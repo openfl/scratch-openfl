@@ -27,7 +27,6 @@ package primitives;
 
 import flash.display.*;
 import flash.geom.*;
-import flash.utils.Dictionary;
 import blocks.Block;
 import interpreter.*;
 import scratch.*;
@@ -110,9 +109,9 @@ class SensingPrims
 		}
 		if (!s.visible)             return false;
 		var sBM : BitmapData = s.bitmap(true);
-		for (s2/* AS3HX WARNING could not determine type for var: s2 exp: ECall(EField(EField(EIdent(app),stagePane),spritesAndClonesNamed),[EIdent(arg)]) type: null */ in app.stagePane.spritesAndClonesNamed(arg))
-		if (s2.visible && sBM.hitTest(s.bounds().topLeft, 1, s2.bitmap(true), s2.bounds().topLeft, 1)) 
-			return true;
+		for (s2 in app.stagePane.spritesAndClonesNamed(arg))
+			if (s2.visible && sBM.hitTest(s.bounds().topLeft, 1, s2.bitmap(true), s2.bounds().topLeft, 1)) 
+				return true;
 
 		return false;
 	}

@@ -46,7 +46,7 @@ import util.*;
 
 class FilterPack
 {
-	public static var filterNames : Array<Dynamic> = [
+	public static var filterNames : Array <String> = [
 		"color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost"];
 
 	public var targetObj : ScratchObj;

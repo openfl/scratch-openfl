@@ -79,7 +79,7 @@ class SpriteInfoPart extends UIPart implements DragClient
 		updateTranslation();
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return ["direction:", "rotation style:", "can drag in player:", "show:"];
 	}
 
@@ -373,8 +373,8 @@ class SpriteInfoPart extends UIPart implements DragClient
 		var targetObj : ScratchSprite = try cast(app.viewedObj(), ScratchSprite) catch(e:Dynamic) null;
 		if (targetObj == null)             return;
 		for (i in 0...numChildren){
-			var b : IconButton = try cast(getChildAt(i), IconButton) catch(e:Dynamic) null;
-			if (b != null) {
+			if (Std.is(getChildAt(i), IconButton)) {
+				var b : IconButton = cast(getChildAt(i), IconButton);
 				if (b.clickFunction == rotate360)                     b.setOn(targetObj.rotationStyle == "normal");
 				if (b.clickFunction == rotateFlip)                     b.setOn(targetObj.rotationStyle == "leftRight");
 				if (b.clickFunction == rotateNone)                     b.setOn(targetObj.rotationStyle == "none");

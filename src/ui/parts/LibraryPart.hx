@@ -98,7 +98,7 @@ class LibraryPart extends UIPart
 		updateTranslation();
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return [
 		"Sprites", "New sprite:", "New backdrop:", "Video on:", "backdrop1", "costume1", "photo1", "pop", 
 		"Choose sprite from library", "Paint new sprite", "Upload sprite from file", "New sprite from camera", 

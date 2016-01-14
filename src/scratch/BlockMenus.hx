@@ -100,7 +100,7 @@ class BlockMenus implements DragClient
 		if (menuName == "videoState")             menuHandler.videoStateMenu(evt);
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		// Exercises all the menus to cause their items to be recorded.
 		// Return a list of additional strings (e.g. from the key menu).
 		var events : Array<Dynamic> = [new MouseEvent("dummy"), new MouseEvent("shift-dummy")];
@@ -233,7 +233,7 @@ class BlockMenus implements DragClient
 
 	private function backdropMenu(evt : MouseEvent) : Void{
 		var m : Menu = new Menu(setBlockArg, "backdrop");
-		for (scene/* AS3HX WARNING could not determine type for var: scene exp: EField(ECall(EField(EIdent(app),stageObj),[]),costumes) type: null */ in app.stageObj().costumes){
+		for (scene in app.stageObj().costumes){
 			m.addItem(scene.costumeName);
 		}
 		if (block != null && block.op.indexOf("startScene") > -1 || Menu.stringCollectionMode) {
@@ -259,7 +259,7 @@ class BlockMenus implements DragClient
 	private function costumeMenu(evt : MouseEvent) : Void{
 		var m : Menu = new Menu(setBlockArg, "costume");
 		if (app.viewedObj() == null)             return;
-		for (c/* AS3HX WARNING could not determine type for var: c exp: EField(ECall(EField(EIdent(app),viewedObj),[]),costumes) type: null */ in app.viewedObj().costumes){
+		for (c in app.viewedObj().costumes){
 			m.addItem(c.costumeName);
 		}
 		showMenu(m);
@@ -285,7 +285,7 @@ class BlockMenus implements DragClient
 	private function effectMenu(evt : MouseEvent) : Void{
 		var m : Menu = new Menu(setBlockArg, "effect");
 		if (app.viewedObj() == null)             return;
-		for (s/* AS3HX WARNING could not determine type for var: s exp: EField(EIdent(FilterPack),filterNames) type: null */ in FilterPack.filterNames)m.addItem(s);
+		for (s in FilterPack.filterNames)m.addItem(s);
 		showMenu(m);
 	}
 
@@ -432,7 +432,7 @@ class BlockMenus implements DragClient
 			m.addLine();
 			spriteNames.push(app.viewedObj().objName);
 		}
-		for (sprite/* AS3HX WARNING could not determine type for var: sprite exp: ECall(EField(EField(EIdent(app),stagePane),sprites),[]) type: null */ in app.stagePane.sprites()){
+		for (sprite in app.stagePane.sprites()){
 			if (sprite != app.viewedObj())                 spriteNames.push(sprite.objName);
 		}
 		spriteNames.sort(function(a, b) {
@@ -571,8 +571,8 @@ class BlockMenus implements DragClient
 		if (Std.is(pane.parent, ScrollFrame)) {
 			pane.x = 5 - def.x * pane.scaleX;
 			pane.y = 5 - def.y * pane.scaleX;
-			(try cast(pane.parent, ScrollFrame) catch(e:Dynamic) null).constrainScroll();
-			(try cast(pane.parent, ScrollFrame) catch(e:Dynamic) null).updateScrollbars();
+			cast(pane.parent, ScrollFrame).constrainScroll();
+			cast(pane.parent, ScrollFrame).updateScrollbars();
 		}
 	}
 
@@ -602,7 +602,7 @@ class BlockMenus implements DragClient
 			if (block.nextBlock != null)                 block.nextBlock.allBlocksDo(function(b : Block) : Void{
 						if (b.op == Specs.GET_PARAM)                             b.parameterIndex = -1;  // parameters may have changed; clear cached indices  ;
 					});
-			for (caller/* AS3HX WARNING could not determine type for var: caller exp: ECall(EField(EField(EIdent(app),runtime),allCallsOf),[EIdent(oldSpec),ECall(EField(EIdent(app),viewedObj),[])]) type: null */ in app.runtime.allCallsOf(oldSpec, app.viewedObj())){
+			for (caller in app.runtime.allCallsOf(oldSpec, app.viewedObj())){
 				var oldArgs : Array<Dynamic> = caller.args;
 				caller.setSpec(newSpec, block.defaultArgValues);
 				for (i in 0...oldArgs.length){
@@ -630,12 +630,12 @@ class BlockMenus implements DragClient
 		}
 		var myName : String = (isGetter) ? blockVarOrListName() : null;
 		var listName : String;
-		for (listName/* AS3HX WARNING could not determine type for var: listName exp: ECall(EField(ECall(EField(EIdent(app),stageObj),[]),listNames),[]) type: null */ in app.stageObj().listNames()){
+		for (listName in app.stageObj().listNames()){
 			if (listName != myName)                 m.addItem(listName);
 		}
 		if (!app.viewedObj().isStage) {
 			m.addLine();
-			for (listName/* AS3HX WARNING could not determine type for var: listName exp: ECall(EField(ECall(EField(EIdent(app),viewedObj),[]),listNames),[]) type: null */ in app.viewedObj().listNames()){
+			for (listName in app.viewedObj().listNames()){
 				if (listName != myName)                     m.addItem(listName);
 			}
 		}
@@ -653,13 +653,12 @@ class BlockMenus implements DragClient
 		else {
 			if (isGetter)                 addGenericBlockItems(m);
 			var myName : String = blockVarOrListName();
-			var vName : String;
-			for (vName/* AS3HX WARNING could not determine type for var: vName exp: ECall(EField(ECall(EField(EIdent(app),stageObj),[]),varNames),[]) type: null */ in app.stageObj().varNames()){
+			for (vName in app.stageObj().varNames()){
 				if (!isGetter || (vName != myName))                     m.addItem(vName);
 			}
 			if (!app.viewedObj().isStage) {
 				m.addLine();
-				for (vName/* AS3HX WARNING could not determine type for var: vName exp: ECall(EField(ECall(EField(EIdent(app),viewedObj),[]),varNames),[]) type: null */ in app.viewedObj().varNames()){
+				for (vName in app.viewedObj().varNames()){
 					if (!isGetter || (vName != myName))                         m.addItem(vName);
 				}
 			}

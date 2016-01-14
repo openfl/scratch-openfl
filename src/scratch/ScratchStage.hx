@@ -106,14 +106,16 @@ class ScratchStage extends ScratchObj {
 		return null;
 	}
 
-	public function spritesAndClonesNamed(spriteName:String):Array<Dynamic> {
+	public function spritesAndClonesNamed(spriteName:String):Array<ScratchSprite> {
 		// Return all sprites and clones with the given name.
-		var result:Array<Dynamic> = [];
+		var result:Array<ScratchSprite> = [];
 		for (i in 0...numChildren) {
 			var c:Dynamic = getChildAt(i);
 			if (Std.is(c, ScratchSprite) && (c.objName == spriteName)) result.push(c);
 		}
-		var app:Scratch = cast(parent, Scratch);
+		var app:Scratch = null;
+		if (parent == Scratch.app.rootDisplayObject())
+			app = Scratch.app;
 		if (app != null) {
 			var spr:ScratchSprite = cast(app.gh.carriedObj, ScratchSprite);
 			if (spr != null && (spr.objName == spriteName)) result.push(spr);
@@ -554,17 +556,20 @@ class ScratchStage extends ScratchObj {
 		bm.draw(cachedBM, m);
 
 		for (i in 0...this.numChildren) {
-			var o:ScratchSprite = cast(this.getChildAt(i), ScratchSprite);
-			if (o != null && (o != s) && o.visible && o.bounds().intersects(r)) {
-				m.identity();
-				m.translate(o.img.x, o.img.y);
-				m.rotate((Math.PI * o.rotation) / 180);
-				m.scale(o.scaleX, o.scaleY);
-				m.translate(o.x - r.x, o.y - r.y);
-				m.tx = Math.floor(m.tx);
-				m.ty = Math.floor(m.ty);
-				var colorTransform:ColorTransform = (o.img.alpha == 1) ? null : new ColorTransform(1, 1, 1, o.img.alpha);
-				bm.draw(o.img, m, colorTransform);
+			if (Std.is(this.getChildAt(i), ScratchSprite))
+			{
+				var o:ScratchSprite = cast(this.getChildAt(i), ScratchSprite);
+				if ((o != s) && o.visible && o.bounds().intersects(r)) {
+					m.identity();
+					m.translate(o.img.x, o.img.y);
+					m.rotate((Math.PI * o.rotation) / 180);
+					m.scale(o.scaleX, o.scaleY);
+					m.translate(o.x - r.x, o.y - r.y);
+					m.tx = Math.floor(m.tx);
+					m.ty = Math.floor(m.ty);
+					var colorTransform:ColorTransform = (o.img.alpha == 1) ? null : new ColorTransform(1, 1, 1, o.img.alpha);
+					bm.draw(o.img, m, colorTransform);
+				}
 			}
 		}
 

@@ -102,7 +102,7 @@ class ListWatcher extends Sprite
 		addEventListener(flash.events.FocusEvent.FOCUS_OUT, lostFocus);
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return [
 		"length", "import", "export", "hide", 
 		"Which column do you want to import"];
@@ -195,7 +195,7 @@ class ListWatcher extends Sprite
 
 		if (lines.length == 0)             return null;
 
-		for (d/* AS3HX WARNING could not determine type for var: d exp: EArrayDecl([EConst(CString(,)),EConst(CString(\t))]) type: null */ in [",", "\t"]){
+		for (d in [",", "\t"]){
 			var count1 : Int = lines[0].split(d).length;
 			var count2 : Int = lines[Math.floor(lines.length / 2)].split(d).length;
 			var count3 : Int = lines[lines.length - 1].split(d).length;
@@ -309,7 +309,7 @@ class ListWatcher extends Sprite
 
 	private function addItem(b : IconButton = null) : Void{
 		// Called when addItemButton is clicked.
-		if ((Std.is(root, Scratch)) && !(cast(root, Scratch).editMode) )            return;
+		if (Std.is(root, Scratch) && !cast(root, Scratch).editMode )            return;
 		if (insertionIndex < 0)             insertionIndex = contents.length;
 		contents.insert(insertionIndex, "");
 		updateContents();
@@ -387,7 +387,7 @@ class ListWatcher extends Sprite
 		addItemButton.x = 2;
 		addItemButton.y = frame.h - addItemButton.height - 2;
 
-		var g : Graphics = (try cast(cellPane.mask, Shape) catch(e:Dynamic) null).graphics;
+		var g : Graphics = cast(cellPane.mask, Shape).graphics;
 		g.clear();
 		g.beginFill(0);
 		g.drawRect(0, 0, frame.w - 17, frame.h - 42);

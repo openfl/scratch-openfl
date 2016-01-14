@@ -56,7 +56,7 @@ class TabsPart extends UIPart
 		scriptsTab.turnOn();
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return ["Scripts", "Costumes", "Backdrops", "Sounds"];
 	}
 

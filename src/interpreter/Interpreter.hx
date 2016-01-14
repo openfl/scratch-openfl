@@ -58,7 +58,6 @@
 package interpreter;
 
 
-import flash.utils.Dictionary;
 
 import flash.geom.Point;
 import blocks.*;
@@ -75,7 +74,7 @@ class Interpreter
 
 	private var app : Scratch;
 	private var primTable : Map<String,Block->Dynamic>;  // maps opcodes to functions  
-	private var threads : Array<Dynamic> = [];  // all threads  
+	private var threads : Array<Thread> = [];  // all threads  
 	private var yield : Bool;  // set true to indicate that active thread should yield control  
 	private var startTime : Int;  // start time for stepThreads()  
 	private var doRedraw : Bool;
@@ -124,7 +123,7 @@ class Interpreter
 
 	public function toggleThread(b : Block, targetObj : Dynamic, startupDelay : Int = 0) : Void{
 		var i : Int;
-		var newThreads : Array<Dynamic> = [];
+		var newThreads : Array<Thread> = [];
 		var wasRunning : Bool = false;
 		for (i in 0...threads.length){
 			if ((threads[i].topBlock == b) && (threads[i].target == targetObj)) {
@@ -240,14 +239,15 @@ class Interpreter
 			if (warpThread != null && (warpThread.block == null))                 clearWarpBlock();
 			var threadStopped : Bool = false;
 			var runnableCount : Int = 0;
-			for (activeThread in threads){
+			for (t in threads) {
+				activeThread = t;
 				isWaiting = false;
 				stepActiveThread();
 				if (activeThread.block == null)                     threadStopped = true;
 				if (!isWaiting)                     runnableCount++;
 			}
 			if (threadStopped) {
-				var newThreads : Array<Dynamic> = [];
+				var newThreads : Array<Thread> = [];
 				for (t in threads){
 					if (t.block != null)                         newThreads.push(t)
 					else if (app.editMode) {
@@ -349,8 +349,8 @@ class Interpreter
 		var shouldYield : Bool = false;
 		var args : Array<Dynamic> = b.args;
 		for (i in 0...args.length){
-			var barg : Block = try cast(args[i], Block) catch(e:Dynamic) null;
-			if (barg != null) {
+			if (Std.is(args[i], Block)) {
+				var barg : Block = cast(args[i], Block);
 				if (checkBlockingArgs(barg)) 
 					shouldYield = true
 				// Don't start a request if the arguments for it are blocking
@@ -368,7 +368,7 @@ class Interpreter
 		var args : Array<Dynamic> = b.args;
 		if (b.rightToLeft) {i = args.length - i - 1;
 		}
-		return ((Std.is(b.args[i], BlockArg))) ? 
+		return Std.is(b.args[i], BlockArg) ? 
 		cast((args[i]), BlockArg).argValue : evalCmd(cast((args[i]), Block));
 	}
 
@@ -401,7 +401,7 @@ class Interpreter
 		// at least one digit to be treated as a number (otherwise a string
 		// containing only whitespace would be consider equal to zero.)
 		if (Std.is(n,String)) {
-			var s : String = try cast(n, String) catch(e:Dynamic) null;
+			var s : String = cast(n, String);
 			var len : Int = s.length;
 			for (i in 0...len){
 				var code : Int = s.charCodeAt(i);
@@ -563,7 +563,7 @@ class Interpreter
 			if (!(Std.is(arg(b, 0), String)))                 return null;
 			var listArg : Dynamic = arg(b, 1);
 			if (Std.is(listArg, Array)) {
-				list = try cast(listArg, Array<Dynamic/*AS3HX WARNING no type*/>) catch(e:Dynamic) null;
+				list = cast(listArg, Array<Dynamic>);
 			}
 			if (Std.is(listArg, String)) {
 				var n : Float = Std.parseFloat(listArg);
@@ -684,7 +684,7 @@ class Interpreter
 			redraw();
 			app.runtime.allStacksAndOwnersDo(findSceneHats);
 			// (re)start all receivers
-			var newThreads : Array<Dynamic> = [];
+			var newThreads : Array<Thread> = [];
 			for (pair in receivers)newThreads.push(restartThread(pair[0], pair[1]));
 			if (!waitFlag)                 return;
 			activeThread.tmpObj = newThreads;

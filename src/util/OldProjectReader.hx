@@ -175,9 +175,9 @@ class OldProjectReader
 		return result;
 	}
 
-	private function buildScripts(scripts : Array<Dynamic>) : Array<Dynamic>{
+	private function buildScripts(scripts : Array<Dynamic>) : Array<Block>{
 		if (!(Std.is(scripts[0], Array)))             return [];
-		var result : Array<Dynamic> = [];
+		var result : Array<Block> = [];
 		for (stack in scripts){
 			// stack is of form: [[x y] [blocks]]
 			var a : Array<Dynamic> = stack[1][0];
@@ -190,9 +190,9 @@ class OldProjectReader
 		return result;
 	}
 
-	private function buildComments(scripts : Array<Dynamic>) : Array<Dynamic>{
+	private function buildComments(scripts : Array<Dynamic>) : Array<ScratchComment>{
 		if (!(Std.is(scripts[0], Array)))             return [];
-		var result : Array<Dynamic> = [];
+		var result : Array<ScratchComment> = [];
 		for (stack in scripts){
 			// stack is of form: [[x y] [blocks]]
 			var a : Array<Dynamic> = stack[1][0];

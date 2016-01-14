@@ -129,7 +129,7 @@ class Button extends Sprite
 	private function setColor(c : Dynamic) : Void{
 		color = c;
 		if (Std.is(labelOrIcon, TextField)) {
-			(try cast(labelOrIcon, TextField) catch(e:Dynamic) null).textColor = ((c == CSS.overColor)) ? CSS.white : CSS.buttonLabelColor;
+			cast(labelOrIcon, TextField).textColor = ((c == CSS.overColor)) ? CSS.white : CSS.buttonLabelColor;
 		}
 		setMinWidthHeight(5, 5);
 	}

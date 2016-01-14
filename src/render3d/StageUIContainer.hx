@@ -28,8 +28,10 @@ class StageUIContainer extends Sprite
 		for (i in 0...numChildren){
 			var c : Dynamic = getChildAt(i);
 			if (c.visible == true && c.exists("step")) {
-				if (Lambda.has(c, "listName"))                     c.step()
-				else c.step(runtime);
+				if (Reflect.hasField(c, "listName"))
+					c.step()
+				else 
+					c.step(runtime);
 			}
 		}
 	}

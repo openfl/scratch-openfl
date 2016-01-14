@@ -169,19 +169,34 @@ class GestureHandler
 		if (!isChrome)             Menu.removeMenusFrom(stage);  // hack: clear menuJustCreated because there's no rightMouseUp  ;
 	}
 
-	private function findTargetFor(property : String, obj : Dynamic, x : Int, y : Int) : DisplayObject{
+	private function findTargetFor(property : String, obj : Dynamic, x : Int, y : Int) : Dynamic{
 		// Return the innermost child  of obj that contains the given (global) point
 		// and implements the menu() method.
-		if (!obj.visible || !obj.hitTestPoint(x, y, true))             return null;
-		if (Std.is(obj, DisplayObjectContainer)) {
-			var i : Int = Std.int(obj.numChildren - 1);
+		if (Std.is(obj, Scratch))
+		{
+			var main: Scratch = cast(obj, Scratch);
+			var i : Int = Std.int(main.numChildren - 1);
 			while (i >= 0){
-				var found : DisplayObject = findTargetFor(property, obj.getChildAt(i), x, y);
+				var found : DisplayObject = findTargetFor(property, main.getChildAt(i), x, y);
 				if (found != null)                     return found;
 				i--;
 			}
 		}
-		return ((Lambda.has(obj, property))) ? obj : null;
+		if (Std.is(obj, DisplayObject))
+		{
+			if (!obj.visible || !obj.hitTestPoint(x, y, true))
+				return null;
+			if (Std.is(obj, DisplayObjectContainer)) {
+				var i : Int = Std.int(obj.numChildren - 1);
+				while (i >= 0){
+					var found : DisplayObject = findTargetFor(property, obj.getChildAt(i), x, y);
+					if (found != null)                     return found;
+					i--;
+				}
+			}
+		}
+		
+		return Reflect.hasField(obj, property) ? obj : null;
 	}
 
 	public function mouseDown(evt : MouseEvent) : Void{
@@ -225,7 +240,7 @@ class GestureHandler
 			handleClick(evt);
 			return;
 		}
-		if (evt.shiftKey && app.editMode && (Lambda.has(mouseTarget, "menu"))) {
+		if (evt.shiftKey && app.editMode && Reflect.hasField(mouseTarget, "menu")) {
 			gesture = "menu";
 			return;
 		}
@@ -452,7 +467,8 @@ class GestureHandler
 
 	private function handleDoubleClick(evt : MouseEvent) : Void{
 		if (mouseTarget == null)             return;
-		if (Lambda.has(mouseTarget, "doubleClick"))             mouseTarget.doubleClick(evt);
+		if (Reflect.hasField(mouseTarget, "doubleClick"))
+			mouseTarget.doubleClick(evt);
 		gesture = "doubleClick";
 	}
 
@@ -486,7 +502,8 @@ class GestureHandler
 			t.handleTool(CursorTool.tool, evt);
 			return;
 		}
-		if (t != null && Lambda.has(t, "handleTool"))             t.handleTool(CursorTool.tool, evt);
+		if (t != null && Reflect.hasField(t, "handleTool"))
+			t.handleTool(CursorTool.tool, evt);
 		if (isGrowShrink && (Std.is(t, Block) && t.isInPalette /*|| Std.is(t, ImageCanvas)*/))             return;  // grow/shrink sticky for scripting area  ;
 
 		if (!evt.shiftKey)             app.clearTool();  // don't clear if shift pressed  ;
@@ -521,7 +538,7 @@ class GestureHandler
 			var inStage : Bool = (obj.parent == app.stagePane);
 			if (obj.parent != null) {
 				if (Std.is(obj, ScratchSprite) && app.isIn3D) 
-					(try cast(obj, ScratchSprite) catch(e:Dynamic) null).prepareToDrag();
+					cast(obj, ScratchSprite).prepareToDrag();
 
 				obj.parent.removeChild(obj);
 			}
@@ -585,7 +602,7 @@ class GestureHandler
 				carriedObj.scaleX = carriedObj.scaleY = originalScale;
 				originalParent.addChild(carriedObj);
 				if (Std.is(carriedObj, ScratchSprite)) {
-					var ss : ScratchSprite = try cast(carriedObj, ScratchSprite) catch(e:Dynamic) null;
+					var ss : ScratchSprite = cast(carriedObj, ScratchSprite);
 					ss.updateCostume();
 					ss.updateBubble();
 				}
@@ -608,7 +625,7 @@ class GestureHandler
 
 	private function removeDropShadowFrom(o : DisplayObject) : Void{
 		var newFilters : Array<flash.filters.BitmapFilter> = [];
-		for (f/* AS3HX WARNING could not determine type for var: f exp: EField(EIdent(o),filters) type: null */ in o.filters){
+		for (f in o.filters){
 			if (!(Std.is(f, DropShadowFilter)))                 newFilters.push(f);
 		}
 		o.filters = newFilters;
@@ -693,7 +710,7 @@ class GestureHandler
 
 	private function removeDebugGlow(o : DisplayObject) : Void{
 		var newFilters : Array<flash.filters.BitmapFilter> = [];
-		for (f/* AS3HX WARNING could not determine type for var: f exp: EField(EIdent(o),filters) type: null */ in o.filters){
+		for (f in o.filters){
 			if (!(Std.is(f, GlowFilter)))                 newFilters.push(f);
 		}
 		o.filters = newFilters;

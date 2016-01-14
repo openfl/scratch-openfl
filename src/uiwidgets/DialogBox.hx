@@ -33,7 +33,7 @@ class DialogBox extends Sprite
 {
 
 	private var fields : Map<String,Dynamic> = new Map<String,Dynamic>();
-	private var booleanFields : Dictionary = new Dictionary();
+	private var booleanFields : Map<String, IconButton> = new Map<String, IconButton>();
 	public var widget : DisplayObject;
 	private var w : Int;private var h : Int;
 	public var leftJustify : Bool;
@@ -118,7 +118,7 @@ class DialogBox extends Sprite
 	}
 
 	public function addText(text : String) : Void{
-		for (s/* AS3HX WARNING could not determine type for var: s exp: ECall(EField(EIdent(text),split),[EConst(CString(\n))]) type: null */ in text.split("\n")){
+		for (s in text.split("\n")){
 			var line : TextField = makeLabel(Translator.map(s));
 			addChild(line);
 			textLines.push(line);
@@ -152,7 +152,7 @@ class DialogBox extends Sprite
 		if (defaultValue)             f.turnOn()
 		else f.turnOff();
 		addChild(f);
-		Reflect.setField(booleanFields, fieldName, f);
+		booleanFields[fieldName] = f;
 		booleanLabelsAndFields.push([l, f]);
 	}
 
@@ -240,14 +240,14 @@ class DialogBox extends Sprite
 
 	public function getField(fieldName : String) : Dynamic{
 		if (fields.exists(fieldName))             return fields[fieldName].text;
-		if (Reflect.field(booleanFields, fieldName) != null)             return Reflect.field(booleanFields, fieldName).isOn();
+		if (booleanFields.exists(fieldName))             return booleanFields[fieldName].isOn();
 		return null;
 	}
 
 	public function setPasswordField(fieldName : String, flag : Bool = true) : Void{
 		var field : Dynamic = fields[fieldName];
 		if (Std.is(field, TextField)) {
-			(try cast(field, TextField) catch(e:Dynamic) null).displayAsPassword = flag;
+			cast(field, TextField).displayAsPassword = flag;
 		}
 	}
 

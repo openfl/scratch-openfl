@@ -120,9 +120,9 @@ class ResizeableFrame extends Sprite implements DragClient
 	}
 
 	public function mouseDown(evt : MouseEvent) : Void{
-		if ((Std.is(root, Scratch)) && !(try cast(root, Scratch) catch(e:Dynamic) null).editMode)             return;
+		if (root == Scratch.app.rootDisplayObject() && !Scratch.app.editMode)             return;
 		if (resizer != null && resizer.hitTestPoint(evt.stageX, evt.stageY)) {
-			cast((root), Scratch).gh.setDragClient(this, evt);
+			Scratch.app.gh.setDragClient(this, evt);
 		}
 	}
 

@@ -87,7 +87,7 @@ class MediaLibraryItem extends Sprite
 		if (isSound)             addPlayButton();
 	}
 
-	public static function strings() : Array<Dynamic>{return ["Costumes:", "Scripts:"];
+	public static function strings() : Array<String>{return ["Costumes:", "Scripts:"];
 	}
 
 	// -----------------------------

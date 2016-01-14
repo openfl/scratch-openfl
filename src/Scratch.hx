@@ -161,6 +161,9 @@ class Scratch /*extends Sprite*/ {
 	public function get_mouseX() return flash.Lib.current.root.mouseX;
 	public var mouseY(get, never) :Float;
 	public function get_mouseY() return flash.Lib.current.root.mouseY;
+	public var numChildren(get, never) :Int;
+	public function get_numChildren() return flash.Lib.current.numChildren;
+	public function getChildAt(index : Int) : DisplayObject { return Lib.current.getChildAt(index); }
 	public function addChild(child : DisplayObject) : DisplayObject { return flash.Lib.current.addChild(child); }
 	public function addChildAt(child : DisplayObject, index : Int) : DisplayObject { return Lib.current.addChildAt(child, index); }
 	public function rootDisplayObject() : DisplayObject { return flash.Lib.current.root; }
@@ -515,8 +518,12 @@ class Scratch /*extends Sprite*/ {
 */
 	public function clearCachedBitmaps():Void {
 		for (i in 0...stagePane.numChildren) {
-			var spr:ScratchSprite = cast(stagePane.getChildAt(i), ScratchSprite);
-			if (spr != null) spr.clearCachedBitmap();
+			var child = stagePane.getChildAt(i);
+			if (Std.is(child, ScratchSprite))
+			{
+				var spr:ScratchSprite = cast(child, ScratchSprite);
+				spr.clearCachedBitmap();
+			}
 		}
 		stagePane.clearCachedBitmap();
 

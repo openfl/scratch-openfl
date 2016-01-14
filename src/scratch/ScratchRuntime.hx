@@ -909,8 +909,8 @@ class ScratchRuntime {
 		}
 	}
 
-	public function allCallsOf(callee:String, owner:ScratchObj, includeRecursive:Bool = true):Array<Dynamic> {
-		var result:Array<Dynamic> = [];
+	public function allCallsOf(callee:String, owner:ScratchObj, includeRecursive:Bool = true):Array<Block> {
+		var result:Array<Block> = [];
 		for (stack in owner.scripts) {
 			if (!includeRecursive && stack.op == Specs.PROCEDURE_DEF && stack.spec == callee) continue;
 			// for each block in stack
@@ -934,9 +934,9 @@ class ScratchRuntime {
 		clearAllCaches();
 	}
 
-	public function allStacks():Array<Dynamic> {
+	public function allStacks():Array<Block> {
 		// return an array containing all stacks in all objects
-		var result:Array<Dynamic> = [];
+		var result:Array<Block> = [];
 		allStacksAndOwnersDo(
 				function (stack:Block, target:ScratchObj):Void { result.push(stack); } );
 		return result;

@@ -81,7 +81,7 @@ class IconButton extends Sprite
 		}
 		else if (Std.is(onImageObjOrName, DisplayObject)) {
 			// on/off images are supplied
-			onImage = try cast(onImageObjOrName, DisplayObject) catch(e:Dynamic) null;
+			onImage = cast(onImageObjOrName, DisplayObject);
 			offImage = ((offImageObj == null)) ? onImage : offImageObj;
 		}
 		redraw();

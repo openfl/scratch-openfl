@@ -360,7 +360,7 @@ class Block extends Sprite
 
 	public function showRunFeedback() : Void{
 		if (filters != null && filters.length > 0) {
-			for (f/* AS3HX WARNING could not determine type for var: f exp: EIdent(filters) type: null */ in filters){
+			for (f in filters){
 				if (Std.is(f, GlowFilter))                     return;
 			}
 		}
@@ -370,7 +370,7 @@ class Block extends Sprite
 	public function hideRunFeedback() : Void{
 		if (filters != null && filters.length > 0) {
 			var newFilters : Array<BitmapFilter> = [];
-			for (f/* AS3HX WARNING could not determine type for var: f exp: EIdent(filters) type: null */ in filters){
+			for (f in filters){
 				if (!(Std.is(f, GlowFilter)))                     newFilters.push(f);
 			}
 			filters = newFilters;
@@ -389,7 +389,8 @@ class Block extends Sprite
 	public function saveOriginalState() : Void{
 		originalParent = parent;
 		if (parent != null) {
-			var b : Block = try cast(parent, Block) catch(e:Dynamic) null;
+			var b : Block = null;
+			if (Std.is(parent, Block)) b = cast(parent, Block);
 			if (b == null) {
 				originalRole = ROLE_ABSOLUTE;
 			}
@@ -873,7 +874,7 @@ class Block extends Sprite
 
 	public function deleteStack() : Bool{
 		if (op == "proc_declaration") {
-			return (try cast(parent, Block) catch(e:Dynamic) null).deleteStack();
+			return cast(parent, Block).deleteStack();
 		}
 		var app : Scratch = Scratch.app;
 		var top : Block = topBlock();
@@ -900,12 +901,12 @@ class Block extends Sprite
 		return true;
 	}
 
-	public function attachedCommentsIn(scriptsPane : ScriptsPane) : Array<Dynamic>{
-		var allBlocks : Array<Dynamic> = [];
+	public function attachedCommentsIn(scriptsPane : ScriptsPane) : Array<ScratchComment>{
+		var allBlocks : Array<Block> = [];
 		allBlocksDo(function(b : Block) : Void{
 					allBlocks.push(b);
 				});
-		var result : Array<Dynamic> = [];
+		var result : Array<ScratchComment> = [];
 		if (scriptsPane == null)             return result;
 		for (i in 0...scriptsPane.numChildren){
 			var c : ScratchComment = try cast(scriptsPane.getChildAt(i), ScratchComment) catch(e:Dynamic) null;
@@ -940,9 +941,11 @@ class Block extends Sprite
 		Scratch.app.runtime.interp.toggleThread(topBlock(), Scratch.app.viewedObj(), 1);
 	}
 
-	private function editArg(evt : MouseEvent) : Bool{
-		var arg : BlockArg = try cast(evt.target, BlockArg) catch(e:Dynamic) null;
-		if (arg == null)             arg = try cast(evt.target.parent, BlockArg) catch(e:Dynamic) null;
+	private function editArg(evt : MouseEvent) : Bool {
+		var arg : BlockArg = null;
+		if (Std.is(evt.target, BlockArg)) arg = cast(evt.target, BlockArg);
+		if (arg == null && Std.is(evt.target.parent, BlockArg))
+			arg = cast(evt.target.parent, BlockArg);
 		if (arg != null && arg.isEditable && (arg.parent == this)) {
 			arg.startEditing();
 			return true;

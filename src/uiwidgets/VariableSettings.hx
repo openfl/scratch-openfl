@@ -49,7 +49,7 @@ class VariableSettings extends Sprite
 		updateButtons();
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return ["For this sprite only", "For all sprites", "list", "variable"];
 	}
 

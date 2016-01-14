@@ -64,7 +64,7 @@ class ScriptsPane extends ScrollFrameContents
 		addFeedbackShape();
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return [
 		"add comment", 
 		"clean up"];
@@ -98,12 +98,12 @@ class ScriptsPane extends ScrollFrameContents
 		addChild(commentLines);
 		viewedObj = obj;
 		if (viewedObj != null) {
-			var blockList : Array<Dynamic> = viewedObj.allBlocks();
-			for (b/* AS3HX WARNING could not determine type for var: b exp: EField(EIdent(viewedObj),scripts) type: null */ in viewedObj.scripts){
+			var blockList : Array<Block> = viewedObj.allBlocks();
+			for (b in viewedObj.scripts){
 				b.cacheAsBitmap = true;
 				addChild(b);
 			}
-			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(viewedObj),scriptComments) type: null */ in viewedObj.scriptComments){
+			for (c in viewedObj.scriptComments){
 				c.updateBlockRef(blockList);
 				addChild(c);
 			}
@@ -111,7 +111,7 @@ class ScriptsPane extends ScrollFrameContents
 		fixCommentLayout();
 		updateSize();
 		x = y = 0;  // reset scroll offset  
-		(try cast(parent, ScrollFrame) catch(e:Dynamic) null).updateScrollbars();
+		cast(parent, ScrollFrame).updateScrollbars();
 	}
 
 	public function saveScripts(saveNeeded : Bool = true) : Void{
@@ -125,7 +125,7 @@ class ScriptsPane extends ScrollFrameContents
 			if (Std.is(o, ScratchComment))                 viewedObj.scriptComments.push(o);
 		}
 		var blockList : Array<Dynamic> = viewedObj.allBlocks();
-		for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(viewedObj),scriptComments) type: null */ in viewedObj.scriptComments){
+		for (c in viewedObj.scriptComments){
 			c.updateBlockID(blockList);
 		}
 		if (saveNeeded)             app.setSaveNeeded();
@@ -397,8 +397,8 @@ class ScriptsPane extends ScrollFrameContents
 	public function handleDrop(obj : Dynamic) : Bool{
 		var localP : Point = globalToLocal(new Point(obj.x, obj.y));
 
-		var info : MediaInfo = try cast(obj, MediaInfo) catch(e:Dynamic) null;
-		if (info != null) {
+		if (Std.is(obj, MediaInfo)) {
+			var info : MediaInfo = cast(obj, MediaInfo);
 			if (info.scripts == null)                 return false;
 			localP.x += info.thumbnailX();
 			localP.y += info.thumbnailY();
@@ -406,8 +406,10 @@ class ScriptsPane extends ScrollFrameContents
 			return true;
 		}
 
-		var b : Block = try cast(obj, Block) catch(e:Dynamic) null;
-		var c : ScratchComment = try cast(obj, ScratchComment) catch(e:Dynamic) null;
+		var b : Block = null;
+		if (Std.is(obj, Block)) b = cast(obj, Block);
+		var c : ScratchComment = null;
+		if (Std.is(obj, ScratchComment)) c = cast(obj, ScratchComment);
 		if (b == null && c == null)             return false;
 
 		obj.x = Math.max(5, localP.x);

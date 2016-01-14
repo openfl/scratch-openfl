@@ -27,7 +27,6 @@ package primitives;
 
 import blocks.Block;
 import interpreter.Interpreter;
-import flash.utils.Dictionary;
 import watchers.ListWatcher;
 import scratch.ScratchObj;
 

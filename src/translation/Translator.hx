@@ -46,14 +46,14 @@ class Translator
 	private static var font12 : Array<Dynamic> = ["fa", "he", "ja", "ja_HIRA", "zh_CN"];
 	private static var font13 : Array<Dynamic> = ["ar"];
 
-	private static var dictionary : Dynamic = { };
+	private static var dictionary : Map<String, String> = new Map<String, String>();
 
 	public static function initializeLanguageList() : Void{
 		// Get a list of language names for the languages menu from the server.
 		function saveLanguageList(data : String) : Void{
 			if (data == null)                 return;
-			for (line/* AS3HX WARNING could not determine type for var: line exp: ECall(EField(EIdent(data),split),[EConst(CString(\n))]) type: null */ in data.split("\n")){
-				var fields : Array<Dynamic> = line.split(",");
+			for (line in data.split("\n")){
+				var fields : Array<String> = line.split(",");
 				if (fields.length >= 2) {
 					languages.push([StringTools.trim(fields[0]), StringTools.trim(fields[1])]);
 				}
@@ -73,7 +73,7 @@ class Translator
 			Scratch.app.translationChanged();
 		};
 
-		dictionary = { };  // default to English (empty dictionary) if there's no .po file  
+		dictionary = new Map<String, String>();  // default to English (empty dictionary) if there's no .po file  
 		setFontsFor("en");
 		if ("en" == lang)             Scratch.app.translationChanged()
 		// there is no .po file English
@@ -134,13 +134,14 @@ class Translator
 	}
 
 	public static function map(s : String, context : Dictionary = null) : String{
-		var result : Dynamic = Reflect.field(dictionary, s);
+		var result : Dynamic = null;
+		if (dictionary.exists(s)) result = dictionary[s];
 		if ((result == null) || (result.length == 0))             result = s;
 		if (context != null)             result = StringUtils.substitute(result, context);
 		return result;
 	}
 
-	private static function parsePOData(bytes : ByteArray) : Dynamic{
+	private static function parsePOData(bytes : ByteArray) : Map<String, String>{
 		// Parse the given data in gettext .po file format.
 		skipBOM(bytes);
 		var lines : Array<Dynamic> = [];
@@ -179,15 +180,15 @@ class Translator
 		return buf.readUTFBytes(buf.length);
 	}
 
-	private static function makeDictionary(lines : Array<Dynamic>) : Dynamic{
+	private static function makeDictionary(lines : Array<Dynamic>) : Map<String, String>{
 		// Return a dictionary mapping original strings to their translations.
-		var dict : Dynamic = { };
+		var dict : Map<String, String> = new Map<String, String>();
 		var mode : String = "none";  // none, key, val  
 		var key : String = "";
 		var val : String = "";
 		for (line in lines){
 			if ((line.length >= 5) && (line.substring(0, 5).toLowerCase() == "msgid")) {
-				if (mode == "val")                     Reflect.setField(dict, key, val);  // recordPairIn(key, val, dict);  ;
+				if (mode == "val")                     dict[key] = val;  // recordPairIn(key, val, dict);  ;
 				mode = "key";
 				key = "";
 			}
@@ -198,7 +199,7 @@ class Translator
 			if (mode == "key")                 key += extractQuotedString(line);
 			if (mode == "val")                 val += extractQuotedString(line);
 		}
-		if (mode == "val")             Reflect.setField(dict, key, val);  // recordPairIn(key, val, dict);  ;
+		if (mode == "val")             dict[key] = val;  // recordPairIn(key, val, dict);  ;
 		// remove the empty-string metadata entry, if present.;
 		return dict;
 	}

@@ -74,7 +74,7 @@ class SoundsPart extends UIPart
 		updateTranslation();
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		new SoundsPart(Scratch.app).showNewSoundMenu(Menu.dummyButton());
 		return [
 		"New sound:", "recording1", 
@@ -108,8 +108,9 @@ class SoundsPart extends UIPart
 		if (obj.sounds.length == 0)             return;
 		currentIndex = 0;
 		for (i in 0...obj.sounds.length){
-							if ((try cast(obj.sounds[i], ScratchSound) catch(e:Dynamic) null) == snd)                                 currentIndex = i;
-						}(try cast(listFrame.contents, MediaPane) catch(e:Dynamic) null).updateSelection();
+			if ((try cast(obj.sounds[i], ScratchSound) catch(e:Dynamic) null) == snd)                                 currentIndex = i;
+		}
+		cast(listFrame.contents, MediaPane).updateSelection();
 		refresh(false);
 	}
 
@@ -124,15 +125,15 @@ class SoundsPart extends UIPart
 		if (viewedObj.sounds.length < 1) {
 			nameField.visible = false;
 			//editor.visible = false;
-			undoButton.visible = false;
-			redoButton.visible = false;
+			//undoButton.visible = false;
+			//redoButton.visible = false;
 			return;
 		}
 		else {
 			nameField.visible = true;
 			//editor.visible = true;
-			undoButton.visible = true;
-			redoButton.visible = true;
+			//undoButton.visible = true;
+			//redoButton.visible = true;
 			refreshUndoButtons();
 		}
 
@@ -221,7 +222,7 @@ class SoundsPart extends UIPart
 		var current : ScratchSound = try cast(app.viewedObj().sounds[currentIndex], ScratchSound) catch(e:Dynamic) null;
 		app.runtime.renameSound(current, nameField.contents());
 		nameField.setContents(current.soundName);
-		(try cast(listFrame.contents, MediaPane) catch(e:Dynamic) null).refresh();
+		cast(listFrame.contents, MediaPane).refresh();
 	}
 
 	// -----------------------------

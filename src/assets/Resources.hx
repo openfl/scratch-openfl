@@ -289,7 +289,7 @@ class Resources
 		// Return the first available font in the given list or '_sans' if none of the fonts exist.
 		// Font names are case sensitive.
 		var availableFonts : Array<Dynamic> = [];
-		for (f/* AS3HX WARNING could not determine type for var: f exp: ECall(EField(EIdent(Font),enumerateFonts),[EIdent(true)]) type: null */ in Font.enumerateFonts(true))availableFonts.push(f.fontName);
+		for (f in Font.enumerateFonts(true))availableFonts.push(f.fontName);
 
 		for (fName in fontList){
 			if (Lambda.indexOf(availableFonts, fName) > -1)                 return fName;

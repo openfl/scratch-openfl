@@ -145,7 +145,7 @@ class BlockIO
 		// Return the block specification for the given command.
 		var op : String = cmd[0];
 		if (op == "\\\\")             op = "%";  // convert old Squeak modulo operator  ;
-		for (entry/* AS3HX WARNING could not determine type for var: entry exp: EField(EIdent(Specs),commands) type: null */ in Specs.commands){
+		for (entry in Specs.commands){
 			if (entry[3] == op)                 return entry;
 		}
 		//var extensionSpec : Array<Dynamic> = Scratch.app.extensionManager.specForCmd(op);
@@ -242,7 +242,7 @@ class BlockIO
 				b.setArg(0, cmd[1]);
 				return b;
 			case "stopScripts":
-				var type : String = ((Lambda.indexOf(cmd[1], "other scripts") == 0)) ? " " : "f";  // block type depends on menu arg  
+				var type : String = cast(cmd[1], String).indexOf("other scripts") == 0 ? " " : "f";  // block type depends on menu arg  
 				b = new Block("stop %m.stop", type, controlColor, "stopScripts");
 				if (type == " ") {
 					if (forStage)                         cmd[1] = "other scripts in stage"

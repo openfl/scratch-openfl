@@ -24,7 +24,6 @@
 
 package primitives;
 
-import flash.utils.Dictionary;
 import blocks.*;
 import interpreter.*;
 import scratch.*;

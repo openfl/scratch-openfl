@@ -87,7 +87,7 @@ class SpriteThumbnail extends Sprite
 		updateThumbnail();
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return ["backdrop", "backdrops", "hide", "show", "Stage"];
 	}
 

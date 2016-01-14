@@ -106,7 +106,7 @@ class ImagesPart extends UIPart
 	}
 	*/
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return [
 		"Clear", "Add", "Import", "New backdrop:", "New costume:", "photo1", "Undo", "Redo", "Flip left-right", 
 		"Flip up-down", "Set costume center", "Choose backdrop from library", "Choose costume from library", 
@@ -127,7 +127,7 @@ class ImagesPart extends UIPart
 		updateLabel();
 		backdropLibraryButton.visible = isStage();
 		costumeLibraryButton.visible = !isStage();
-		(try cast(listFrame.contents, MediaPane) catch(e:Dynamic) null).refresh();
+		cast(listFrame.contents, MediaPane).refresh();
 		if (!fromEditor)             selectCostume();  // this refresh is because the editor just saved the costume; do nothing  ;
 	}
 
@@ -184,7 +184,7 @@ class ImagesPart extends UIPart
 	}
 
 	public function step() : Void{
-		(try cast(listFrame.contents, MediaPane) catch(e:Dynamic) null).updateSelection();
+		cast(listFrame.contents, MediaPane).updateSelection();
 		listFrame.updateScrollbars();
 	}
 
@@ -261,7 +261,7 @@ class ImagesPart extends UIPart
 	private function nameChanged() : Void{
 		app.runtime.renameCostume(nameField.contents());
 		nameField.setContents(app.viewedObj().currentCostume().costumeName);
-		(try cast(listFrame.contents, MediaPane) catch(e:Dynamic) null).refresh();
+		cast(listFrame.contents, MediaPane).refresh();
 	}
 
 	private function addNewCostumeButtons() : Void{
@@ -557,7 +557,7 @@ class ImagesPart extends UIPart
 			var spr : ScratchSprite = try cast(costumeOrSprite, ScratchSprite) catch(e:Dynamic) null;
 			if (spr != null) {
 				// If a sprite was selected, add all it's costumes to this sprite.
-				for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(spr),costumes) type: null */ in spr.costumes)addAndSelectCostume(c);
+				for (c in spr.costumes)addAndSelectCostume(c);
 				return;
 			}
 			var costumeList : Array<Dynamic> = try cast(costumeOrSprite, Array<Dynamic/*AS3HX WARNING no type*/>) catch(e:Dynamic) null;

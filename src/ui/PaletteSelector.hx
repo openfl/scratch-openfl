@@ -34,7 +34,7 @@ import scratch.PaletteBuilder;
 class PaletteSelector extends Sprite
 {
 
-	private static var categories : Array<Dynamic> = [
+	private static var categories : Array<String> = [
 		"Motion", "Looks", "Sound", "Pen", "Data",   // column 1  
 		"Events", "Control", "Sensing", "Operators", "More Blocks"];  // column 2  
 
@@ -48,7 +48,7 @@ class PaletteSelector extends Sprite
 		initCategories();
 	}
 
-	public static function strings() : Array<Dynamic>{return categories;
+	public static function strings() : Array<String>{return categories;
 	}
 	public function updateTranslation() : Void{initCategories();
 	}

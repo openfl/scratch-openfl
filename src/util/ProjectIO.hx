@@ -59,7 +59,7 @@ class ProjectIO
 		this.app = app;
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return [];
 	}
 
@@ -157,13 +157,13 @@ class ProjectIO
 			if (fName.indexOf("__MACOSX") > -1)                 continue;  // skip MacOS meta info in zip file  ;
 			var fIndex : Int = Std.parseInt(integerName(fName));
 			var contents : ByteArray = f[1];
-			if (fName.substring(-4) == ".gif")                 images[fIndex] = contents;
-			if (fName.substring(-4) == ".jpg")                 images[fIndex] = contents;
-			if (fName.substring(-4) == ".png")                 images[fIndex] = contents;
-			if (fName.substring(-4) == ".svg")                 images[fIndex] = contents;
-			if (fName.substring(-4) == ".wav")                 sounds[fIndex] = contents;
-			if (fName.substring(-4) == ".mp3")                 sounds[fIndex] = contents;
-			if (fName.substring(-5) == ".json")                 jsonData = contents.readUTFBytes(contents.length);
+			if (fName.substr(-4) == ".gif")                 images[fIndex] = contents;
+			if (fName.substr(-4) == ".jpg")                 images[fIndex] = contents;
+			if (fName.substr(-4) == ".png")                 images[fIndex] = contents;
+			if (fName.substr(-4) == ".svg")                 images[fIndex] = contents;
+			if (fName.substr(-4) == ".wav")                 sounds[fIndex] = contents;
+			if (fName.substr(-4) == ".mp3")                 sounds[fIndex] = contents;
+			if (fName.substr(-5) == ".json")                 jsonData = contents.readUTFBytes(contents.length);
 		}
 		if (jsonData == null)             return null;
 		var jsonObj : Dynamic = util.JSON.parse(jsonData);
@@ -200,11 +200,11 @@ class ProjectIO
 	private function installImagesAndSounds(objList : Array<ScratchObj>) : Void{
 		// Install the images and sounds for the given list of ScratchObj objects.
 		for (obj in objList){
-			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
+			for (c in obj.costumes){
 				if (images[c.baseLayerID] != null)                     c.baseLayerData = images[c.baseLayerID];
 				if (images[c.textLayerID] != null)                     c.textLayerData = images[c.textLayerID];
 			}
-			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
+			for (snd in obj.sounds){
 				var sndData : Dynamic = sounds[snd.soundID];
 				if (sndData != null) {
 					snd.soundData = sndData;
@@ -221,7 +221,7 @@ class ProjectIO
 		// Load all images in all costumes from their image data, then call whenDone.
 		function allImagesLoaded() : Void{
 			if (error)                 return;
-			for (c/* AS3HX WARNING could not determine type for var: c exp: EIdent(allCostumes) type: null */ in allCostumes){
+			for (c in allCostumes){
 				if ((c.baseLayerData != null) && (c.baseLayerBitmap == null)) {
 					var img : Dynamic = imageDict[c.baseLayerData];
 					if (Std.is(img, BitmapData))                         c.baseLayerBitmap = img;
@@ -229,7 +229,7 @@ class ProjectIO
 				}
 				if ((c.textLayerData != null) && (c.textLayerBitmap == null))                     c.textLayerBitmap = imageDict[c.textLayerData];
 			}
-			for (c/* AS3HX WARNING could not determine type for var: c exp: EIdent(allCostumes) type: null */ in allCostumes)c.generateOrFindComposite(allCostumes);
+			for (c in allCostumes)c.generateOrFindComposite(allCostumes);
 			whenDone();
 		};
 		function imageDecoded() : Void{
@@ -506,14 +506,14 @@ class ProjectIO
 		if (!uploading && proj != null)             proj.penLayerID = recordImage(proj.penLayerPNG, proj.penLayerMD5, recordedAssets, uploading);
 
 		for (obj in objList){
-			for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(obj),costumes) type: null */ in obj.costumes){
+			for (c in obj.costumes){
 				c.prepareToSave();  // encodes image and computes md5 if necessary  
 				c.baseLayerID = recordImage(c.baseLayerData, c.baseLayerMD5, recordedAssets, uploading);
 				if (c.textLayerBitmap != null) {
 					c.textLayerID = recordImage(c.textLayerData, c.textLayerMD5, recordedAssets, uploading);
 				}
 			}
-			for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(obj),sounds) type: null */ in obj.sounds){
+			for (snd in obj.sounds){
 				snd.prepareToSave();  // compute md5 if necessary  
 				snd.soundID = recordSound(snd, snd.md5, recordedAssets, uploading);
 			}

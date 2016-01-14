@@ -60,8 +60,8 @@ class ScratchObj extends Sprite
 	public var isStage : Bool = false;
 	public var variables : Array<Variable> = [];
 	public var lists : Array<ListWatcher> = [];
-	public var scripts : Array<Dynamic> = [];
-	public var scriptComments : Array<Dynamic> = [];
+	public var scripts : Array<Block> = [];
+	public var scriptComments : Array<ScratchComment> = [];
 	public var sounds : Array<ScratchSound> = [];
 	public var costumes : Array<ScratchCostume> = [];
 	public var currentCostumeIndex : Float;
@@ -246,7 +246,7 @@ class ScratchObj extends Sprite
 			costumeObj.scaleX = 1 / c.bitmapResolution;  // don't flip  
 			img.x = -c.rotationCenterX / c.bitmapResolution;
 			img.y = -c.rotationCenterY / c.bitmapResolution;
-			if ((try cast(this, ScratchSprite) catch(e:Dynamic) null).isCostumeFlipped()) {
+			if (cast(this, ScratchSprite).isCostumeFlipped()) {
 				costumeObj.scaleX = -1 / c.bitmapResolution;  // flip  
 				img.x = -img.x;
 			}
@@ -373,9 +373,9 @@ class ScratchObj extends Sprite
 
 	/* Scripts */
 
-	public function allBlocks() : Array<Dynamic>{
-		var result : Array<Dynamic> = [];
-		for (script in scripts){
+	public function allBlocks() : Array<Block>{
+		var result : Array<Block> = [];
+		for (script in scripts) {
 			script.allBlocksDo(function(b : Block) : Void{result.push(b);
 					});
 		}
@@ -477,7 +477,7 @@ class ScratchObj extends Sprite
 		for (v in variables){
 			if (v.name == varName)                 return v;
 		}
-		for (v/* AS3HX WARNING could not determine type for var: v exp: EField(EField(EField(EIdent(Scratch),app),stagePane),variables) type: null */ in Scratch.app.stagePane.variables){
+		for (v in Scratch.app.stagePane.variables){
 			if (v.name == varName)                 return v;
 		}
 		return null;
@@ -531,7 +531,7 @@ class ScratchObj extends Sprite
 		for (list in lists){
 			if (list.listName == listName)                 return list;
 		}
-		for (list/* AS3HX WARNING could not determine type for var: list exp: EField(EField(EField(EIdent(Scratch),app),stagePane),lists) type: null */ in Scratch.app.stagePane.lists){
+		for (list in Scratch.app.stagePane.lists){
 			if (list.listName == listName)                 return list;
 		}
 		return null;
@@ -556,8 +556,8 @@ class ScratchObj extends Sprite
 	private var lastClickTime : Int;
 
 	public function click(evt : MouseEvent) : Void {
-		if (!Std.is(root, Scratch)) return;
-		var app : Scratch = cast(root, Scratch);
+		if (root != Scratch.app.rootDisplayObject()) return;
+		var app : Scratch = Scratch.app;
 		var now : Int = Math.round(haxe.Timer.stamp() * 1000);
 		app.runtime.startClickedHats(this);
 		if ((now - lastClickTime) < DOUBLE_CLICK_MSECS) {
@@ -574,13 +574,13 @@ class ScratchObj extends Sprite
 
 	public function updateScriptsAfterTranslation() : Void{
 		// Update the scripts of this object after switching languages.
-		var newScripts : Array<Dynamic> = [];
+		var newScripts : Array<Block> = [];
 		for (b in scripts){
 			var newStack : Block = BlockIO.arrayToStack(BlockIO.stackToArray(b), isStage);
 			newStack.x = b.x;
 			newStack.y = b.y;
 			newScripts.push(newStack);
-			if (b.parent) {  // stack in the scripts pane; replace it  
+			if (b.parent != null) {  // stack in the scripts pane; replace it  
 				b.parent.addChild(newStack);
 				b.parent.removeChild(b);
 			}

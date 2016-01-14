@@ -92,7 +92,7 @@ class Watcher extends Sprite implements DragClient
 		addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return [
 		"Max", "Min", "Slider Range", 
 		"normal readout", "large readout", "slider", "set slider min and max", "hide"];
@@ -423,7 +423,7 @@ class Watcher extends Sprite implements DragClient
 	private function mouseDown(evt : MouseEvent) : Void{
 		if (mode != SLIDER_MODE)             return;
 		var p : Point = globalToLocal(new Point(evt.stageX, evt.stageY));
-		if (p.y > 20)             cast((root), Scratch).gh.setDragClient(this, evt);
+		if (p.y > 20)             Scratch.app.gh.setDragClient(this, evt);
 	}
 
 	public function dragBegin(evt : MouseEvent) : Void{

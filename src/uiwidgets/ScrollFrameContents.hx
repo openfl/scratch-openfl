@@ -92,7 +92,7 @@ class ScrollFrameContents extends Sprite
 			maxY = Std.int(Math.max(maxY, ((cast((parent), ScrollFrame).visibleH() - y) / scaleY)));
 		}
 		setWidthHeight(maxX, maxY);
-		if (Std.is(parent, ScrollFrame))             (try cast(parent, ScrollFrame) catch(e:Dynamic) null).updateScrollbarVisibility();
+		if (Std.is(parent, ScrollFrame))             cast(parent, ScrollFrame).updateScrollbarVisibility();
 	}
 
 	public function new()

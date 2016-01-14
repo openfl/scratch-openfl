@@ -63,20 +63,20 @@ class BlockPalette extends ScrollFrameContents
 
 	public function handleDrop(obj : Dynamic) : Bool{
 		// Delete blocks and stacks dropped onto the palette.
-		var c : ScratchComment = try cast(obj, ScratchComment) catch(e:Dynamic) null;
-		if (c != null) {
+		if (Std.is(obj, ScratchComment)) {
+			var c : ScratchComment = cast(obj, ScratchComment);
 			c.x = c.y = 20;  // position for undelete  
 			c.deleteComment();
 			return true;
 		}
-		var b : Block = try cast(obj, Block) catch(e:Dynamic) null;
-		if (b != null) {
+		if (Std.is(obj, Block)) {
+			var b : Block = cast(obj, Block);
 			return b.deleteStack();
 		}
 		return false;
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return ["Cannot Delete", "To delete a block definition, first remove all uses of the block."];
 	}
 }

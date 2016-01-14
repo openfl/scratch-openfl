@@ -93,7 +93,7 @@ class TopBarPart extends UIPart
 		}
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		if (Scratch.app != null) {
 			Scratch.app.showFileMenu(Menu.dummyButton());
 			Scratch.app.showEditMenu(Menu.dummyButton());
@@ -271,7 +271,7 @@ class TopBarPart extends UIPart
 	}
 
 	private function clearToolButtonsExcept(activeButton : IconButton) : Void{
-		for (b/* AS3HX WARNING could not determine type for var: b exp: EArrayDecl([EIdent(copyTool),EIdent(cutTool),EIdent(growTool),EIdent(shrinkTool),EIdent(helpTool)]) type: null */ in [copyTool, cutTool, growTool, shrinkTool, helpTool]){
+		for (b in [copyTool, cutTool, growTool, shrinkTool, helpTool]){
 			if (b != activeButton)                 b.turnOff();
 		}
 	}

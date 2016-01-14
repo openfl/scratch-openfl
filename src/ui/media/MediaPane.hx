@@ -82,7 +82,7 @@ class MediaPane extends ScrollFrameContents
 	private function costumeItems() : Array<Dynamic>{
 		var result : Array<Dynamic> = [];
 		var viewedObj : ScratchObj = app.viewedObj();
-		for (c/* AS3HX WARNING could not determine type for var: c exp: EField(EIdent(viewedObj),costumes) type: null */ in viewedObj.costumes){
+		for (c in viewedObj.costumes){
 			result.push(Scratch.app.createMediaInfo(c, viewedObj));
 		}
 		return result;
@@ -91,7 +91,7 @@ class MediaPane extends ScrollFrameContents
 	private function soundItems() : Array<Dynamic>{
 		var result : Array<Dynamic> = [];
 		var viewedObj : ScratchObj = app.viewedObj();
-		for (snd/* AS3HX WARNING could not determine type for var: snd exp: EField(EIdent(viewedObj),sounds) type: null */ in viewedObj.sounds){
+		for (snd in viewedObj.sounds){
 			result.push(Scratch.app.createMediaInfo(snd, viewedObj));
 		}
 		return result;
@@ -141,8 +141,8 @@ class MediaPane extends ScrollFrameContents
 		sp.currentIndex = Std.int(Math.min(sp.currentIndex, viewedObj.sounds.length - 1));
 		var current : ScratchSound = try cast(viewedObj.sounds[sp.currentIndex], ScratchSound) catch(e:Dynamic) null;
 		for (i in 0...numChildren){
-			var si : MediaInfo = try cast(getChildAt(i), MediaInfo) catch(e:Dynamic) null;
-			if (si != null) {
+			if (Std.is(getChildAt(i), MediaInfo)) {
+				var si : MediaInfo = cast(getChildAt(i), MediaInfo);
 				if (si.mysound == current)                     si.highlight()
 				else si.unhighlight();
 			}

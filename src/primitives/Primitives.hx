@@ -25,7 +25,6 @@
 
 package primitives;
 
-import flash.utils.Dictionary;
 import blocks.*;
 import interpreter.*;
 import scratch.ScratchSprite;
@@ -223,7 +222,7 @@ class Primitives
 		clone.initFrom(proto, true);
 		clone.objName = proto.objName;
 		clone.isClone = true;
-		for (stack/* AS3HX WARNING could not determine type for var: stack exp: EField(EIdent(clone),scripts) type: null */ in clone.scripts){
+		for (stack in clone.scripts){
 			if (stack.op == "whenCloned") {
 				interp.startThreadForClone(stack, clone);
 			}

@@ -26,6 +26,7 @@ import flash.filters.DropShadowFilter;
 import flash.geom.*;
 import flash.text.*;
 import flash.utils.Dictionary;
+import flash.utils.Object;
 import flash.utils.Timer;
 
 import translation.Translator;
@@ -44,7 +45,7 @@ import translation.Translator;
 class SimpleTooltip
 {
 	// Map of DisplayObject => Strings
-	private var tipObjs : Dictionary = new Dictionary();
+	private var tipObjs : Map<DisplayObject,Map<String, String>> = new Map<DisplayObject,Map<String, String>>();
 	private var currentTipObj : DisplayObject;
 	private var nextTipObj : DisplayObject;
 
@@ -94,10 +95,10 @@ class SimpleTooltip
 			return;
 		}
 
-		if (Reflect.field(tipObjs, Std.string(dObj)) == null) {
+		if (!tipObjs.exists(dObj)) {
 			dObj.addEventListener(MouseEvent.MOUSE_OVER, eventHandler);
 		}
-		Reflect.setField(tipObjs, Std.string(dObj), opts);
+		tipObjs[dObj] = opts;
 	}
 
 	private function eventHandler(evt : Event) : Void{
@@ -134,15 +135,15 @@ class SimpleTooltip
 		showTimer.reset();
 		hideTimer.reset();
 		sprite.alpha = 0;
-		var ttOpts : Dynamic = Reflect.field(tipObjs, Std.string(nextTipObj));
-		renderTooltip(ttOpts.text);
+		var ttOpts  = tipObjs[nextTipObj];
+		renderTooltip(ttOpts['text']);
 		currentTipObj = nextTipObj;
 
 		// TODO: Make it fade in
 		sprite.alpha = 1;
 		stage.addChild(sprite);
 
-		var pos : Point = getPos(ttOpts.direction);
+		var pos : Point = getPos(ttOpts['direction']);
 		sprite.x = pos.x;
 		sprite.y = pos.y;
 	}
@@ -225,7 +226,7 @@ class SimpleTooltip
 			return;
 		}
 
-		if (Std.is(Reflect.field(tipObjs, Std.string(dObj)), Dynamic)) {
+		if (tipObjs.exists(dObj)) {
 			nextTipObj = dObj;
 
 			showTimer.reset();

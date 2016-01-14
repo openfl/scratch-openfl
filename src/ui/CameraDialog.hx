@@ -32,7 +32,7 @@ class CameraDialog extends DialogBox
 	private var picture : Bitmap;
 	private var video : Video;
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return ["Camera", "Save", "Close"];
 	}
 

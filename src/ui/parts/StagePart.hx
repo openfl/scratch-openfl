@@ -85,7 +85,7 @@ class StagePart extends UIPart
 		addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheel);
 	}
 
-	public static function strings() : Array<Dynamic>{
+	public static function strings() : Array<String>{
 		return [
 		"by", "shared", "unshared", "Turbo Mode", 
 		"This project can detect who is using it, through the “username” block. To hide your identity, sign out before using the project."];
