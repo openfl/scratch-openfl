@@ -899,7 +899,7 @@ class ScratchRuntime {
 		return result;
 	}
 
-	public function allUsesOfSoundDo(soundName:String, f:Function):Void {
+	public function allUsesOfSoundDo(soundName:String, f:BlockArg->Void):Void {
 		for (stack in app.viewedObj().scripts) {
 			stack.allBlocksDo(function (b:Block):Void {
 				for (a in b.args) {
@@ -942,7 +942,7 @@ class ScratchRuntime {
 		return result;
 	}
 
-	public function allStacksAndOwnersDo(f:Function):Void {
+	public function allStacksAndOwnersDo(f:Block->ScratchObj->Void):Void {
 		// Call the given function on every stack in the project, passing the stack and owning sprite/stage.
 		// This method is used by broadcast, so enumerate sprites/stage from front to back to match Scratch.
 		var stage:ScratchStage = app.stagePane;

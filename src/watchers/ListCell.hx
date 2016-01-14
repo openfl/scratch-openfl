@@ -37,9 +37,9 @@ class ListCell extends Sprite
 	public var tf : TextField;
 	private var frame : ResizeableFrame;
 	private var deleteButton : IconButton;
-	private var deleteItem : Function;
+	private var deleteItem : Dynamic->Void;
 
-	public function new(s : String, width : Int, whenChanged : Function, keyPress : Function, deleteItem : Function)
+	public function new(s : String, width : Int, whenChanged : Dynamic->Void, keyPress : Dynamic->Void, deleteItem : Dynamic->Void)
 	{
 		super();
 		frame = new ResizeableFrame(0xFFFFFF, normalColor, 6, true);
@@ -69,7 +69,7 @@ class ListCell extends Sprite
 		deleteButton.y = (frameH - deleteButton.height) / 2;
 	}
 
-	private function addTextField(whenChanged : Function, keyPress : Function) : Void{
+	private function addTextField(whenChanged : Dynamic->Void, keyPress : Dynamic->Void) : Void{
 		tf = new TextField();
 		tf.type = TextFieldType.INPUT;
 		tf.wordWrap = true;
