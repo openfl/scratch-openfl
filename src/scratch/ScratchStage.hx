@@ -462,33 +462,33 @@ class ScratchStage extends ScratchObj {
 	}
 */
 	public function setVideoState(newState:String):Void {
-		if ('off' == newState) {
-			if (video != null) video.attachCamera(null); // turn off camera
-			if (videoImage != null && videoImage.parent != null) videoImage.parent.removeChild(videoImage);
-			video = null;
-			videoImage = null;
-			return;
-		}
-		Scratch.app.libraryPart.showVideoButton();
-		flipVideo = ('on' == newState); // 'on' means mirrored; 'on-flip' means unmirrored
-		if (camera == null) {
-			// Set up the camera only the first time it is used.
-			camera = Camera.getCamera();
-			if (camera == null) return; // no camera available or access denied
-			camera.setMode(640, 480, 30);
-		}
-		if (video == null) {
-			video = new Video(480, 360);
-			video.attachCamera(camera);
-			videoImage = new Bitmap(new BitmapData(Std.int(video.width), Std.int(video.height), false));
-			videoImage.alpha = videoAlpha;
-			/*
-			SCRATCH::allow3d {
-				updateSpriteEffects(videoImage, {'ghost': 100 * (1 - videoAlpha)});
-			}
-			*/
-			addChildAt(videoImage, getChildIndex(penLayer) + 1);
-		}
+		//if ('off' == newState) {
+			//if (video != null) video.attachCamera(null); // turn off camera
+			//if (videoImage != null && videoImage.parent != null) videoImage.parent.removeChild(videoImage);
+			//video = null;
+			//videoImage = null;
+			//return;
+		//}
+		//Scratch.app.libraryPart.showVideoButton();
+		//flipVideo = ('on' == newState); // 'on' means mirrored; 'on-flip' means unmirrored
+		//if (camera == null) {
+			//// Set up the camera only the first time it is used.
+			//camera = Camera.getCamera();
+			//if (camera == null) return; // no camera available or access denied
+			//camera.setMode(640, 480, 30);
+		//}
+		//if (video == null) {
+			//video = new Video(480, 360);
+			//video.attachCamera(camera);
+			//videoImage = new Bitmap(new BitmapData(Std.int(video.width), Std.int(video.height), false));
+			//videoImage.alpha = videoAlpha;
+			///*
+			//SCRATCH::allow3d {
+				//updateSpriteEffects(videoImage, {'ghost': 100 * (1 - videoAlpha)});
+			//}
+			//*/
+			//addChildAt(videoImage, getChildIndex(penLayer) + 1);
+		//}
 	}
 
 	public function setVideoTransparency(transparency:Float):Void {

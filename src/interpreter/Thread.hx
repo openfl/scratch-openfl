@@ -28,7 +28,6 @@ package interpreter;
 
 
 import blocks.Block;
-import flash.sampler.StackFrame;
 import scratch.ScratchObj;
 
 

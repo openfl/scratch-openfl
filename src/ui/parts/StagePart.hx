@@ -434,7 +434,7 @@ class StagePart extends UIPart
 
 
 
-		SoundMixer.soundTransform = new SoundTransform((evt != null && (evt.ctrlKey) ? 0 : 1));
+		//SoundMixer.soundTransform = new SoundTransform((evt != null && (evt.ctrlKey) ? 0 : 1));
 
 		if (evt != null && evt.shiftKey) {
 			app.toggleTurboMode();

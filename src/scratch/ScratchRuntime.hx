@@ -706,14 +706,15 @@ class ScratchRuntime {
 	public function isLoud():Bool { return soundLevel() > 10; }
 
 	public function soundLevel():Int {
-		if (microphone == null) {
-			microphone = Microphone.getMicrophone();
-			if(microphone != null) {
-				microphone.setLoopBack(true);
-				microphone.soundTransform = new SoundTransform(0, 0);
-			}
-		}
-		return microphone != null ? Std.int(microphone.activityLevel) : 0;
+		return 0;
+		//if (microphone == null) {
+			//microphone = Microphone.getMicrophone();
+			//if(microphone != null) {
+				//microphone.setLoopBack(true);
+				//microphone.soundTransform = new SoundTransform(0, 0);
+			//}
+		//}
+		//return microphone != null ? Std.int(microphone.activityLevel) : 0;
 	}
 
 	// -----------------------------

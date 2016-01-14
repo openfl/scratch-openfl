@@ -30,7 +30,7 @@ class CameraDialog extends DialogBox
 
 	private var saveFunc : BitmapData->Void;
 	private var picture : Bitmap;
-	private var video : Video;
+	//private var video : Video;
 
 	public static function strings() : Array<String>{
 		return ["Camera", "Save", "Close"];
@@ -51,10 +51,10 @@ class CameraDialog extends DialogBox
 		picture.visible = false;
 		container.addChild(picture);
 
-		video = new Video(320, 240);
-		video.smoothing = true;
-		video.attachCamera(Camera.getCamera());
-		container.addChild(video);
+		//video = new Video(320, 240);
+		//video.smoothing = true;
+		//video.attachCamera(Camera.getCamera());
+		//container.addChild(video);
 
 		var b : Button;
 		addChild(b = new Button(Translator.map("Save"), savePicture));
@@ -64,12 +64,12 @@ class CameraDialog extends DialogBox
 	}
 
 	private function savePicture() : Void{
-		picture.bitmapData.draw(video);
+		//picture.bitmapData.draw(video);
 		if (saveFunc != null)             (saveFunc(picture.bitmapData.clone()));
 	}
 
 	public function closeDialog() : Void{
-		if (video != null)             video.attachCamera(null);
+		//if (video != null)             video.attachCamera(null);
 		if (parent != null)             parent.removeChild(this);
 	}
 }

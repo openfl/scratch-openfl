@@ -278,7 +278,7 @@ class ProjectIO
 		loader.loadBytes(imageData);
 	}
 
-	private function decodeSVG(svgData : ByteArray, imageDict : Dictionary, doneFunction : Void->Void) : Void{
+	private function decodeSVG(svgData : ByteArray, imageDict : Map<ByteArray,Dynamic>, doneFunction : Void->Void) : Void{
 		//function loadDone(svgRoot : SVGElement) : Void{
 			//Reflect.setField(imageDict, Std.string(svgData), svgRoot);
 			//doneFunction();
