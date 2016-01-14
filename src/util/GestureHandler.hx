@@ -240,7 +240,7 @@ class GestureHandler
 			handleClick(evt);
 			return;
 		}
-		if (evt.shiftKey && app.editMode && Reflect.hasField(mouseTarget, "menu")) {
+		if (evt.shiftKey && app.editMode && Compat.hasMethod(mouseTarget, "menu")) {
 			gesture = "menu";
 			return;
 		}
@@ -343,7 +343,8 @@ class GestureHandler
 		drop(evt);
 		Menu.removeMenusFrom(stage);
 		if (gesture == "unknown") {
-			if (mouseTarget != null && Reflect.hasField(mouseTarget, "doubleClick"))                 gesture = "clickOrDoubleClick"
+			if (mouseTarget != null && Compat.hasMethod(mouseTarget, "doubleClick"))                 
+				gesture = "clickOrDoubleClick";
 			else {
 				handleClick(evt);
 				mouseTarget = null;
@@ -437,15 +438,15 @@ class GestureHandler
 		// Return true if the given object is hit by the mouse and has a
 		// method named click, doubleClick, menu or objToGrab.
 		if (!o.hitTestPoint(globalX, globalY, true))             return false;
-		if ((Reflect.hasField(o, "click")) || (Reflect.hasField(o, "doubleClick")))             return true;
-		if ((Reflect.hasField(o, "menu")) || (Reflect.hasField(o, "objToGrab")))             return true;
+		if ((Compat.hasMethod(o, "click")) || (Compat.hasMethod(o, "doubleClick")))             return true;
+		if ((Compat.hasMethod(o, "menu")) || (Compat.hasMethod(o, "objToGrab")))             return true;
 		return false;
 	}
 
 	private function handleDrag(evt : MouseEvent) : Void{
 		// Note: Called with a null event if gesture is click and hold.
 		Menu.removeMenusFrom(stage);
-		if (!Reflect.hasField(mouseTarget, "objToGrab"))             return;
+		if (!Compat.hasMethod(mouseTarget, "objToGrab"))             return;
 		if (!app.editMode) {
 			if (app.loadInProgress)                 return;
 			if ((Std.is(mouseTarget, ScratchSprite)) && !cast((mouseTarget), ScratchSprite).isDraggable)                 return;  // don't drag locked sprites in presentation mode  ;
@@ -461,13 +462,13 @@ class GestureHandler
 	private function handleClick(evt : MouseEvent) : Void{
 		if (mouseTarget == null)             return;
 		evt.updateAfterEvent();
-		if (Reflect.hasField(mouseTarget, "click"))             mouseTarget.click(evt);
+		if (Compat.hasMethod(mouseTarget, "click"))             mouseTarget.click(evt);
 		gesture = "click";
 	}
 
 	private function handleDoubleClick(evt : MouseEvent) : Void{
 		if (mouseTarget == null)             return;
-		if (Reflect.hasField(mouseTarget, "doubleClick"))
+		if (Compat.hasMethod(mouseTarget, "doubleClick"))
 			mouseTarget.doubleClick(evt);
 		gesture = "doubleClick";
 	}
@@ -502,7 +503,7 @@ class GestureHandler
 			t.handleTool(CursorTool.tool, evt);
 			return;
 		}
-		if (t != null && Reflect.hasField(t, "handleTool"))
+		if (t != null && Compat.hasMethod(t, "handleTool"))
 			t.handleTool(CursorTool.tool, evt);
 		if (isGrowShrink && (Std.is(t, Block) && t.isInPalette /*|| Std.is(t, ImageCanvas)*/))             return;  // grow/shrink sticky for scripting area  ;
 
@@ -576,7 +577,7 @@ class GestureHandler
 		for (o in possibleTargets){
 			while (o){  // see if some parent can handle the drop  
 				if (Lambda.indexOf(tried, o) == -1) {
-					if (Reflect.hasField(o, "handleDrop") && o.handleDrop(droppedObj))                         return true;
+					if (Compat.hasMethod(o, "handleDrop") && o.handleDrop(droppedObj))                         return true;
 					tried.push(o);
 				}
 				o = o.parent;

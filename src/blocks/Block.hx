@@ -35,13 +35,13 @@ package blocks;
 
 //import extensions.ExtensionManager;
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.BitmapFilter;
-import flash.filters.GlowFilter;
-import flash.geom.*;
-import flash.net.URLLoader;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.BitmapFilter;
+import openfl.filters.GlowFilter;
+import openfl.geom.*;
+import openfl.net.URLLoader;
+import openfl.text.*;
 import assets.Resources;
 import translation.Translator;
 import util.*;

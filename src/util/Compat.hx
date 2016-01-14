@@ -10,6 +10,11 @@ class Compat
 		return Reflect.callMethod(x, Reflect.field(x, "toFixed"), [numDecimals]);
 	}
 	
+	public static function hasMethod(x: Dynamic, methodName: String) : Bool
+	{
+		return Type.getInstanceFields(Type.getClass(x)).indexOf(methodName) != -1;
+	}
+	
 	public static function newArray<T>(size: Int, defaultValue: T) :Array<T> 
 	{
 		var array:Array<T> = new Array<T>();
