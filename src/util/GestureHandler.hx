@@ -196,7 +196,7 @@ class GestureHandler
 			}
 		}
 		
-		return Reflect.hasField(obj, property) ? obj : null;
+		return Compat.hasMethod(obj, property) ? obj : null;
 	}
 
 	public function mouseDown(evt : MouseEvent) : Void{
@@ -510,14 +510,15 @@ class GestureHandler
 		if (!evt.shiftKey)             app.clearTool();  // don't clear if shift pressed  ;
 	}
 
-	private function grab(obj : Dynamic, evt : MouseEvent) : Void{
+	private function grab(obj : Sprite, evt : MouseEvent) : Void{
 		// Note: Called with a null event if gesture is click and hold.
 		if (evt != null)             drop(evt);
 
 		var globalP : Point = obj.localToGlobal(new Point(0, 0));  // record the original object's global position  
-		obj = obj.objToGrab((evt != null) ? evt : new MouseEvent(""));  // can return the original object, a new object, or null  
+		var untypedObj : Dynamic = obj;
+		obj = untypedObj.objToGrab((evt != null) ? evt : new MouseEvent(""));  // can return the original object, a new object, or null  
 		if (obj == null)             return;  // not grabbable  ;
-		if (obj.parent)             globalP = obj.localToGlobal(new Point(0, 0));  // update position if not a copy  ;
+		if (obj.parent != null)             globalP = obj.localToGlobal(new Point(0, 0));  // update position if not a copy  ;
 
 		originalParent = obj.parent;  // parent is null if objToGrab() returns a new object  
 		originalPosition = new Point(obj.x, obj.y);
@@ -562,7 +563,7 @@ class GestureHandler
 		scrollStartTime = Math.round(haxe.Timer.stamp() * 1000);
 	}
 
-	private function dropHandled(droppedObj : Dynamic, evt : MouseEvent) : Bool{
+	private function dropHandled(droppedObj : Sprite, evt : MouseEvent) : Bool{
 		// Search for an object to handle this drop and return true one is found.
 		// Note: Search from front to back, so the front-most object catches the dropped object.
 		if (app.isIn3D)             app.stagePane.visible = true;

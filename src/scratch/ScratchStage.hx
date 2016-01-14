@@ -763,7 +763,7 @@ class ScratchStage extends ScratchObj {
 
 	/* Dropping */
 
-	public function handleDrop(obj:Dynamic):Bool {
+	public function handleDrop(obj:Sprite):Bool {
 		if (Std.is(obj, ScratchSprite) || Std.is(obj, Watcher) || Std.is(obj, ListWatcher)) {
 			if (scaleX != 1) {
 				obj.scaleX = obj.scaleY = obj.scaleX / scaleX; // revert to original scale
@@ -771,14 +771,15 @@ class ScratchStage extends ScratchObj {
 			var p:Point = globalToLocal(new Point(obj.x, obj.y));
 			obj.x = p.x;
 			obj.y = p.y;
-			if (obj.parent) obj.parent.removeChild(obj); // force redisplay
+			if (obj.parent != null) obj.parent.removeChild(obj); // force redisplay
 			addChild(obj);
 			if (Std.is(obj, ScratchSprite)) {
-				cast(obj, ScratchSprite).updateCostume();
-				obj.setScratchXY(p.x - 240, 180 - p.y);
-				Scratch.app.selectSprite(obj);
-				obj.setScratchXY(p.x - 240, 180 - p.y); // needed because selectSprite() moves sprite back if costumes tab is open
-				cast(obj, ScratchObj).applyFilters();
+				var spr = cast(obj, ScratchSprite);
+				spr.updateCostume();
+				spr.setScratchXY(p.x - 240, 180 - p.y);
+				Scratch.app.selectSprite(spr);
+				spr.setScratchXY(p.x - 240, 180 - p.y); // needed because selectSprite() moves sprite back if costumes tab is open
+				spr.applyFilters();
 			}
 			if (!Std.is(obj, ScratchSprite) || Scratch.app.editMode) Scratch.app.setSaveNeeded();
 			return true;

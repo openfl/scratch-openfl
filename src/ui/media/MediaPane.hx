@@ -153,7 +153,7 @@ class MediaPane extends ScrollFrameContents
 	// Dropping
 	//------------------------------
 
-	public function handleDrop(obj : Dynamic) : Bool{
+	public function handleDrop(obj : Sprite) : Bool{
 		var item : MediaInfo = try cast(obj, MediaInfo) catch(e:Dynamic) null;
 		if (item != null && item.owner == app.viewedObj()) {
 			changeMediaOrder(item);

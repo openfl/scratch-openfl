@@ -492,7 +492,7 @@ class LibraryPart extends UIPart
 	// Dropping
 	//------------------------------
 
-	public function handleDrop(obj : Dynamic) : Bool{
+	public function handleDrop(obj : Sprite) : Bool{
 		return false;
 	}
 

@@ -394,7 +394,7 @@ class ScriptsPane extends ScrollFrameContents
 
 	/* Dropping */
 
-	public function handleDrop(obj : Dynamic) : Bool{
+	public function handleDrop(obj : Sprite) : Bool{
 		var localP : Point = globalToLocal(new Point(obj.x, obj.y));
 
 		if (Std.is(obj, MediaInfo)) {

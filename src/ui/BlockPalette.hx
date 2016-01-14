@@ -27,6 +27,7 @@
 package ui;
 
 
+import openfl.display.Sprite;
 import openfl.geom.*;
 import blocks.Block;
 import interpreter.Interpreter;
@@ -61,7 +62,7 @@ class BlockPalette extends ScrollFrameContents
 		if (scrollToOrigin)             x = y = 0;
 	}
 
-	public function handleDrop(obj : Dynamic) : Bool{
+	public function handleDrop(obj : Sprite) : Bool{
 		// Delete blocks and stacks dropped onto the palette.
 		if (Std.is(obj, ScratchComment)) {
 			var c : ScratchComment = cast(obj, ScratchComment);

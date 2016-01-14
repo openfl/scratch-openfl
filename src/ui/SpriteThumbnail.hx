@@ -234,7 +234,7 @@ class SpriteThumbnail extends Sprite
 		return result;
 	}
 
-	public function handleDrop(obj : Dynamic) : Bool{
+	public function handleDrop(obj : Sprite) : Bool{
 		function addCostume(c : ScratchCostume) : Void{app.addCostume(c, targetObj);
 		};
 		function addSound(snd : ScratchSound) : Void{app.addSound(snd, targetObj);
