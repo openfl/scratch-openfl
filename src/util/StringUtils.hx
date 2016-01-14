@@ -19,7 +19,6 @@
 package util;
 
 
-import flash.utils.Dictionary;
 
 class StringUtils
 {

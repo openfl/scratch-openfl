@@ -25,7 +25,6 @@ import flash.events.*;
 import flash.filters.DropShadowFilter;
 import flash.geom.*;
 import flash.text.*;
-import flash.utils.Dictionary;
 import flash.utils.Timer;
 
 import translation.Translator;

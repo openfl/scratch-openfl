@@ -25,7 +25,6 @@ import blocks.Block;
 import flash.events.Event;
 import flash.net.*;
 import flash.utils.ByteArray;
-import flash.utils.Dictionary;
 
 import logging.LogLevel;
 
@@ -125,7 +124,7 @@ class Translator
 
 		currentLang = lang;
 
-		var rtlLanguages : Array<Dynamic> = ["ar", "fa", "he"];
+		var rtlLanguages : Array<String> = ["ar", "fa", "he"];
 		rightToLeft = Lambda.indexOf(rtlLanguages, lang) > -1;
 		rightToLeftMath = ("ar" == lang);
 		Block.setFonts(10, 9, true, 0);  // default font settings  
@@ -133,8 +132,8 @@ class Translator
 		if (Lambda.indexOf(font13, lang) > -1)             Block.setFonts(13, 12, false, 0);
 	}
 
-	public static function map(s : String, context : Dictionary = null) : String{
-		var result : Dynamic = null;
+	public static function map(s : String, context : Map<String,String> = null) : String{
+		var result : String = null;
 		if (dictionary.exists(s)) result = dictionary[s];
 		if ((result == null) || (result.length == 0))             result = s;
 		if (context != null)             result = StringUtils.substitute(result, context);
