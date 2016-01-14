@@ -40,7 +40,7 @@ import flash.geom.Rectangle;
 import flash.net.FileFilter;
 import flash.net.FileReference;
 import flash.net.FileReferenceList;
-import flash.net.LocalConnection;
+//import flash.net.LocalConnection;
 import flash.net.URLLoader;
 import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
@@ -528,11 +528,11 @@ class Scratch /*extends Sprite*/ {
 		stagePane.clearCachedBitmap();
 
 		// unsupported technique that seems to force garbage collection
-		try {
-			new LocalConnection().connect('foo');
-			new LocalConnection().connect('foo');
-		} catch (e:Error) {
-		}
+		//try {
+			//new LocalConnection().connect('foo');
+			//new LocalConnection().connect('foo');
+		//} catch (e:Error) {
+		//}
 	}
 /*
 	SCRATCH::allow3d

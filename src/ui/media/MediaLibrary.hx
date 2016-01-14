@@ -31,7 +31,7 @@ import scratch.*;
 import translation.Translator;
 import uiwidgets.*;
 import util.*;
-import flash.xml.XML;
+//import flash.xml.XML;
 
 class MediaLibrary extends Sprite {
 

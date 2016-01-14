@@ -24,7 +24,7 @@ import flash.display.Shape;
 import flash.display.Sprite;
 import flash.events.MouseEvent;
 import flash.events.Event;
-import flash.filters.BevelFilter;
+//import flash.filters.BevelFilter;
 import flash.geom.Point;
 import util.DragClient;
 
@@ -113,7 +113,9 @@ class Scrollbar extends Sprite implements DragClient
 		slider.graphics.endFill();
 	}
 
-	private function addFilters() : Void{
+	private function addFilters() : Void {
+		return [];
+		/*
 		var f : BevelFilter = new BevelFilter();
 		f.distance = 1;
 		f.blurX = f.blurY = 2;
@@ -127,6 +129,7 @@ class Scrollbar extends Sprite implements DragClient
 		f.highlightAlpha = 1.0;
 		f.shadowAlpha = 0.5;
 		slider.filters = [f];
+		*/
 	}
 
 	public function allowDragging(flag : Bool) : Void{

@@ -39,7 +39,7 @@ package blocks;
 
 import flash.display.*;
 import flash.events.*;
-import flash.filters.BevelFilter;
+//import flash.filters.BevelFilter;
 import flash.text.*;
 import scratch.BlockMenus;
 import translation.Translator;
@@ -196,14 +196,15 @@ class BlockArg extends Sprite
 		field.selectable = false;
 	}
 
-	private function blockArgFilters() : Array<flash.filters.BitmapFilter>{
-		// filters for BlockArg outlines
-		var f : BevelFilter = new BevelFilter(1);
-		f.blurX = f.blurY = 2;
-		f.highlightAlpha = 0.3;
-		f.shadowAlpha = 0.6;
-		f.angle = 240;  // change light angle to show indentation  
-		return [f];
+	private function blockArgFilters() : Array<flash.filters.BitmapFilter> {
+		return [];
+		//// filters for BlockArg outlines
+		//var f : BevelFilter = new BevelFilter(1);
+		//f.blurX = f.blurY = 2;
+		//f.highlightAlpha = 0.3;
+		//f.shadowAlpha = 0.6;
+		//f.angle = 240;  // change light angle to show indentation  
+		//return [f];
 	}
 
 	private function makeTextField() : TextField{
