@@ -114,7 +114,7 @@ class Scrollbar extends Sprite implements DragClient
 	}
 
 	private function addFilters() : Void {
-		return [];
+		slider.filters = [];
 		/*
 		var f : BevelFilter = new BevelFilter();
 		f.distance = 1;

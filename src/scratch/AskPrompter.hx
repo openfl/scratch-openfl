@@ -106,14 +106,15 @@ class AskPrompter extends Sprite
 		input.width = 410;
 		input.height = 20;
 
-		var f : BevelFilter = new BevelFilter();
-		f.angle = 225;
-		f.shadowAlpha = 0.6;
-		f.distance = 3;
-		f.strength = 0.4;
-		f.blurX = f.blurY = 0;
-		f.type = BitmapFilterType.OUTER;
-		input.filters = [f];
+		//var f : BevelFilter = new BevelFilter();
+		//f.angle = 225;
+		//f.shadowAlpha = 0.6;
+		//f.distance = 3;
+		//f.strength = 0.4;
+		//f.blurX = f.blurY = 0;
+		//f.type = BitmapFilterType.OUTER;
+		//input.filters = [f];
+		input.filters = [];
 
 		input.x = 9;
 		input.y = h - (input.height + 5);

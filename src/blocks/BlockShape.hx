@@ -166,14 +166,15 @@ class BlockShape extends Shape
 
 	private function blockShapeFilters() : Array<BitmapFilter>{
 		// filters for command and reporter Block outlines
-		var f : BevelFilter = new BevelFilter(1);
-		f.blurX = f.blurY = 3;
-		f.highlightAlpha = 0.3;
-		f.shadowAlpha = 0.6;
-		return [f];
+		//var f : BevelFilter = new BevelFilter(1);
+		//f.blurX = f.blurY = 3;
+		//f.highlightAlpha = 0.3;
+		//f.shadowAlpha = 0.6;
+		//return [f];
+		return [];
 	}
 
-	private function dropFeedbackFilters(forReporter : Bool) : Array<flash.filters.BitmapFilter>{
+	private function dropFeedbackFilters(forReporter : Bool) : Array<BitmapFilter>{
 		// filters for command/reporter block drop feedback
 		var f : GlowFilter;
 		if (forReporter) {

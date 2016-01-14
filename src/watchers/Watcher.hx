@@ -29,7 +29,7 @@ package watchers;
 import blocks.BlockIO;
 
 import flash.display.*;
-import flash.filters.BevelFilter;
+//import flash.filters.BevelFilter;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.text.*;
@@ -287,11 +287,12 @@ class Watcher extends Sprite implements DragClient
 
 	private function addSliderAndKnob() : Void{
 		slider = new Shape();  // slider is drawn by fixLayout()  
-		var f : BevelFilter = new BevelFilter(2);
-		f.angle = 225;
-		f.shadowAlpha = 0.5;
-		f.highlightAlpha = 0.5;
-		slider.filters = [f];
+		//var f : BevelFilter = new BevelFilter(2);
+		//f.angle = 225;
+		//f.shadowAlpha = 0.5;
+		//f.highlightAlpha = 0.5;
+		//slider.filters = [f];
+		slider.filters = [];
 		addChild(slider);
 
 		knob = new Shape();
@@ -299,9 +300,10 @@ class Watcher extends Sprite implements DragClient
 		g.lineStyle(1, 0x808080);
 		g.beginFill(0xFFFFFF);
 		g.drawCircle(5, 5, 5);
-		f = new BevelFilter(2);
-		f.blurX = f.blurY = 5;
-		knob.filters = [f];
+		//f = new BevelFilter(2);
+		//f.blurX = f.blurY = 5;
+		//knob.filters = [f];
+		//knob.filters = [];
 		addChild(knob);
 	}
 

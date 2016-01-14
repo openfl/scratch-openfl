@@ -53,7 +53,7 @@ class ResizeableFrame extends Sprite implements DragClient
 
 		box = new Shape();
 		addChild(box);
-		if (isInset)             box.filters = [insetBevelFilter()];
+		if (isInset)             box.filters = insetBevelFilter();
 		outline = new Shape();
 		addChild(outline);
 		setWidthHeight(80, 60);
@@ -110,13 +110,14 @@ class ResizeableFrame extends Sprite implements DragClient
 		}
 	}
 
-	private function insetBevelFilter() : BitmapFilter{
-		var f : BevelFilter = new BevelFilter(2);
-		f.angle = 225;
-		f.blurX = f.blurY = 3;
-		f.highlightAlpha = 0.5;
-		f.shadowAlpha = 0.5;
-		return f;
+	private function insetBevelFilter() : Array<BitmapFilter>{
+		//var f : BevelFilter = new BevelFilter(2);
+		//f.angle = 225;
+		//f.blurX = f.blurY = 3;
+		//f.highlightAlpha = 0.5;
+		//f.shadowAlpha = 0.5;
+		//return f;
+		return [];
 	}
 
 	public function mouseDown(evt : MouseEvent) : Void{

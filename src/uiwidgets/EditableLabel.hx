@@ -117,12 +117,13 @@ class EditableLabel extends Sprite
 	}
 
 	private function addFilter() : Void{
-		var f : BevelFilter = new BevelFilter();
-		f.angle = 225;
-		f.shadowAlpha = 0.5;
-		f.distance = 2;
-		f.strength = 0.5;
-		f.blurX = f.blurY = 2;
-		bezel.filters = [f];
+		//var f : BevelFilter = new BevelFilter();
+		//f.angle = 225;
+		//f.shadowAlpha = 0.5;
+		//f.distance = 2;
+		//f.strength = 0.5;
+		//f.blurX = f.blurY = 2;
+		//bezel.filters = [f];
+		bezel.filters = [];
 	}
 }

@@ -60,7 +60,7 @@ class ScratchStage extends ScratchObj {
 
 	// camera support
 	public var videoImage:Bitmap;
-	static private var camera:Camera;
+	//static private var camera:Camera;
 	private var video:Video;
 	private var videoAlpha:Float = 0.5;
 	private var flipVideo:Bool = true;

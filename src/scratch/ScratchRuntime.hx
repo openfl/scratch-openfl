@@ -52,7 +52,7 @@ class ScratchRuntime {
 	public var cloneCount:Int;
 	public var edgeTriggersEnabled:Bool = false; // initially false, becomes true when project first run
 
-	private var microphone:Microphone;
+	//private var microphone:Microphone;
 	private var timerBase:UInt;
 
 	private var projectToInstall:ScratchStage;
