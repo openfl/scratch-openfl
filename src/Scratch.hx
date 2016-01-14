@@ -420,7 +420,7 @@ class Scratch /*extends Sprite*/ {
 		return isOffline || isExtensionDevMode;
 	}
 
-	public function getMediaLibrary(type:String, whenDone:Function):MediaLibrary {
+	public function getMediaLibrary(type:String, whenDone:Dynamic->Void):MediaLibrary {
 		return new MediaLibrary(this, type, whenDone);
 	}
 
@@ -1145,7 +1145,7 @@ class Scratch /*extends Sprite*/ {
 				'\n\nPlease do not distribute!', stage);
 	}
 
-	private function createNewProjectAndThen(callback:Function = null):Void {
+	private function createNewProjectAndThen(callback:Void->Void = null):Void {
 		function clearProject():Void {
 			startNewProject('', '');
 			setProjectName('Untitled');
@@ -1167,7 +1167,7 @@ class Scratch /*extends Sprite*/ {
 		//});
 	//}
 
-	private function saveProjectAndThen(postSaveAction:Function = null):Void {
+	private function saveProjectAndThen(postSaveAction:Void->Void = null):Void {
 		var d:DialogBox = new DialogBox();
 		// Give the user a chance to save their project, if needed, then call postSaveAction.
 		function doNothing():Void {
@@ -1199,7 +1199,7 @@ class Scratch /*extends Sprite*/ {
 		d.showOnStage(stage);
 	}
 
-	public function exportProjectToFile(fromJS:Bool = false, saveCallback:Function = null):Void {
+	public function exportProjectToFile(fromJS:Bool = false, saveCallback:Void->Void = null):Void {
 		if (loadInProgress) return;
 		var projIO:ProjectIO = new ProjectIO(this);
 		function fileSaved(e:Event):Void {
@@ -1557,7 +1557,7 @@ class Scratch /*extends Sprite*/ {
 	// Camera Dialog
 	//------------------------------
 
-	public function openCameraDialog(savePhoto:Function):Void {
+	public function openCameraDialog(savePhoto:BitmapData->Void):Void {
 		closeCameraDialog();
 		cameraDialog = new CameraDialog(savePhoto);
 		cameraDialog.fixLayout();
@@ -1578,7 +1578,7 @@ class Scratch /*extends Sprite*/ {
 		return new MediaInfo(obj, owningObj);
 	}
 
-	static public function loadSingleFile(fileLoaded:Function, filter:FileFilter = null):Void {
+	static public function loadSingleFile(fileLoaded:Dynamic -> Void, filter:FileFilter = null):Void {
 		var fileList:FileReferenceList = new FileReferenceList();
 		function fileSelected(event:Event):Void {
 			if (fileList.fileList.length > 0) {

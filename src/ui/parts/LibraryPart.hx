@@ -333,7 +333,7 @@ class LibraryPart extends UIPart
 		addChild(spritesFrame);
 	}
 
-	private function makeButton(fcn : Function, iconName : String) : IconButton{
+	private function makeButton(fcn : Dynamic->Void, iconName : String) : IconButton{
 		var b : IconButton = new IconButton(fcn, iconName);
 		b.isMomentary = true;
 		return b;
@@ -459,8 +459,8 @@ class LibraryPart extends UIPart
 	}
 
 	private function addBackdrop(costumeOrList : Dynamic) : Void{
-		var c : ScratchCostume = try cast(costumeOrList, ScratchCostume) catch(e:Dynamic) null;
-		if (c != null) {
+		if (Std.is(costumeOrList, ScratchCostume)) {
+			var c : ScratchCostume = cast(costumeOrList, ScratchCostume);
 			if (c.baseLayerData == null)
 			{
 				c.prepareToSave();
@@ -474,8 +474,8 @@ class LibraryPart extends UIPart
 			app.stagePane.costumes.push(c);
 			app.stagePane.showCostumeNamed(c.costumeName);
 		}
-		var list : Array<Dynamic> = try cast(costumeOrList, Array<Dynamic/*AS3HX WARNING no type*/>) catch(e:Dynamic) null;
-		if (list != null) {
+		if (Std.is(costumeOrList, Array)) {
+			var list : Array<Dynamic> = cast(costumeOrList, Array<Dynamic>);
 			for (c in list){
 				if (!c.baseLayerData)                     c.prepareToSave();
 				if (!app.okayToAdd(c.baseLayerData.length))                     return;  // not enough room  ;

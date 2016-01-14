@@ -282,11 +282,11 @@ class SoundsPart extends UIPart
 	}
 
 	public function soundFromLibrary(b : Dynamic = null) : Void{
-		app.getMediaLibrary("sound", app.addSound).open();
+		app.getMediaLibrary("sound", function(param:Dynamic) app.addSound(param)).open();
 	}
 
 	public function soundFromComputer(b : Dynamic = null) : Void{
-		app.getMediaLibrary("sound", app.addSound).importFromDisk();
+		app.getMediaLibrary("sound", function(param:Dynamic) app.addSound(param)).importFromDisk();
 	}
 
 	public function recordSound(b : Dynamic = null) : Void{

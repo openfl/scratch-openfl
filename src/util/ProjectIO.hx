@@ -127,7 +127,7 @@ class ProjectIO
 		return try cast(decodeFromZipFile(zipData), ScratchStage) catch(e:Dynamic) null;
 	}
 
-	public function decodeSpriteFromZipFile(zipData : ByteArray, whenDone : Function, fail : Void->Void = null) : Void{
+	public function decodeSpriteFromZipFile(zipData : ByteArray, whenDone : Dynamic->Void, fail : Void->Void = null) : Void{
 		var spr : ScratchSprite = try cast(decodeFromZipFile(zipData), ScratchSprite) catch(e:Dynamic) null;
 		function imagesDecoded() : Void{
 			spr.showCostume(spr.currentCostumeIndex);
@@ -214,7 +214,7 @@ class ProjectIO
 		}
 	}
 
-	public function decodeAllImages(objList : Array<ScratchObj>, whenDone : Function, fail : Void->Void = null) : Void{
+	public function decodeAllImages(objList : Array<ScratchObj>, whenDone : Void->Void, fail : Void->Void = null) : Void{
 		var allCostumes : Array<ScratchCostume> = [];
 		var imageDict : Map<ByteArray,Dynamic> = new Map<ByteArray,Dynamic>();  // maps image data to BitmapData  
 		var error : Bool = false;
@@ -257,7 +257,7 @@ class ProjectIO
 		imageDecoded();
 	}
 
-	private function decodeImage(imageData : ByteArray, imageDict : Map<ByteArray,Dynamic>, doneFunction : Function, fail : Void->Void) : Void{
+	private function decodeImage(imageData : ByteArray, imageDict : Map<ByteArray,Dynamic>, doneFunction : Void->Void, fail : Void->Void) : Void{
 		function loadDone(e : Event) : Void{
 			imageDict[imageData] = e.target.content.bitmapData;
 			doneFunction();
@@ -278,7 +278,7 @@ class ProjectIO
 		loader.loadBytes(imageData);
 	}
 
-	private function decodeSVG(svgData : ByteArray, imageDict : Dictionary, doneFunction : Function) : Void{
+	private function decodeSVG(svgData : ByteArray, imageDict : Dictionary, doneFunction : Void->Void) : Void{
 		//function loadDone(svgRoot : SVGElement) : Void{
 			//Reflect.setField(imageDict, Std.string(svgData), svgRoot);
 			//doneFunction();
@@ -327,7 +327,7 @@ class ProjectIO
 	// Fetch a costume or sound from the server
 	//----------------------------
 
-	public function fetchImage(id : String, costumeName : String, width : Int, whenDone : Function, otherData : Dynamic = null) : URLLoader{
+	public function fetchImage(id : String, costumeName : String, width : Int, whenDone : ScratchCostume->Void, otherData : Dynamic = null) : URLLoader{
 		// Fetch an image asset from the server and call whenDone with the resulting ScratchCostume.
 		var c : ScratchCostume;
 		function imageError(event : IOErrorEvent) : Void{
@@ -368,7 +368,7 @@ class ProjectIO
 		return app.server.getAsset(id, gotCostumeData);
 	}
 
-	public function fetchSound(id : String, sndName : String, whenDone : Function) : Void{
+	public function fetchSound(id : String, sndName : String, whenDone : Dynamic->Void) : Void{
 		// Fetch a sound asset from the server and call whenDone with the resulting ScratchSound.
 		function gotSoundData(sndData : ByteArray) : Void{
 			if (sndData == null) {
@@ -397,7 +397,7 @@ class ProjectIO
 	// Download a sprite from the server
 	//----------------------------
 
-	public function fetchSprite(md5AndExt : String, whenDone : Function) : Void{
+	public function fetchSprite(md5AndExt : String, whenDone : Dynamic->Void) : Void{
 		var spr : ScratchSprite = new ScratchSprite();
 		// Fetch a sprite with the md5 hash.
 		function done() : Void{
@@ -520,7 +520,7 @@ class ProjectIO
 		}
 	}
 
-	public function convertSqueakSounds(scratchObj : ScratchObj, done : Function) : Void{
+	public function convertSqueakSounds(scratchObj : ScratchObj, done : Void->Void) : Void{
 		var soundsToConvert : Array<Dynamic> = [];
 		var i : Int = 0;
 		// Pre-convert any Squeak sounds (asynch, with a progress bar) before saving a project.

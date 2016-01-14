@@ -908,10 +908,13 @@ class Block extends Sprite
 				});
 		var result : Array<ScratchComment> = [];
 		if (scriptsPane == null)             return result;
-		for (i in 0...scriptsPane.numChildren){
-			var c : ScratchComment = try cast(scriptsPane.getChildAt(i), ScratchComment) catch(e:Dynamic) null;
-			if (c != null && c.blockRef != null && Lambda.indexOf(allBlocks, c.blockRef) != -1) {
-				result.push(c);
+		for (i in 0...scriptsPane.numChildren) {
+			if (Std.is(scriptsPane.getChildAt(i), ScratchComment))
+			{
+				var c : ScratchComment = cast(scriptsPane.getChildAt(i), ScratchComment);
+				if (c.blockRef != null && Lambda.indexOf(allBlocks, c.blockRef) != -1) {
+					result.push(c);
+				}
 			}
 		}
 		return result;

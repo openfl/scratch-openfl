@@ -19,7 +19,7 @@ class Piano extends Sprite
 
 	private var color : Int;
 	private var instrument : Int;
-	private var callback : Function;
+	private var callback : Int->Void;
 
 	private var selectedKey : PianoKey;
 	private var selectedNote : Int;
@@ -32,7 +32,7 @@ class Piano extends Sprite
 	private var mousePressed : Bool;
 	private var notePlayer : NotePlayer;
 
-	public function new(color : Int, instrument : Int = 0, callback : Function = null, firstKey : Int = 48, lastKey : Int = 72)
+	public function new(color : Int, instrument : Int = 0, callback : Int->Void = null, firstKey : Int = 48, lastKey : Int = 72)
 	{
 		super();
 		this.color = color;

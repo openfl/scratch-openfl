@@ -58,7 +58,7 @@ class MediaLibrary extends Sprite {
 
 	private var app:Scratch;
 	private var assetType:String;
-	private var whenDone:Function;
+	private var whenDone:Dynamic->Void;
 	private var allItems:Array<MediaLibraryItem> = [];
 
 	private var title:TextField;
@@ -78,7 +78,7 @@ class MediaLibrary extends Sprite {
 
 	private static var libraryCache:Map<String, Array<Dynamic>> = new Map<String, Array<Dynamic>>(); // cache of all mediaLibrary entries
 
-	public function new(app:Scratch, type:String, whenDone:Function) {
+	public function new(app:Scratch, type:String, whenDone:Dynamic->Void) {
 		super();
 		this.app = app;
 		this.assetType = type;
@@ -510,11 +510,11 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		} catch(e:Dynamic) {}
 	}
 
-	private function uploadCostume(costume:ScratchCostume, whenDone:Function):Void {
+	private function uploadCostume(costume:ScratchCostume, whenDone:Void->Void):Void {
 		whenDone();
 	}
 
-	private function uploadSprite(sprite:ScratchSprite, whenDone:Function):Void {
+	private function uploadSprite(sprite:ScratchSprite, whenDone:Void->Void):Void {
 		whenDone();
 	}
 
@@ -666,7 +666,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		} catch(e:Dynamic) {}
 	}
 
-	private function startSoundUpload(sndToUpload:ScratchSound, origName:String, whenDone:Function):Void {
+	private function startSoundUpload(sndToUpload:ScratchSound, origName:String, whenDone:Void->Void):Void {
 		if(sndToUpload == null) {
 			DialogBox.notify(
 					'Sorry!',
