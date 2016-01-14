@@ -21,7 +21,6 @@ package uiwidgets;
 
 import flash.text.TextField;
 import flash.text.TextFormat;
-import flash.utils.Dictionary;
 
 import util.StringUtils;
 
@@ -34,14 +33,14 @@ class VariableTextField extends TextField
 		//return value;
 	//}
 
-	public function setText(t : String, context : Dictionary = null) : Void{
+	public function setText(t : String, context : Map<String,String> = null) : Void{
 		originalText = t;
 		applyContext(context);
 	}
 
 	// Re-substitutes values from this new context into the original text.
 	// This context must be a complete context, not just the fields that have changed.
-	public function applyContext(context : Dictionary) : Void{
+	public function applyContext(context : Map<String,String>) : Void{
 		// Assume that the whole text field uses the same format since there's no guarantee how indices will map.
 		var oldFormat : TextFormat = this.getTextFormat();
 		super.text = (context != null) ? StringUtils.substitute(originalText, context) : originalText;

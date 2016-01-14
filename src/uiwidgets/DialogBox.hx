@@ -25,7 +25,6 @@ import flash.display.*;
 import flash.events.*;
 import flash.filters.DropShadowFilter;
 import flash.text.*;
-import flash.utils.Dictionary;
 import translation.Translator;
 import ui.parts.UIPart;
 
@@ -38,7 +37,7 @@ class DialogBox extends Sprite
 	private var w : Int;private var h : Int;
 	public var leftJustify : Bool;
 
-	private var context : Dictionary;
+	private var context : Map<String, String>;
 	private var title : TextField;
 	private var buttons : Array<Dynamic> = [];
 	private var labelsAndFields : Array<Dynamic> = [];
@@ -66,7 +65,7 @@ class DialogBox extends Sprite
 		addEventListener(FocusEvent.KEY_FOCUS_CHANGE, focusChange);
 	}
 
-	public static function ask(question : String, defaultAnswer : String, stage : Stage = null, resultFunction : String->Void = null, context : Dictionary = null) : Void {
+	public static function ask(question : String, defaultAnswer : String, stage : Stage = null, resultFunction : String->Void = null, context : Map<String, String> = null) : Void {
 		var d : DialogBox = null;	
 		function done(param:Dynamic) : Void{if (resultFunction != null)                 resultFunction(d.fields["answer"].text);
 		};
@@ -78,7 +77,7 @@ class DialogBox extends Sprite
 		d.showOnStage((stage != null) ? stage : Scratch.app.stage);
 	}
 
-	public static function confirm(question : String, stage : Stage = null, okFunction : Dynamic->Void = null, cancelFunction : Dynamic->Void= null, context : Dictionary = null) : Void{
+	public static function confirm(question : String, stage : Stage = null, okFunction : Dynamic->Void = null, cancelFunction : Dynamic->Void= null, context : Map<String, String> = null) : Void{
 		var d : DialogBox = new DialogBox(okFunction, cancelFunction);
 		d.addTitle(question);
 		d.addAcceptCancelButtons("OK");
@@ -86,7 +85,7 @@ class DialogBox extends Sprite
 		d.showOnStage((stage != null) ? stage : Scratch.app.stage);
 	}
 
-	public static function notify(title : String, msg : String, stage : Stage = null, leftJustify : Bool = false, okFunction : Dynamic->Void= null, cancelFunction : Dynamic->Void= null, context : Dictionary = null) : Void{
+	public static function notify(title : String, msg : String, stage : Stage = null, leftJustify : Bool = false, okFunction : Dynamic->Void= null, cancelFunction : Dynamic->Void= null, context : Map<String, String> = null) : Void{
 		var d : DialogBox = new DialogBox(okFunction, cancelFunction);
 		d.leftJustify = leftJustify;
 		d.addTitle(title);
@@ -99,10 +98,10 @@ class DialogBox extends Sprite
 	// Updates the context for variable substitution in the dialog's text, or sets it if there was none before.
 	// Make sure any text values in the context are already translated: they will not be translated here.
 	// Calling this will update the text of the dialog immediately.
-	public function updateContext(c : Dictionary) : Void{
-		if (context == null)             context = new Dictionary();
-		for (key in Reflect.fields(c)){
-			Reflect.setField(context, key, Reflect.field(c, key));
+	public function updateContext(c : Map<String, String>) : Void{
+		if (context == null)             context = new Map<String, String>();
+		for (key in c.keys()){
+			context[key] = c[key];
 		}
 		for (i in 0...numChildren){
 			var f : VariableTextField = try cast(getChildAt(i), VariableTextField) catch(e:Dynamic) null;
