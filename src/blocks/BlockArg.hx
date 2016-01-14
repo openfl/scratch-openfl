@@ -37,10 +37,16 @@
 
 package blocks;
 
-import flash.display.*;
-import flash.events.*;
 //import flash.filters.BevelFilter;
-import flash.text.*;
+import openfl.display.Graphics;
+import openfl.display.Shape;
+import openfl.display.Sprite;
+import openfl.events.MouseEvent;
+import openfl.events.Event;
+import openfl.events.FocusEvent;
+import openfl.text.TextField;
+import openfl.text.TextFieldAutoSize;
+import openfl.text.TextFieldType;
 import scratch.BlockMenus;
 import translation.Translator;
 import util.Color;
@@ -165,7 +171,7 @@ class BlockArg extends Sprite
 		// this is used for sprite names and to support translation
 		argValue = value;
 		if (field != null) {
-			var s : String = ((value == null)) ? "" : value;
+			var s : String = ((value == null)) ? "" : Std.string(value);
 			field.text = ((label != null)) ? label : s;
 			if (menuName != null && label == null && (Std.is(value, String)) && (value != "")) {
 				if (BlockMenus.shouldTranslateItemForMenu(value, menuName)) {

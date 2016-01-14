@@ -42,8 +42,10 @@ package scratch;
 	import flash.geom.*;
 	import flash.text.TextField;
 	import flash.utils.*;
+	import openfl.display.BitmapData;
 	import svgutils.*;
 	import util.*;
+	import openfl.utils.ByteArray;
 	//import by.blooddy.crypto.MD5;
 	//import by.blooddy.crypto.image.PNG24Encoder;
 	//import by.blooddy.crypto.image.PNGFilter;
@@ -86,22 +88,36 @@ class ScratchCostume {
 	public var undoList:Array<Dynamic> = [];
 	public var undoListIndex:Int;
 
-	public function new(name:String, data:Dynamic, centerX:Int = 99999, centerY:Int = 99999, bmRes:Int = 1) {
+	private function new(name:String)
+	{
 		costumeName = name;
-		rotationCenterX = centerX;
-		rotationCenterY = centerY;
-		if (data == null) {
-			rotationCenterX = rotationCenterY = 0;
-		} else if (Std.is(data, BitmapData)) {
-			bitmap = baseLayerBitmap = data;
-			bitmapResolution = bmRes;
-			if (centerX == 99999) rotationCenterX = Std.int(bitmap.rect.width / 2);
-			if (centerY == 99999) rotationCenterY = Std.int(bitmap.rect.height / 2);
-			prepareToSave();
-		} else if (Std.is(data, ByteArray)) {
-			setSVGData(data, (centerX == 99999));
-			prepareToSave();
-		}
+	}
+	
+	public static function fromSVG(name:String, data:ByteArray, centerX:Int = 99999, centerY:Int = 99999, bmRes:Int = 1) : ScratchCostume {
+		var c = new ScratchCostume(name);
+		c.rotationCenterX = centerX;
+		c.rotationCenterY = centerY;
+		c.setSVGData(data, (centerX == 99999));
+		c.prepareToSave();
+		return c;
+	}
+	
+	public static function fromBitmapData(name:String, data:BitmapData, centerX:Int = 99999, centerY:Int = 99999, bmRes:Int = 1) : ScratchCostume {
+		var c = new ScratchCostume(name);
+		c.rotationCenterX = centerX;
+		c.rotationCenterY = centerY;
+		c.bitmap = c.baseLayerBitmap = data;
+		c.bitmapResolution = bmRes;
+		if (centerX == 99999) c.rotationCenterX = Std.int(c.bitmap.rect.width / 2);
+		if (centerY == 99999) c.rotationCenterY = Std.int(c.bitmap.rect.height / 2);
+		c.prepareToSave();
+		return c;
+	}
+	
+	public static function newEmptyCostume(name:String) : ScratchCostume {
+		var c = new ScratchCostume(name);
+		c.rotationCenterX = c.rotationCenterY = 0;
+		return c;
 	}
 
 	public var baseLayerData (get, set) : ByteArray;
@@ -170,7 +186,7 @@ class ScratchCostume {
 		var bm:BitmapData = forBackdrop ?
 			new BitmapData(480, 360, true, 0xFFFFFFFF) :
 			new BitmapData(1, 1, true, 0);
-		var result:ScratchCostume = new ScratchCostume(costumeName, bm);
+		var result:ScratchCostume = ScratchCostume.fromBitmapData(costumeName, bm);
 		return result;
 	}
 
@@ -409,7 +425,7 @@ class ScratchCostume {
 
 		if (oldComposite != null) computeTextLayer();
 
-		var dup:ScratchCostume = new ScratchCostume(costumeName, null);
+		var dup:ScratchCostume = ScratchCostume.newEmptyCostume(costumeName);
 		dup.bitmap = bitmap;
 		dup.bitmapResolution = bitmapResolution;
 		dup.rotationCenterX = rotationCenterX;

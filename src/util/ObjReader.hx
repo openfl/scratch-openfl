@@ -259,7 +259,7 @@ class ObjReader
 			if (classID == 124)                 objTable[i][0] = new ScratchSprite();
 			if (classID == 125)                 objTable[i][0] = new ScratchStage();
 			if (classID == 155)                 objTable[i][0] = new Watcher();
-			if (classID == 162)                 objTable[i][0] = new ScratchCostume("uninitialized", null);
+			if (classID == 162)                 objTable[i][0] = ScratchCostume.newEmptyCostume("uninitialized");
 			if (classID == 164)                 objTable[i][0] = new ScratchSound("uninitialized", null);
 			if (classID == 175)                 objTable[i][0] = new ListWatcher();
 		}

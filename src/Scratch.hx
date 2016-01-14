@@ -186,7 +186,7 @@ class Scratch /*extends Sprite*/ {
 	}
 
 	private function initialize():Void {
-		isOffline = !URLUtil.isHttpURL(flash.Lib.current.root.loaderInfo.url);
+		isOffline = true; // !URLUtil.isHttpURL(flash.Lib.current.root.loaderInfo.url);
 		hostProtocol = URLUtil.getProtocol(flash.Lib.current.root.loaderInfo.url);
 
 		isExtensionDevMode = false; // (loaderInfo.parameters['extensionDevMode'] == 'true');

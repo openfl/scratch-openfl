@@ -26,11 +26,11 @@
 package ui.media;
 
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.net.URLLoader;
-import flash.text.*;
-import flash.utils.ByteArray;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.net.URLLoader;
+import openfl.text.*;
+import openfl.utils.ByteArray;
 import assets.Resources;
 import scratch.*;
 //import sound.ScratchSoundPlayer;
@@ -54,7 +54,7 @@ class MediaLibraryItem extends Sprite
 	private var labelFormat : TextFormat = new TextFormat(CSS.font, 14, CSS.textColor);
 	private var infoFormat : TextFormat = new TextFormat(CSS.font, 10, CSS.textColor);
 
-	private static var spriteCache : Dynamic = { };  // maps md5 -> JSON for sprites  
+	private static var spriteCache : Map<String, String> = new Map<String, String>();  // maps md5 -> JSON for sprites  
 	private static var thumbnailCache : Dynamic = { };
 
 	private var frame : Shape;  // visible when selected  
@@ -126,7 +126,7 @@ class MediaLibraryItem extends Sprite
 			//}
 		//};
 		//function svgImagesLoaded() : Void{
-			//var c : ScratchCostume = new ScratchCostume("", null);
+			//var c : ScratchCostume = ScratchCostume.newEmptyCostume("");
 			//c.setSVGRoot(importer.root, false);
 			//setThumbnail(c.thumbnail(thumbnailWidth, thumbnailHeight, forStage));
 			//done();
@@ -153,11 +153,11 @@ class MediaLibraryItem extends Sprite
 	// all paths must call done() even on failure!
 	private function setSpriteThumbnail(done : Void->Void) : Void{
 		var spriteMD5 : String = dbObj.md5;
-		function gotJSONData(data : String) : Void{
+		function gotJSONData(data : String) : Void {
 			var md5 : String = null;
 			if (data != null) {
 				var sprObj : Dynamic = util.JSON.parse(data);
-				Reflect.setField(spriteCache, spriteMD5, data);
+				spriteCache[spriteMD5] = data;
 				dbObj.scriptCount = ((Std.is(sprObj.scripts, Array))) ? sprObj.scripts.length : 0;
 				dbObj.costumeCount = ((Std.is(sprObj.costumes, Array))) ? sprObj.costumes.length : 0;
 				dbObj.soundCount = ((Std.is(sprObj.sounds, Array))) ? sprObj.sounds.length : 0;
@@ -177,13 +177,21 @@ class MediaLibraryItem extends Sprite
 				done();
 			}
 		}  // first, check the thumbnail cache  ;
+		function gotRawJSONData(rawData : ByteArray) : Void {
+			var data : String = null;
+			if (rawData != null)
+				data = rawData.readUTFBytes(rawData.length);
+			gotJSONData(data);
+		}
 
 		var cachedBM : BitmapData = Reflect.field(thumbnailCache, spriteMD5);
 		if (cachedBM != null) {setThumbnailBM(cachedBM);done();return;
 		}
 
-		if (Reflect.field(spriteCache, spriteMD5))             gotJSONData(Reflect.field(spriteCache, spriteMD5))
-		else loaders.push(Scratch.app.server.getAsset(spriteMD5, gotJSONData));
+		if (spriteCache.exists(spriteMD5))             
+			gotJSONData(spriteCache[spriteMD5]);
+		else 
+			loaders.push(Scratch.app.server.getAsset(spriteMD5, gotRawJSONData));
 	}
 
 	private function setThumbnailBM(bm : BitmapData) : Void{

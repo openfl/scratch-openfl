@@ -589,7 +589,7 @@ class ImagesPart extends UIPart
 			scaledPhoto.draw(photo, m);
 			photo = scaledPhoto;
 		}
-		var c : ScratchCostume = new ScratchCostume(Translator.map("photo1"), photo);
+		var c : ScratchCostume = ScratchCostume.fromBitmapData(Translator.map("photo1"), photo);
 		addAndSelectCostume(c);
 		//editor.getWorkArea().zoom();
 	}

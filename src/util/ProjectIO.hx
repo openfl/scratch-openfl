@@ -338,9 +338,9 @@ class ProjectIO
 		};
 		function imageLoaded(e : Event) : Void{
 			if (otherData != null && otherData.centerX) 
-				c = new ScratchCostume(costumeName, e.target.content.bitmapData, otherData.centerX, otherData.centerY, otherData.bitmapResolution)
+				c = ScratchCostume.fromBitmapData(costumeName, e.target.content.bitmapData, otherData.centerX, otherData.centerY, otherData.bitmapResolution)
 			else 
-			c = new ScratchCostume(costumeName, e.target.content.bitmapData);
+				c = ScratchCostume.fromBitmapData(costumeName, e.target.content.bitmapData);
 			if (width != 0)                 c.bitmapResolution = Std.int(c.baseLayerBitmap.width / width);
 			c.baseLayerMD5 = id;
 			whenDone(c);
@@ -352,9 +352,9 @@ class ProjectIO
 			}
 			if (ScratchCostume.isSVGData(data)) {
 				if (otherData != null && otherData.centerX) 
-					c = new ScratchCostume(costumeName, data, otherData.centerX, otherData.centerY, otherData.bitmapResolution)
+					c = ScratchCostume.fromSVG(costumeName, data, otherData.centerX, otherData.centerY, otherData.bitmapResolution)
 				else 
-				c = new ScratchCostume(costumeName, data);
+					c = ScratchCostume.fromSVG(costumeName, data);
 				c.baseLayerMD5 = id;
 				whenDone(c);
 			}

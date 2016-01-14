@@ -2,6 +2,7 @@ package util;
 
 
 import flash.net.URLLoader;
+import openfl.utils.ByteArray;
 
 class ServerEasyStarter extends Server
 {
@@ -17,7 +18,7 @@ class ServerEasyStarter extends Server
 		return resourcePrefix;
 	}
 
-	override public function getAsset(md5 : String, whenDone : Dynamic->Void) : URLLoader{
+	override public function getAsset(md5 : String, whenDone : ByteArray->Void) : URLLoader{
 		//		if (BackpackPart.localAssets[md5] && BackpackPart.localAssets[md5].length > 0) {
 		//			whenDone(BackpackPart.localAssets[md5]);
 		//			return null;

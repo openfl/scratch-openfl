@@ -36,6 +36,8 @@ import flash.utils.*;
 
 import interpreter.*;
 
+import openfl.Assets;
+
 import scratch.ScratchComment;
 import scratch.ScratchSprite;
 
@@ -45,10 +47,9 @@ import util.*;
 
 import watchers.*;
 
-
 class ScratchObj extends Sprite
 {
-	private static function makePop() : ByteArray { return new Pop(); }
+	private static function makePop() : ByteArray { return Assets.getBytes("pop"); }
 
 	//@:meta(Embed(source="../assets/pop.wav",mimeType="application/octet-stream"))
 //private static var Pop : Class<Dynamic>;
@@ -689,7 +690,7 @@ class ScratchObj extends Sprite
 		costumes = Compat.newArray(jsonCostumes.length, null);
 		for (i in 0...jsonCostumes.length){
 			jsonObj = jsonCostumes[i];
-			costumes[i] = new ScratchCostume("json temp", null);
+			costumes[i] = ScratchCostume.newEmptyCostume("json temp");
 			costumes[i].readJSON(jsonObj);
 		}
 
@@ -746,7 +747,7 @@ class ScratchObj extends Sprite
 //
 		//for (i in 0...costumes.length){
 			//jsonObj = costumes[i];
-			//costumes[i] = new ScratchCostume("json temp", null);
+			//costumes[i] = ScratchCostume.newEmptyCostume("json temp");
 			//costumes[i].readJSON(jsonObj);
 		//}
 	//}
@@ -808,4 +809,4 @@ class ScratchObj extends Sprite
 	}
 }
 
-@:file("assets/pop.wav") class Pop extends ByteArray { }
+//@:file("assets/pop.wav") class Pop extends ByteArray { }

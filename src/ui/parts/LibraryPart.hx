@@ -390,7 +390,7 @@ class LibraryPart extends UIPart
 	private function spriteFromCamera(b : IconButton) : Void{
 		function savePhoto(photo : BitmapData) : Void{
 			var s : ScratchSprite = new ScratchSprite();
-			s.setInitialCostume(new ScratchCostume(Translator.map("photo1"), photo));
+			s.setInitialCostume(ScratchCostume.fromBitmapData(Translator.map("photo1"), photo));
 			app.addNewSprite(s);
 			app.closeCameraDialog();
 		};
@@ -438,7 +438,7 @@ class LibraryPart extends UIPart
 
 	private function backdropFromCamera(b : IconButton) : Void{
 		function savePhoto(photo : BitmapData) : Void{
-			addBackdrop(new ScratchCostume(Translator.map("photo1"), photo));
+			addBackdrop(ScratchCostume.fromBitmapData(Translator.map("photo1"), photo));
 			app.closeCameraDialog();
 		};
 		app.openCameraDialog(savePhoto);

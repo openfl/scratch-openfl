@@ -29,6 +29,7 @@ package util;
 
 
 import flash.net.URLLoader;
+import openfl.utils.ByteArray;
 
 interface IServer
 {
@@ -36,7 +37,7 @@ interface IServer
 	// -----------------------------
 	// Asset API
 	//------------------------------
-	function getAsset(md5 : String, callback : Dynamic->Void) : URLLoader;
+	function getAsset(md5 : String, callback : ByteArray->Void) : URLLoader;
 	function getMediaLibrary(type : String, callback : Dynamic->Void) : URLLoader;
 	function getThumbnail(md5 : String, w : Int, h : Int, callback : Dynamic->Void) : URLLoader;
 
