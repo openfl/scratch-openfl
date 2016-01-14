@@ -21,14 +21,14 @@
 // John Maloney, September 2010
 
 package scratch;
-import flash.display.*;
-import flash.events.*;
-import flash.geom.Rectangle;
-import flash.media.*;
-import flash.net.*;
-import flash.system.System;
-import flash.text.TextField;
-import flash.utils.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.geom.Rectangle;
+import openfl.media.*;
+import openfl.net.*;
+import openfl.system.System;
+import openfl.text.TextField;
+import openfl.utils.*;
 import blocks.Block;
 import blocks.BlockArg;
 import interpreter.*;
@@ -428,8 +428,8 @@ class ScratchRuntime {
 			var objTable:Array<Dynamic> = null;
 			data.position = 0;
 			var reader:ObjReader = new ObjReader(data);
-			try { info = reader.readInfo(); } catch (e:flash.errors.Error) { data.position = 0; }
-			try { objTable = reader.readObjTable(); } catch (e:flash.errors.Error) { }
+			try { info = reader.readInfo(); } catch (e:openfl.errors.Error) { data.position = 0; }
+			try { objTable = reader.readObjTable(); } catch (e:openfl.errors.Error) { }
 			if (objTable == null) {
 				projectLoadFailed();
 				return;

@@ -28,11 +28,11 @@
 
 package util;
 
-import flash.errors.Error;
+import openfl.errors.Error;
 import util.ReadStream;
 
-import flash.display.BitmapData;
-import flash.utils.*;
+import openfl.display.BitmapData;
+import openfl.utils.*;
 
 class JSON
 {

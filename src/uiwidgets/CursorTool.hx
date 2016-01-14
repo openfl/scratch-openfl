@@ -20,13 +20,13 @@
 package uiwidgets;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.geom.Point;
-import flash.system.Capabilities;
-import flash.ui.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.geom.Point;
+import openfl.system.Capabilities;
+import openfl.ui.*;
 import assets.Resources;
-import flash.Vector;
+import openfl.Vector;
 
 class CursorTool
 {

@@ -27,12 +27,12 @@
 package uiwidgets;
 
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.geom.Point;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.geom.Point;
 import blocks.*;
 import scratch.*;
-import flash.geom.Rectangle;
+import openfl.geom.Rectangle;
 import ui.media.MediaInfo;
 
 class ScriptsPane extends ScrollFrameContents

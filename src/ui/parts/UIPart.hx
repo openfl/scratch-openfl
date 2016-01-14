@@ -30,12 +30,12 @@
 package ui.parts;
 
 
-import flash.display.GradientType;
-import flash.display.Graphics;
-import flash.display.Shape;
-import flash.display.Sprite;
-import flash.geom.Matrix;
-import flash.text.*;
+import openfl.display.GradientType;
+import openfl.display.Graphics;
+import openfl.display.Shape;
+import openfl.display.Sprite;
+import openfl.geom.Matrix;
+import openfl.text.*;
 import translation.Translator;
 import uiwidgets.IconButton;
 import util.DrawPath;

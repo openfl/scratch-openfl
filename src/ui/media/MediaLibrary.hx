@@ -18,12 +18,12 @@
  */
 
 package ui.media;
-import flash.display.*;
-import flash.events.*;
-import flash.media.Sound;
-import flash.net.*;
-import flash.text.*;
-import flash.utils.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.media.Sound;
+import openfl.net.*;
+import openfl.text.*;
+import openfl.utils.*;
 import assets.Resources;
 //import extensions.ScratchExtension;
 import scratch.*;
@@ -31,7 +31,7 @@ import scratch.*;
 import translation.Translator;
 import uiwidgets.*;
 import util.*;
-//import flash.xml.XML;
+//import openfl.xml.XML;
 
 class MediaLibrary extends Sprite {
 
@@ -573,8 +573,8 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 				var objTable:Array<Dynamic> = null;
 				data.position = 0;
 				var reader:ObjReader = new ObjReader(data);
-				try { info = reader.readInfo(); } catch (e:flash.errors.Error) { data.position = 0; }
-				try { objTable = reader.readObjTable(); } catch (e:flash.errors.Error) { }
+				try { info = reader.readInfo(); } catch (e:openfl.errors.Error) { data.position = 0; }
+				try { objTable = reader.readObjTable(); } catch (e:openfl.errors.Error) { }
 				if (objTable == null) {
 					spriteError();
 					return;
@@ -690,7 +690,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		app.addLoadProgressBox('Importing sound...');
 		try {
 			snd = new ScratchSound(sndName, data); // try reading the data as a WAV file
-		} catch (e:flash.errors.Error) { }
+		} catch (e:openfl.errors.Error) { }
 
 		if (snd != null && snd.sampleCount > 0) { // WAV data
 			startSoundUpload(snd, origName, uploadComplete);

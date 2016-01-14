@@ -20,8 +20,8 @@
 package ui;
 
 
-import flash.display.*;
-import flash.media.*;
+import openfl.display.*;
+import openfl.media.*;
 import translation.Translator;
 import uiwidgets.*;
 

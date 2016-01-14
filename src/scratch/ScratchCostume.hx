@@ -38,10 +38,10 @@
 // converting to/from JPEG format.
 
 package scratch;
-	import flash.display.*;
-	import flash.geom.*;
-	import flash.text.TextField;
-	import flash.utils.*;
+	import openfl.display.*;
+	import openfl.geom.*;
+	import openfl.text.TextField;
+	import openfl.utils.*;
 	import openfl.display.BitmapData;
 	import svgutils.*;
 	import util.*;

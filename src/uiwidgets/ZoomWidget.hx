@@ -20,7 +20,7 @@
 package uiwidgets;
 
 
-import flash.display.Sprite;
+import openfl.display.Sprite;
 
 class ZoomWidget extends Sprite
 {

@@ -20,12 +20,12 @@
 package uiwidgets;
 
 
-import flash.display.Shape;
-import flash.display.Sprite;
-import flash.events.MouseEvent;
-import flash.events.Event;
-//import flash.filters.BevelFilter;
-import flash.geom.Point;
+import openfl.display.Shape;
+import openfl.display.Sprite;
+import openfl.events.MouseEvent;
+import openfl.events.Event;
+//import openfl.filters.BevelFilter;
+import openfl.geom.Point;
 import util.DragClient;
 
 class Scrollbar extends Sprite implements DragClient

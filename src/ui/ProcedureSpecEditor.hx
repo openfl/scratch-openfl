@@ -20,10 +20,10 @@
 package ui;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.geom.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.geom.*;
+import openfl.text.*;
 import assets.Resources;
 import blocks.*;
 import uiwidgets.*;

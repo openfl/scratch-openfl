@@ -35,9 +35,9 @@
 package uiwidgets;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.GlowFilter;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.GlowFilter;
 import util.DragClient;
 
 class ScrollFrame extends Sprite implements DragClient

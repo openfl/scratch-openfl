@@ -19,8 +19,8 @@
 package uiwidgets;
 
 
-import flash.text.TextField;
-import flash.text.TextFormat;
+import openfl.text.TextField;
+import openfl.text.TextFormat;
 
 import util.StringUtils;
 

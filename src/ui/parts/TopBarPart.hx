@@ -29,9 +29,9 @@ import assets.Resources;
 
 //import extensions.ExtensionDevManager;
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.text.*;
 
 import translation.Translator;
 

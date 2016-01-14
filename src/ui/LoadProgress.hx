@@ -20,9 +20,9 @@
 package ui;
 
 
-import flash.display.*;
-import flash.filters.DropShadowFilter;
-import flash.text.*;
+import openfl.display.*;
+import openfl.filters.DropShadowFilter;
+import openfl.text.*;
 import assets.Resources;
 import translation.Translator;
 

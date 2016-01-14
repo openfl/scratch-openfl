@@ -22,8 +22,8 @@ package uiwidgets;
 import uiwidgets.Bitmap;
 import uiwidgets.BitmapData;
 
-import flash.display.*;
-import flash.geom.*;
+import openfl.display.*;
+import openfl.geom.*;
 
 class StretchyBitmap extends Sprite
 {

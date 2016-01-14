@@ -25,9 +25,9 @@
 package ui.parts;
 
 
-import flash.display.*;
-import flash.text.*;
-import flash.utils.*;
+import openfl.display.*;
+import openfl.text.*;
+import openfl.utils.*;
 import scratch.*;
 import translation.Translator;
 import ui.media.*;

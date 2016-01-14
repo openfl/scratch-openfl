@@ -1,8 +1,8 @@
 package;
 
-import flash.display.StageAlign;
-import flash.display.StageScaleMode;
-import flash.Lib;
+import openfl.display.StageAlign;
+import openfl.display.StageScaleMode;
+import openfl.Lib;
 
 /**
  * ...

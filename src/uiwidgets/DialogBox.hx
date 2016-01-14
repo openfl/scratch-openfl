@@ -21,10 +21,10 @@ package uiwidgets;
 
 import CSS;
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.DropShadowFilter;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.DropShadowFilter;
+import openfl.text.*;
 import translation.Translator;
 import ui.parts.UIPart;
 

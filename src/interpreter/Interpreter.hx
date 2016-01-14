@@ -59,7 +59,7 @@ package interpreter;
 
 
 
-import flash.geom.Point;
+import openfl.geom.Point;
 import blocks.*;
 import primitives.*;
 import scratch.*;

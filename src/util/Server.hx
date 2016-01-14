@@ -30,23 +30,23 @@ package util;
 
 //import by.blooddy.crypto.serialization.JSON;
 
-import flash.display.BitmapData;
-import flash.display.Loader;
-import flash.events.ErrorEvent;
-import flash.events.Event;
-import flash.events.HTTPStatusEvent;
-import flash.events.IOErrorEvent;
-import flash.events.SecurityErrorEvent;
-import flash.geom.Matrix;
-import flash.net.SharedObject;
-import flash.net.URLLoader;
-import flash.net.URLLoaderDataFormat;
-import flash.net.URLRequest;
-import flash.net.URLRequestHeader;
-import flash.net.URLRequestMethod;
-import flash.system.Capabilities;
-import flash.system.Security;
-import flash.utils.ByteArray;
+import openfl.display.BitmapData;
+import openfl.display.Loader;
+import openfl.events.ErrorEvent;
+import openfl.events.Event;
+import openfl.events.HTTPStatusEvent;
+import openfl.events.IOErrorEvent;
+import openfl.events.SecurityErrorEvent;
+import openfl.geom.Matrix;
+import openfl.net.SharedObject;
+import openfl.net.URLLoader;
+import openfl.net.URLLoaderDataFormat;
+import openfl.net.URLRequest;
+import openfl.net.URLRequestHeader;
+import openfl.net.URLRequestMethod;
+import openfl.system.Capabilities;
+import openfl.system.Security;
+import openfl.utils.ByteArray;
 
 import logging.LogLevel;
 
@@ -161,7 +161,7 @@ class Server implements IServer
 	// This will be called if callServer encounters an exception, before whenDone(null) is called.
 	// The url and data parameters match those passed to callServer.
 	private function onCallServerException(url : String, data : Dynamic, exception : Dynamic) : Void{
-		if (Std.is(exception, flash.errors.Error)) {
+		if (Std.is(exception, openfl.errors.Error)) {
 			Scratch.app.logException(exception);
 		}
 	}
@@ -308,7 +308,7 @@ class Server implements IServer
 			try{
 				decoder.loadBytes(data);
 			}            catch (e : Dynamic){
-				if (Std.is(e, flash.errors.Error)) {
+				if (Std.is(e, openfl.errors.Error)) {
 					Scratch.app.logException(e);
 				}
 				else {

@@ -25,7 +25,7 @@
 package uiwidgets;
 
 
-import flash.display.*;
+import openfl.display.*;
 import uiwidgets.SimpleTooltips;
 
 class IndicatorLight extends Sprite

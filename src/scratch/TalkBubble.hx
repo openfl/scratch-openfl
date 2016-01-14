@@ -20,8 +20,8 @@
 package scratch;
 
 
-import flash.display.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.text.*;
 
 class TalkBubble extends Sprite
 {

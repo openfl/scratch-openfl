@@ -26,11 +26,11 @@
 package ui.parts;
 
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.geom.*;
-import flash.text.*;
-//import flash.utils.SetTimeout;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.geom.*;
+import openfl.text.*;
+//import openfl.utils.SetTimeout;
 import haxe.Timer;
 import scratch.*;
 

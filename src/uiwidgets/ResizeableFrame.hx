@@ -20,10 +20,10 @@
 package uiwidgets;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.*;
-import flash.geom.Point;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.*;
+import openfl.geom.Point;
 import util.DragClient;
 
 class ResizeableFrame extends Sprite implements DragClient

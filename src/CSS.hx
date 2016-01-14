@@ -23,7 +23,7 @@
 // Styles for Scratch Editor based on the Upstatement design.
 
 
-import flash.text.*;
+import openfl.text.*;
 import assets.Resources;
 
 class CSS

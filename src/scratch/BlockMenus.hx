@@ -20,10 +20,10 @@
 package scratch;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.geom.*;
-import flash.ui.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.geom.*;
+import openfl.ui.*;
 import blocks.*;
 import filters.*;
 import sound.*;

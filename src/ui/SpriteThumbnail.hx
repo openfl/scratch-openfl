@@ -20,10 +20,10 @@
 package ui;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.GlowFilter;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.GlowFilter;
+import openfl.text.*;
 import assets.Resources;
 import blocks.Block;
 import scratch.*;

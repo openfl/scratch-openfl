@@ -1,11 +1,11 @@
 package uiwidgets;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.*;
-import flash.geom.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.*;
+import openfl.geom.*;
+import openfl.text.*;
 
 import sound.*;
 import translation.*;

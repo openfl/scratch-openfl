@@ -45,12 +45,12 @@
 package util;
 
 
-import flash.display.BitmapData;
-import flash.errors.IOError;
-import flash.geom.Rectangle;
-import flash.utils.*;
+import openfl.display.BitmapData;
+import openfl.errors.IOError;
+import openfl.geom.Rectangle;
+import openfl.utils.*;
 import blocks.BlockArg;
-import flash.Vector;
+import openfl.Vector;
 import scratch.*;
 import sound.*;
 import watchers.*;

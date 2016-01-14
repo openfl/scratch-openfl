@@ -1,10 +1,10 @@
 import Scratch;
 
 import util.ServerEasyStarter;
-//import flash.external.ExternalInterface;
-import flash.display.StageAlign;
-import flash.display.StageScaleMode;
-import flash.Lib;
+//import openfl.external.ExternalInterface;
+import openfl.display.StageAlign;
+import openfl.display.StageScaleMode;
+import openfl.Lib;
 
 class ScratchEasyStarter extends Scratch
 {
@@ -15,7 +15,7 @@ class ScratchEasyStarter extends Scratch
 	}
 
 	override private function initServer() : Void{
-		var cdnPrefix : String = Reflect.field(flash.Lib.current.root.loaderInfo.parameters, "cdnPrefix");
+		var cdnPrefix : String = Reflect.field(openfl.Lib.current.root.loaderInfo.parameters, "cdnPrefix");
 		//ExternalInterface.call("console.log", cdnPrefix);
 		if (cdnPrefix != null) 
 			server = new ServerEasyStarter(cdnPrefix)

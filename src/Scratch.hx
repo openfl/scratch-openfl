@@ -24,29 +24,29 @@
 
 package;
 import blocks.*;
-import flash.Lib;
+import openfl.Lib;
 
 //import com.adobe.utils.StringUtil;
 
 //import extensions.ExtensionDevManager;
 //import extensions.ExtensionManager;
 
-import flash.errors.Error;
-import flash.display.*;
-import flash.events.*;
-import flash.external.ExternalInterface;
-import flash.geom.Point;
-import flash.geom.Rectangle;
-import flash.net.FileFilter;
-import flash.net.FileReference;
-import flash.net.FileReferenceList;
-//import flash.net.LocalConnection;
-import flash.net.URLLoader;
-import flash.net.URLLoaderDataFormat;
-import flash.net.URLRequest;
-import flash.system.*;
-import flash.text.*;
-import flash.utils.*;
+import openfl.errors.Error;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.external.ExternalInterface;
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
+import openfl.net.FileFilter;
+import openfl.net.FileReference;
+import openfl.net.FileReferenceList;
+//import openfl.net.LocalConnection;
+import openfl.net.URLLoader;
+import openfl.net.URLLoaderDataFormat;
+import openfl.net.URLRequest;
+import openfl.system.*;
+import openfl.text.*;
+import openfl.utils.*;
 
 import interpreter.*;
 
@@ -139,7 +139,7 @@ class Scratch /*extends Sprite*/ {
 	public function new() {
 		//super();
 		//SVGTool.setStage(stage);
-		flash.Lib.current.root.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
+		openfl.Lib.current.root.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		app = this;
 
 		// This one must finish before most other queries can start, so do it separately
@@ -150,23 +150,23 @@ class Scratch /*extends Sprite*/ {
 	// simply pretend to be a Sprite variable instead (requiring me to supply all the needed variables
 	// in another way)
 	public var stage(get, never):Stage;
-	public function get_stage() return flash.Lib.current.root.stage;
+	public function get_stage() return openfl.Lib.current.root.stage;
 	public var loaderInfo(get, never):LoaderInfo;
-	public function get_loaderInfo() return flash.Lib.current.root.loaderInfo;
+	public function get_loaderInfo() return openfl.Lib.current.root.loaderInfo;
 	public var scaleX(get, never) :Float;
-	public function get_scaleX() return flash.Lib.current.root.scaleX;
+	public function get_scaleX() return openfl.Lib.current.root.scaleX;
 	public var scaleY(get, never) :Float;
-	public function get_scaleY() return flash.Lib.current.root.scaleY;
+	public function get_scaleY() return openfl.Lib.current.root.scaleY;
 	public var mouseX(get, never) :Float;
-	public function get_mouseX() return flash.Lib.current.root.mouseX;
+	public function get_mouseX() return openfl.Lib.current.root.mouseX;
 	public var mouseY(get, never) :Float;
-	public function get_mouseY() return flash.Lib.current.root.mouseY;
+	public function get_mouseY() return openfl.Lib.current.root.mouseY;
 	public var numChildren(get, never) :Int;
-	public function get_numChildren() return flash.Lib.current.numChildren;
+	public function get_numChildren() return openfl.Lib.current.numChildren;
 	public function getChildAt(index : Int) : DisplayObject { return Lib.current.getChildAt(index); }
-	public function addChild(child : DisplayObject) : DisplayObject { return flash.Lib.current.addChild(child); }
+	public function addChild(child : DisplayObject) : DisplayObject { return openfl.Lib.current.addChild(child); }
 	public function addChildAt(child : DisplayObject, index : Int) : DisplayObject { return Lib.current.addChildAt(child, index); }
-	public function rootDisplayObject() : DisplayObject { return flash.Lib.current.root; }
+	public function rootDisplayObject() : DisplayObject { return openfl.Lib.current.root; }
 
 	private function determineJSAccess():Void {
 		//if (externalInterfaceAvailable()) {
@@ -186,8 +186,8 @@ class Scratch /*extends Sprite*/ {
 	}
 
 	private function initialize():Void {
-		isOffline = true; // !URLUtil.isHttpURL(flash.Lib.current.root.loaderInfo.url);
-		hostProtocol = URLUtil.getProtocol(flash.Lib.current.root.loaderInfo.url);
+		isOffline = true; // !URLUtil.isHttpURL(openfl.Lib.current.root.loaderInfo.url);
+		hostProtocol = URLUtil.getProtocol(openfl.Lib.current.root.loaderInfo.url);
 
 		isExtensionDevMode = false; // (loaderInfo.parameters['extensionDevMode'] == 'true');
 		isMicroworld = false; //  (loaderInfo.parameters['microworldMode'] == 'true');

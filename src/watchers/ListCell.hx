@@ -20,10 +20,10 @@
 package watchers;
 
 
-import flash.display.Sprite;
-import flash.events.*;
-import flash.utils.*;
-import flash.text.*;
+import openfl.display.Sprite;
+import openfl.events.*;
+import openfl.utils.*;
+import openfl.text.*;
 import uiwidgets.*;
 import util.Color;
 

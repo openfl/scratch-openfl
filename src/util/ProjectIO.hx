@@ -29,10 +29,10 @@
 package util;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.net.URLLoader;
-import flash.utils.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.net.URLLoader;
+import openfl.utils.*;
 
 import logging.LogLevel;
 

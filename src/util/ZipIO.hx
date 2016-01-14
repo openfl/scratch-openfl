@@ -19,10 +19,10 @@
 
 package util;
 
-import flash.errors.Error;
+import openfl.errors.Error;
 
-import flash.utils.Endian;
-import flash.utils.ByteArray;
+import openfl.utils.Endian;
+import openfl.utils.ByteArray;
 
 
 

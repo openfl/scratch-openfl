@@ -27,8 +27,8 @@ package primitives;
 
 import blocks.*;
 
-import flash.display.*;
-import flash.geom.*;
+import openfl.display.*;
+import openfl.geom.*;
 
 import interpreter.*;
 

@@ -20,8 +20,8 @@
 package watchers;
 
 
-import flash.display.Sprite;
-import flash.text.*;
+import openfl.display.Sprite;
+import openfl.text.*;
 import uiwidgets.ResizeableFrame;
 
 class WatcherReadout extends Sprite

@@ -23,11 +23,11 @@
 package ui.media;
 
 
-import flash.display.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.text.*;
 import assets.Resources;
 import translation.Translator;
-import flash.events.MouseEvent;
+import openfl.events.MouseEvent;
 
 class MediaFilter extends Sprite
 {

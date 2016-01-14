@@ -22,8 +22,8 @@ package util;
 
 
 
-import flash.display.DisplayObjectContainer;
-import flash.display.DisplayObject;
+import openfl.display.DisplayObjectContainer;
+import openfl.display.DisplayObject;
 
 class DebugUtils
 {

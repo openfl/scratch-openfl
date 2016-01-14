@@ -28,11 +28,11 @@ package watchers;
 
 import blocks.BlockIO;
 
-import flash.display.*;
-//import flash.filters.BevelFilter;
-import flash.events.MouseEvent;
-import flash.geom.Point;
-import flash.text.*;
+import openfl.display.*;
+//import openfl.filters.BevelFilter;
+import openfl.events.MouseEvent;
+import openfl.geom.Point;
+import openfl.text.*;
 import interpreter.*;
 import scratch.*;
 import uiwidgets.*;

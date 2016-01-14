@@ -28,10 +28,10 @@
 
 package uiwidgets;
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.DropShadowFilter;
-import flash.geom.Point;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.DropShadowFilter;
+import openfl.geom.Point;
 
 import translation.TranslatableStrings;
 

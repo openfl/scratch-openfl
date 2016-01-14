@@ -20,7 +20,7 @@
 package util;
 
 
-import flash.display.Graphics;
+import openfl.display.Graphics;
 
 class DrawPath
 {

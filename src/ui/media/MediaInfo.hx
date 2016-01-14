@@ -26,11 +26,11 @@
 //	* to drag between the backpack and the media pane
 
 package ui.media;
-	import flash.display.*;
-	import flash.events.*;
-	import flash.geom.*;
-	import flash.net.*;
-	import flash.text.*;
+	import openfl.display.*;
+	import openfl.events.*;
+	import openfl.geom.*;
+	import openfl.net.*;
+	import openfl.text.*;
 	import assets.Resources;
 	import blocks.*;
 	import scratch.*;

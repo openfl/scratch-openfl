@@ -20,7 +20,7 @@
 package render3d;
 
 
-import flash.display.Sprite;
+import openfl.display.Sprite;
 
 class StageUIContainer extends Sprite
 {

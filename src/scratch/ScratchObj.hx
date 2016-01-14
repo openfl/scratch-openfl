@@ -29,10 +29,10 @@ import blocks.*;
 
 import filters.FilterPack;
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.geom.ColorTransform;
-import flash.utils.*;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.geom.ColorTransform;
+import openfl.utils.*;
 
 import interpreter.*;
 

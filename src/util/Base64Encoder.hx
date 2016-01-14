@@ -20,7 +20,7 @@
 package util;
 
 
-import flash.utils.ByteArray;
+import openfl.utils.ByteArray;
 
 class Base64Encoder
 {

@@ -25,8 +25,8 @@
 package blocks;
 
 
-import flash.display.*;
-import flash.filters.*;
+import openfl.display.*;
+import openfl.filters.*;
 
 class BlockShape extends Shape
 {

@@ -20,9 +20,9 @@
 package ui.media;
 
 
-import flash.display.Sprite;
-import flash.geom.Point;
-import flash.text.TextField;
+import openfl.display.Sprite;
+import openfl.geom.Point;
+import openfl.text.TextField;
 import assets.Resources;
 import scratch.*;
 import ui.parts.SoundsPart;

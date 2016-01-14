@@ -28,12 +28,12 @@ import blocks.*;
 
 //import extensions.*;
 
-import flash.display.*;
-import flash.events.Event;
-import flash.events.MouseEvent;
-import flash.geom.ColorTransform;
-import flash.net.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.Event;
+import openfl.events.MouseEvent;
+import openfl.geom.ColorTransform;
+import openfl.net.*;
+import openfl.text.*;
 
 import translation.Translator;
 

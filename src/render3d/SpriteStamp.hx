@@ -20,7 +20,7 @@
 package render3d;
 
 
-import flash.display.BitmapData;
+import openfl.display.BitmapData;
 
 class SpriteStamp extends BitmapData
 {

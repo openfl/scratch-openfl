@@ -25,9 +25,9 @@
 package uiwidgets;
 
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.text.*;
 import scratch.BlockMenus;
 import translation.Translator;
 import util.Color;

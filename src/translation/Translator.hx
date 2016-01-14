@@ -22,9 +22,9 @@ package translation;
 
 import blocks.Block;
 
-import flash.events.Event;
-import flash.net.*;
-import flash.utils.ByteArray;
+import openfl.events.Event;
+import openfl.net.*;
+import openfl.utils.ByteArray;
 
 import logging.LogLevel;
 

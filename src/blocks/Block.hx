@@ -377,7 +377,7 @@ class Block extends Sprite
 		}
 	}
 
-	private function runFeedbackFilters() : Array<flash.filters.BitmapFilter>{
+	private function runFeedbackFilters() : Array<openfl.filters.BitmapFilter>{
 		// filters for showing that a stack is running
 		var f : GlowFilter = new GlowFilter(0xfeffa0);
 		f.strength = 2;

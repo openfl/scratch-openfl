@@ -19,14 +19,14 @@
 
 package uiwidgets;
 
-import flash.display.DisplayObject;
-import flash.display.*;
-import flash.events.*;
-import flash.filters.DropShadowFilter;
-import flash.geom.*;
-import flash.text.*;
-import flash.utils.Object;
-import flash.utils.Timer;
+import openfl.display.DisplayObject;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.DropShadowFilter;
+import openfl.geom.*;
+import openfl.text.*;
+import openfl.utils.Object;
+import openfl.utils.Timer;
 
 import translation.Translator;
 

@@ -26,9 +26,9 @@
 package uiwidgets;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.geom.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.geom.*;
 import util.DragClient;
 
 class Slider extends Sprite implements DragClient

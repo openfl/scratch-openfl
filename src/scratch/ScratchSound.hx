@@ -31,8 +31,8 @@
 package scratch; 
 //import by.blooddy.crypto.MD5;
 
-import flash.media.Sound;
-import flash.utils.*;
+import openfl.media.Sound;
+import openfl.utils.*;
 
 import logging.LogLevel;
 

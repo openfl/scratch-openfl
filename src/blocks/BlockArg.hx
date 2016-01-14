@@ -37,7 +37,7 @@
 
 package blocks;
 
-//import flash.filters.BevelFilter;
+//import openfl.filters.BevelFilter;
 import openfl.display.Graphics;
 import openfl.display.Shape;
 import openfl.display.Sprite;
@@ -202,7 +202,7 @@ class BlockArg extends Sprite
 		field.selectable = false;
 	}
 
-	private function blockArgFilters() : Array<flash.filters.BitmapFilter> {
+	private function blockArgFilters() : Array<openfl.filters.BitmapFilter> {
 		return [];
 		//// filters for BlockArg outlines
 		//var f : BevelFilter = new BevelFilter(1);

@@ -20,7 +20,7 @@
 package util;
 
 
-import flash.events.MouseEvent;
+import openfl.events.MouseEvent;
 
 interface DragClient
 {

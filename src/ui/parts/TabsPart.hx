@@ -24,8 +24,8 @@
 
 package ui.parts;
 
-import flash.display.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.text.*;
 import translation.Translator;
 import uiwidgets.IconButton;
 

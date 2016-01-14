@@ -34,7 +34,7 @@
 package translation;
 
 
-import flash.net.FileReference;
+import openfl.net.FileReference;
 import scratch.*;
 //import soundedit.SoundEditor;
 import svgeditor.*;

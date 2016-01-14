@@ -27,10 +27,10 @@
 package uiwidgets;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.*;
+import openfl.text.*;
 
 class EditableLabel extends Sprite
 {

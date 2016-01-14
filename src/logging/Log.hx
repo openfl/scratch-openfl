@@ -21,7 +21,7 @@ package logging;
 
 import logging.LogEntry;
 
-import flash.system.Capabilities;
+import openfl.system.Capabilities;
 
 import util.JSON;
 

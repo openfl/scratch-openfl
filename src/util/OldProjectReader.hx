@@ -19,7 +19,7 @@
 
 package util;
 
-import flash.display.DisplayObject;
+import openfl.display.DisplayObject;
 import blocks.*;
 import interpreter.Variable;
 import scratch.*;

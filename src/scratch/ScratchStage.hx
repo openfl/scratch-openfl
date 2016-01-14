@@ -25,13 +25,13 @@
 package scratch;
 import blocks.BlockArg;
 
-import flash.display.*;
-import flash.geom.*;
-import flash.media.*;
-import flash.events.*;
-import flash.system.Capabilities;
-import flash.utils.ByteArray;
-import flash.net.FileReference;
+import openfl.display.*;
+import openfl.geom.*;
+import openfl.media.*;
+import openfl.events.*;
+import openfl.system.Capabilities;
+import openfl.utils.ByteArray;
+import openfl.net.FileReference;
 import blocks.Block;
 import filters.FilterPack;
 import translation.Translator;

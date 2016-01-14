@@ -20,10 +20,10 @@
 package uiwidgets;
 
 import CSS;
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.geom.Matrix;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.geom.Matrix;
+import openfl.text.*;
 
 class Button extends Sprite
 {

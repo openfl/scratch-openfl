@@ -26,7 +26,7 @@
 //		b. add a primitive for the new command to the interpreter
 
 
-import flash.display.Bitmap;
+import openfl.display.Bitmap;
 import assets.Resources;
 
 class Specs

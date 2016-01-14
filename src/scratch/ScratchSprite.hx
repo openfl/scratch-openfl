@@ -26,11 +26,11 @@
 package scratch;
 import filters.FilterPack;
 
-import flash.display.*;
-import flash.events.*;
-import flash.geom.*;
-import flash.net.FileReference;
-import flash.utils.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.geom.*;
+import openfl.net.FileReference;
+import openfl.utils.*;
 
 import interpreter.Variable;
 

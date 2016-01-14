@@ -27,10 +27,10 @@
 package ui.parts;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.text.*;
-import flash.media.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.text.*;
+import openfl.media.*;
 import assets.Resources;
 import scratch.*;
 import translation.Translator;

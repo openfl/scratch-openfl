@@ -20,11 +20,11 @@
 package uiwidgets;
 
 
-import flash.display.Sprite;
-import flash.events.Event;
-import flash.text.TextField;
-import flash.text.TextFieldType;
-import flash.text.TextFormat;
+import openfl.display.Sprite;
+import openfl.events.Event;
+import openfl.text.TextField;
+import openfl.text.TextFieldType;
+import openfl.text.TextFormat;
 
 class TextPane extends Sprite
 {

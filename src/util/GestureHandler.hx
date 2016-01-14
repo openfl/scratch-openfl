@@ -48,13 +48,13 @@
 
 package util;
 
-import flash.errors.Error;
+import openfl.errors.Error;
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.filters.*;
-import flash.geom.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.filters.*;
+import openfl.geom.*;
+import openfl.text.*;
 
 import blocks.*;
 import scratch.*;
@@ -625,7 +625,7 @@ class GestureHandler
 	}
 
 	private function removeDropShadowFrom(o : DisplayObject) : Void{
-		var newFilters : Array<flash.filters.BitmapFilter> = [];
+		var newFilters : Array<openfl.filters.BitmapFilter> = [];
 		for (f in o.filters){
 			if (!(Std.is(f, DropShadowFilter)))                 newFilters.push(f);
 		}
@@ -699,7 +699,7 @@ class GestureHandler
 	}
 
 	private function addDebugGlow(o : DisplayObject) : Void{
-		var newFilters : Array<flash.filters.BitmapFilter> = [];
+		var newFilters : Array<openfl.filters.BitmapFilter> = [];
 		if (o.filters != null)             newFilters = o.filters;
 		var f : GlowFilter = new GlowFilter(0xFFFF00);
 		f.strength = 15;
@@ -710,7 +710,7 @@ class GestureHandler
 	}
 
 	private function removeDebugGlow(o : DisplayObject) : Void{
-		var newFilters : Array<flash.filters.BitmapFilter> = [];
+		var newFilters : Array<openfl.filters.BitmapFilter> = [];
 		for (f in o.filters){
 			if (!(Std.is(f, GlowFilter)))                 newFilters.push(f);
 		}

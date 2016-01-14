@@ -25,9 +25,9 @@
 
 package ui;
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.text.*;
 
 class PaletteSelectorItem extends Sprite
 {

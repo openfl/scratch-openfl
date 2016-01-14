@@ -37,10 +37,10 @@ import filters.ShaderFilter;
 import filters.WhirlKernel;
 */
 
-import flash.display.*;
-import flash.filters.*;
-import flash.geom.ColorTransform;
-import flash.system.Capabilities;
+import openfl.display.*;
+import openfl.filters.*;
+import openfl.geom.ColorTransform;
+import openfl.system.Capabilities;
 import scratch.*;
 import util.*;
 
@@ -121,9 +121,9 @@ class FilterPack
 		return result;
 	}
 
-	private static var emptyArray : Array<flash.filters.BitmapFilter> = [];
-	private var newFilters : Array<flash.filters.BitmapFilter> = [];
-	public function buildFilters(force : Bool = false) : Array<flash.filters.BitmapFilter>{
+	private static var emptyArray : Array<openfl.filters.BitmapFilter> = [];
+	private var newFilters : Array<openfl.filters.BitmapFilter> = [];
+	public function buildFilters(force : Bool = false) : Array<openfl.filters.BitmapFilter>{
 		// disable filters not running on x86 because PixelBender is really slow
 		if ((Scratch.app.isIn3D || Capabilities.cpuArchitecture != "x86") && !force)             return emptyArray;
 

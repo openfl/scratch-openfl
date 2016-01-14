@@ -28,7 +28,7 @@
 package util;
 
 
-import flash.net.URLLoader;
+import openfl.net.URLLoader;
 import openfl.utils.ByteArray;
 
 interface IServer

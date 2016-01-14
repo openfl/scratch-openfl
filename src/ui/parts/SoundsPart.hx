@@ -26,10 +26,10 @@
 package ui.parts;
 
 
-import flash.display.*;
-import flash.events.KeyboardEvent;
-import flash.geom.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.KeyboardEvent;
+import openfl.geom.*;
+import openfl.text.*;
 import assets.Resources;
 import scratch.*;
 //import sound.WAVFile;

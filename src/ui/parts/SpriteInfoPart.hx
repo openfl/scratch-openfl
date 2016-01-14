@@ -25,10 +25,10 @@
 package ui.parts;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.geom.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.geom.*;
+import openfl.text.*;
 import scratch.*;
 import translation.Translator;
 import uiwidgets.*;

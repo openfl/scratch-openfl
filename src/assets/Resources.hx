@@ -20,9 +20,9 @@
 package assets;
 
 
-import flash.display.*;
-import flash.text.*;
-import flash.utils.ByteArray;
+import openfl.display.*;
+import openfl.text.*;
+import openfl.utils.ByteArray;
 
 class Resources
 {

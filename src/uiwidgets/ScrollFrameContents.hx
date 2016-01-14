@@ -31,7 +31,7 @@
 package uiwidgets;
 
 
-import flash.display.*;
+import openfl.display.*;
 
 class ScrollFrameContents extends Sprite
 {

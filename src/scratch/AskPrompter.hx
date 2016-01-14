@@ -20,10 +20,10 @@
 package scratch;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.*;
+import openfl.text.*;
 import assets.Resources;
 
 class AskPrompter extends Sprite

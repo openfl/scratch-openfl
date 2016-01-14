@@ -20,8 +20,8 @@
 package uiwidgets;
 
 
-import flash.display.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.text.*;
 import assets.Resources;
 import translation.Translator;
 

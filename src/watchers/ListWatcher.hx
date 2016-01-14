@@ -20,11 +20,11 @@
 package watchers;
 
 
-import flash.display.*;
-import flash.events.*;
-import flash.net.*;
-import flash.text.*;
-import flash.utils.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.net.*;
+import openfl.text.*;
+import openfl.utils.*;
 import interpreter.Interpreter;
 import scratch.ScratchObj;
 import translation.Translator;
@@ -98,8 +98,8 @@ class ListWatcher extends Sprite
 		frame.addChild(elementCount);
 
 		setWidthHeight(100, 200);
-		addEventListener(flash.events.FocusEvent.FOCUS_IN, gotFocus);
-		addEventListener(flash.events.FocusEvent.FOCUS_OUT, lostFocus);
+		addEventListener(openfl.events.FocusEvent.FOCUS_IN, gotFocus);
+		addEventListener(openfl.events.FocusEvent.FOCUS_OUT, lostFocus);
 	}
 
 	public static function strings() : Array<String>{

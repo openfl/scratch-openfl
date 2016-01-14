@@ -30,9 +30,9 @@
 package uiwidgets;
 
 import CSS;
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.text.*;
 import assets.Resources;
 
 class IconButton extends Sprite

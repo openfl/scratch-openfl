@@ -27,7 +27,7 @@
 package ui;
 
 
-import flash.display.*;
+import openfl.display.*;
 import translation.Translator;
 import scratch.PaletteBuilder;
 
