@@ -739,14 +739,14 @@ class BlockMenus implements DragClient
 	public function dragEnd(evt : MouseEvent) : Void{
 		if (pickingColor) {
 			pickingColor = false;
-			Mouse.cursor = MouseCursor.AUTO;
+			//Mouse.cursor = MouseCursor.AUTO;
 			app.stage.removeChild(colorPickerSprite);
 			app.stage.removeEventListener(Event.RESIZE, fixColorPickerLayout);
 		}
 		else {
 			pickingColor = true;
 			app.gh.setDragClient(this, evt);
-			Mouse.cursor = MouseCursor.BUTTON;
+			//Mouse.cursor = MouseCursor.BUTTON;
 			app.stage.addEventListener(Event.RESIZE, fixColorPickerLayout);
 			app.stage.addChild(colorPickerSprite = new Sprite());
 			fixColorPickerLayout();

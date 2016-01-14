@@ -68,7 +68,7 @@ class CursorTool
 		// Hide the current cursor and revert to using the hardware cursor.
 		if (currentCursor != null && currentCursor.parent!= null)             currentCursor.parent.removeChild(currentCursor);
 		currentCursor = null;
-		Mouse.cursor = MouseCursor.AUTO;
+		//Mouse.cursor = MouseCursor.AUTO;
 		Mouse.show();
 	}
 
@@ -98,7 +98,9 @@ class CursorTool
 		}
 	}
 
-	private static function mouseLeave(ignore : Dynamic) : Void{Mouse.cursor = MouseCursor.AUTO;Mouse.show();
+	private static function mouseLeave(ignore : Dynamic) : Void {
+		//Mouse.cursor = MouseCursor.AUTO;
+		Mouse.show();
 	}
 
 	public static function setCustomCursor(name : String, bmp : BitmapData = null, hotSpot : Point = null, reuse : Bool = true) : Void{
@@ -107,7 +109,9 @@ class CursorTool
 		if (tool != null)             return;  // don't let point editor cursors override top bar tools  ;
 
 		hideSoftwareCursor();
-		if (Lambda.indexOf(standardCursors, name) != -1) {Mouse.cursor = name;return;
+		if (Lambda.indexOf(standardCursors, name) != -1) {
+			//Mouse.cursor = name;
+			return;
 		}
 
 		if (("" == name) && !reuse) {
@@ -118,18 +122,25 @@ class CursorTool
 
 		var saved : Array<Dynamic> = Reflect.field(registeredCursors, name);
 		if (saved != null && reuse) {
-			if (isLinux())                 showSoftwareCursor(new Bitmap(saved[0]), cast(saved[1].x, Int), cast(saved[1].y, Int))
-			else Mouse.cursor = name;  // use previously registered hardware cursor  
+			if (useSoftwareCursor())
+				showSoftwareCursor(new Bitmap(saved[0]), cast(saved[1].x, Int), cast(saved[1].y, Int));
+			//else 
+				//Mouse.cursor = name;  // use previously registered hardware cursor  
 			return;
 		}
 
 		if (bmp != null && hotSpot != null) {
 			Reflect.setField(registeredCursors, name, [bmp, hotSpot]);
-			if (isLinux())                 showSoftwareCursor(new Bitmap(bmp), Std.int(hotSpot.x), Std.int(hotSpot.y));
-			else registerHardwareCursor(name, bmp, hotSpot);
+			if (useSoftwareCursor())
+				showSoftwareCursor(new Bitmap(bmp), Std.int(hotSpot.x), Std.int(hotSpot.y));
+			//else 
+				//registerHardwareCursor(name, bmp, hotSpot);
 		}
 	}
 
+	private static function useSoftwareCursor() : Bool {
+		return true;
+	}
 	private static function isLinux() : Bool{
 		var os : String = Capabilities.os;
 		if (os.indexOf("Mac OS") > -1)             return false;
@@ -137,15 +148,15 @@ class CursorTool
 		return true;
 	}
 
-	private static function registerHardwareCursor(name : String, bmp : BitmapData, hotSpot : Point) : Void{
-		var images : Array<BitmapData> = new Array<BitmapData>();
-		images[0] = bmp;
-
-		var cursorData : MouseCursorData = new MouseCursorData();
-		cursorData.data = Vector.ofArray(images);
-		cursorData.hotSpot = hotSpot;
-		Mouse.registerCursor(name, cursorData);
-	}
+	//private static function registerHardwareCursor(name : String, bmp : BitmapData, hotSpot : Point) : Void{
+		//var images : Array<BitmapData> = new Array<BitmapData>();
+		//images[0] = bmp;
+//
+		//var cursorData : MouseCursorData = new MouseCursorData();
+		//cursorData.data = Vector.ofArray(images);
+		//cursorData.hotSpot = hotSpot;
+		//Mouse.registerCursor(name, cursorData);
+	//}
 
 	public function new()
 	{
