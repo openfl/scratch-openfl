@@ -392,9 +392,9 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		return true;
 	}
 
-	private function appendItems(items:Array<Dynamic>):Void {
+	private function appendItems(items:Array<MediaLibraryItem>):Void {
 		if (items.length == 0) return;
-		var itemWidth:Int = cast(items[0], MediaLibraryItem).frameWidth + 6;
+		var itemWidth:Int = items[0].frameWidth + 6;
 		var totalWidth:Int = Std.int(resultsFrame.width - 15);
 		var columnCount:Int = Std.int(totalWidth / itemWidth);
 		var extra:Int = Std.int((totalWidth - (columnCount * itemWidth)) / columnCount); // extra space per column
@@ -402,8 +402,8 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		var colNum:Int = 0;
 		var nextX:Int = 2;
 		var nextY:Int = 2;
-		var item: Dynamic = null;
-		var it: Iterator<Dynamic> = items.iterator();
+		var item: MediaLibraryItem = null;
+		var it: Iterator<MediaLibraryItem> = items.iterator();
 		while (it.hasNext())
 		{
 			item = it.next();

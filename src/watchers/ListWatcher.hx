@@ -122,7 +122,7 @@ class ListWatcher extends Sprite
 
 	/* Dragging */
 
-	public function objToGrab(evt : MouseEvent) : ListWatcher{return this;
+	public function objToGrab(evt : MouseEvent) : Dynamic{return this;
 	}  // allow dragging  
 
 	/* Menu */

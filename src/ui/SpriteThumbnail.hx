@@ -225,7 +225,7 @@ class SpriteThumbnail extends Sprite
 	// Grab and Drop
 	//------------------------------
 
-	public function objToGrab(evt : MouseEvent) : MediaInfo{
+	public function objToGrab(evt : MouseEvent) : Dynamic{
 		if (targetObj.isStage)             return null;
 		var result : MediaInfo = app.createMediaInfo(targetObj);
 		result.removeDeleteButton();

@@ -25,10 +25,13 @@
 
 package scratch;
 import filters.FilterPack;
+import openfl.geom.ColorTransform;
+import openfl.geom.Matrix;
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
 
 import openfl.display.*;
 import openfl.events.*;
-import openfl.geom.*;
 import openfl.net.FileReference;
 import openfl.utils.*;
 
@@ -424,12 +427,16 @@ class ScratchSprite extends ScratchObj {
 		// crop cachedBitmap and record cachedBounds
 		// Note: handles the case where cropR is empty
 		var cropR:Rectangle = cachedBitmap.getColorBoundsRect(0xFF000000, 0, false);
+		/*
 		if ((cropR.width > 0) && (cropR.height > 0)) {
 			var cropped:BitmapData = new BitmapData(Std.int(Math.max(Std.int(cropR.width), 1)), Std.int(Math.max(Std.int(cropR.height), 1)), true, 0);
 			cropped.copyPixels(cachedBitmap, cropR, new Point(0, 0));
 			cachedBitmap = cropped;
 			cachedBounds = cropR;
 		}
+		*/
+		// TODO: For the life of me, I can't get the copyPixels above to work properly with openfl, so I'm just commenting it out since it's not necessary in the end
+		cachedBounds = new Rectangle(0, 0, cachedBitmap.width, cachedBitmap.height);
 
 		cachedBounds.offset(r.x, r.y);
 		return cachedBitmap;
@@ -465,7 +472,7 @@ class ScratchSprite extends ScratchObj {
 
 	/* Dragging */
 
-	public function objToGrab(evt:MouseEvent):ScratchSprite { return this; } // allow dragging
+	public function objToGrab(evt:MouseEvent):Dynamic { return this; } // allow dragging
 
 	/* Menu */
 

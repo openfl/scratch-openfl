@@ -353,7 +353,7 @@ class Watcher extends Sprite implements DragClient
 
 	/* Dragging */
 
-	public function objToGrab(evt : MouseEvent) : Watcher{return this;
+	public function objToGrab(evt : MouseEvent) : Dynamic{return this;
 	}  // allow dragging  
 
 	/* Double-Click */

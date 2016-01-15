@@ -69,7 +69,7 @@ class ScratchComment extends Sprite
 		setExpanded(isOpen);
 	}
 
-	public function objToGrab(evt : Dynamic) : Dynamic{return this;
+	public function objToGrab(evt : MouseEvent) : Dynamic{return this;
 	}
 
 	public function fixLayout() : Void{

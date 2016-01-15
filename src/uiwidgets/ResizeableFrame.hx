@@ -25,6 +25,7 @@ import openfl.events.*;
 import openfl.filters.*;
 import openfl.geom.Point;
 import util.DragClient;
+import util.Compat;
 
 class ResizeableFrame extends Sprite implements DragClient
 {
@@ -137,7 +138,7 @@ class ResizeableFrame extends Sprite implements DragClient
 		var newW : Int = Std.int(Math.max(minWidth, pt.x + 3));
 		var newH : Int = Std.int(Math.max(minHeight, pt.y + 3));
 		setWidthHeight(newW, newH);
-		if (parent != null && (Reflect.hasField(parent, "fixLayout"))) {
+		if (parent != null && Compat.hasMethod(parent, "fixLayout")) {
 			var unknownParent :Dynamic = parent;
             unknownParent.fixLayout();
 		}

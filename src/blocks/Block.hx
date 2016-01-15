@@ -927,7 +927,7 @@ class Block extends Sprite
 
 	/* Dragging */
 
-	public function objToGrab(evt : MouseEvent) : Block{
+	public function objToGrab(evt : MouseEvent) : Dynamic{
 		if (isEmbeddedParameter() || isInPalette())             return duplicate(false, Std.is(Scratch.app.viewedObj(), ScratchStage));
 		return this;
 	}

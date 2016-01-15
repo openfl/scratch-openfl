@@ -42,8 +42,8 @@ class MediaFilter extends Sprite
 	private var rolloverColor : UInt = CSS.buttonLabelOverColor;
 
 	private var title : TextField;
-	private var selectorNames : Array<Dynamic> = [];  // strings representing tags/themes/categories  
-	private var selectors : Array<Dynamic> = [];  // TextFields (translated)  
+	private var selectorNames : Array<String> = [];  // strings representing tags/themes/categories  
+	private var selectors : Array<TextField> = [];  // TextFields (translated)  
 	private var selection : String = "";
 	private var whenChanged : Dynamic->Void;
 
@@ -69,7 +69,7 @@ class MediaFilter extends Sprite
 		for (sel in selectors){
 			sel.x = 15;
 			sel.y = nextY;
-			nextY += sel.height;
+			nextY += Std.int(sel.height);
 		}
 	}
 
