@@ -16,7 +16,13 @@
 	<!-- assets -->
 	<assets path="src/assets/pop.wav" rename="pop" type="binary"/>
 	
+	<!--
+	The OpenFL assets mechanism puts everything in a separate file and then preloads them on
+	application startup. That's just way too slow (especially for debugging purposes) when compared
+	to Haxe's @:bitmap macro mechanism which uses data: urls. I'll try to work out a mechanism
+	for preloading the data: urls later on.
 	
+		
 	// Block Icons (2x resolution to look better when scaled)
 	<assets path="src/assets/blocks/flagIcon.png" rename="flagIcon"/>
 	<assets path="src/assets/blocks/stopIcon.png" rename="stopIcon"/>
@@ -246,7 +252,7 @@
 	<assets path="src/assets/UI/paint/bitmapStampOn.png" rename="bitmapStampOn"/>
 	<assets path="src/assets/UI/paint/bitmapTextOff.png" rename="bitmapTextOff"/>
 	<assets path="src/assets/UI/paint/bitmapTextOn.png" rename="bitmapTextOn"/>
-
+	-->
 
 <!-- 	
 	<icon path="assets/openfl.svg" />
