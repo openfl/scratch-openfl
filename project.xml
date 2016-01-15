@@ -15,6 +15,239 @@
 	
 	<!-- assets -->
 	<assets path="src/assets/pop.wav" rename="pop" type="binary"/>
+	
+	
+	// Block Icons (2x resolution to look better when scaled)
+	<assets path="src/assets/blocks/flagIcon.png" rename="flagIcon"/>
+	<assets path="src/assets/blocks/stopIcon.png" rename="stopIcon"/>
+	<assets path="src/assets/blocks/turnLeftIcon.png" rename="turnLeftIcon"/>
+	<assets path="src/assets/blocks/turnRightIcon.png" rename="turnRightIcon"/>
+
+	// Cursors
+	<assets path="src/assets/cursors/copyCursor.png" rename="copyCursor"/>
+	<assets path="src/assets/cursors/crosshairCursor.gif" rename="crosshairCursor"/>
+	<assets path="src/assets/cursors/cutCursor.png" rename="cutCursor"/>
+	<assets path="src/assets/cursors/growCursor.png" rename="growCursor"/>
+	<assets path="src/assets/cursors/helpCursor.png" rename="helpCursor"/>
+	<assets path="src/assets/cursors/shrinkCursor.png" rename="shrinkCursor"/>
+	<assets path="src/assets/UI/paint/zoomInCursor.png" rename="zoomInCursor"/>
+
+	// Top bar
+	<assets path="src/assets/UI/topbar/scratchlogoOff.png" rename="scratchlogoOff"/>
+	<assets path="src/assets/UI/topbar/scratchlogoOn.png" rename="scratchlogoOn"/>
+	<assets path="src/assets/UI/topbar/scratchx-logo.png" rename="scratchxlogo"/>
+	<assets path="src/assets/UI/topbar/copyTool.png" rename="copyTool"/>
+	<assets path="src/assets/UI/topbar/cutTool.png" rename="cutTool"/>
+	<assets path="src/assets/UI/topbar/growTool.png" rename="growTool"/>
+	<assets path="src/assets/UI/topbar/helpTool.png" rename="helpTool"/>
+	<assets path="src/assets/UI/topbar/languageButtonOff.png" rename="languageButtonOff"/>
+	<assets path="src/assets/UI/topbar/languageButtonOn.png" rename="languageButtonOn"/>
+	<assets path="src/assets/UI/topbar/myStuffOff.gif" rename="myStuffOff"/>
+	<assets path="src/assets/UI/topbar/myStuffOn.gif" rename="myStuffOn"/>
+	<assets path="src/assets/UI/topbar/projectPageFlip.png" rename="projectPageFlip"/>
+	<assets path="src/assets/UI/topbar/shrinkTool.png" rename="shrinkTool"/>
+
+	// Buttons
+	<assets path="src/assets/UI/buttons/addItemOff.gif" rename="addItemOff"/>
+	<assets path="src/assets/UI/buttons/addItemOn.gif" rename="addItemOn"/>
+	<assets path="src/assets/UI/buttons/backarrowOff.png" rename="backarrowOff"/>
+	<assets path="src/assets/UI/buttons/backarrowOn.png" rename="backarrowOn"/>
+	<assets path="src/assets/UI/buttons/checkboxOff.gif" rename="checkboxOff"/>
+	<assets path="src/assets/UI/buttons/checkboxOn.gif" rename="checkboxOn"/>
+	<assets path="src/assets/UI/buttons/closeOff.gif" rename="closeOff"/>
+	<assets path="src/assets/UI/buttons/closeOn.gif" rename="closeOn"/>
+	<assets path="src/assets/UI/buttons/deleteItemOff.png" rename="deleteItemOff"/>
+	<assets path="src/assets/UI/buttons/deleteItemOn.png" rename="deleteItemOn"/>
+	<assets path="src/assets/UI/buttons/extensionHelpOff.png" rename="extensionHelpOff"/>
+	<assets path="src/assets/UI/buttons/extensionHelpOn.png" rename="extensionHelpOn"/>
+	<assets path="src/assets/UI/buttons/flipOff.png" rename="flipOff"/>
+	<assets path="src/assets/UI/buttons/flipOn.png" rename="flipOn"/>
+	<assets path="src/assets/UI/buttons/fullScreenOff.png" rename="fullscreenOff"/>
+	<assets path="src/assets/UI/buttons/fullScreenOn.png" rename="fullscreenOn"/>
+	<assets path="src/assets/UI/buttons/greenFlagOff.png" rename="greenflagOff"/>
+	<assets path="src/assets/UI/buttons/greenFlagOn.png" rename="greenflagOn"/>
+	<assets path="src/assets/UI/buttons/norotationOff.png" rename="norotationOff"/>
+	<assets path="src/assets/UI/buttons/norotationOn.png" rename="norotationOn"/>
+	<assets path="src/assets/UI/buttons/playOff.png" rename="playOff"/>
+	<assets path="src/assets/UI/buttons/playOn.png" rename="playOn"/>
+	<assets path="src/assets/UI/buttons/redoOff.png" rename="redoOff"/>
+	<assets path="src/assets/UI/buttons/redoOn.png" rename="redoOn"/>
+	<assets path="src/assets/UI/buttons/revealOff.gif" rename="revealOff"/>
+	<assets path="src/assets/UI/buttons/revealOn.gif" rename="revealOn"/>
+	<assets path="src/assets/UI/buttons/rotate360Off.png" rename="rotate360Off"/>
+	<assets path="src/assets/UI/buttons/rotate360On.png" rename="rotate360On"/>
+	<assets path="src/assets/UI/buttons/spriteInfoOff.png" rename="spriteInfoOff"/>
+	<assets path="src/assets/UI/buttons/spriteInfoOn.png" rename="spriteInfoOn"/>
+	<assets path="src/assets/UI/buttons/stopOff.png" rename="stopOff"/>
+	<assets path="src/assets/UI/buttons/stopOn.png" rename="stopOn"/>
+	<assets path="src/assets/UI/buttons/undoOff.png" rename="undoOff"/>
+	<assets path="src/assets/UI/buttons/undoOn.png" rename="undoOn"/>
+	<assets path="src/assets/UI/buttons/unlockedOff.png" rename="unlockedOff"/>
+	<assets path="src/assets/UI/buttons/unlockedOn.png" rename="unlockedOn"/>
+
+	// Misc UI Elements
+	<assets path="src/assets/UI/misc/hatshape.png" rename="hatshape"/>
+	<assets path="src/assets/UI/misc/playerStartFlag.png" rename="playerStartFlag"/>
+	<assets path="src/assets/UI/misc/promptCheckButton.png" rename="promptCheckButton"/>
+	<assets path="src/assets/UI/misc/questionMark.png" rename="questionMark"/>
+	<assets path="src/assets/UI/misc/removeItem.png" rename="removeItem"/>
+	<assets path="src/assets/UI/misc/speakerOff.png" rename="speakerOff"/>
+	<assets path="src/assets/UI/misc/speakerOn.png" rename="speakerOn"/>
+
+	// New Backdrop Buttons
+	<assets path="src/assets/UI/newbackdrop/cameraSmallOff.png" rename="cameraSmallOff"/>
+	<assets path="src/assets/UI/newbackdrop/cameraSmallOn.png" rename="cameraSmallOn"/>
+	<assets path="src/assets/UI/newbackdrop/importSmallOff.png" rename="importSmallOff"/>
+	<assets path="src/assets/UI/newbackdrop/importSmallOn.png" rename="importSmallOn"/>
+	<assets path="src/assets/UI/newbackdrop/landscapeSmallOff.png" rename="landscapeSmallOff"/>
+	<assets path="src/assets/UI/newbackdrop/landscapeSmallOn.png" rename="landscapeSmallOn"/>
+	<assets path="src/assets/UI/newbackdrop/paintbrushSmallOff.png" rename="paintbrushSmallOff"/>
+	<assets path="src/assets/UI/newbackdrop/paintbrushSmallOn.png" rename="paintbrushSmallOn"/>
+
+	// New Sprite Buttons
+	<assets path="src/assets/UI/newsprite/cameraOff.png" rename="cameraOff"/>
+	<assets path="src/assets/UI/newsprite/cameraOn.png" rename="cameraOn"/>
+	<assets path="src/assets/UI/newsprite/importOff.png" rename="importOff"/>
+	<assets path="src/assets/UI/newsprite/importOn.png" rename="importOn"/>
+	<assets path="src/assets/UI/newsprite/landscapeOff.png" rename="landscapeOff"/>
+	<assets path="src/assets/UI/newsprite/landscapeOn.png" rename="landscapeOn"/>
+	<assets path="src/assets/UI/newsprite/libraryOff.png" rename="libraryOff"/>
+	<assets path="src/assets/UI/newsprite/libraryOn.png" rename="libraryOn"/>
+	<assets path="src/assets/UI/newsprite/paintbrushOff.png" rename="paintbrushOff"/>
+	<assets path="src/assets/UI/newsprite/paintbrushOn.png" rename="paintbrushOn"/>
+
+	// New Sound Buttons
+	<assets path="src/assets/UI/newsound/recordOff.png" rename="recordOff"/>
+	<assets path="src/assets/UI/newsound/recordOn.png" rename="recordOn"/>
+	<assets path="src/assets/UI/newsound/soundlibraryOff.png" rename="soundlibraryOff"/>
+	<assets path="src/assets/UI/newsound/soundlibraryOn.png" rename="soundlibraryOn"/>
+
+	// Sound Editing
+	<assets path="src/assets/UI/sound/forwardOff.png" rename="forwardSndOff"/>
+	<assets path="src/assets/UI/sound/forwardOn.png" rename="forwardSndOn"/>
+	<assets path="src/assets/UI/sound/pauseOff.png" rename="pauseSndOff"/>
+	<assets path="src/assets/UI/sound/pauseOn.png" rename="pauseSndOn"/>
+	<assets path="src/assets/UI/sound/playOff.png" rename="playSndOff"/>
+	<assets path="src/assets/UI/sound/playOn.png" rename="playSndOn"/>
+	<assets path="src/assets/UI/sound/recordOff.png" rename="recordSndOff"/>
+	<assets path="src/assets/UI/sound/recordOn.png" rename="recordSndOn"/>
+	<assets path="src/assets/UI/sound/rewindOff.png" rename="rewindSndOff"/>
+	<assets path="src/assets/UI/sound/rewindOn.png" rename="rewindSndOn"/>
+	<assets path="src/assets/UI/sound/stopOff.png" rename="stopSndOff"/>
+	<assets path="src/assets/UI/sound/stopOn.png" rename="stopSndOn"/>
+
+	// Paint
+	<assets path="src/assets/UI/paint/swatchesOff.png" rename="swatchesOff"/>
+	<assets path="src/assets/UI/paint/swatchesOn.png" rename="swatchesOn"/>
+	<assets path="src/assets/UI/paint/wheelOff.png" rename="wheelOff"/>
+	<assets path="src/assets/UI/paint/wheelOn.png" rename="wheelOn"/>
+
+	<assets path="src/assets/UI/paint/noZoomOff.png" rename="noZoomOff"/>
+	<assets path="src/assets/UI/paint/noZoomOn.png" rename="noZoomOn"/>
+	<assets path="src/assets/UI/paint/zoomInOff.png" rename="zoomInOff"/>
+	<assets path="src/assets/UI/paint/zoomInOn.png" rename="zoomInOn"/>
+	<assets path="src/assets/UI/paint/zoomOutOff.png" rename="zoomOutOff"/>
+	<assets path="src/assets/UI/paint/zoomOutOn.png" rename="zoomOutOn"/>
+
+	<assets path="src/assets/UI/paint/wicon.png" rename="widthIcon"/>
+	<assets path="src/assets/UI/paint/hicon.png" rename="heightIcon"/>
+
+	<assets path="src/assets/UI/paint/canvasGrid.gif" rename="canvasGrid"/>
+	<assets path="src/assets/UI/paint/colorWheel.png" rename="colorWheel"/>
+	<assets path="src/assets/UI/paint/swatchButton.png" rename="swatchButton"/>
+	<assets path="src/assets/UI/paint/rainbowButton.png" rename="rainbowButton"/>
+
+	// Paint Tools
+	<assets path="src/assets/UI/paint/ellipseOff.png" rename="ellipseOff"/>
+	<assets path="src/assets/UI/paint/ellipseOn.png" rename="ellipseOn"/>
+	<assets path="src/assets/UI/paint/cropOff.png" rename="cropOff"/>
+	<assets path="src/assets/UI/paint/cropOn.png" rename="cropOn"/>
+	<assets path="src/assets/UI/paint/flipHOff.gif" rename="flipHOff"/>
+	<assets path="src/assets/UI/paint/flipHOn.gif" rename="flipHOn"/>
+	<assets path="src/assets/UI/paint/flipVOff.gif" rename="flipVOff"/>
+	<assets path="src/assets/UI/paint/flipVOn.gif" rename="flipVOn"/>
+	<assets path="src/assets/UI/paint/pathOff.png" rename="pathOff"/>
+	<assets path="src/assets/UI/paint/pathOn.png" rename="pathOn"/>
+	<assets path="src/assets/UI/paint/pencilCursor.gif" rename="pencilCursor"/>
+	<assets path="src/assets/UI/paint/textOff.png" rename="textOff"/>
+	<assets path="src/assets/UI/paint/textOn.png" rename="textOn"/>
+	<assets path="src/assets/UI/paint/selectOff.png" rename="selectOff"/>
+	<assets path="src/assets/UI/paint/selectOn.png" rename="selectOn"/>
+	<assets path="src/assets/UI/paint/rotateCursor.png" rename="rotateCursor"/>
+	<assets path="src/assets/UI/paint/eyedropperOff.png" rename="eyedropperOff"/>
+	<assets path="src/assets/UI/paint/eyedropperOn.png" rename="eyedropperOn"/>
+	<assets path="src/assets/UI/paint/setCenterOn.gif" rename="setCenterOn"/>
+	<assets path="src/assets/UI/paint/setCenterOff.gif" rename="setCenterOff"/>
+	<assets path="src/assets/UI/paint/rectSolidOn.png" rename="rectSolidOn"/>
+	<assets path="src/assets/UI/paint/rectSolidOff.png" rename="rectSolidOff"/>
+	<assets path="src/assets/UI/paint/rectBorderOn.png" rename="rectBorderOn"/>
+	<assets path="src/assets/UI/paint/rectBorderOff.png" rename="rectBorderOff"/>
+	<assets path="src/assets/UI/paint/ellipseSolidOn.png" rename="ellipseSolidOn"/>
+	<assets path="src/assets/UI/paint/ellipseSolidOff.png" rename="ellipseSolidOff"/>
+	<assets path="src/assets/UI/paint/ellipseBorderOn.png" rename="ellipseBorderOn"/>
+	<assets path="src/assets/UI/paint/ellipseBorderOff.png" rename="ellipseBorderOff"/>
+
+	// Vector
+	<assets path="src/assets/UI/paint/vectorRectOff.png" rename="vectorRectOff"/>
+	<assets path="src/assets/UI/paint/vectorRectOn.png" rename="vectorRectOn"/>
+	<assets path="src/assets/UI/paint/vectorEllipseOff.png" rename="vectorEllipseOff"/>
+	<assets path="src/assets/UI/paint/vectorEllipseOn.png" rename="vectorEllipseOn"/>
+	<assets path="src/assets/UI/paint/vectorLineOff.png" rename="vectorLineOff"/>
+	<assets path="src/assets/UI/paint/vectorLineOn.png" rename="vectorLineOn"/>
+	<assets path="src/assets/UI/paint/patheditOff.png" rename="patheditOff"/>
+	<assets path="src/assets/UI/paint/patheditOn.png" rename="patheditOn"/>
+	<assets path="src/assets/UI/paint/groupOff.png" rename="groupOff"/>
+	<assets path="src/assets/UI/paint/groupOn.png" rename="groupOn"/>
+	<assets path="src/assets/UI/paint/ungroupOff.png" rename="ungroupOff"/>
+	<assets path="src/assets/UI/paint/ungroupOn.png" rename="ungroupOn"/>
+	<assets path="src/assets/UI/paint/frontOff.png" rename="frontOff"/>
+	<assets path="src/assets/UI/paint/frontOn.png" rename="frontOn"/>
+	<assets path="src/assets/UI/paint/backOn.png" rename="backOn"/>
+	<assets path="src/assets/UI/paint/backOff.png" rename="backOff"/>
+	<assets path="src/assets/UI/paint/paintbrushOff.png" rename="vpaintbrushOff"/>
+	<assets path="src/assets/UI/paint/paintbrushOn.png" rename="vpaintbrushOn"/>
+
+	// Bitmap
+	<assets path="src/assets/UI/paint/rectOff.png" rename="rectOff"/>
+	<assets path="src/assets/UI/paint/rectOn.png" rename="rectOn"/>
+	<assets path="src/assets/UI/paint/paintbucketOn.png" rename="paintbucketOn"/>
+	<assets path="src/assets/UI/paint/paintbucketOff.png" rename="paintbucketOff"/>
+
+	<assets path="src/assets/UI/paint/editOff.png" rename="editOff"/>
+	<assets path="src/assets/UI/paint/editOn.png" rename="editOn"/>
+
+	<assets path="src/assets/UI/paint/sliceOn.png" rename="sliceOn"/>
+	<assets path="src/assets/UI/paint/sliceOff.png" rename="sliceOff"/>
+	<assets path="src/assets/UI/paint/wandOff.png" rename="wandOff"/>
+	<assets path="src/assets/UI/paint/wandOn.png" rename="wandOn"/>
+
+	<assets path="src/assets/UI/paint/eraserOn.png" rename="eraserOn"/>
+	<assets path="src/assets/UI/paint/eraserOff.png" rename="eraserOff"/>
+	<assets path="src/assets/UI/paint/saveOn.png" rename="saveOn"/>
+	<assets path="src/assets/UI/paint/saveOff.png" rename="saveOff"/>
+	<assets path="src/assets/UI/paint/cloneOff.png" rename="cloneOff"/>
+	<assets path="src/assets/UI/paint/cloneOn.png" rename="cloneOn"/>
+	<assets path="src/assets/UI/paint/lassoOn.png" rename="lassoOn"/>
+	<assets path="src/assets/UI/paint/lassoOff.png" rename="lassoOff"/>
+	<assets path="src/assets/UI/paint/lineOn.png" rename="lineOn"/>
+	<assets path="src/assets/UI/paint/lineOff.png" rename="lineOff"/>
+
+	<assets path="src/assets/UI/paint/bitmapBrushOff.png" rename="bitmapBrushOff"/>
+	<assets path="src/assets/UI/paint/bitmapBrushOn.png" rename="bitmapBrushOn"/>
+	<assets path="src/assets/UI/paint/bitmapEllipseOff.png" rename="bitmapEllipseOff"/>
+	<assets path="src/assets/UI/paint/bitmapEllipseOn.png" rename="bitmapEllipseOn"/>
+	<assets path="src/assets/UI/paint/bitmapPaintbucketOff.png" rename="bitmapPaintbucketOff"/>
+	<assets path="src/assets/UI/paint/bitmapPaintbucketOn.png" rename="bitmapPaintbucketOn"/>
+	<assets path="src/assets/UI/paint/bitmapRectOff.png" rename="bitmapRectOff"/>
+	<assets path="src/assets/UI/paint/bitmapRectOn.png" rename="bitmapRectOn"/>
+	<assets path="src/assets/UI/paint/bitmapSelectOff.png" rename="bitmapSelectOff"/>
+	<assets path="src/assets/UI/paint/bitmapSelectOn.png" rename="bitmapSelectOn"/>
+	<assets path="src/assets/UI/paint/bitmapStampOff.png" rename="bitmapStampOff"/>
+	<assets path="src/assets/UI/paint/bitmapStampOn.png" rename="bitmapStampOn"/>
+	<assets path="src/assets/UI/paint/bitmapTextOff.png" rename="bitmapTextOff"/>
+	<assets path="src/assets/UI/paint/bitmapTextOn.png" rename="bitmapTextOn"/>
+
+
 <!-- 	
 	<icon path="assets/openfl.svg" />
  -->	

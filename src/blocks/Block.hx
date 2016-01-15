@@ -95,7 +95,7 @@ class Block extends Sprite
 	public var base : BlockShape;
 
 	private var suppressLayout : Bool;  // used to avoid extra layouts during block initialization  
-	private var labelsAndArgs : Array<Dynamic> = [];
+	private var labelsAndArgs : Array<DisplayObject> = [];
 	private var argTypes : Array<Dynamic> = [];
 	private var elseLabel : TextField;
 
@@ -213,7 +213,7 @@ class Block extends Sprite
 			labelsAndArgs = [makeLabel(spec)];
 		}
 		else {
-			var loopBlocks : Array<Dynamic> = ["doForever", "doForeverIf", "doRepeat", "doUntil"];
+			var loopBlocks : Array<String> = ["doForever", "doForeverIf", "doRepeat", "doUntil"];
 			base.hasLoopArrow = (Lambda.indexOf(loopBlocks, op) >= 0);
 			addLabelsAndArgs(spec, base.color);
 		}
@@ -264,7 +264,7 @@ class Block extends Sprite
 		// Used to switch among a family of related operators (e.g. +, -, *, and /).
 		// Note: This does not deal with translation, so it only works for symbolic operators.
 		for (item in labelsAndArgs){
-			if ((Std.is(item, TextField)) && (item.text == op))                 item.text = newOp;
+			if ((Std.is(item, TextField)) && (cast(item, TextField).text == op))                 cast(item, TextField).text = newOp;
 		}
 		op = newOp;
 		opFunction = null;
@@ -520,7 +520,7 @@ class Block extends Sprite
 		collectArgs();
 	}
 
-	private function indentAjustmentFor(item : Dynamic) : Int{
+	private function indentAjustmentFor(item : DisplayObject) : Int{
 		var itemType : String = "";
 		if (Std.is(item, Block))             itemType = cast((item), Block).type;
 		if (Std.is(item, BlockArg))             itemType = cast((item), BlockArg).type;
