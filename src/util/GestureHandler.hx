@@ -160,16 +160,16 @@ class GestureHandler
 		// To avoid getting the Adobe menu on right-click, JavaScript captures
 		// right-button mouseDown events and calls this method.'
 		Menu.removeMenusFrom(stage);
-		var menuTarget : Dynamic = findTargetFor("menu", app, x, y);
+		var menuTarget : DisplayObject = findTargetFor("menu", app, x, y);
 		if (menuTarget == null)             return;
 		var menu : Menu = null;
-		try{menu = menuTarget.menu(new MouseEvent("right click"));
+		try{menu = (cast menuTarget).menu(new MouseEvent("right click"));
 		}        catch (e : Error){ };
 		if (menu != null)             menu.showOnStage(stage, x, y);
 		if (!isChrome)             Menu.removeMenusFrom(stage);  // hack: clear menuJustCreated because there's no rightMouseUp  ;
 	}
 
-	private function findTargetFor(property : String, obj : Dynamic, x : Int, y : Int) : Dynamic{
+	private function findTargetFor(property : String, obj : Dynamic, x : Int, y : Int) : DisplayObject {
 		// Return the innermost child  of obj that contains the given (global) point
 		// and implements the menu() method.
 		if (Std.is(obj, Scratch))
@@ -184,12 +184,14 @@ class GestureHandler
 		}
 		if (Std.is(obj, DisplayObject))
 		{
-			if (!obj.visible || !obj.hitTestPoint(x, y, true))
+			var dispObj: DisplayObject = obj;
+			if (!dispObj.visible || !dispObj.hitTestPoint(x, y, true))
 				return null;
-			if (Std.is(obj, DisplayObjectContainer)) {
-				var i : Int = Std.int(obj.numChildren - 1);
+			if (Std.is(dispObj, DisplayObjectContainer)) {
+				var dispObjContainer: DisplayObjectContainer = cast(dispObj, DisplayObjectContainer);
+				var i : Int = Std.int(dispObjContainer.numChildren - 1);
 				while (i >= 0){
-					var found : DisplayObject = findTargetFor(property, obj.getChildAt(i), x, y);
+					var found : DisplayObject = findTargetFor(property, dispObjContainer.getChildAt(i), x, y);
 					if (found != null)                     return found;
 					i--;
 				}
@@ -485,7 +487,7 @@ class GestureHandler
 
 	private function handleTool(evt : MouseEvent) : Void{
 		var isGrowShrink : Bool = ("grow" == CursorTool.tool) || ("shrink" == CursorTool.tool);
-		var t : Dynamic = findTargetFor("handleTool", app, Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY));
+		var t : DisplayObject = findTargetFor("handleTool", app, Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY));
 		if (t == null)             t = findMouseTargetOnStage(Std.int(evt.stageX / app.scaleX), Std.int(evt.stageY / app.scaleY));
 
 		if (isGrowShrink && (Std.is(t, ScratchSprite))) {
@@ -498,14 +500,14 @@ class GestureHandler
 			};
 			if (lastGrowShrinkSprite == null && !evt.shiftKey) {
 				t.addEventListener(MouseEvent.MOUSE_OUT, clearTool);
-				lastGrowShrinkSprite = t;
+				lastGrowShrinkSprite = cast(t, ScratchSprite);
 			}
-			t.handleTool(CursorTool.tool, evt);
+			(cast t).handleTool(CursorTool.tool, evt);
 			return;
 		}
 		if (t != null && Compat.hasMethod(t, "handleTool"))
-			t.handleTool(CursorTool.tool, evt);
-		if (isGrowShrink && (Std.is(t, Block) && t.isInPalette /*|| Std.is(t, ImageCanvas)*/))             return;  // grow/shrink sticky for scripting area  ;
+			(cast t).handleTool(CursorTool.tool, evt);
+		if (isGrowShrink && (Std.is(t, Block) && cast(t, Block).isInPalette() /*|| Std.is(t, ImageCanvas)*/))             return;  // grow/shrink sticky for scripting area  ;
 
 		if (!evt.shiftKey)             app.clearTool();  // don't clear if shift pressed  ;
 	}
