@@ -24,13 +24,17 @@
 
 package;
 import blocks.*;
-import openfl.Lib;
+import haxe.io.Bytes;
+import js.html.FileReader;
+import js.html.InputElement;
+import js.Browser;
 
 //import com.adobe.utils.StringUtil;
 
 //import extensions.ExtensionDevManager;
 //import extensions.ExtensionManager;
 
+import openfl.Lib;
 import openfl.errors.Error;
 import openfl.display.*;
 import openfl.events.*;
@@ -1050,8 +1054,8 @@ class Scratch /*extends Sprite*/ {
 		}
 		var uiLayer:Sprite = app.stagePane.getUILayer();
 		for (i in 0...uiLayer.numChildren) {
-			var lw:ListWatcher = cast(uiLayer.getChildAt(i), ListWatcher);
-			if (lw != null) lw.updateTranslation();
+			if (Std.is(uiLayer.getChildAt(i), ListWatcher))
+				cast(uiLayer.getChildAt(i), ListWatcher).updateTranslation();
 		}
 		topBarPart.updateTranslation();
 		stagePart.updateTranslation();
@@ -1579,6 +1583,28 @@ class Scratch /*extends Sprite*/ {
 	}
 
 	static public function loadSingleFile(fileLoaded:Dynamic -> Void, filter:FileFilter = null):Void {
+		
+		// HTML5-specific file opening code (just for testing)
+		var div = js.Browser.document.createElement("div");
+		div.innerHTML = '<input style="display: none" class="fileinput" type="file">';
+		var input = cast(div.querySelector('input'), InputElement);
+		input.addEventListener("change", function(evt:js.html.Event) {
+			var filereader = new FileReader();
+			var fileName = input.files.item(0).name;
+			filereader.onload = function(evt:Event) {
+				var bytes = Bytes.ofData(filereader.result);
+				var data:ByteArray = ByteArray.fromBytes(bytes);
+				function doInstall(ignore:Dynamic = null):Void {
+					app.runtime.installProjectFromFile(fileName, data);
+				}
+				if (app.stagePane.isEmpty()) doInstall();
+				else DialogBox.confirm('Replace contents of the current project?', app.stage, doInstall);
+			};
+			filereader.readAsArrayBuffer(input.files.item(0));
+		});
+		input.click();
+		
+		/*
 		var fileList:FileReferenceList = new FileReferenceList();
 		function fileSelected(event:Event):Void {
 			if (fileList.fileList.length > 0) {
@@ -1594,6 +1620,7 @@ class Scratch /*extends Sprite*/ {
 			fileList.browse(filter != null ? [filter] : null);
 		} catch (e:Dynamic) {
 		}
+		*/
 	}
 
 	// -----------------------------

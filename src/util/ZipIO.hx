@@ -19,6 +19,9 @@
 
 package util;
 
+import haxe.io.Bytes;
+import haxe.zip.InflateImpl;
+import haxe.zip.Uncompress;
 import openfl.errors.Error;
 
 import openfl.utils.Endian;
@@ -35,10 +38,10 @@ class ZipIO
 	private static inline var DirEntryID : Int = 0x02014b50;  // Central Directory Record  
 	private static inline var EndID : Int = 0x06054b50;  // End of Central Directory Record  
 
-	private static var crcTable : Array<Dynamic> = makeCrcTable();
+	private static var crcTable : Array<Int> = makeCrcTable();
 
 	private var buf : ByteArray;
-	private var entries : Array<Dynamic> = [];
+	private var entries : Array<Entry> = [];
 	private var writtenFiles : Dynamic = {};
 
 	//************************************
@@ -117,7 +120,14 @@ class ZipIO
 		e.name = fileName;
 		e.data = new ByteArray();
 		if (compressedSize > 0)             buf.readBytes(e.data, 0, compressedSize);
-		if (compressionMethod == 8)             e.data.inflate();
+		if (compressionMethod == 8) {
+			// Must manually invoke the inflater here since openfl.util.ByteArray won't invoke it properly for us
+			var inflater = new InflateImpl(new haxe.io.BytesInput(e.data), false, false);
+			var output = Bytes.alloc(uncompressedSize);
+			inflater.readBytes(output, 0, uncompressedSize);
+			e.data = output;
+		}
+		//e.data.inflate();
 		if (Std.int(e.data.length) != uncompressedSize)             throw cast(("Bad uncompressed size"), Error);
 		if (crc != computeCRC(e.data))             throw cast(("Bad CRC"), Error);
 	}
@@ -300,8 +310,8 @@ class ZipIO
 	}
 
 	/* CRC table, computed at load time. */
-	private static function makeCrcTable() : Array<Dynamic>{
-		var crcTable : Array<Dynamic> = Compat.newArray(256, null); // new Array<Dynamic>(256);
+	private static function makeCrcTable() : Array<Int>{
+		var crcTable : Array<Int> = Compat.newArray(256, null); // new Array<Dynamic>(256);
 		for (n in 0...256){
 			var c : Int = n;
 			for (i in 0...8){

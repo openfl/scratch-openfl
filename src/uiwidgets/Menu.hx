@@ -50,7 +50,7 @@ class Menu extends Sprite
 	private static var menuJustCreated : Bool;
 
 	private var menuName : String = "";
-	private var allItems : Array<Dynamic> = [];
+	private var allItems : Array<MenuItem> = [];
 	private var firstItemIndex : Int = 0;
 	private var maxHeight : Int;
 	private var maxScrollIndex : Int;
@@ -150,7 +150,7 @@ class Menu extends Sprite
 		for (item in allItems){
 			item.setWidthHeight(maxW, itemHeight);
 			item.y = nextY;
-			nextY += item.height;
+			nextY += Std.int(item.height);
 		}  // compute max height  
 
 		maxHeight = Std.int(Math.min(500, stage.stageHeight - 50));
@@ -158,7 +158,7 @@ class Menu extends Sprite
 		var totalH : Int = 0;
 		maxScrollIndex = allItems.length - 1;
 		while (maxScrollIndex > 0){
-			totalH += allItems[maxScrollIndex].height;
+			totalH += Std.int(allItems[maxScrollIndex].height);
 			if (totalH > maxHeight)                 break;
 			maxScrollIndex--;
 		}
@@ -225,7 +225,7 @@ class Menu extends Sprite
 		}  // add up/down arrows, if needed  
 
 		if (firstItemIndex > 0)             addChild(upArrow);
-		var showDownArrow : Bool = (allItems.length > 0) && !allItems[allItems.length - 1].parent;
+		var showDownArrow : Bool = (allItems.length > 0) && allItems[allItems.length - 1].parent == null;
 		if (showDownArrow) {
 			downArrow.y = this.height - 5;
 			addChild(downArrow);
