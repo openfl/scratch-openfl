@@ -217,11 +217,15 @@ class ScratchStage extends ScratchObj {
 		var toDelete:Array<Dynamic> = [];
 		var uiLayer:Sprite = getUILayer();
 		for (i in 0...uiLayer.numChildren) {
-			var w:Watcher = cast(uiLayer.getChildAt(i), Watcher);
-			if (w != null && !w.target.isStage && (w.target.parent != this)) toDelete.push(w);
+			if (Std.is(uiLayer.getChildAt(i), Watcher)) {
+				var w:Watcher = cast(uiLayer.getChildAt(i), Watcher);
+				if (!w.target.isStage && (w.target.parent != this)) toDelete.push(w);
+			}
 
-			var lw:ListWatcher = cast(uiLayer.getChildAt(i), ListWatcher);
-			if (lw != null && !lw.target.isStage && (lw.target.parent != this)) toDelete.push(lw);
+			if (Std.is(uiLayer.getChildAt(i), ListWatcher)) {
+				var lw:ListWatcher = cast(uiLayer.getChildAt(i), ListWatcher);
+				if (!lw.target.isStage && (lw.target.parent != this)) toDelete.push(lw);
+			}
 		}
 		for (c in toDelete) uiLayer.removeChild(c);
 	}
