@@ -20,13 +20,264 @@
 package assets;
 
 
+import assets.Resources.FlagIcon;
+import haxe.Timer;
 import openfl.display.*;
 import openfl.text.*;
 import openfl.utils.ByteArray;
 
 class Resources
 {
+	public static function preload(whenDone: Void->Void) : Void {
+		var bitmaps : Array<BitmapData> = new Array<BitmapData>();
+		// Block Icons (2x resolution to look better when scaled)
+		bitmaps.push(new FlagIcon(0, 0));
+		bitmaps.push(new StopIcon(0, 0));
+		bitmaps.push(new TurnLeftIcon(0, 0));
+		bitmaps.push(new TurnRightIcon(0, 0));
 
+		// Cursors
+		bitmaps.push(new CopyCursor(0, 0));
+		bitmaps.push(new CrosshairCursor(0, 0));
+		bitmaps.push(new CutCursor(0, 0));
+		bitmaps.push(new GrowCursor(0, 0));
+		bitmaps.push(new HelpCursor(0, 0));
+		bitmaps.push(new ShrinkCursor(0, 0));
+		bitmaps.push(new ZoomInCursor(0, 0));
+
+		// Top bar
+		bitmaps.push(new ScratchlogoOff(0, 0));
+		bitmaps.push(new ScratchlogoOn(0, 0));
+		bitmaps.push(new Scratchxlogo(0, 0));
+		bitmaps.push(new CopyTool(0, 0));
+		bitmaps.push(new CutTool(0, 0));
+		bitmaps.push(new GrowTool(0, 0));
+		bitmaps.push(new HelpTool(0, 0));
+		bitmaps.push(new LanguageButtonOff(0, 0));
+		bitmaps.push(new LanguageButtonOn(0, 0));
+		bitmaps.push(new MyStuffOff(0, 0));
+		bitmaps.push(new MyStuffOn(0, 0));
+		bitmaps.push(new ProjectPageFlip(0, 0));
+		bitmaps.push(new ShrinkTool(0, 0));
+
+		// Buttons
+		bitmaps.push(new AddItemOff(0, 0));
+		bitmaps.push(new AddItemOn(0, 0));
+		bitmaps.push(new BackarrowOff(0, 0));
+		bitmaps.push(new BackarrowOn(0, 0));
+		bitmaps.push(new CheckboxOff(0, 0));
+		bitmaps.push(new CheckboxOn(0, 0));
+		bitmaps.push(new CloseOff(0, 0));
+		bitmaps.push(new CloseOn(0, 0));
+		bitmaps.push(new DeleteItemOff(0, 0));
+		bitmaps.push(new DeleteItemOn(0, 0));
+		bitmaps.push(new ExtensionHelpOff(0, 0));
+		bitmaps.push(new ExtensionHelpOn(0, 0));
+		bitmaps.push(new FlipOff(0, 0));
+		bitmaps.push(new FlipOn(0, 0));
+		bitmaps.push(new FullscreenOff(0, 0));
+		bitmaps.push(new FullscreenOn(0, 0));
+		bitmaps.push(new GreenflagOff(0, 0));
+		bitmaps.push(new GreenflagOn(0, 0));
+		bitmaps.push(new NorotationOff(0, 0));
+		bitmaps.push(new NorotationOn(0, 0));
+		bitmaps.push(new PlayOff(0, 0));
+		bitmaps.push(new PlayOn(0, 0));
+		bitmaps.push(new RedoOff(0, 0));
+		bitmaps.push(new RedoOn(0, 0));
+		bitmaps.push(new RevealOff(0, 0));
+		bitmaps.push(new RevealOn(0, 0));
+		bitmaps.push(new Rotate360Off(0, 0));
+		bitmaps.push(new Rotate360On(0, 0));
+		bitmaps.push(new SpriteInfoOff(0, 0));
+		bitmaps.push(new SpriteInfoOn(0, 0));
+		bitmaps.push(new StopOff(0, 0));
+		bitmaps.push(new StopOn(0, 0));
+		bitmaps.push(new UndoOff(0, 0));
+		bitmaps.push(new UndoOn(0, 0));
+		bitmaps.push(new UnlockedOff(0, 0));
+		bitmaps.push(new UnlockedOn(0, 0));
+
+		// Misc UI Elements
+		bitmaps.push(new Hatshape(0, 0));
+		bitmaps.push(new PlayerStartFlag(0, 0));
+		bitmaps.push(new PromptCheckButton(0, 0));
+		bitmaps.push(new QuestionMark(0, 0));
+		bitmaps.push(new RemoveItem(0, 0));
+		bitmaps.push(new SpeakerOff(0, 0));
+		bitmaps.push(new SpeakerOn(0, 0));
+
+		// New Backdrop Buttons
+		bitmaps.push(new CameraSmallOff(0, 0));
+		bitmaps.push(new CameraSmallOn(0, 0));
+		bitmaps.push(new ImportSmallOff(0, 0));
+		bitmaps.push(new ImportSmallOn(0, 0));
+		bitmaps.push(new LandscapeSmallOff(0, 0));
+		bitmaps.push(new LandscapeSmallOn(0, 0));
+		bitmaps.push(new PaintbrushSmallOff(0, 0));
+		bitmaps.push(new PaintbrushSmallOn(0, 0));
+
+		// New Sprite Buttons
+		bitmaps.push(new CameraOff(0, 0));
+		bitmaps.push(new CameraOn(0, 0));
+		bitmaps.push(new ImportOff(0, 0));
+		bitmaps.push(new ImportOn(0, 0));
+		bitmaps.push(new LandscapeOff(0, 0));
+		bitmaps.push(new LandscapeOn(0, 0));
+		bitmaps.push(new LibraryOff(0, 0));
+		bitmaps.push(new LibraryOn(0, 0));
+		bitmaps.push(new PaintbrushOff(0, 0));
+		bitmaps.push(new PaintbrushOn(0, 0));
+
+		// New Sound Buttons
+		bitmaps.push(new RecordOff(0, 0));
+		bitmaps.push(new RecordOn(0, 0));
+		bitmaps.push(new SoundlibraryOff(0, 0));
+		bitmaps.push(new SoundlibraryOn(0, 0));
+
+		// Sound Editing
+		bitmaps.push(new ForwardSndOff(0, 0));
+		bitmaps.push(new ForwardSndOn(0, 0));
+		bitmaps.push(new PauseSndOff(0, 0));
+		bitmaps.push(new PauseSndOn(0, 0));
+		bitmaps.push(new PlaySndOff(0, 0));
+		bitmaps.push(new PlaySndOn(0, 0));
+		bitmaps.push(new RecordSndOff(0, 0));
+		bitmaps.push(new RecordSndOn(0, 0));
+		bitmaps.push(new RewindSndOff(0, 0));
+		bitmaps.push(new RewindSndOn(0, 0));
+		bitmaps.push(new StopSndOff(0, 0));
+		bitmaps.push(new StopSndOn(0, 0));
+
+		// Paint
+		bitmaps.push(new SwatchesOff(0, 0));
+		bitmaps.push(new SwatchesOn(0, 0));
+		bitmaps.push(new WheelOff(0, 0));
+		bitmaps.push(new WheelOn(0, 0));
+
+		bitmaps.push(new NoZoomOff(0, 0));
+		bitmaps.push(new NoZoomOn(0, 0));
+		bitmaps.push(new ZoomInOff(0, 0));
+		bitmaps.push(new ZoomInOn(0, 0));
+		bitmaps.push(new ZoomOutOff(0, 0));
+		bitmaps.push(new ZoomOutOn(0, 0));
+
+		bitmaps.push(new WidthIcon(0, 0));
+		bitmaps.push(new HeightIcon(0, 0));
+
+		bitmaps.push(new CanvasGrid(0, 0));
+		bitmaps.push(new ColorWheel(0, 0));
+		bitmaps.push(new SwatchButton(0, 0));
+		bitmaps.push(new RainbowButton(0, 0));
+
+		// Paint Tools
+		bitmaps.push(new EllipseOff(0, 0));
+		bitmaps.push(new EllipseOn(0, 0));
+		bitmaps.push(new CropOff(0, 0));
+		bitmaps.push(new CropOn(0, 0));
+		bitmaps.push(new FlipHOff(0, 0));
+		bitmaps.push(new FlipHOn(0, 0));
+		bitmaps.push(new FlipVOff(0, 0));
+		bitmaps.push(new FlipVOn(0, 0));
+		bitmaps.push(new PathOff(0, 0));
+		bitmaps.push(new PathOn(0, 0));
+		bitmaps.push(new PencilCursor(0, 0));
+		bitmaps.push(new TextOff(0, 0));
+		bitmaps.push(new TextOn(0, 0));
+		bitmaps.push(new SelectOff(0, 0));
+		bitmaps.push(new SelectOn(0, 0));
+		bitmaps.push(new RotateCursor(0, 0));
+		bitmaps.push(new EyedropperOff(0, 0));
+		bitmaps.push(new EyedropperOn(0, 0));
+		bitmaps.push(new SetCenterOn(0, 0));
+		bitmaps.push(new SetCenterOff(0, 0));
+		bitmaps.push(new RectSolidOn(0, 0));
+		bitmaps.push(new RectSolidOff(0, 0));
+		bitmaps.push(new RectBorderOn(0, 0));
+		bitmaps.push(new RectBorderOff(0, 0));
+		bitmaps.push(new EllipseSolidOn(0, 0));
+		bitmaps.push(new EllipseSolidOff(0, 0));
+		bitmaps.push(new EllipseBorderOn(0, 0));
+		bitmaps.push(new EllipseBorderOff(0, 0));
+
+		// Vector
+		bitmaps.push(new VectorRectOff(0, 0));
+		bitmaps.push(new VectorRectOn(0, 0));
+		bitmaps.push(new VectorEllipseOff(0, 0));
+		bitmaps.push(new VectorEllipseOn(0, 0));
+		bitmaps.push(new VectorLineOff(0, 0));
+		bitmaps.push(new VectorLineOn(0, 0));
+		bitmaps.push(new PatheditOff(0, 0));
+		bitmaps.push(new PatheditOn(0, 0));
+		bitmaps.push(new GroupOff(0, 0));
+		bitmaps.push(new GroupOn(0, 0));
+		bitmaps.push(new UngroupOff(0, 0));
+		bitmaps.push(new UngroupOn(0, 0));
+		bitmaps.push(new FrontOff(0, 0));
+		bitmaps.push(new FrontOn(0, 0));
+		bitmaps.push(new BackOn(0, 0));
+		bitmaps.push(new BackOff(0, 0));
+		bitmaps.push(new VpaintbrushOff(0, 0));
+		bitmaps.push(new VpaintbrushOn(0, 0));
+
+		// Bitmap
+		bitmaps.push(new RectOff(0, 0));
+		bitmaps.push(new RectOn(0, 0));
+		bitmaps.push(new PaintbucketOn(0, 0));
+		bitmaps.push(new PaintbucketOff(0, 0));
+
+		bitmaps.push(new EditOff(0, 0));
+		bitmaps.push(new EditOn(0, 0));
+
+		bitmaps.push(new SliceOn(0, 0));
+		bitmaps.push(new SliceOff(0, 0));
+		bitmaps.push(new WandOff(0, 0));
+		bitmaps.push(new WandOn(0, 0));
+
+		bitmaps.push(new EraserOn(0, 0));
+		bitmaps.push(new EraserOff(0, 0));
+		bitmaps.push(new SaveOn(0, 0));
+		bitmaps.push(new SaveOff(0, 0));
+		bitmaps.push(new CloneOff(0, 0));
+		bitmaps.push(new CloneOn(0, 0));
+		bitmaps.push(new LassoOn(0, 0));
+		bitmaps.push(new LassoOff(0, 0));
+		bitmaps.push(new LineOn(0, 0));
+		bitmaps.push(new LineOff(0, 0));
+
+		bitmaps.push(new BitmapBrushOff(0, 0));
+		bitmaps.push(new BitmapBrushOn(0, 0));
+		bitmaps.push(new BitmapEllipseOff(0, 0));
+		bitmaps.push(new BitmapEllipseOn(0, 0));
+		bitmaps.push(new BitmapPaintbucketOff(0, 0));
+		bitmaps.push(new BitmapPaintbucketOn(0, 0));
+		bitmaps.push(new BitmapRectOff(0, 0));
+		bitmaps.push(new BitmapRectOn(0, 0));
+		bitmaps.push(new BitmapSelectOff(0, 0));
+		bitmaps.push(new BitmapSelectOn(0, 0));
+		bitmaps.push(new BitmapStampOff(0, 0));
+		bitmaps.push(new BitmapStampOn(0, 0));
+		bitmaps.push(new BitmapTextOff(0, 0));
+		bitmaps.push(new BitmapTextOn(0, 0));
+		var waitCount : Int = 0;
+		function isDone() : Void {
+			// Wait for one second at most
+			waitCount++;
+			if (waitCount < 20) {
+				// If things haven't finished loading, wait some more
+				for (bmp in bitmaps) {
+					if (bmp.image.buffer == null) {
+						Timer.delay(isDone, 50);
+						return;
+					}
+				}
+			}
+			// Everything loaded correctly
+			whenDone();
+		}
+		Timer.delay(isDone, 100);
+	}
+	
 	public static function createBmp(resourceName : String) : Bitmap {
 		var embedded = findEmbeddedBitmap(resourceName);
 		if (embedded == null) {

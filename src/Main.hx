@@ -3,6 +3,7 @@ package;
 import openfl.display.StageAlign;
 import openfl.display.StageScaleMode;
 import openfl.Lib;
+import assets.Resources;
 
 /**
  * ...
@@ -17,7 +18,10 @@ class Main
 		stage.scaleMode = StageScaleMode.NO_SCALE;
 		stage.align = StageAlign.TOP_LEFT;
 		// Entry point
-		new ScratchEasyStarter();
+		Resources.preload(function() {
+			trace(Resources.createBmp("flagIcon").bitmapData.width);
+			new ScratchEasyStarter();
+		});
 	}
 	
 }
