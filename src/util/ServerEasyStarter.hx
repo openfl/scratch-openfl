@@ -8,7 +8,7 @@ class ServerEasyStarter extends Server
 {
 	public var resourcePrefix : String;
 
-	public function new(resourceUrlPrefix : String = "../")
+	public function new(resourceUrlPrefix : String = "")
 	{
 		super();
 		resourcePrefix = resourceUrlPrefix;
