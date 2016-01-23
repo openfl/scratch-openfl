@@ -86,8 +86,9 @@ public class DisplayObjectContainerIn3D extends Sprite {SCRATCH::allow3d{
 	private var textures:Array;
 	private var testBMs:Array;
 	private var textureIndexByID:Object;
-	private static var texSizeMax:int = 4096;
+	private static var texSizeMax:int = 2048;
 	private static var texSize:int = 1024;
+	private static var maxTextures:uint = 15;
 	private var penPacked:Boolean;
 
 	/** Triangle index data */
@@ -446,7 +447,10 @@ public class DisplayObjectContainerIn3D extends Sprite {SCRATCH::allow3d{
 		if (textureDirty)
 			packTextureBitmaps();
 
-		__context.clear(0, 0, 0, 0);
+		// Generally the clear color will be replaced by the backdrop and/or pen layer.
+		// However, it will show when we render partially-off-stage regions for getOtherRenderedChildren().
+		// Filling these regions with white matches the behavior we get in 2D.
+		__context.clear(1, 1, 1, 1);
 
 		if (childrenChanged) {// || effectsChanged) {
 			vertexData.position = 0;
@@ -941,8 +945,6 @@ public class DisplayObjectContainerIn3D extends Sprite {SCRATCH::allow3d{
 		}
 	}
 
-	private var maxTextures:uint = 5;
-
 	private function packTextureBitmaps():void {
 		var penID:String = spriteBitmaps[stagePenLayer];
 		if (textures.length < 1)
@@ -1149,7 +1151,7 @@ public class DisplayObjectContainerIn3D extends Sprite {SCRATCH::allow3d{
 		var changeBackBuffer:Boolean = isIOS || (bmd.width > scissorRect.width || bmd.height > scissorRect.height);
 		if (changeBackBuffer) {
 			projMatrix = createOrthographicProjectionMatrix(bmd.width, bmd.height, 0, 0);
-			__context.configureBackBuffer(bmd.width, bmd.height, 0, false);
+			__context.configureBackBuffer(Math.max(32, bmd.width), Math.max(32, bmd.height), 0, false);
 			pScale = 1;
 		}
 

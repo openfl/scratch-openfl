@@ -22,36 +22,37 @@ package util;
 
 
 
-class Perf {
-	
-	private static var totalStart : UInt;
-	private static var lapStart : UInt;
-	private static var lapTotal : UInt;
-	
+class Perf
+{
+
+	private static var totalStart : Int;
+	private static var lapStart : Int;
+	private static var lapTotal : Int;
+
 	public static function start(msg : String = null) : Void{
-		if (msg == null) 			msg = "Perf.start";
+		if (msg == null)             msg = "Perf.start";
 		Scratch.app.log(msg);
 		totalStart = lapStart = Math.round(haxe.Timer.stamp() * 1000);
 		lapTotal = 0;
 	}
-	
+
 	public static function clearLap() : Void{
 		lapStart = Math.round(haxe.Timer.stamp() * 1000);
 	}
-	
+
 	public static function lap(msg : String = "") : Void{
-		if (totalStart == 0) 			return  // not monitoring performance  ;
-		var lapMSecs : UInt = Math.round(haxe.Timer.stamp() * 1000) - lapStart;
+		if (totalStart == 0)             return;  // not monitoring performance  ;
+		var lapMSecs : Int = Math.round(haxe.Timer.stamp() * 1000) - lapStart;
 		Scratch.app.log("  " + msg + ": " + lapMSecs + " msecs");
 		lapTotal += lapMSecs;
 		lapStart = Math.round(haxe.Timer.stamp() * 1000);
 	}
-	
+
 	public static function end() : Void{
-		if (totalStart == 0) 			return  // not monitoring performance  ;
-		var totalMSecs : UInt = Math.round(haxe.Timer.stamp() * 1000) - totalStart;
-		var unaccountedFor : UInt = totalMSecs - lapTotal;
-		Scratch.app.log("Total: " + totalMSecs + " msecs; unaccounted for: " + unaccountedFor + " msecs (" + as3hx.Compat.parseInt((100 * unaccountedFor) / totalMSecs) + "%)");
+		if (totalStart == 0)             return;  // not monitoring performance  ;
+		var totalMSecs : Int = Math.round(haxe.Timer.stamp() * 1000) - totalStart;
+		var unaccountedFor : Int = totalMSecs - lapTotal;
+		Scratch.app.log("Total: " + totalMSecs + " msecs; unaccounted for: " + unaccountedFor + " msecs (" + Std.parseInt((100 * unaccountedFor) / totalMSecs) + "%)");
 		totalStart = lapStart = lapTotal = 0;
 	}
 

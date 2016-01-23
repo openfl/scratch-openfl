@@ -24,19 +24,28 @@
 // rotation style, size, draggability, and pen state.
 
 package scratch;
-	import flash.display.*;
-	import flash.events.*;
-import flash.filters.GlowFilter;
-import flash.geom.*;
-import flash.geom.ColorTransform;
-import flash.utils.*;
-	import flash.net.FileReference;
-	import filters.FilterPack;
-	import interpreter.Variable;
-	import translation.Translator;
-	import uiwidgets.Menu;
-	import util.*;
-	import watchers.ListWatcher;
+import filters.FilterPack;
+import openfl.geom.ColorTransform;
+import openfl.geom.Matrix;
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
+
+import openfl.display.*;
+import openfl.events.*;
+import openfl.net.FileReference;
+import openfl.utils.*;
+
+import interpreter.Variable;
+
+import logging.LogLevel;
+
+import translation.Translator;
+
+import uiwidgets.Menu;
+
+import util.*;
+
+import watchers.ListWatcher;
 
 class ScratchSprite extends ScratchObj {
 
@@ -62,10 +71,11 @@ class ScratchSprite extends ScratchObj {
 	public var localMotionDirection:Int = -2;
 	public var localFrameNum:Int;
 
-	public var spriteInfo:Dynamic = {};
+	public var spriteInfo:Object = {};
 	private var geomShape:Shape;
 
 	public function new(name:String = 'Sprite1') {
+		super();
 		objName = name;
 		filterPack = new FilterPack(this);
 		initMedia();
@@ -81,8 +91,8 @@ class ScratchSprite extends ScratchObj {
 
 	private function initMedia():Void {
 		var graySquare:BitmapData = new BitmapData(4, 4, true, 0x808080);
-		costumes.push(new ScratchCostume(Translator.map('costume1'), graySquare));
-		sounds.push(new ScratchSound(Translator.map('pop'), new Pop()));
+		costumes.push(ScratchCostume.fromBitmapData(Translator.map('costume1'), graySquare));
+		sounds.push(new ScratchSound(Translator.map('pop'), ScratchObj.makePop()));
 		sounds[0].prepareToSave();
 	}
 
@@ -119,7 +129,7 @@ class ScratchSprite extends ScratchObj {
 		for (i in 0...spr.lists.length) {
 			var lw:ListWatcher = spr.lists[i];
 			var lwDup:ListWatcher;
-			lists.push(lwDup = new ListWatcher(lw.listName, lw.contents.concat(), spr));
+			lists.push(lwDup = new ListWatcher(lw.listName, lw.contents.copy(), spr));
 			lwDup.visible = false;
 		}
 
@@ -129,7 +139,7 @@ class ScratchSprite extends ScratchObj {
 			sounds = spr.sounds;
 		} else {
 			for (i in 0...spr.scripts.length) scripts.push(spr.scripts[i].duplicate(forClone));
-			sounds = spr.sounds.concat();
+			sounds = spr.sounds.copy();
 		}
 
 		// To support vector costumes, every sprite must have its own costume copies, even clones.
@@ -166,14 +176,14 @@ class ScratchSprite extends ScratchObj {
 
 	override private function updateImage():Void {
 		// Make sure to update the shape
-		if(geomShape.parent) img.removeChild(geomShape);
+		if(geomShape.parent != null) img.removeChild(geomShape);
 		super.updateImage();
-		if(bubble) updateBubble();
+		if(bubble != null) updateBubble();
 	}
 
 	public function setScratchXY(newX:Float, newY:Float):Void {
-		scratchX = isFinite(newX) ? newX : newX > 0 ? 1e6 : -1e6;
-		scratchY = isFinite(newY) ? newY : newY > 0 ? 1e6 : -1e6;
+		scratchX = Math.isFinite(newX) ? newX : newX > 0 ? 1e6 : -1e6;
+		scratchY = Math.isFinite(newY) ? newY : newY > 0 ? 1e6 : -1e6;
 		x = 240 + Math.round(scratchX);
 		y = 180 - Math.round(scratchY);
 		updateBubble();
@@ -200,7 +210,7 @@ class ScratchSprite extends ScratchObj {
 
 		if(stageRect.containsRect(myBox)) return;
 
-		var inset:Int = Math.min(18, Math.min(myBox.width, myBox.height) / 2);
+		var inset:Int = Std.int(Math.min(18, Math.min(myBox.width, myBox.height) / 2));
 		edgeBox.x = edgeBox.y = inset;
 		inset += inset;
 		edgeBox.width = 480 - inset;
@@ -245,8 +255,8 @@ class ScratchSprite extends ScratchObj {
 	public function getSize():Float { return 100 * scaleX; }
 
 	public function setSize(percent:Float):Void {
-		var origW:Int = img.width;
-		var origH:Int = img.height;
+		var origW:Int = Std.int(img.width);
+		var origH:Int = Std.int(img.height);
 		var minScale:Float = Math.min(1, Math.max(5 / origW, 5 / origH));
 		var maxScale:Float = Math.min((1.5 * 480) / origW, (1.5 * 360) / origH);
 		scaleX = scaleY = Math.max(minScale, Math.min(percent / 100.0, maxScale));
@@ -259,7 +269,7 @@ class ScratchSprite extends ScratchObj {
 	}
 
 	public function setPenColor(c:Float):Void {
-		var hsv:Array = Color.rgb2hsv(c);
+		var hsv:Array<Float> = Color.rgb2hsv(c);
 		penHue = (200 * hsv[0]) / 360 ;
 		penShade = 50 * hsv[2];  // not quite right; doesn't account for saturation
 		penColorCache = c;
@@ -296,7 +306,7 @@ class ScratchSprite extends ScratchObj {
 		cachedBitmap = null;
 		cachedBounds = null;
 
-		if(!geomShape.parent) {
+		if(geomShape.parent == null) {
 			geomShape.graphics.copyFrom(currentCostume().getShape().graphics);
 			var currDO:DisplayObject = img.getChildAt(0);
 			geomShape.scaleX = currDO.scaleX;
@@ -337,7 +347,7 @@ class ScratchSprite extends ScratchObj {
 //	private var testBM:Bitmap = new Bitmap();
 //	private var testSpr:Sprite = new Sprite();
 	public function bitmap(forTest:Bool = false):BitmapData {
-		if (cachedBitmap != null && (!forTest || !Scratch.app.isIn3D))
+		if (cachedBitmap != null)
 			return cachedBitmap;
 
 		// compute cachedBitmap
@@ -345,7 +355,7 @@ class ScratchSprite extends ScratchObj {
 		var m:Matrix = new Matrix();
 		m.rotate((Math.PI * rotation) / 180);
 		m.scale(scaleX, scaleY);
-		var b:Rectangle = (!Scratch.app.render3D || currentCostume().bitmap) ? img.getChildAt(0).getBounds(this) : getVisibleBounds(this);
+		var b:Rectangle = img.getChildAt(0).getBounds(this);
 		var r:Rectangle = transformedBounds(b, m);
 
 		// returns true if caller should immediately return cachedBitmap
@@ -359,14 +369,14 @@ class ScratchSprite extends ScratchObj {
 
 			var oldTrans:ColorTransform = img.transform.colorTransform;
 			img.transform.colorTransform = new ColorTransform(1, 1, 1, 1, oldTrans.redOffset, oldTrans.greenOffset, oldTrans.blueOffset, 0);
-			cachedBitmap = new BitmapData(Math.max(int(r.width), 1), Math.max(int(r.height), 1), true, 0);
+			cachedBitmap = new BitmapData(Std.int(Math.max(Std.int(r.width), 1)), Std.int(Math.max(Std.int(r.height), 1)), true, 0);
 			m.translate(-r.left, -r.top);
 			cachedBitmap.draw(self, m);
 			img.transform.colorTransform = oldTrans;
 			return false;
 		}
-
-		#if allow3d
+/*
+		if (SCRATCH::allow3d) {
 			if (Scratch.app.isIn3D) {
 				var oldGhost:Float = filterPack.getFilterSetting('ghost');
 				filterPack.setFilter('ghost', 0);
@@ -404,21 +414,29 @@ class ScratchSprite extends ScratchObj {
 			else {
 				if (bitmap2d()) return cachedBitmap;
 			}
-		#else
+		}
+		else {
+		*/
 			if (bitmap2d()) return cachedBitmap;
-		#end
+		/*
+		}
+		*/
 
 		cachedBounds = cachedBitmap.rect;
 
 		// crop cachedBitmap and record cachedBounds
 		// Note: handles the case where cropR is empty
 		var cropR:Rectangle = cachedBitmap.getColorBoundsRect(0xFF000000, 0, false);
+		/*
 		if ((cropR.width > 0) && (cropR.height > 0)) {
-			var cropped:BitmapData = new BitmapData(Math.max(int(cropR.width), 1), Math.max(int(cropR.height), 1), true, 0);
+			var cropped:BitmapData = new BitmapData(Std.int(Math.max(Std.int(cropR.width), 1)), Std.int(Math.max(Std.int(cropR.height), 1)), true, 0);
 			cropped.copyPixels(cachedBitmap, cropR, new Point(0, 0));
 			cachedBitmap = cropped;
 			cachedBounds = cropR;
 		}
+		*/
+		// TODO: For the life of me, I can't get the copyPixels above to work properly with openfl, so I'm just commenting it out since it's not necessary in the end
+		cachedBounds = new Rectangle(0, 0, cachedBitmap.width, cachedBitmap.height);
 
 		cachedBounds.offset(r.x, r.y);
 		return cachedBitmap;
@@ -431,10 +449,10 @@ class ScratchSprite extends ScratchObj {
 		var p3:Point = m.transformPoint(new Point(r.left, r.bottom));
 		var p4:Point = m.transformPoint(r.bottomRight);
 		var xMin:Float, xMax:Float, yMin:Float, yMax:Float;
-		xMin = Math.min(p1.x, p2.x, p3.x, p4.x);
-		yMin = Math.min(p1.y, p2.y, p3.y, p4.y);
-		xMax = Math.max(p1.x, p2.x, p3.x, p4.x);
-		yMax = Math.max(p1.y, p2.y, p3.y, p4.y);
+		xMin = Math.min(p1.x, Math.min(p2.x, Math.min(p3.x, p4.x)));
+		yMin = Math.min(p1.y, Math.min(p2.y, Math.min(p3.y, p4.y)));
+		xMax = Math.max(p1.x, Math.max(p2.x, Math.max(p3.x, p4.x)));
+		yMax = Math.max(p1.y, Math.max(p2.y, Math.max(p3.y, p4.y)));
 		var newR:Rectangle = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
 		return newR;
 	}
@@ -445,7 +463,7 @@ class ScratchSprite extends ScratchObj {
 		if ('glideSecs:toX:y:elapsed:from:' == op) return [1, Math.round(scratchX), Math.round(scratchY)];
 		if ('setSizeTo:' == op) return [Math.round(getSize() * 10) / 10];
 		if ((['startScene', 'startSceneAndWait', 'whenSceneStarts'].indexOf(op)) > -1) {
-			var stg:ScratchStage = cast (parent, ScratchStage);
+			var stg:ScratchStage = cast(parent, ScratchStage);
 			if (stg != null) return [stg.costumes[stg.costumes.length - 1].costumeName];
 		}
 		if ('senseVideoMotion' == op) return ['motion', 'this sprite'];
@@ -454,7 +472,7 @@ class ScratchSprite extends ScratchObj {
 
 	/* Dragging */
 
-	public function objToGrab(evt:MouseEvent):ScratchSprite { return this; } // allow dragging
+	public function objToGrab(evt:MouseEvent):Dynamic { return this; } // allow dragging
 
 	/* Menu */
 
@@ -485,12 +503,12 @@ class ScratchSprite extends ScratchObj {
 		dup.objName = unusedSpriteName(objName);
 		if (!grab) {
 			dup.setScratchXY(
-				int(Math.random() * 400) - 200,
-				int(Math.random() * 300) - 150);
+				Std.int(Math.random() * 400) - 200,
+				Std.int(Math.random() * 300) - 150);
 		}
 		if (parent != null) {
 			parent.addChild(dup);
-			var app:Scratch = cast (root, Scratch);
+			var app:Scratch = Scratch.app;
 			if (app != null) {
 				app.setSaveNeeded();
 				app.updateSpriteLibrary();
@@ -506,14 +524,14 @@ class ScratchSprite extends ScratchObj {
 	}
 
 	public function unusedSpriteName(baseName:String):String {
-		var stg:ScratchStage = cast (parent, ScratchStage);
+		var stg:ScratchStage = cast(parent, ScratchStage);
 		return stg != null ? stg.unusedSpriteName(baseName) : baseName;
 	}
 
 	public function deleteSprite():Void {
 		if (parent != null) {
 			var app:Scratch = Scratch.app;
-			app.runtime.recordForUndelete(this, scratchX, scratchY, 0, app.stagePane);
+			app.runtime.recordForUndelete(this, Std.int(scratchX), Std.int(scratchY), 0, app.stagePane);
 			hideBubble();
 
 			// Force redisplay (workaround for flash display update bug)
@@ -523,12 +541,16 @@ class ScratchSprite extends ScratchObj {
 			}
 
 			parent.removeChild(this);
-			if (app) {
+			if (app != null) {
 				app.stagePane.removeObsoleteWatchers();
-				var sprites:Array = app.stagePane.sprites();
+				var sprites:Array<ScratchSprite> = app.stagePane.sprites();
 				if (sprites.length > 0) {
 					// Pick the sprite just before the deleted sprite in the sprite library to select next.
-					sprites.sortOn('indexInLibrary');
+					sprites.sort(function(a, b) {
+						if (a.indexInLibrary < b.indexInLibrary) return -1;
+						if (a.indexInLibrary > b.indexInLibrary) return 1;
+						return 0;
+					});
 					var nextSelection:ScratchSprite = sprites[0];
 					for (spr in sprites) {
 						if (spr.indexInLibrary > this.indexInLibrary) break;
@@ -546,12 +568,12 @@ class ScratchSprite extends ScratchObj {
 	}
 
 	private function saveToLocalFile():Void {
-		function success():Void {
-			Scratch.app.log('sprite saved to file: ' + file.name);
+		var file:FileReference = new FileReference();
+		function success(param:Dynamic):Void {
+			Scratch.app.log(LogLevel.INFO, 'sprite saved to file', {filename: file.name});
 		}
 		var zipData:ByteArray = new ProjectIO(Scratch.app).encodeSpriteAsZipFile(copyToShare());
 		var defaultName:String = objName + '.sprite2';
-		var file:FileReference = new FileReference();
 		file.addEventListener(Event.COMPLETE, success);
 		file.save(zipData, defaultName);
 	}
@@ -567,17 +589,17 @@ class ScratchSprite extends ScratchObj {
 
 	/* talk/think bubble support */
 
-	public function showBubble(s:Dynamic, type:String, source:Dynamic, isAsk:Bool = false):Void {
+	public function showBubble(s:Dynamic, type:String, source:Object, isAsk:Bool = false):Void {
 		hideBubble();
 		if (s == null) s = 'NULL';
-		if (Std.is (s, Float)) {
-			if ((Math.abs(s) >= 0.01) && (int(s) != s)) {
+		if (Std.is(s, Float)) {
+			if ((Math.abs(s) >= 0.01) && (Std.int(s) != s)) {
 				s = s.toFixed(2); // 2 digits after decimal point
 			} else {
-				s = Std.string (s);
+				s = s.toString();
 			}
 		}
-		if (!(Std.is (s, String))) s = Std.string (s);
+		if (!(Std.is(s, String))) s = s.toString();
 		if (s.length == 0) return;
 		bubble = new TalkBubble(s, type, isAsk ? 'ask' : 'say', source);
 		parent.addChild(bubble);
@@ -596,8 +618,8 @@ class ScratchSprite extends ScratchObj {
 		if (!visible) return;
 		var pad:Int = 3;
 		var stageL:Int = pad;
-		var stageR:Int = STAGEW - pad;
-		var stageH:Int = STAGEH;
+		var stageR:Int = ScratchObj.STAGEW - pad;
+		var stageH:Int = ScratchObj.STAGEH;
 		var r:Rectangle = bubbleRect();
 
 		// decide which side of the sprite the bubble should be on
@@ -656,8 +678,8 @@ class ScratchSprite extends ScratchObj {
 		json.writeKeyValue('spriteInfo', spriteInfo);
 	}
 
-	public override function readJSON(jsonObj:Dynamic):Void {
-		super.readJSON(jsonObj);
+	public override function readJSONAndInstantiate(jsonObj : Dynamic, newStage : ScratchStage) : Void{
+		super.readJSONAndInstantiate(jsonObj, newStage);
 		scratchX = jsonObj.scratchX;
 		scratchY = jsonObj.scratchY;
 		scaleX = scaleY = jsonObj.scale;
@@ -671,12 +693,13 @@ class ScratchSprite extends ScratchObj {
 	}
 
 	public function getVisibleBounds(space:DisplayObject):Rectangle {
+		var rot:Float = 0;
 		if(space == this) {
-			var rot:Float = rotation;
+			rot= rotation;
 			rotation = 0;
 		}
 
-		if(!geomShape.parent) {
+		if(geomShape.parent == null) {
 			img.addChild(geomShape);
 			geomShape.x = img.getChildAt(0).x;
 			geomShape.scaleX = img.getChildAt(0).scaleX;

@@ -22,24 +22,25 @@ package util;
 
 
 
-import flash.display.DisplayObjectContainer;
-import flash.display.DisplayObject;
+import openfl.display.DisplayObjectContainer;
+import openfl.display.DisplayObject;
 
-class DebugUtils {
-	
+class DebugUtils
+{
+
 	public static function printTree(top : DisplayObject) : String{
 		var result : String = "";
 		printSubtree(top, 0, result);
 		return result;
 	}
-	
+
 	private static function printSubtree(t : DisplayObject, indent : Int, out : String) : Void{
 		var tabs : String = "";
 		for (i in 0...indent){tabs += "\t";
 		}
 		out += tabs + Type.getClassName(t) + "\n";
 		var container : DisplayObjectContainer = try cast(t, DisplayObjectContainer) catch(e:Dynamic) null;
-		if (container == null) 			return;
+		if (container == null)             return;
 		for (i in 0...container.numChildren){
 			printSubtree(container.getChildAt(i), indent + 1, out);
 		}

@@ -44,54 +44,48 @@
 
 package util;
 
-import util.Dictionary;
-import util.IDataInput;
-import util.ListWatcher;
-import util.ScratchCostume;
-import util.ScratchSound;
-import util.ScratchSprite;
-import util.ScratchStage;
-import util.Watcher;
 
-import flash.display.BitmapData;
-import flash.errors.IOError;
-import flash.geom.Rectangle;
-import flash.utils.*;
+import openfl.display.BitmapData;
+import openfl.errors.IOError;
+import openfl.geom.Rectangle;
+import openfl.utils.*;
 import blocks.BlockArg;
+import openfl.Vector;
 import scratch.*;
 import sound.*;
 import watchers.*;
 
-class ObjReader {
-	private inline var OBJ_REF : Int = 99;
-	
+class ObjReader
+{
+	private static inline var OBJ_REF : Int = 99;
+
 	private var s : IDataInput;
 	private var objTable : Array<Dynamic> = [];
-	
+
 	public function new(s : IDataInput)
 	{
 		this.s = s;
 	}
-	
+
 	public static function isOldProject(data : ByteArray) : Bool{
-		if (data.length < 10) 			return false;
+		if (data.length < 10)             return false;
 		data.position = 0;
 		var s : String = data.readUTFBytes(10);
 		data.position = 0;
 		return ("ScratchV01" == s) || ("ScratchV02" == s);
 	}
-	
+
 	public function readInfo() : Dynamic{
 		var id : String = this.s.readMultiByte(10, "macintosh");
 		if (id != "ScratchV01" && id != "ScratchV02") {
 			throw new IOError("Not a valid Scratch file");
 		}
-		
+
 		var infoBytes : Int = s.readInt();
 		readObjTable();
-		
+
 		// convert the array of names and values into a dictionary
-		var infoDict : Dynamic = new Dynamic();
+		var infoDict : Dynamic = {};
 		var keysAndValues : Array<Dynamic> = objTable[0][0];
 		var i : Int = 0;
 		while (i < (keysAndValues.length - 1)){
@@ -100,7 +94,7 @@ class ObjReader {
 		}
 		return infoDict;
 	}
-	
+
 	public function readObjTable() : Array<Dynamic>{
 		var buf : String;
 		if (s.readMultiByte(4, "macintosh") != "ObjS" || s.readByte() != 1) {
@@ -109,17 +103,17 @@ class ObjReader {
 		if (s.readMultiByte(4, "macintosh") != "Stch" || s.readByte() != 1) {
 			throw new IOError();
 		}
-		
+
 		objTable = [];
 		var objCount : Int = s.readInt();
 		for (i in 0...objCount){
 			objTable[i] = readObj();
 		}  // Note: must decode images and instantiate objects before fixing references    // post processing  
-		
-		
-		
-		
-		
+
+
+
+
+
 		decodeSqueakImages();
 		instantiateScratchObjects();
 		fixReferences();
@@ -129,10 +123,10 @@ class ObjReader {
 		initSounds();
 		return objTable;
 	}
-	
+
 	private function readObj() : Array<Dynamic>{
 		var result : Array<Dynamic> = [];
-		
+
 		var classID : Int = s.readUnsignedByte();
 		if (classID < OBJ_REF) {
 			result[0] = readFixedFormat(classID);
@@ -150,7 +144,7 @@ class ObjReader {
 		}
 		return result;
 	}
-	
+
 	private function readField() : Dynamic{
 		var classID : Int = s.readUnsignedByte();
 		if (classID == OBJ_REF) {
@@ -161,14 +155,15 @@ class ObjReader {
 		}
 		return readFixedFormat(classID);
 	}
-	
+
 	private function readFixedFormat(classID : Int) : Dynamic{
 		var count : Int;
 		var i : Int;
 		var bytes : ByteArray = new ByteArray();
 		var objList : Array<Dynamic>;
-		
-		switch (classID) {
+
+		switch (classID)
+		{
 			case 1:
 				return null;
 			case 2:
@@ -189,23 +184,23 @@ class ObjReader {
 				}
 				return num;
 			case 8:
-				num = s.readDouble();
-				if (Std.is(num, Int)) 					num += BlockArg.epsilon  // ensure result is a float, even if it has no fractional part  ;
+				var num:Float = s.readDouble();
+				if (Std.is(num, Int))                     num += BlockArg.epsilon;  // ensure result is a float, even if it has no fractional part  ;
 				return num;
 			case 9, 10:
 				count = s.readInt();
 				return s.readMultiByte(count, "macintosh");
 			case 11:
 				count = s.readInt();
-				if (count > 0) 					s.readBytes(bytes, 0, count);
+				if (count > 0)                     s.readBytes(bytes, 0, count);
 				return bytes;
 			case 12:
 				count = s.readInt();
-				if (count > 0) 					s.readBytes(bytes, 0, 2 * count);
+				if (count > 0)                     s.readBytes(bytes, 0, 2 * count);
 				return bytes;
 			case 13:  // bitmap  
 				count = s.readInt();
-				objList = new Array<Dynamic>(count);
+				objList = Compat.newArray(count, null); // new Array<Dynamic>(count);
 				for (i in 0...count){
 					objList[i] = s.readUnsignedInt();
 				}
@@ -215,14 +210,14 @@ class ObjReader {
 				return s.readMultiByte(count, "utf-8");
 			case 20, 21, 22, 23:  // array  
 				count = s.readInt();
-				objList = new Array<Dynamic>(count);
+				objList = Compat.newArray(count, null); // new Array<Dynamic>(count);
 				for (i in 0...count){
 					objList[i] = readField();
 				}
 				return objList;
 			case 24, 25:  // dictionary  
 				count = s.readInt();
-				objList = new Array<Dynamic>(2 * count);
+				objList = Compat.newArray(2 * count, null); // new Array<Dynamic>(2 * count);
 				for (i in 0...2 * count){
 					objList[i] = readField();
 				}
@@ -235,12 +230,12 @@ class ObjReader {
 				var b : Int = (rgb >> 2) & 0xFF;
 				return (alpha << 24) | (r << 16) | (g << 8) | b;
 			case 32:  // point  
-				objList = new Array<Dynamic>(2);
+				objList = Compat.newArray(2, null); // new Array<Dynamic>(2);
 				objList[0] = readField();
 				objList[1] = readField();
 				return objList;
 			case 33:  // rectangle  
-				objList = new Array<Dynamic>(4);
+				objList = Compat.newArray(4, null); //  new Array<Dynamic>(4);
 				objList[0] = readField();
 				objList[1] = readField();
 				objList[2] = readField();
@@ -251,25 +246,25 @@ class ObjReader {
 				for (i in 0...5){
 					fields[i] = readField();
 				}
-				if (classID == 35) 					fields[5] = readField()  // colormap  ;
+				if (classID == 35)                     fields[5] = readField();  // colormap  ;
 				return fields;
 			default:
 				throw new IOError("Unknown fixed-format class " + classID);
 		}
 	}
-	
+
 	private function instantiateScratchObjects() : Void{
 		for (i in 0...objTable.length){
 			var classID : Int = objTable[i][1];
-			if (classID == 124) 				objTable[i][0] = new ScratchSprite();
-			if (classID == 125) 				objTable[i][0] = new ScratchStage();
-			if (classID == 155) 				objTable[i][0] = new Watcher();
-			if (classID == 162) 				objTable[i][0] = new ScratchCostume("uninitialized", null);
-			if (classID == 164) 				objTable[i][0] = new ScratchSound("uninitialized", null);
-			if (classID == 175) 				objTable[i][0] = new ListWatcher();
+			if (classID == 124)                 objTable[i][0] = new ScratchSprite();
+			if (classID == 125)                 objTable[i][0] = new ScratchStage();
+			if (classID == 155)                 objTable[i][0] = new Watcher();
+			if (classID == 162)                 objTable[i][0] = ScratchCostume.newEmptyCostume("uninitialized");
+			if (classID == 164)                 objTable[i][0] = new ScratchSound("uninitialized", null);
+			if (classID == 175)                 objTable[i][0] = new ListWatcher();
 		}
 	}
-	
+
 	private function decodeSqueakImages() : Void{
 		for (i in 0...objTable.length){
 			var classID : Int = objTable[i][1];
@@ -278,57 +273,57 @@ class ObjReader {
 				var w : Int = fields[0];
 				var h : Int = fields[1];
 				var depth : Int = fields[2];
-				
+
 				var rect : Rectangle = new Rectangle(0, 0, w, h);
 				var raster : Array<UInt> = decodePixels(objTable[fields[4].index][0], (depth == 32));
 				var bmpData : BitmapData = new BitmapData(w, h);
-				
+
 				if (depth <= 8) {
-					var colormap : Array<UInt> = ((depth == 1)) ? defaultOneBitColorMap : defaultColorMap;
+					var colormap : Array<Int> = ((depth == 1)) ? defaultOneBitColorMap : defaultColorMap;
 					if (fields[5] != null) {
 						var colors : Array<Dynamic> = objTable[fields[5].index][0];
 						colormap = buildCustomColormap(depth, colors);
 					}
-					bmpData.setVector(rect, unpackPixels(raster, w, h, depth, colormap));
+					bmpData.setVector(rect, Vector.ofArray(unpackPixels(raster, w, h, depth, colormap)));
 				}
 				if (depth == 16) {
-					bmpData.setVector(rect, raster16to32(raster, w, h));
+					bmpData.setVector(rect, Vector.ofArray(raster16to32(raster, w, h)));
 				}
 				if (depth == 32) {
-					bmpData.setVector(rect, raster);
+					bmpData.setVector(rect, Vector.ofArray(raster));
 				}
 				objTable[i][0] = bmpData;
 			}
 		}
 	}
-	
+
 	private function fixReferences() : Void{
 		for (i in 0...objTable.length){
 			var classID : Int = objTable[i][1];
 			var j : Int;
 			var el : Dynamic;
-			
+
 			if ((classID >= 20) && (classID <= 29)) {  // process collection elements  
 				var list : Array<Dynamic> = objTable[i][0];
 				for (j in 0...list.length){
 					el = list[j];
-					if (Std.is(el, Ref)) 						list[j] = deRef(el);
+					if (Std.is(el, Ref))                         list[j] = deRef(el);
 				}
 			}
 			if (classID > OBJ_REF) {  // process fields of a user-defined object  
 				for (j in 3...objTable[i].length){
 					el = objTable[i][j];
-					if (Std.is(el, Ref)) 						objTable[i][j] = deRef(el);
+					if (Std.is(el, Ref))                         objTable[i][j] = deRef(el);
 				}
 			}
 		}
 	}
-	
+
 	private function deRef(r : Dynamic) : Dynamic{
 		var entry : Array<Dynamic> = objTable[cast((r), Ref).index];
 		return ((entry[0] == null)) ? entry : entry[0];
 	}
-	
+
 	private function initCostumes() : Void{
 		// convert ImageMedia objects to ScratchCostume objects
 		for (entry in objTable){
@@ -357,11 +352,11 @@ class ObjReader {
 				else {
 					costume.baseLayerBitmap = costume.bitmap;
 				}
-				if (entry[8] != null) 					costume.bitmap = costume.oldComposite = entry[8];
+				if (entry[8] != null)                     costume.bitmap = costume.oldComposite = entry[8];
 			}
 		}
 	}
-	
+
 	private function initWatchers() : Void{
 		for (entry in objTable){
 			if (entry[1] == 155) {  // Watcher  
@@ -383,7 +378,7 @@ class ObjReader {
 				if (version > 3) {
 					w.setSliderMinMax(entry[23], entry[24], readoutValue);
 				}  // set the mode:  
-				
+
 				var slider : Dynamic = entry[19];
 				var readoutBox : Array<Dynamic> = readoutFrame[3];
 				var mode : Int;
@@ -397,7 +392,7 @@ class ObjReader {
 			}
 		}
 	}
-	
+
 	private function initListWatchers() : Void{
 		for (entry in objTable){
 			if (entry[1] == 175) {  // ListWatcher  
@@ -410,52 +405,52 @@ class ObjReader {
 					listWatcher.x = box[0] + 1;
 					listWatcher.y = box[1] + 1;
 				}
-				listWatcher.setWidthHeight(box[2] - box[0] - 2, box[3] - box[1] - 2);
+				listWatcher.setWidthHeight(Std.int(box[2] - box[0] - 2), Std.int(box[3] - box[1] - 2));
 				listWatcher.listName = entry[11];
 				listWatcher.contents = entry[12];
 				listWatcher.target = entry[13];
 			}
 		}
 	}
-	
+
 	private function initSounds() : Void{
 		// Convert SoundMedia objects to ScratchSound objects.
 		// To speed up reading old Scratch projects, compressed sounds
 		// are kept in Squeak format until the project is saved.
-		var cache : Dictionary = new Dictionary();  // used to avoid converting multiple identical copies of a sound to WAV  
-		var sndData : ByteArray;
-		for (entry in objTable){
-			if (entry[1] == 164) {  // SoundMedia  
-				var snd : ScratchSound = entry[0];
-				snd.soundName = entry[3];
-				
-				if (entry[9] == null) {
-					var uncompressedSound : Array<Dynamic> = entry[4];
-					sndData = uncompressedSound[6];
-					snd.format = "";
-					snd.rate = uncompressedSound[7];
-					snd.bitsPerSample = 16;
-					snd.sampleCount = sndData.length / 2;
-					if (Reflect.field(cache, Std.string(sndData)) != null) {
-						snd.soundData = Reflect.field(cache, Std.string(sndData));
-					}
-					else {
-						snd.soundData = WAVFile.encode(reverseBytes(sndData), snd.sampleCount, snd.rate, false);
-						Reflect.setField(cache, Std.string(sndData), snd.soundData);
-					}
-				}
-				else {
-					sndData = entry[9];
-					snd.format = "squeak";
-					snd.rate = entry[7];
-					snd.bitsPerSample = entry[8];
-					snd.sampleCount = Math.floor((8 * sndData.length) / snd.bitsPerSample);
-					snd.soundData = sndData;
-				}
-			}
-		}
+		//var cache : Dictionary = new Dictionary();  // used to avoid converting multiple identical copies of a sound to WAV  
+		//var sndData : ByteArray;
+		//for (entry in objTable){
+			//if (entry[1] == 164) {  // SoundMedia  
+				//var snd : ScratchSound = entry[0];
+				//snd.soundName = entry[3];
+//
+				//if (entry[9] == null) {
+					//var uncompressedSound : Array<Dynamic> = entry[4];
+					//sndData = uncompressedSound[6];
+					//snd.format = "";
+					//snd.rate = uncompressedSound[7];
+					//snd.bitsPerSample = 16;
+					//snd.sampleCount = Std.int(sndData.length / 2);
+					//if (Reflect.field(cache, Std.string(sndData)) != null) {
+						//snd.soundData = Reflect.field(cache, Std.string(sndData));
+					//}
+					//else {
+						//snd.soundData = WAVFile.encode(reverseBytes(sndData), snd.sampleCount, snd.rate, false);
+						//Reflect.setField(cache, Std.string(sndData), snd.soundData);
+					//}
+				//}
+				//else {
+					//sndData = entry[9];
+					//snd.format = "squeak";
+					//snd.rate = entry[7];
+					//snd.bitsPerSample = entry[8];
+					//snd.sampleCount = Math.floor((8 * sndData.length) / snd.bitsPerSample);
+					//snd.soundData = sndData;
+				//}
+			//}
+		//}
 	}
-	
+
 	private function reverseBytes(orig : ByteArray) : ByteArray{
 		var out : ByteArray = new ByteArray();
 		var end : Int = orig.length - 1;
@@ -468,41 +463,42 @@ class ObjReader {
 		out.endian = Endian.LITTLE_ENDIAN;
 		return out;
 	}
-	
+
 	private function decodePixels(data : Dynamic, addAlpha : Bool) : Array<UInt>{
 		var result : Array<UInt>;
 		var i : Int;
-		var w : UInt;
+		var w : Int;
 		if (Std.is(data, Array)) {
 			result = data;  // already an array (uncompressed pixel data)  
 			if (addAlpha) {
 				for (i in 0...result.length){
-					if ((w = result[i]) != 0) 						result[i] = 0xFF000000 | w;
+					if ((w = result[i]) != 0)                         result[i] = 0xFF000000 | w;
 				}
 			}
 			return result;
 		}
-		
+
 		var s : ByteArray = cast((data), ByteArray);
-		var n : UInt = decodeInt(s);
+		var n : Int = decodeInt(s);
 		result = new Array<UInt>();
 		i = 0;
 		while ((s.bytesAvailable > 0) && (i < n)){
-			var runLengthAndCode : UInt = decodeInt(s);
+			var runLengthAndCode : Int = decodeInt(s);
 			var runLength : Int = runLengthAndCode >> 2;
 			var code : Int = runLengthAndCode & 3;
-			switch (code) {
+			switch (code)
+			{
 				case 0:
 					i += runLength;
 				case 1:
 					w = s.readUnsignedByte();
 					w = (w << 24) | (w << 16) | (w << 8) | w;
-					if (addAlpha && (w != 0)) 						w |= 0xFF000000;
+					if (addAlpha && (w != 0))                         w |= 0xFF000000;
 					for (j in 0...runLength){result[i++] = w;
 					}
 				case 2:
 					w = s.readInt();
-					if (addAlpha && (w != 0)) 						w |= 0xFF000000;
+					if (addAlpha && (w != 0))                         w |= 0xFF000000;
 					for (j in 0...runLength){result[i++] = w;
 					}
 				case 3:
@@ -511,35 +507,35 @@ class ObjReader {
 						w |= (s.readUnsignedByte()) << 16;
 						w |= (s.readUnsignedByte()) << 8;
 						w |= s.readUnsignedByte();
-						if (addAlpha && (w != 0)) 							w |= 0xFF000000;
+						if (addAlpha && (w != 0))                             w |= 0xFF000000;
 						result[i++] = w;
 					}
 			}
 		}
 		return result;
 	}
-	
-	private function decodeInt(s : ByteArray) : UInt{
+
+	private function decodeInt(s : ByteArray) : Int{
 		// Decode an integer as follows...
 		//	 0-223		0-223
 		//	 224-254	(0-30)*256 + next byte (0-7935)
 		//	 255		next 4 bytes as big-endian integer
 		var count : Int = s.readUnsignedByte();
-		if (count <= 223) 			return count;
-		if (count <= 254) 			return ((count - 224) * 256) + (s.readUnsignedByte());
+		if (count <= 223)             return count;
+		if (count <= 254)             return ((count - 224) * 256) + (s.readUnsignedByte());
 		return s.readUnsignedInt();
 	}
-	
-	private function unpackPixels(words : Array<UInt>, w : Int, h : Int, depth : Int, colormap : Array<UInt>) : Array<UInt>{
+
+	private function unpackPixels(words : Array<UInt>, w : Int, h : Int, depth : Int, colormap : Array<Int>) : Array<UInt>{
 		var result : Array<UInt> = new Array<UInt>();
-		var span : Int = words.length / h;
+		var span : Int = Std.int(words.length / h);
 		var mask : Int = (1 << depth) - 1;
-		var pixels_per_word : Int = 32 / depth;
+		var pixels_per_word : Int = Std.int(32 / depth);
 		var dst : Int = 0;
-		
+
 		for (y in 0...h){
 			var src : Int = y * span;
-			var word : UInt;
+			var word : Int = 0;
 			var shift : Int = -1;
 			for (x in 0...w){
 				if (shift < 0) {
@@ -552,14 +548,14 @@ class ObjReader {
 		}
 		return result;
 	}
-	
+
 	private function raster16to32(raster16 : Array<UInt>, w : Int, h : Int) : Array<UInt>{
 		var result : Array<UInt> = new Array<UInt>();
-		var shift : Int;
-		var word : UInt;
-		var pix : Int;
-		var src : Int;
-		var dst : Int;
+		var shift : Int = 0;
+		var word : Int = 0;
+		var pix : Int = 0;
+		var src : Int = 0;
+		var dst : Int = 0;
 		for (y in 0...h){
 			shift = -1;
 			for (x in 0...w){
@@ -580,19 +576,19 @@ class ObjReader {
 		}
 		return result;
 	}
-	
-	private function buildCustomColormap(depth : Int, colors : Array<Dynamic>) : Array<UInt>{
+
+	private function buildCustomColormap(depth : Int, colors : Array<Dynamic>) : Array<Int>{
 		// a colormap is an array of ARGB ints
-		var result : Array<UInt> = new Array<UInt>();
+		var result : Array<Int> = new Array<Int>();
 		for (i in 0...colors.length){
 			result[i] = objTable[colors[i].index][0];
 		}
 		return result;
 	}
-	
-	private var defaultOneBitColorMap : Array<UInt> = [0xFFFFFFFF, 0xFF000000];  // 0 -> white, 1 -> black  
-	
-	private var defaultColorMap : Array<UInt> = [
+
+	private var defaultOneBitColorMap : Array<Int> = [0xFFFFFFFF, 0xFF000000];  // 0 -> white, 1 -> black  
+
+	private var defaultColorMap : Array<Int> = [
 				0x00000000, 0xFF000000, 0xFFFFFFFF, 0xFF808080, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF00FFFF, 
 				0xFFFFFF00, 0xFFFF00FF, 0xFF202020, 0xFF404040, 0xFF606060, 0xFF9F9F9F, 0xFFBFBFBF, 0xFFDFDFDF, 
 				0xFF080808, 0xFF101010, 0xFF181818, 0xFF282828, 0xFF303030, 0xFF383838, 0xFF484848, 0xFF505050, 
@@ -625,52 +621,42 @@ class ObjReader {
 				0xFFFF0066, 0xFFFF3366, 0xFFFF6666, 0xFFFF9966, 0xFFFFCC66, 0xFFFFFF66, 0xFFFF0099, 0xFFFF3399, 
 				0xFFFF6699, 0xFFFF9999, 0xFFFFCC99, 0xFFFFFF99, 0xFFFF00CC, 0xFFFF33CC, 0xFFFF66CC, 0xFFFF99CC, 
 				0xFFFFCCCC, 0xFFFFFFCC, 0xFFFF00FF, 0xFFFF33FF, 0xFFFF66FF, 0xFFFF99FF, 0xFFFFCCFF, 0xFFFFFFFF];
-	
+
 	private function classIDToName(id : Int) : String{
-		if (id == 9) 			return "String";
-		if (id == 10) 			return "Symbol";
-		if (id == 11) 			return "ByteArray";
-		if (id == 12) 			return "SoundBuffer";
-		if (id == 13) 			return "Bitmap";
-		if (id == 14) 			return "UTF8";
-		if (id == 20) 			return "Array";
-		if (id == 21) 			return "OrderedCollection";
-		if (id == 22) 			return "Set";
-		if (id == 23) 			return "IdentitySet";
-		if (id == 24) 			return "Dictionary";
-		if (id == 25) 			return "IdentityDictionary";
-		if (id == 30) 			return "Color";
-		if (id == 31) 			return "ColorAlpha";
-		if (id == 32) 			return "Point";
-		if (id == 33) 			return "Rectangle";
-		if (id == 34) 			return "Form";
-		if (id == 35) 			return "ColorForm";
-		if (id == 100) 			return "Morph";
-		if (id == 104) 			return "Alignment";
-		if (id == 105) 			return "String";
-		if (id == 106) 			return "UpdatingString";
-		if (id == 109) 			return "SampledSound";
-		if (id == 110) 			return "ImageMorph";
-		if (id == 124) 			return "Sprite";
-		if (id == 125) 			return "Stage";
-		if (id == 155) 			return "Watcher";
-		if (id == 162) 			return "ImageMedia";
-		if (id == 164) 			return "SoundMedia";
-		if (id == 171) 			return "MultilineString";
-		if (id == 173) 			return "WatcherReadoutFrame";
-		if (id == 174) 			return "WatcherSlider";
-		if (id == 175) 			return "ListWatcher";
+		if (id == 9)             return "String";
+		if (id == 10)             return "Symbol";
+		if (id == 11)             return "ByteArray";
+		if (id == 12)             return "SoundBuffer";
+		if (id == 13)             return "Bitmap";
+		if (id == 14)             return "UTF8";
+		if (id == 20)             return "Array";
+		if (id == 21)             return "OrderedCollection";
+		if (id == 22)             return "Set";
+		if (id == 23)             return "IdentitySet";
+		if (id == 24)             return "Dictionary";
+		if (id == 25)             return "IdentityDictionary";
+		if (id == 30)             return "Color";
+		if (id == 31)             return "ColorAlpha";
+		if (id == 32)             return "Point";
+		if (id == 33)             return "Rectangle";
+		if (id == 34)             return "Form";
+		if (id == 35)             return "ColorForm";
+		if (id == 100)             return "Morph";
+		if (id == 104)             return "Alignment";
+		if (id == 105)             return "String";
+		if (id == 106)             return "UpdatingString";
+		if (id == 109)             return "SampledSound";
+		if (id == 110)             return "ImageMorph";
+		if (id == 124)             return "Sprite";
+		if (id == 125)             return "Stage";
+		if (id == 155)             return "Watcher";
+		if (id == 162)             return "ImageMedia";
+		if (id == 164)             return "SoundMedia";
+		if (id == 171)             return "MultilineString";
+		if (id == 173)             return "WatcherReadoutFrame";
+		if (id == 174)             return "WatcherSlider";
+		if (id == 175)             return "ListWatcher";
 		return "Unknown(" + id + ")";
 	}
 }
 
-class Ref {
-	@:allow(util)
-	private var index : Int;
-	private function new(i : Int)
-	{index = i - 1;
-	}
-	@:allow(util)
-	private function toString() : String{return "Ref(" + index + ")";
-	}
-}

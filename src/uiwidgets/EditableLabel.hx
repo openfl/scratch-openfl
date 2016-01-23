@@ -26,47 +26,40 @@
 
 package uiwidgets;
 
-//import uiwidgets.BevelFilter;
-//import uiwidgets.FocusEvent;
-//import uiwidgets.Graphics;
-//import uiwidgets.KeyboardEvent;
-//import uiwidgets.Shape;
-//import uiwidgets.Sprite;
-//import uiwidgets.TextField;
-//import uiwidgets.TextFormat;
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.*;
+import openfl.text.*;
 
-class EditableLabel extends Sprite {
-	
+class EditableLabel extends Sprite
+{
+
 	private var defaultFormat : TextFormat = new TextFormat(CSS.font, 13, 0x929497);
-	private inline static var bgColor : Int = 0xFFFFFF;
-	private inline static var frameColor : Int = 0xA6A8AB;
-	
+	private static inline var bgColor : Int = 0xFFFFFF;
+	private static inline var frameColor : Int = 0xA6A8AB;
+
 	public var tf : TextField;
-	
+
 	private var bezel : Shape;
 	private var dynamicBezel : Bool;
-	private var textChanged : Dynamic;
-	
-	public function new(textChanged : Dynamic, format : TextFormat = null)
+	private var textChanged : Void->Void;
+
+	public function new(textChanged : Void->Void, format : TextFormat = null)
 	{
 		super();
 		this.textChanged = textChanged;
 		bezel = new Shape();
 		addChild(bezel);
 		addFilter();
-		if (format == null) 			format = defaultFormat;
+		if (format == null)             format = defaultFormat;
 		addTextField(format);
 		setWidth(100);
 	}
-	
+
 	public function setWidth(w : Int) : Void{
-		if (tf.text.length == 0) 			tf.text = " ";  // needs at least one character to compute textHeight  ;
-		var h : Int = tf.textHeight + 5;  // the height is determined by the font  
+		if (tf.text.length == 0)             tf.text = " ";  // needs at least one character to compute textHeight  ;
+		var h : Int = Std.int(tf.textHeight + 5);  // the height is determined by the font  
 		var g : Graphics = bezel.graphics;
 		g.clear();
 		g.lineStyle(0.5, frameColor, 1, true);
@@ -76,7 +69,7 @@ class EditableLabel extends Sprite {
 		tf.width = w - 3;
 		tf.height = h - 1;
 	}
-	
+
 	public function contents() : String{return tf.text;
 	}
 	public function setContents(s : String) : Void{tf.text = s;
@@ -86,17 +79,17 @@ class EditableLabel extends Sprite {
 		tf.selectable = flag;
 		bezel.visible = flag;
 	}
-	
+
 	public function useDynamicBezel(flag : Bool) : Void{
 		dynamicBezel = flag;
 		bezel.visible = !dynamicBezel;
 	}
-	
+
 	private function focusChange(evt : FocusEvent) : Void{
-		if (dynamicBezel) 			bezel.visible = ((root.stage.focus == tf) && (tf.type == TextFieldType.INPUT));
-		if ((evt.type == FocusEvent.FOCUS_OUT) && (textChanged != null)) 			textChanged();
+		if (dynamicBezel)             bezel.visible = ((root.stage.focus == tf) && (tf.type == TextFieldType.INPUT));
+		if ((evt.type == FocusEvent.FOCUS_OUT) && (textChanged != null))             textChanged();
 	}
-	
+
 	private function keystroke(evt : KeyboardEvent) : Void{
 		// Called after each keystroke.
 		var k : Int = evt.charCode;
@@ -105,7 +98,7 @@ class EditableLabel extends Sprite {
 			evt.stopPropagation();
 		}
 	}
-	
+
 	private function addTextField(format : TextFormat) : Void{
 		tf = new TextField();
 		tf.defaultTextFormat = format;
@@ -122,14 +115,15 @@ class EditableLabel extends Sprite {
 		tf.addEventListener(KeyboardEvent.KEY_DOWN, keystroke);
 		addChild(tf);
 	}
-	
+
 	private function addFilter() : Void{
-		var f : BevelFilter = new BevelFilter();
-		f.angle = 225;
-		f.shadowAlpha = 0.5;
-		f.distance = 2;
-		f.strength = 0.5;
-		f.blurX = f.blurY = 2;
-		bezel.filters = [f];
+		//var f : BevelFilter = new BevelFilter();
+		//f.angle = 225;
+		//f.shadowAlpha = 0.5;
+		//f.distance = 2;
+		//f.strength = 0.5;
+		//f.blurX = f.blurY = 2;
+		//bezel.filters = [f];
+		bezel.filters = [];
 	}
 }

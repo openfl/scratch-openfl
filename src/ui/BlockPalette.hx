@@ -26,52 +26,58 @@
 
 package ui;
 
-//import ui.ScrollFrameContents;
 
-import flash.geom.*;
+import openfl.display.Sprite;
+import openfl.geom.*;
 import blocks.Block;
 import interpreter.Interpreter;
 import uiwidgets.*;
 import scratch.ScratchObj;
 import scratch.ScratchComment;
 
-class BlockPalette extends ScrollFrameContents {
-	
+class BlockPalette extends ScrollFrameContents
+{
+
 	public var isBlockPalette : Bool = true;
-	
+
 	public function new()
 	{
 		super();
 		this.color = 0xE0E0E0;
 	}
-	
+
 	override public function clear(scrollToOrigin : Bool = true) : Void{
 		var interp : Interpreter = Scratch.app.interp;
 		var targetObj : ScratchObj = Scratch.app.viewedObj();
-		while (numChildren > 0){
-			var b : Block = try cast(getChildAt(0), Block) catch(e:Dynamic) null;
-			if (interp.isRunning(b, targetObj)) 				interp.toggleThread(b, targetObj);
+		while (numChildren > 0) {
+			var child = getChildAt(0);
+			if (Std.is(child, Block))
+			{
+				var b : Block = cast(child, Block);
+				if (interp.isRunning(b, targetObj))
+					interp.toggleThread(b, targetObj);
+			}
 			removeChildAt(0);
 		}
-		if (scrollToOrigin) 			x = y = 0;
+		if (scrollToOrigin)             x = y = 0;
 	}
-	
-	public function handleDrop(obj : Dynamic) : Bool{
+
+	public function handleDrop(obj : Sprite) : Bool{
 		// Delete blocks and stacks dropped onto the palette.
-		var c : ScratchComment = try cast(obj, ScratchComment) catch(e:Dynamic) null;
-		if (c != null) {
+		if (Std.is(obj, ScratchComment)) {
+			var c : ScratchComment = cast(obj, ScratchComment);
 			c.x = c.y = 20;  // position for undelete  
 			c.deleteComment();
 			return true;
 		}
-		var b : Block = try cast(obj, Block) catch(e:Dynamic) null;
-		if (b != null) {
+		if (Std.is(obj, Block)) {
+			var b : Block = cast(obj, Block);
 			return b.deleteStack();
 		}
 		return false;
 	}
-	
-	public static function strings() : Array<Dynamic>{
+
+	public static function strings() : Array<String>{
 		return ["Cannot Delete", "To delete a block definition, first remove all uses of the block."];
 	}
 }

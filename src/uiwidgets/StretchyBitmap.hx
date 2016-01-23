@@ -22,31 +22,32 @@ package uiwidgets;
 import uiwidgets.Bitmap;
 import uiwidgets.BitmapData;
 
-import flash.display.*;
-import flash.geom.*;
+import openfl.display.*;
+import openfl.geom.*;
 
-class StretchyBitmap extends Sprite {
-	
+class StretchyBitmap extends Sprite
+{
+
 	private var srcBM : BitmapData;
 	private var cachedBM : Bitmap;
-	
+
 	public function new(bm : BitmapData = null, w : Int = 100, h : Int = 75)
 	{
 		super();
 		srcBM = bm;
-		if (srcBM == null) 			srcBM = new BitmapData(1, 1, false, 0x808080);
+		if (srcBM == null)             srcBM = new BitmapData(1, 1, false, 0x808080);
 		cachedBM = new Bitmap(srcBM);
 		addChild(cachedBM);
 		setWidthHeight(w, h);
 	}
-	
+
 	public function setWidthHeight(w : Int, h : Int) : Void{
 		var srcW : Int = srcBM.width;
 		var srcH : Int = srcBM.height;
 		w = Math.max(w, srcW);
 		h = Math.max(h, srcH);
 		var halfSrc : Int;
-		
+
 		// adjust width
 		var newBM : BitmapData = new BitmapData(w, h, true, 0xFF000000);
 		halfSrc = srcW / 2;
@@ -55,17 +56,17 @@ class StretchyBitmap extends Sprite {
 		for (dstX in halfSrc...(w - halfSrc)){
 			newBM.copyPixels(srcBM, new Rectangle(halfSrc, 0, 1, srcH), new Point(dstX, 0));
 		}  // adjust height  
-		
-		
-		
+
+
+
 		halfSrc = srcH / 2;
 		newBM.copyPixels(newBM, new Rectangle(0, (srcH - halfSrc), w, halfSrc), new Point(0, h - halfSrc));
 		for (dstY in halfSrc + 1...(h - halfSrc)){
 			newBM.copyPixels(newBM, new Rectangle(0, halfSrc, w, 1), new Point(0, dstY));
 		}  // install new bitmap  
-		
-		
-		
+
+
+
 		cachedBM.bitmapData = newBM;
 	}
 }

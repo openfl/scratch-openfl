@@ -37,38 +37,38 @@
 
 package blocks;
 
-import blocks.BlockShape;
-//import blocks.Graphics;
-//import blocks.MouseEvent;
-//import blocks.Shape;
-//import blocks.Sprite;
-//import blocks.TextField;
-
-import flash.display.*;
-import flash.events.*;
-import flash.filters.BevelFilter;
-import flash.text.*;
+//import openfl.filters.BevelFilter;
+import openfl.display.Graphics;
+import openfl.display.Shape;
+import openfl.display.Sprite;
+import openfl.events.MouseEvent;
+import openfl.events.Event;
+import openfl.events.FocusEvent;
+import openfl.text.TextField;
+import openfl.text.TextFieldAutoSize;
+import openfl.text.TextFieldType;
 import scratch.BlockMenus;
 import translation.Translator;
 import util.Color;
 
-class BlockArg extends Sprite {
-	
+class BlockArg extends Sprite
+{
+
 	public static var epsilon : Float = 1 / 4294967296;
-	public static inline var NT_NOT_NUMBER : UInt = 0;
-	public static inline var NT_FLOAT : UInt = 1;
-	public static inline var NT_INT : UInt = 2;
-	
+	public static inline var NT_NOT_NUMBER : Int = 0;
+	public static inline var NT_FLOAT : Int = 1;
+	public static inline var NT_INT : Int = 2;
+
 	public var type : String;
 	public var base : BlockShape;
 	public var argValue : Dynamic = "";
-	public var numberType : UInt = NT_NOT_NUMBER;
+	public var numberType : Int = NT_NOT_NUMBER;
 	public var isEditable : Bool;
 	public var field : TextField;
 	public var menuName : String;
-	
+
 	private var menuIcon : Shape;
-	
+
 	// BlockArg types:
 	//	b - boolean (pointed)
 	//	c - color selector
@@ -81,9 +81,9 @@ class BlockArg extends Sprite {
 	{
 		super();
 		this.type = type;
-		
+
 		if (color == -1) {  // copy for clone; omit graphics  
-			if ((type == "d") || (type == "n")) 				numberType = NT_FLOAT;
+			if ((type == "d") || (type == "n"))                 numberType = NT_FLOAT;
 			return;
 		}
 		var c : Int = Color.scaleBrightness(color, 0.92);
@@ -121,17 +121,17 @@ class BlockArg extends Sprite {
 			// and optionally defining the base shape
 			return;
 		}
-		
+
 		if (type == "c") {
 			base.setWidthAndTopHeight(13, 13);
 			setArgValue(Color.random());
 		}
 		else {
-			base.setWidthAndTopHeight(30, Block.argTextFormat.size + 6);
+			base.setWidthAndTopHeight(30, Std.int(Block.argTextFormat.size + 6));
 		}
 		base.filters = blockArgFilters();
 		addChild(base);
-		
+
 		if ((type == "d") || (type == "m")) {  // add a menu icon  
 			menuIcon = new Shape();
 			var g : Graphics = menuIcon.graphics;
@@ -143,13 +143,13 @@ class BlockArg extends Sprite {
 			menuIcon.y = 5;
 			addChild(menuIcon);
 		}
-		
+
 		if (editable || numberType != 0 || (type == "m")) {  // add a string field  
 			field = makeTextField();
-			if ((type == "m") && !editable) 				field.textColor = 0xFFFFFF
-			else base.setWidthAndTopHeight(30, Block.argTextFormat.size + 5);  // 14 for normal arg font  
+			if ((type == "m") && !editable)                 field.textColor = 0xFFFFFF
+			else base.setWidthAndTopHeight(30, Std.int(Block.argTextFormat.size + 5));  // 14 for normal arg font  
 			field.text = (numberType != 0) ? "10" : "";
-			if (numberType != 0) 				field.restrict = "0-9e.\\-";  // restrict to numeric characters  ;
+			if (numberType != 0)                 field.restrict = "0-9e.\\-";  // restrict to numeric characters  ;
 			if (editable) {
 				base.setColor(0xFFFFFF);  // if editable, set color to white  
 				isEditable = true;
@@ -162,16 +162,16 @@ class BlockArg extends Sprite {
 			base.redraw();
 		}
 	}
-	
+
 	public function labelOrNull() : String{return (field != null) ? field.text : null;
 	}
-	
+
 	public function setArgValue(value : Dynamic, label : String = null) : Void{
 		// if provided, label is displayed in field, rather than the value
 		// this is used for sprite names and to support translation
 		argValue = value;
 		if (field != null) {
-			var s : String = ((value == null)) ? "" : value;
+			var s : String = ((value == null)) ? "" : Std.string(value);
 			field.text = ((label != null)) ? label : s;
 			if (menuName != null && label == null && (Std.is(value, String)) && (value != "")) {
 				if (BlockMenus.shouldTranslateItemForMenu(value, menuName)) {
@@ -183,35 +183,36 @@ class BlockArg extends Sprite {
 			argValue = value;  // set argValue after textChanged()  
 			return;
 		}
-		if (type == "c") 			base.setColor(as3hx.Compat.parseInt(argValue) & 0xFFFFFF);
+		if (type == "c")             base.setColor(Std.parseInt(argValue) & 0xFFFFFF);
 		base.redraw();
 	}
-	
+
 	public function startEditing() : Void{
 		if (isEditable) {
 			field.type = TextFieldType.INPUT;
 			field.selectable = true;
-			if (field.text.length == 0) 				field.text = "  ";
+			if (field.text.length == 0)                 field.text = "  ";
 			field.setSelection(0, field.text.length);
 			root.stage.focus = field;
 		}
 	}
-	
+
 	private function stopEditing(ignore : Dynamic) : Void{
 		field.type = TextFieldType.DYNAMIC;
 		field.selectable = false;
 	}
-	
-	private function blockArgFilters() : Array<Dynamic>{
-		// filters for BlockArg outlines
-		var f : BevelFilter = new BevelFilter(1);
-		f.blurX = f.blurY = 2;
-		f.highlightAlpha = 0.3;
-		f.shadowAlpha = 0.6;
-		f.angle = 240;  // change light angle to show indentation  
-		return [f];
+
+	private function blockArgFilters() : Array<openfl.filters.BitmapFilter> {
+		return [];
+		//// filters for BlockArg outlines
+		//var f : BevelFilter = new BevelFilter(1);
+		//f.blurX = f.blurY = 2;
+		//f.highlightAlpha = 0.3;
+		//f.shadowAlpha = 0.6;
+		//f.angle = 240;  // change light angle to show indentation  
+		//return [f];
 	}
-	
+
 	private function makeTextField() : TextField{
 		var tf : TextField = new TextField();
 		var offsets : Array<Dynamic> = argTextInsets(type);
@@ -223,12 +224,12 @@ class BlockArg extends Sprite {
 		tf.addEventListener(Event.CHANGE, textChanged);
 		return tf;
 	}
-	
+
 	private function argTextInsets(type : String = "") : Array<Dynamic>{
-		if (type == "b") 			return [5, 0];
+		if (type == "b")             return [5, 0];
 		return (numberType != 0) ? [3, 0] : [2, -1];
 	}
-	
+
 	private function textChanged(evt : Dynamic) : Void{
 		argValue = field.text;
 		if (numberType != 0) {
@@ -236,28 +237,28 @@ class BlockArg extends Sprite {
 			var n : Float = Std.parseFloat(argValue);
 			if (!Math.isNaN(n)) {
 				argValue = n;
-				
+
 				// For number arguments that are integers AND do NOT contain a decimal point, mark them as an INTEGER (used by pick random)
 				numberType = ((field.text.indexOf(".") == -1 && Std.is(n, Int))) ? NT_INT : NT_FLOAT;
 			}
 			else 
 			numberType = NT_FLOAT;
 		}  // fix layout:  
-		
+
 		var padding : Int = ((type == "n")) ? 3 : 0;
-		if (type == "b") 			padding = 8;
-		if (menuIcon != null) 			padding = ((type == "d")) ? 10 : 13;
-		var w : Int = Math.max(14, field.textWidth + 6 + padding);
-		if (menuIcon != null) 			menuIcon.x = w - menuIcon.width - 3;
+		if (type == "b")             padding = 8;
+		if (menuIcon != null)             padding = ((type == "d")) ? 10 : 13;
+		var w : Int = Std.int(Math.max(14, field.textWidth + 6 + padding));
+		if (menuIcon != null)             menuIcon.x = w - menuIcon.width - 3;
 		base.setWidth(w);
 		base.redraw();
-		if (Std.is(parent, Block)) 			cast((parent), Block).fixExpressionLayout();
-		
-		if (evt != null && Scratch.app) 			Scratch.app.setSaveNeeded();
+		if (Std.is(parent, Block))             cast((parent), Block).fixExpressionLayout();
+
+		if (evt != null && Scratch.app != null)             Scratch.app.setSaveNeeded();
 	}
-	
+
 	private function invokeMenu(evt : MouseEvent) : Void{
-		if ((menuIcon != null) && (evt.localX <= menuIcon.x)) 			return;
+		if ((menuIcon != null) && (evt.localX <= menuIcon.x))             return;
 		if (Block.MenuHandlerFunction != null) {
 			Block.MenuHandlerFunction(evt, parent, this, menuName);
 			evt.stopImmediatePropagation();

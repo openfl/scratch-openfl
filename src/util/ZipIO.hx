@@ -19,31 +19,35 @@
 
 package util;
 
-import nme.errors.Error;
+import haxe.io.Bytes;
+import haxe.zip.InflateImpl;
+import haxe.zip.Uncompress;
+import openfl.errors.Error;
 
-import flash.utils.Endian;
-import flash.utils.ByteArray;
+import openfl.utils.Endian;
+import openfl.utils.ByteArray;
 
 
 
 
-class ZipIO {
-	
-	private inline var Version : Int = 10;
-	private inline var FileEntryID : UInt = 0x04034b50;  // Local File Header Record  
-	private inline var DirEntryID : UInt = 0x02014b50;  // Central Directory Record  
-	private inline var EndID : UInt = 0x06054b50;  // End of Central Directory Record  
-	
-	private static var crcTable : Array<Dynamic> = makeCrcTable();
-	
+class ZipIO
+{
+
+	private static inline var Version : Int = 10;
+	private static inline var FileEntryID : Int = 0x04034b50;  // Local File Header Record  
+	private static inline var DirEntryID : Int = 0x02014b50;  // Central Directory Record  
+	private static inline var EndID : Int = 0x06054b50;  // End of Central Directory Record  
+
+	private static var crcTable : Array<Int> = makeCrcTable();
+
 	private var buf : ByteArray;
-	private var entries : Array<Dynamic> = [];
-	private var writtenFiles : Dynamic = new Dynamic();
-	
+	private var entries : Array<Entry> = [];
+	private var writtenFiles : Dynamic = {};
+
 	//************************************
 	// Reading
 	//************************************
-	
+
 	public function read(data : ByteArray) : Array<Dynamic>{
 		// Read the given zip file data and return an array of [<name>, <data>] pairs.
 		var i : Int;
@@ -62,7 +66,7 @@ class ZipIO {
 		}
 		return result;
 	}
-	
+
 	public function recover(data : ByteArray) : Array<Dynamic>{
 		// Scan the zip file for file entries and return all the well-formed files.
 		// This can be used to recover some of the files if the zip file is damaged.
@@ -78,35 +82,35 @@ class ZipIO {
 					e.offset = i;
 					try{
 						readFile(e, true);
-					}					catch (e : Dynamic){
+					}                    catch (e : Dynamic){
 						e = null;
 					}
-					if (e != null) 						result.push([e.name, e.data]);
+					if (e != null)                         result.push([e.name, e.data]);
 				}
 			}
 		}
 		return result;
 	}
-	
+
 	private function readFile(e : Entry, recovering : Bool = false) : Void{
 		// Read a local file header and the following file data.
 		// Decompress the data if necessary, check the CRC, and record in e.data.
 		buf.position = e.offset;
-		if (buf.readUnsignedInt() != FileEntryID) 			throw cast(("zip: bad local file header"), Error);
+		if (buf.readUnsignedInt() != FileEntryID)             throw cast(("zip: bad local file header"), Error);
 		var versionNeeded : Int = buf.readUnsignedShort();
 		var flags : Int = buf.readUnsignedShort();
 		var compressionMethod : Int = buf.readUnsignedShort();
-		var dosTime : UInt = buf.readUnsignedInt();
-		var crc : UInt = buf.readUnsignedInt();
-		var compressedSize : UInt = buf.readUnsignedInt();
-		var uncompressedSize : UInt = buf.readUnsignedInt();
+		var dosTime : Int = buf.readUnsignedInt();
+		var crc : Int = buf.readUnsignedInt();
+		var compressedSize : Int = buf.readUnsignedInt();
+		var uncompressedSize : Int = buf.readUnsignedInt();
 		var nameLength : Int = buf.readUnsignedShort();
 		var extraLength : Int = buf.readUnsignedShort();
 		var fileName : String = buf.readUTFBytes(nameLength);
 		var extra : ByteArray = new ByteArray();
-		if (extraLength > 0) 			buf.readBytes(extra, 0, extraLength);
-		if ((flags & 1) != 0) 			throw cast(("cannot read encrypted zip files"), Error);
-		if ((compressionMethod != 0) && (compressionMethod != 8)) 			throw cast(("Cannot handle zip compression method " + compressionMethod), Error);
+		if (extraLength > 0)             buf.readBytes(extra, 0, extraLength);
+		if ((flags & 1) != 0)             throw cast(("cannot read encrypted zip files"), Error);
+		if ((compressionMethod != 0) && (compressionMethod != 8))             throw cast(("Cannot handle zip compression method " + compressionMethod), Error);
 		if (!recovering && ((flags & 8) != 0)) {
 			// use the sizes and crc values from directory (these values are also stored following the data)
 			compressedSize = e.compressedSize;
@@ -115,32 +119,39 @@ class ZipIO {
 		}
 		e.name = fileName;
 		e.data = new ByteArray();
-		if (compressedSize > 0) 			buf.readBytes(e.data, 0, compressedSize);
-		if (compressionMethod == 8) 			e.data.inflate();
-		if (e.data.length != uncompressedSize) 			throw cast(("Bad uncompressed size"), Error);
-		if (crc != computeCRC(e.data)) 			throw cast(("Bad CRC"), Error);
+		if (compressedSize > 0)             buf.readBytes(e.data, 0, compressedSize);
+		if (compressionMethod == 8) {
+			// Must manually invoke the inflater here since openfl.util.ByteArray won't invoke it properly for us
+			var inflater = new InflateImpl(new haxe.io.BytesInput(e.data), false, false);
+			var output = Bytes.alloc(uncompressedSize);
+			inflater.readBytes(output, 0, uncompressedSize);
+			e.data = output;
+		}
+		//e.data.inflate();
+		if (Std.int(e.data.length) != uncompressedSize)             throw cast(("Bad uncompressed size"), Error);
+		if (crc != computeCRC(e.data))             throw cast(("Bad CRC"), Error);
 	}
-	
+
 	private function readDirEntry() : Entry{
-		if (buf.readUnsignedInt() != DirEntryID) 			throw cast(("zip: bad central directory entry"), Error);
+		if (buf.readUnsignedInt() != DirEntryID)             throw cast(("zip: bad central directory entry"), Error);
 		var versionMadeBy : Int = buf.readUnsignedShort();
 		var versionNeeded : Int = buf.readUnsignedShort();
 		var flags : Int = buf.readUnsignedShort();
 		var compressionMethod : Int = buf.readUnsignedShort();
-		var dosTime : UInt = buf.readUnsignedInt();
-		var crc : UInt = buf.readUnsignedInt();
-		var compressedSize : UInt = buf.readUnsignedInt();
-		var uncompressedSize : UInt = buf.readUnsignedInt();
+		var dosTime : Int = buf.readUnsignedInt();
+		var crc : Int = buf.readUnsignedInt();
+		var compressedSize : Int = buf.readUnsignedInt();
+		var uncompressedSize : Int = buf.readUnsignedInt();
 		var nameLength : Int = buf.readUnsignedShort();
 		var extraLength : Int = buf.readUnsignedShort();
 		var commentLength : Int = buf.readUnsignedShort();
 		var diskNum : Int = buf.readUnsignedShort();
 		var internalAttributes : Int = buf.readUnsignedShort();
-		var externalAttributes : UInt = buf.readUnsignedInt();
-		var offset : UInt = buf.readUnsignedInt();
+		var externalAttributes : Int = buf.readUnsignedInt();
+		var offset : Int = buf.readUnsignedInt();
 		var fileName : String = buf.readUTFBytes(nameLength);
 		var extra : ByteArray = new ByteArray();
-		if (extraLength > 0) 			buf.readBytes(extra, 0, extraLength);
+		if (extraLength > 0)             buf.readBytes(extra, 0, extraLength);
 		var comment : String = buf.readUTFBytes(commentLength);
 		var entry : Entry = new Entry();
 		entry.name = fileName;
@@ -151,17 +162,17 @@ class ZipIO {
 		entry.crc = crc;
 		return entry;
 	}
-	
+
 	private function readEndRecord() : Int{
 		// Read the end-of-central-directory record. If successful, set entryCount
 		// and leave the buffer positioned at the start of the directory.
-		if (buf.readUnsignedInt() != EndID) 			throw cast(("zip: bad zip end record"), Error);
+		if (buf.readUnsignedInt() != EndID)             throw cast(("zip: bad zip end record"), Error);
 		var thisDiskNum : Int = buf.readUnsignedShort();
 		var startDiskNum : Int = buf.readUnsignedShort();
 		var entriesOnThisDisk : Int = buf.readUnsignedShort();
 		var totalEntries : Int = buf.readUnsignedShort();
-		var directorySize : UInt = buf.readUnsignedInt();
-		var directoryOffset : UInt = buf.readUnsignedInt();
+		var directorySize : Int = buf.readUnsignedInt();
+		var directoryOffset : Int = buf.readUnsignedInt();
 		var comment : String = buf.readUTF();
 		if ((thisDiskNum != startDiskNum) || (entriesOnThisDisk != totalEntries)) {
 			throw cast(("cannot read multiple disk zip files"), Error);
@@ -169,7 +180,7 @@ class ZipIO {
 		buf.position = directoryOffset;
 		return totalEntries;
 	}
-	
+
 	private function scanForEndRecord() : Void{
 		// Scan backwards from the end to find the EndOfCentralDiretory record.
 		// If successful, leave the buffer positioned at the start of the record.
@@ -187,18 +198,18 @@ class ZipIO {
 		}
 		throw new Error("Could not find zip directory; bad zip file?");
 	}
-	
+
 	//************************************
 	// Writing
 	//************************************
-	
+
 	public function startWrite() : Void{
 		buf = new ByteArray();
 		buf.endian = Endian.LITTLE_ENDIAN;
 		entries = [];
-		writtenFiles = new Dynamic();
+		writtenFiles = {};
 	}
-	
+
 	public function write(fileName : String, stringOrByteArray : Dynamic, useCompression : Bool = false) : Void{
 		if (Reflect.field(writtenFiles, fileName) != null) {
 			throw new Error("duplicate file name: " + fileName);
@@ -208,11 +219,11 @@ class ZipIO {
 		}
 		var e : Entry = new Entry();
 		e.name = fileName;
-		e.time = dosTime(Date.now().time);
+		e.time = dosTime(Date.now().getTime());
 		e.offset = buf.position;
 		e.compressionMethod = 0;
 		e.data = new ByteArray();
-		if (Std.is(stringOrByteArray, String)) 			e.data.writeUTFBytes(Std.string(stringOrByteArray))
+		if (Std.is(stringOrByteArray, String))             e.data.writeUTFBytes(Std.string(stringOrByteArray))
 		else e.data.writeBytes(stringOrByteArray);
 		e.size = e.data.length;
 		e.crc = computeCRC(e.data);
@@ -222,15 +233,15 @@ class ZipIO {
 		}
 		e.compressedSize = e.data.length;
 		entries.push(e);  // record the entry so it can be saved in the directory  
-		
+
 		// write the file header and data
 		writeFileHeader(e);
 		buf.writeBytes(e.data);
 	}
-	
+
 	public function endWrite() : ByteArray{
-		if (entries.length < 1) 			throw new Error("A zip file must have at least one entry");
-		var off : UInt = buf.position;
+		if (entries.length < 1)             throw new Error("A zip file must have at least one entry");
+		var off : Int = buf.position;
 		// write central directory
 		for (i in 0...entries.length){
 			writeDirectoryEntry(entries[i]);
@@ -239,7 +250,7 @@ class ZipIO {
 		buf.position = 0;
 		return buf;
 	}
-	
+
 	private function writeFileHeader(e : Entry) : Void{
 		buf.writeUnsignedInt(FileEntryID);
 		buf.writeShort(Version);
@@ -253,7 +264,7 @@ class ZipIO {
 		buf.writeShort(0);  // extra info length  
 		buf.writeUTFBytes(e.name);
 	}
-	
+
 	private function writeDirectoryEntry(e : Entry) : Void{
 		buf.writeUnsignedInt(DirEntryID);
 		buf.writeShort(Version);  // version created by  
@@ -273,8 +284,8 @@ class ZipIO {
 		buf.writeUnsignedInt(e.offset);  // relative offset of local header  
 		buf.writeUTFBytes(e.name);
 	}
-	
-	private function writeEndRecord(dirStart : UInt, dirSize : UInt) : Void{
+
+	private function writeEndRecord(dirStart : Int, dirSize : Int) : Void{
 		buf.writeUnsignedInt(EndID);
 		buf.writeShort(0);  // number of this disk  
 		buf.writeShort(0);  // central directory start disk  
@@ -284,27 +295,27 @@ class ZipIO {
 		buf.writeUnsignedInt(dirStart);  // offset of central directory from start of file  
 		buf.writeUTF("");
 	}
-	
-	public function dosTime(time : Float) : UInt{
-		var d : Date = new Date(time);
-		return (d.fullYear - 1980 & 0x7F) << 25 | (d.month + 1) << 21 | d.day << 16 | d.hours << 11 | d.minutes << 5 | d.seconds >> 1;
+
+	public function dosTime(time : Float) : Int{
+		var d : Date = Date.fromTime(time);
+		return (d.getFullYear() - 1980 & 0x7F) << 25 | (d.getMonth() + 1) << 21 | d.getDay() << 16 | d.getHours() << 11 | d.getMinutes() << 5 | d.getSeconds() >> 1;
 	}
-	
-	private function computeCRC(buf : ByteArray) : UInt{
-		var off : UInt = 0;
-		var len : UInt = buf.length;
-		var crc : UInt = 0xFFFFFFFF;  // = ~0  
+
+	private function computeCRC(buf : ByteArray) : Int{
+		var off : Int = 0;
+		var len : Int = buf.length;
+		var crc : Int = 0xFFFFFFFF;  // = ~0  
 		while (--len >= 0)crc = crcTable[(crc ^ buf[off++]) & 0xFF] ^ (crc >>> 8);
 		return ~crc & 0xFFFFFFFF;
 	}
-	
+
 	/* CRC table, computed at load time. */
-	private static function makeCrcTable() : Array<Dynamic>{
-		var crcTable : Array<Dynamic> = new Array<Dynamic>(256);
+	private static function makeCrcTable() : Array<Int>{
+		var crcTable : Array<Int> = Compat.newArray(256, null); // new Array<Dynamic>(256);
 		for (n in 0...256){
-			var c : UInt = n;
+			var c : Int = n;
 			for (i in 0...8){
-				if ((c & 1) != 0) 					c = 0xedb88320 ^ (c >>> 1)
+				if ((c & 1) != 0)                     c = 0xedb88320 ^ (c >>> 1)
 				else c = c >>> 1;
 			}
 			crcTable[n] = c;
@@ -317,15 +328,16 @@ class ZipIO {
 	}
 }
 
-class Entry {
+class Entry
+{
 	public var name : String;
-	public var time : UInt;
-	public var offset : UInt;
+	public var time : Int;
+	public var offset : Int;
 	public var compressionMethod : Int;  // compression method (0 = uncompressed, 8 = deflate)  
-	public var size : UInt;
-	public var compressedSize : UInt;
+	public var size : Int;
+	public var compressedSize : Int;
 	public var data : ByteArray;
-	public var crc : UInt;
+	public var crc : Int;
 
 	public function new()
 	{

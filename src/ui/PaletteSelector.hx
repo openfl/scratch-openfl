@@ -26,36 +26,33 @@
 
 package ui;
 
-//import ui.Graphics;
-//import ui.PaletteSelectorItem;
-//import ui.Scratch;
-//import ui.Sprite;
 
-import flash.display.*;
+import openfl.display.*;
 import translation.Translator;
 import scratch.PaletteBuilder;
 
-class PaletteSelector extends Sprite {
-	
-	private static var categories : Array<Dynamic> = [
+class PaletteSelector extends Sprite
+{
+
+	private static var categories : Array<String> = [
 		"Motion", "Looks", "Sound", "Pen", "Data",   // column 1  
 		"Events", "Control", "Sensing", "Operators", "More Blocks"];  // column 2  
-	
+
 	public var selectedCategory : Int = 0;
 	private var app : Scratch;
-	
+
 	public function new(app : Scratch)
 	{
 		super();
 		this.app = app;
 		initCategories();
 	}
-	
-	public static function strings() : Array<Dynamic>{return categories;
+
+	public static function strings() : Array<String>{return categories;
 	}
 	public function updateTranslation() : Void{initCategories();
 	}
-	
+
 	public function select(id : Int, shiftKey : Bool = false) : Void{
 		for (i in 0...numChildren){
 			var item : PaletteSelectorItem = try cast(getChildAt(i), PaletteSelectorItem) catch(e:Dynamic) null;
@@ -65,25 +62,25 @@ class PaletteSelector extends Sprite {
 		selectedCategory = id;
 		app.getPaletteBuilder().showBlocksForCategory(selectedCategory, (id != oldID), shiftKey);
 	}
-	
+
 	private function initCategories() : Void{
 		var numberOfRows : Int = 5;
 		var w : Int = 208;
 		var startY : Int = 3;
-		var itemH : Int;
-		var x : Int;
-		var i : Int;
+		var itemH : Int = 0;
+		var x : Int = 0;
+		var i : Int = 0;
 		var y : Int = startY;
 		while (numChildren > 0)removeChildAt(0);  // remove old contents  
-		
+
 		for (i in 0...categories.length){
 			if (i == numberOfRows) {
-				x = (w / 2) - 3;
+				x = Std.int((w / 2) - 3);
 				y = startY;
 			}
 			var entry : Array<Dynamic> = Specs.entryForCategory(categories[i]);
 			var item : PaletteSelectorItem = new PaletteSelectorItem(entry[0], Translator.map(entry[1]), entry[2]);
-			itemH = item.height;
+			itemH = Std.int(item.height);
 			item.x = x;
 			item.y = y;
 			addChild(item);
@@ -91,7 +88,7 @@ class PaletteSelector extends Sprite {
 		}
 		setWidthHeightColor(w, startY + (numberOfRows * itemH) + 5);
 	}
-	
+
 	private function setWidthHeightColor(w : Int, h : Int) : Void{
 		var g : Graphics = graphics;
 		g.clear();

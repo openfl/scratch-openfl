@@ -20,18 +20,19 @@
 package util;
 
 
-import flash.utils.ByteArray;
+import openfl.utils.ByteArray;
 
-class Base64Encoder {
-	
+class Base64Encoder
+{
+
 	private static var alphabet : String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	
+
 	public static function encodeString(s : String) : String{
 		var data : ByteArray = new ByteArray();
 		data.writeUTFBytes(s);
 		return encode(data);
 	}
-	
+
 	public static function encode(data : ByteArray) : String{
 		var result : String = "";
 		var n : Int;
@@ -58,7 +59,7 @@ class Base64Encoder {
 		}
 		return result;
 	}
-	
+
 	public static function decode(s : String) : ByteArray{
 		var result : ByteArray = new ByteArray();
 		var buf : Int = 0;
@@ -80,8 +81,8 @@ class Base64Encoder {
 		if (bufCount > 0) {  // write partial buffer (bufCount is 1, 2, or 3)  
 			buf = buf << ((4 - bufCount) * 6);  // zero-pad on right  
 			result.writeByte((buf >> 16) & 0xFF);
-			if (bufCount > 1) 				result.writeByte((buf >> 8) & 0xFF);
-			if (bufCount > 2) 				result.writeByte(buf & 0xFF);
+			if (bufCount > 1)                 result.writeByte((buf >> 8) & 0xFF);
+			if (bufCount > 2)                 result.writeByte(buf & 0xFF);
 		}
 		result.position = 0;
 		return result;

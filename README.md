@@ -1,28 +1,24 @@
-## Scratch 2.0 editor and player [![Build Status](https://api.travis-ci.org/LLK/scratch-flash.svg?branch=master)](https://travis-ci.org/LLK/scratch-flash)
-This is the open source version of Scratch 2.0 and the core code for the official version found on http://scratch.mit.edu. This code has been released under the GPL version 2 license. Forks can be released under the GPL v2 or any later version of the GPL.
+## Scratch 2.0 editor and player 
+This is a port of the open source version of Scratch 2.0 to Haxe. Although the original Scratch 2.0 source code was released under GPL v2 or later, this fork is released under GPL v3 or later. This was necessary because it includes some code from the Apache Flex project, whose code is licensed under the Apache License v2.0. That license is incompatible with GPL v2.
 
-If you're interested in contributing to Scratch, please take a look at the issues on this repository. Two great ways of helping Scratch are by identifying bugs and documenting them as issues, or fixing issues and creating pull requests. When submitting pull requests please be patient -- the Scratch Team is very busy and it can take a while to find time to review them. The organization and class structures can't be radically changed without significant coordination and collaboration from the Scratch Team, so these types of changes should be avoided.
-
-It's been said that the Scratch Team spends about one hour of design discussion for every pixel in Scratch, but some think that estimate is a little low. While we welcome suggestions for new features in our <a href="http://scratch.mit.edu/discuss/1/">suggestions forum</a> (especially ones that come with mockups), we are unlikely to accept PRs with new features that we haven't deeply thought through. Why? Because we have a strong belief in the value of keeping things simple for new users. To learn more about our design philosophy, see this <a href="http://scratch.mit.edu/discuss/post/1576/">forum post<a>, or <a href="http://web.media.mit.edu/~jmaloney/papers/ScratchLangAndEnvironment.pdf">this paper</a>.
 
 ### Building
-To build the Scratch 2.0 SWF you will need [Ant](http://ant.apache.org/), the [Flex SDK](http://flex.apache.org/) version 4.10+, and [playerglobal.swc files](http://helpx.adobe.com/flash-player/kb/archived-flash-player-versions.html#playerglobal) for Flash Player versions 10.2 and 11.4 added to the Flex SDK. Scratch is used in a multitude of settings and some users have older versions of Flash which we try to support (as far back as 10.2).
 
-After downloading ``playerglobal11_4.swc`` and ``playerglobal10_2.swc``, move them to ``<path to flex>/frameworks/libs/player/<version>/playerglobal.swc``. E.g., ``playerglobal11_4.swc`` should be located at ``<path to flex>/frameworks/libs/player/11.4/playerglobal.swc``.
+I normally build the code in FlashDevelop, but I think once you have [Haxe](http://haxe.org/download/) and [OpenFL](http://www.openfl.org/download/) installed, you can build the code using 
 
-The ``build.properties`` file sets the default location for the Flex SDK. Create a ``local.properties`` file to set the location on your filesystem. Your ``local.properties`` file may look something like this:
 ```
-FLEX_HOME=/home/joe/downloads/flex_sdk_4.11
+openfl build html5
 ```
-Now you can run Ant ('ant' from the commandline) to build the SWF.
 
-If the source is building but the resulting .swf is producing runtime errors, your first course of action should be to download version 4.11 of the Flex SDK and try targeting that. The Apache foundation maintains an [installer](http://flex.apache.org/installer.html) that lets you select a variety of versions.
+or something like that. It was tested with Haxe 3.2.1 and OpenFl 3.5.3 using the html5 target. There are a couple of small bugs in OpenFL that I found so far while getting the code to work. Hopefully, I'll get around to submitting those fixes.
+
+By default, the Scratch distribution won't work because it doesn't come with any content. You can copy the `medialibraries` and `medialibrarythumbnails` directories to `bin/html5/bin` then things should work. If you invoke OpenFL with
+
+```
+openfl run html5
+```
+
+it will automatically start up a local webserver to properly serve the content to your web browser for debugging.
 
 Please note that the Scratch trademarks (including the Scratch name, logo, Scratch Cat, and Gobo) are property of MIT. For use of these Marks, please see the [Scratch Trademark Policy](http://wiki.scratch.mit.edu/wiki/Scratch_1.4_Source_Code#Scratch_Trademark_Policy).
 
-### Debugging
-Here are a few integrated development environments available with Flash debugging support:
-* [Intellij IDEA](http://www.jetbrains.com/idea/features/flex_ide.html)
-* [Adobe Flash Builder](http://www.adobe.com/products/flash-builder.html)
-* [FlashDevelop](http://www.flashdevelop.org/)
-* [FDT for Eclipse](http://fdt.powerflasher.com/)

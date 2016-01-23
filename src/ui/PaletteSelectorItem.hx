@@ -25,24 +25,20 @@
 
 package ui;
 
-import ui.Graphics;
-import ui.Sprite;
-import ui.TextField;
-import ui.TextFormat;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.text.*;
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.text.*;
+class PaletteSelectorItem extends Sprite
+{
 
-class PaletteSelectorItem extends Sprite {
-	
 	public var categoryID : Int;
 	public var label : TextField;
 	public var isSelected : Bool;
-	
-	private var color : UInt;
-	
-	public function new(id : Int, s : String, c : UInt)
+
+	private var color : Int;
+
+	public function new(id : Int, s : String, c : Int)
 	{
 		super();
 		categoryID = id;
@@ -53,7 +49,7 @@ class PaletteSelectorItem extends Sprite {
 		addEventListener(MouseEvent.MOUSE_OUT, mouseOut);
 		addEventListener(MouseEvent.CLICK, mouseUp);
 	}
-	
+
 	private function addLabel(s : String) : Void{
 		label = new TextField();
 		label.autoSize = TextFieldAutoSize.LEFT;
@@ -61,10 +57,10 @@ class PaletteSelectorItem extends Sprite {
 		label.text = s;
 		addChild(label);
 	}
-	
+
 	public function setSelected(flag : Bool) : Void{
 		var w : Int = 100;
-		var h : Int = label.height + 2;
+		var h : Int = Std.int(label.height + 2);
 		var tabInset : Int = 8;
 		var tabW : Int = 7;
 		isSelected = flag;
@@ -81,15 +77,15 @@ class PaletteSelectorItem extends Sprite {
 		g.drawRect(tabInset, 1, (isSelected) ? w - tabInset - 1 : tabW, h - 2);
 		g.endFill();
 	}
-	
+
 	private function mouseOver(event : MouseEvent) : Void{
 		label.textColor = (isSelected) ? CSS.white : CSS.buttonLabelOverColor;
 	}
-	
+
 	private function mouseOut(event : MouseEvent) : Void{
 		label.textColor = (isSelected) ? CSS.white : CSS.offColor;
 	}
-	
+
 	private function mouseUp(event : MouseEvent) : Void{
 		if (Std.is(parent, PaletteSelector)) {
 			cast((parent), PaletteSelector).select(categoryID, event.shiftKey);

@@ -22,20 +22,21 @@ package util;
 
 
 
-class Transition {
-	
+class Transition
+{
+
 	private static var activeTransitions : Array<Dynamic> = [];
-	
-	private var interpolate : Function;
-	private var setValue : Function;
+
+	private var interpolate : Float->Float;
+	private var setValue : Dynamic->Void;
 	private var startValue : Dynamic;
 	private var endValue : Dynamic;
 	private var delta : Dynamic;
-	private var whenDone : Function;
-	private var startMSecs : UInt;
-	private var duration : UInt;
-	
-	public function new(interpolate : Function, setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function)
+	private var whenDone : Void->Void;
+	private var startMSecs : Int;
+	private var duration : Int;
+
+	public function new(interpolate : Float->Float, setValue : Dynamic->Void, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Void->Void)
 	{
 		// Create a transition animation between two values (either scalars or Arrays).
 		this.interpolate = interpolate;
@@ -53,32 +54,32 @@ class Transition {
 			delta = endValue - startValue;
 		}
 		startMSecs = Math.round(haxe.Timer.stamp() * 1000);
-		duration = 1000 * secs;
+		duration = Std.int(1000 * secs);
 	}
-	
-	public static function linear(setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function = null) : Void{
+
+	public static function linear(setValue : Dynamic->Void, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Void->Void = null) : Void{
 		activeTransitions.push(new Transition(linearFunc, setValue, startValue, endValue, secs, whenDone));
 	}
-	
-	public static function quadratic(setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function = null) : Void{
+
+	public static function quadratic(setValue : Dynamic->Void, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Void->Void = null) : Void{
 		activeTransitions.push(new Transition(quadraticFunc, setValue, startValue, endValue, secs, whenDone));
 	}
-	
-	public static function cubic(setValue : Function, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Function = null) : Void{
+
+	public static function cubic(setValue : Dynamic->Void, startValue : Dynamic, endValue : Dynamic, secs : Float, whenDone : Void->Void = null) : Void{
 		activeTransitions.push(new Transition(cubicFunc, setValue, startValue, endValue, secs, whenDone));
 	}
-	
+
 	public static function step(evt : Dynamic) : Void{
-		if (activeTransitions.length == 0) 			return;
-		var now : UInt = Math.round(haxe.Timer.stamp() * 1000);
+		if (activeTransitions.length == 0)             return;
+		var now : Int = Math.round(haxe.Timer.stamp() * 1000);
 		var newActive : Array<Dynamic> = [];
 		for (t in activeTransitions){
-			if (t.apply(now)) 				newActive.push(t);
+			if (t.apply(now))                 newActive.push(t);
 		}
 		activeTransitions = newActive;
 	}
-	
-	private function apply(now : UInt) : Bool{
+
+	private function apply(now : Int) : Bool{
 		var msecs : Int = now - startMSecs;
 		if (msecs < 50) {  // ensure that start value is processed for at least one frame  
 			setValue(startValue);
@@ -87,7 +88,7 @@ class Transition {
 		var t : Float = (now - startMSecs) / duration;
 		if (t > 1.0) {
 			setValue(endValue);
-			if (whenDone != null) 				whenDone();
+			if (whenDone != null)                 whenDone();
 			return false;
 		}
 		if (Std.is(startValue, Array)) {
@@ -102,7 +103,7 @@ class Transition {
 		}
 		return true;
 	}
-	
+
 	// Transition functions:
 	private static function linearFunc(t : Float) : Float{return t;
 	}

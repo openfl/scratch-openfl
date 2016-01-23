@@ -57,80 +57,73 @@
 
 package interpreter;
 
-//import interpreter.Block;
-//import interpreter.Primitives;
-//import interpreter.Scratch;
-//import interpreter.ScratchObj;
-//import interpreter.ScratchSprite;
-//import interpreter.Thread;
-//import interpreter.Variable;
 
-import flash.utils.Dictionary;
 
-import flash.geom.Point;
+import openfl.geom.Point;
 import blocks.*;
 import primitives.*;
 import scratch.*;
 import sound.*;
 
-class Interpreter {
-	
+class Interpreter
+{
+
 	public var activeThread : Thread;  // current thread  
 	public var currentMSecs : Int = Math.round(haxe.Timer.stamp() * 1000);  // millisecond clock for the current step  
 	public var turboMode : Bool = false;
-	
+
 	private var app : Scratch;
-	private var primTable : Dictionary;  // maps opcodes to functions  
-	private var threads : Array<Dynamic> = [];  // all threads  
+	private var primTable : Map<String,Block->Dynamic>;  // maps opcodes to functions  
+	private var threads : Array<Thread> = [];  // all threads  
 	private var yield : Bool;  // set true to indicate that active thread should yield control  
 	private var startTime : Int;  // start time for stepThreads()  
 	private var doRedraw : Bool;
 	private var isWaiting : Bool;
-	
-	private inline var warpMSecs : Int = 500;  // max time to run during warp  
+
+	private static inline var warpMSecs : Int = 500;  // max time to run during warp  
 	private var warpThread : Thread;  // thread that is in warp mode  
 	private var warpBlock : Block;  // proc call block that entered warp mode  
-	
+
 	private var bubbleThread : Thread;  // thread for reporter bubble  
 	public var askThread : Thread;  // thread that opened the ask prompt  
-	
-	private var debugFunc : Function;
-	
+
+	private var debugFunc : Dynamic->Void;
+
 	public function new(app : Scratch)
 	{
 		this.app = app;
 		initPrims();
 	}
-	
+
 	public function targetObj() : ScratchObj{return cast((activeThread.target), ScratchObj);
 	}
 	public function targetSprite() : ScratchSprite{return try cast(activeThread.target, ScratchSprite) catch(e:Dynamic) null;
 	}
-	
+
 	/* Threads */
-	
+
 	public function doYield() : Void{isWaiting = true;yield = true;
 	}
-	public function redraw() : Void{if (!turboMode) 			doRedraw = true;
+	public function redraw() : Void{if (!turboMode)             doRedraw = true;
 	}
-	
+
 	public function yieldOneCycle() : Void{
 		// Yield control but proceed to the next block. Do nothing in warp mode.
 		// Used to ensure proper ordering of HTTP extension commands.
-		if (activeThread == warpThread) 			return;
+		if (activeThread == warpThread)             return;
 		if (activeThread.firstTime) {
 			redraw();
 			yield = true;
 			activeThread.firstTime = false;
 		}
 	}
-	
+
 	public function threadCount() : Int{return threads.length;
 	}
-	
+
 	public function toggleThread(b : Block, targetObj : Dynamic, startupDelay : Int = 0) : Void{
 		var i : Int;
-		var newThreads : Array<Dynamic> = [];
+		var newThreads : Array<Thread> = [];
 		var wasRunning : Bool = false;
 		for (i in 0...threads.length){
 			if ((threads[i].topBlock == b) && (threads[i].target == targetObj)) {
@@ -142,7 +135,7 @@ class Interpreter {
 		}
 		threads = newThreads;
 		if (wasRunning) {
-			if (app.editMode) 				b.hideRunFeedback();
+			if (app.editMode)                 b.hideRunFeedback();
 			clearWarpBlock();
 		}
 		else {
@@ -155,53 +148,59 @@ class Interpreter {
 				var reporter : Block = b;
 				var interp : Interpreter = this;
 				b = new Block("%s", "", -1);
-				b.opFunction = function(b : Block) : Void{
+				b.opFunction = function(b : Block) : Dynamic{
 							var p : Point = reporter.localToGlobal(new Point(0, 0));
 							app.showBubble(Std.string(interp.arg(b, 0)), p.x, p.y, reporter.getRect(app.stage).width);
+							return null;
 						};
 				b.args[0] = reporter;
 			}
-			if (app.editMode) 				topBlock.showRunFeedback();
+			if (app.editMode)                 topBlock.showRunFeedback();
 			var t : Thread = new Thread(b, targetObj, startupDelay);
-			if (topBlock.isReporter) 				bubbleThread = t;
+			if (topBlock.isReporter)                 bubbleThread = t;
 			t.topBlock = topBlock;
 			threads.push(t);
 			app.threadStarted();
 		}
 	}
-	
+
 	public function showAllRunFeedback() : Void{
 		for (t in threads){
 			t.topBlock.showRunFeedback();
 		}
 	}
-	
+
 	public function isRunning(b : Block, targetObj : ScratchObj) : Bool{
 		for (t in threads){
-			if ((t.topBlock == b) && (t.target == targetObj)) 				return true;
+			if ((t.topBlock == b) && (t.target == targetObj))                 return true;
 		}
 		return false;
 	}
-	
+
 	public function startThreadForClone(b : Block, clone : Dynamic) : Void{
 		threads.push(new Thread(b, clone));
 	}
-	
-	public function stopThreadsFor(target : Dynamic, skipActiveThread : Bool = false) : Void{
-		for (i in 0...threads.length){
+
+	public function stopThreadsFor(target : Dynamic, skipActiveThread : Bool = false) : Void {
+		var i = 0;
+		while (i < threads.length) {
 			var t : Thread = threads[i];
-			if (skipActiveThread && (t == activeThread)) 				{i++;continue;
+			if (skipActiveThread && (t == activeThread))                 {
+				i++;
+				i++;
+				continue;
 			};
 			if (t.target == target) {
-				if (Std.is(t.tmpObj, ScratchSoundPlayer)) {
-					(try cast(t.tmpObj, ScratchSoundPlayer) catch(e:Dynamic) null).stopPlaying();
-				}
+				//if (Std.is(t.tmpObj, ScratchSoundPlayer)) {
+					//(try cast(t.tmpObj, ScratchSoundPlayer) catch(e:Dynamic) null).stopPlaying();
+				//}
 				t.stop();
 			}
+			i++;
 		}
-		if ((activeThread.target == target) && !skipActiveThread) 			yield = true;
+		if ((activeThread.target == target) && !skipActiveThread)             yield = true;
 	}
-	
+
 	public function restartThread(b : Block, targetObj : Dynamic) : Thread{
 		// used by broadcast, click hats, and when key pressed hats
 		// stop any thread running on b, then start a new thread on b
@@ -209,62 +208,63 @@ class Interpreter {
 		var wasRunning : Bool = false;
 		for (i in 0...threads.length){
 			if ((threads[i].topBlock == b) && (threads[i].target == targetObj)) {
-				if (askThread == threads[i]) 					app.runtime.clearAskPrompts();
+				if (askThread == threads[i])                     app.runtime.clearAskPrompts();
 				threads[i] = newThread;
 				wasRunning = true;
 			}
 		}
 		if (!wasRunning) {
 			threads.push(newThread);
-			if (app.editMode) 				b.showRunFeedback();
+			if (app.editMode)                 b.showRunFeedback();
 			app.threadStarted();
 		}
 		return newThread;
 	}
-	
+
 	public function stopAllThreads() : Void{
 		threads = [];
-		if (activeThread != null) 			activeThread.stop();
+		if (activeThread != null)             activeThread.stop();
 		clearWarpBlock();
 		app.runtime.clearRunFeedback();
 		doRedraw = true;
 	}
-	
+
 	public function stepThreads() : Void{
 		startTime = Math.round(haxe.Timer.stamp() * 1000);
-		var workTime : Int = (0.75 * 1000) / app.stage.frameRate;  // work for up to 75% of one frame time  
+		var workTime : Int = Std.int((0.75 * 1000) / app.stage.frameRate);  // work for up to 75% of one frame time  
 		doRedraw = false;
 		currentMSecs = Math.round(haxe.Timer.stamp() * 1000);
-		if (threads.length == 0) 			return;
+		if (threads.length == 0)             return;
 		while ((currentMSecs - startTime) < workTime){
-			if (warpThread != null && (warpThread.block == null)) 				clearWarpBlock();
+			if (warpThread != null && (warpThread.block == null))                 clearWarpBlock();
 			var threadStopped : Bool = false;
 			var runnableCount : Int = 0;
-			for (activeThread in threads){
+			for (t in threads) {
+				activeThread = t;
 				isWaiting = false;
 				stepActiveThread();
-				if (activeThread.block == null) 					threadStopped = true;
-				if (!isWaiting) 					runnableCount++;
+				if (activeThread.block == null)                     threadStopped = true;
+				if (!isWaiting)                     runnableCount++;
 			}
 			if (threadStopped) {
-				var newThreads : Array<Dynamic> = [];
+				var newThreads : Array<Thread> = [];
 				for (t in threads){
-					if (t.block != null) 						newThreads.push(t)
+					if (t.block != null)                         newThreads.push(t)
 					else if (app.editMode) {
-						if (t == bubbleThread) 							bubbleThread = null;
+						if (t == bubbleThread)                             bubbleThread = null;
 						t.topBlock.hideRunFeedback();
 					}
 				}
 				threads = newThreads;
-				if (threads.length == 0) 					return;
+				if (threads.length == 0)                     return;
 			}
 			currentMSecs = Math.round(haxe.Timer.stamp() * 1000);
-			if (doRedraw || (runnableCount == 0)) 				return;
+			if (doRedraw || (runnableCount == 0))                 return;
 		}
 	}
-	
+
 	private function stepActiveThread() : Void{
-		if (activeThread.block == null) 			return;
+		if (activeThread.block == null)             return;
 		if (activeThread.startDelayCount > 0) {activeThread.startDelayCount--;doRedraw = true;return;
 		}
 		if (!(activeThread.target.isStage || (Std.is(activeThread.target.parent, ScratchStage)))) {
@@ -277,22 +277,22 @@ class Interpreter {
 		}
 		yield = false;
 		while (true){
-			if (activeThread == warpThread) 				currentMSecs = Math.round(haxe.Timer.stamp() * 1000);
+			if (activeThread == warpThread)                 currentMSecs = Math.round(haxe.Timer.stamp() * 1000);
 			evalCmd(activeThread.block);
 			if (yield) {
 				if (activeThread == warpThread) {
-					if ((currentMSecs - startTime) > warpMSecs) 						return;
+					if ((currentMSecs - startTime) > warpMSecs)                         return;
 					yield = false;
 					continue;
 				}
 				else return;
 			}
-			
+
 			if (activeThread.block != null) 
 				activeThread.block = activeThread.block.nextBlock;
-			
+
 			while (activeThread.block == null){  // end of block sequence  
-				if (!activeThread.popState()) 					return  // end of script  ;
+				if (!activeThread.popState())                     return;  // end of script  ;
 				if ((activeThread.block == warpBlock) && activeThread.firstTime) {  // end of outer warp block  
 					clearWarpBlock();
 					activeThread.block = activeThread.block.nextBlock;
@@ -300,137 +300,139 @@ class Interpreter {
 				}
 				if (activeThread.isLoop) {
 					if (activeThread == warpThread) {
-						if ((currentMSecs - startTime) > warpMSecs) 							return;
+						if ((currentMSecs - startTime) > warpMSecs)                             return;
 					}
 					else return;
 				}
 				else {
-					if (activeThread.block.op == Specs.CALL) 						activeThread.firstTime = true;  // in case set false by call  ;
+					if (activeThread.block.op == Specs.CALL)                         activeThread.firstTime = true;  // in case set false by call  ;
 					activeThread.block = activeThread.block.nextBlock;
 				}
 			}
 		}
 	}
-	
+
 	private function clearWarpBlock() : Void{
 		warpThread = null;
 		warpBlock = null;
 	}
-	
+
 	/* Evaluation */
 	public function evalCmd(b : Block) : Dynamic{
-		if (b == null) 			return 0;  // arg() and friends can pass null if arg index is out of range  ;
+		if (b == null)             return 0;  // arg() and friends can pass null if arg index is out of range  ;
 		var op : String = b.op;
 		if (b.opFunction == null) {
-			if (op.indexOf(".") > -1) 				b.opFunction = app.extensionManager.primExtensionOp
-			else b.opFunction = ((Reflect.field(primTable, op) == null)) ? primNoop : Reflect.field(primTable, op);
+			//if (op.indexOf(".") > -1)                 
+				//b.opFunction = app.extensionManager.primExtensionOp;
+			//else 
+			b.opFunction = (!primTable.exists(op)) ? primNoop : primTable[op];
 		}  // TODO: Optimize this into a cached check if the args *could* block at all  
-		
-		
-		
-		if (b.args.length && checkBlockingArgs(b)) {
+
+
+
+		if (b.args.length > 0 && checkBlockingArgs(b)) {
 			doYield();
 			return null;
 		}  // Debug code  
-		
-		
-		
+
+
+
 		if (debugFunc != null) 
 			debugFunc(b);
-		
+
 		return b.opFunction(b);
 	}
-	
+
 	// Returns true if the thread needs to yield while data is requested
 	public function checkBlockingArgs(b : Block) : Bool{
 		// Do any of the arguments request data?  If so, start any requests and yield.
 		var shouldYield : Bool = false;
 		var args : Array<Dynamic> = b.args;
 		for (i in 0...args.length){
-			var barg : Block = try cast(args[i], Block) catch(e:Dynamic) null;
-			if (barg != null) {
+			if (Std.is(args[i], Block)) {
+				var barg : Block = cast(args[i], Block);
 				if (checkBlockingArgs(barg)) 
 					shouldYield = true
 				// Don't start a request if the arguments for it are blocking
 				else if (barg.isRequester && barg.requestState < 2) {
-					if (barg.requestState == 0) 						evalCmd(barg);
+					if (barg.requestState == 0)                         evalCmd(barg);
 					shouldYield = true;
 				}
 			}
 		}
-		
+
 		return shouldYield;
 	}
-	
+
 	public function arg(b : Block, i : Int) : Dynamic{
 		var args : Array<Dynamic> = b.args;
 		if (b.rightToLeft) {i = args.length - i - 1;
 		}
-		return ((Std.is(b.args[i], BlockArg))) ? 
+		return Std.is(b.args[i], BlockArg) ? 
 		cast((args[i]), BlockArg).argValue : evalCmd(cast((args[i]), Block));
 	}
-	
+
 	public function numarg(b : Block, i : Int) : Float{
 		var args : Array<Dynamic> = b.args;
 		if (b.rightToLeft) {i = args.length - i - 1;
 		}
 		var n : Float = ((Std.is(args[i], BlockArg))) ? 
 		Std.parseFloat(cast((args[i]), BlockArg).argValue) : Std.parseFloat(evalCmd(cast((args[i]), Block)));
-		
-		if (n != n) 			return 0;  // return 0 if NaN (uses fast, inline test for NaN)  ;
+
+		if (n != n)             return 0;  // return 0 if NaN (uses fast, inline test for NaN)  ;
 		return n;
 	}
-	
+
 	public function boolarg(b : Block, i : Int) : Bool{
 		if (b.rightToLeft) {i = b.args.length - i - 1;
 		}
 		var o : Dynamic = ((Std.is(b.args[i], BlockArg))) ? cast((b.args[i]), BlockArg).argValue : evalCmd(cast((b.args[i]), Block));
-		if (Std.is(o, Bool)) 			return o;
+		if (Std.is(o, Bool))             return o;
 		if (Std.is(o, String)) {
 			var s : String = o;
-			if ((s == "") || (s == "0") || (s.toLowerCase() == "false")) 				return false;
+			if ((s == "") || (s == "0") || (s.toLowerCase() == "false"))                 return false;
 			return true;
 		}
 		return cast(o, Bool);
 	}
-	
+
 	public static function asNumber(n : Dynamic) : Float{
 		// Convert n to a number if possible. If n is a string, it must contain
 		// at least one digit to be treated as a number (otherwise a string
 		// containing only whitespace would be consider equal to zero.)
-		if (as3hx.Compat.typeof((n)) == "string") {
-			var s : String = try cast(n, String) catch(e:Dynamic) null;
-			var len : UInt = s.length;
+		if (Std.is(n,String)) {
+			var s : String = cast(n, String);
+			var len : Int = s.length;
 			for (i in 0...len){
-				var code : UInt = s.charCodeAt(i);
-				if (code >= 48 && code <= 57) 					return Std.parseFloat(s);
+				var code : Int = s.charCodeAt(i);
+				if (code >= 48 && code <= 57)                     return Std.parseFloat(s);
 			}
-			return NaN;
+			return Math.NaN;
 		}
 		return Std.parseFloat(n);
 	}
-	
+
 	private function startCmdList(b : Block, isLoop : Bool = false, argList : Array<Dynamic> = null) : Void{
 		if (b == null) {
-			if (isLoop) 				yield = true;
+			if (isLoop)                 yield = true;
 			return;
 		}
 		activeThread.isLoop = isLoop;
 		activeThread.pushStateForBlock(b);
-		if (argList != null) 			activeThread.args = argList;
+		if (argList != null)             activeThread.args = argList;
 		evalCmd(activeThread.block);
 	}
-	
+
 	/* Timer */
-	
+
 	public function startTimer(secs : Float) : Void{
-		var waitMSecs : Int = 1000 * secs;
-		if (waitMSecs < 0) 			waitMSecs = 0;
+		var waitMSecs : Int = Std.int(1000 * secs);
+		if (waitMSecs < 0)             waitMSecs = 0;
 		activeThread.tmp = currentMSecs + waitMSecs;  // end time in milliseconds  
 		activeThread.firstTime = false;
 		doYield();
 	}
-	
+
 	public function checkTimer() : Bool{
 		// check for timer expiration and clean up if expired. return true when expired
 		if (currentMSecs >= activeThread.tmp) {
@@ -446,76 +448,95 @@ class Interpreter {
 			return false;
 		}
 	}
-	
+
 	/* Primitives */
-	
+
 	public function isImplemented(op : String) : Bool{
-		return Reflect.field(primTable, op) != null;
+		return primTable.exists(op);
 	}
-	
-	public function getPrim(op : String) : Function{return Reflect.field(primTable, op);
+
+	public function getPrim(op : String) : Block->Dynamic {return primTable[op];
 	}
-	
+
 	private function initPrims() : Void{
-		primTable = new Dictionary();
+		primTable = new Map<String, Block->Dynamic>();
 		// control
-		Reflect.setField(primTable, "whenGreenFlag", primNoop);
-		Reflect.setField(primTable, "whenKeyPressed", primNoop);
-		Reflect.setField(primTable, "whenClicked", primNoop);
-		Reflect.setField(primTable, "whenSceneStarts", primNoop);
-		Reflect.setField(primTable, "wait:elapsed:from:", primWait);
-		Reflect.setField(primTable, "doForever", function(b : Dynamic) : Dynamic{startCmdList(b.subStack1, true);
-		});
-		Reflect.setField(primTable, "doRepeat", primRepeat);
-		Reflect.setField(primTable, "broadcast:", function(b : Dynamic) : Dynamic{broadcast(arg(b, 0), false);
-		});
-		Reflect.setField(primTable, "doBroadcastAndWait", function(b : Dynamic) : Dynamic{broadcast(arg(b, 0), true);
-		});
-		Reflect.setField(primTable, "whenIReceive", primNoop);
-		Reflect.setField(primTable, "doForeverIf", function(b : Dynamic) : Dynamic{if (arg(b, 0)) 				startCmdList(b.subStack1, true)
+		primTable[ "whenGreenFlag"] = primNoop;
+		primTable[ "whenKeyPressed"] = primNoop;
+		primTable[ "whenClicked"] = primNoop;
+		primTable[ "whenSceneStarts"] = primNoop;
+		primTable[ "wait:elapsed:from:"] = primWait;
+		primTable[ "doForever"] = function(b : Dynamic) : Dynamic {
+			startCmdList(b.subStack1, true);
+			return null;
+		};
+		primTable[ "doRepeat"] = primRepeat;
+		primTable[ "broadcast:"] = function(b : Dynamic) : Dynamic {
+			broadcast(arg(b, 0), false);
+			return null;
+		};
+		primTable[ "doBroadcastAndWait"] = function(b : Dynamic) : Dynamic {
+			broadcast(arg(b, 0), true);
+			return null;
+		};
+		primTable[ "whenIReceive"] = primNoop;
+		primTable[ "doForeverIf"] = function(b : Dynamic) : Dynamic {
+			if (arg(b, 0))                 startCmdList(b.subStack1, true);
 			else yield = true;
-		});
-		Reflect.setField(primTable, "doForLoop", primForLoop);
-		Reflect.setField(primTable, "doIf", function(b : Dynamic) : Dynamic{if (arg(b, 0)) 				startCmdList(b.subStack1);
-		});
-		Reflect.setField(primTable, "doIfElse", function(b : Dynamic) : Dynamic{if (arg(b, 0)) 				startCmdList(b.subStack1)
+			return null;
+		};
+		primTable[ "doForLoop"] = primForLoop;
+		primTable[ "doIf"] = function(b : Dynamic) : Dynamic {
+			if (arg(b, 0))                 startCmdList(b.subStack1);
+			return null;
+		};
+		primTable[ "doIfElse"] = function(b : Dynamic) : Dynamic {
+			if (arg(b, 0))                 startCmdList(b.subStack1);
 			else startCmdList(b.subStack2);
-		});
-		Reflect.setField(primTable, "doWaitUntil", function(b : Dynamic) : Dynamic{if (!arg(b, 0)) 				yield = true;
-		});
-		Reflect.setField(primTable, "doWhile", function(b : Dynamic) : Dynamic{if (arg(b, 0)) 				startCmdList(b.subStack1, true);
-		});
-		Reflect.setField(primTable, "doUntil", function(b : Dynamic) : Dynamic{if (!arg(b, 0)) 				startCmdList(b.subStack1, true);
-		});
-		Reflect.setField(primTable, "doReturn", primReturn);
-		Reflect.setField(primTable, "stopAll", function(b : Dynamic) : Dynamic{app.runtime.stopAll();yield = true;
-		});
-		Reflect.setField(primTable, "stopScripts", primStop);
-		Reflect.setField(primTable, "warpSpeed", primOldWarpSpeed);
-		
+			return null;
+		};
+		primTable[ "doWaitUntil"] = function(b : Dynamic) : Dynamic {
+			if (!arg(b, 0))                 yield = true;
+			return null;
+		};
+		primTable[ "doWhile"] = function(b : Dynamic) : Dynamic {
+			if (arg(b, 0))                 startCmdList(b.subStack1, true);
+			return null;
+		};
+		primTable[ "doUntil"] = function(b : Dynamic) : Dynamic {
+			if (!arg(b, 0))                 startCmdList(b.subStack1, true);
+			return null;
+		};
+		primTable[ "doReturn"] = primReturn;
+		primTable[ "stopAll"] = function(b : Dynamic) : Dynamic { app.runtime.stopAll(); yield = true;
+			return null;
+		};
+		primTable[ "stopScripts"] = primStop;
+		primTable[ "warpSpeed"] = primOldWarpSpeed;
+
 		// procedures
 		primTable[Specs.CALL] = primCall;
-		
+
 		// variables
 		primTable[Specs.GET_VAR] = primVarGet;
 		primTable[Specs.SET_VAR] = primVarSet;
 		primTable[Specs.CHANGE_VAR] = primVarChange;
 		primTable[Specs.GET_PARAM] = primGetParam;
-		
+
 		// edge-trigger hat blocks
-		Reflect.setField(primTable, "whenDistanceLessThan", primNoop);
-		Reflect.setField(primTable, "whenSensorConnected", primNoop);
-		Reflect.setField(primTable, "whenSensorGreaterThan", primNoop);
-		Reflect.setField(primTable, "whenTiltIs", primNoop);
-		
+		primTable[ "whenDistanceLessThan"] = primNoop;
+		primTable[ "whenSensorConnected"] = primNoop;
+		primTable[ "whenSensorGreaterThan"] = primNoop;
+		primTable[ "whenTiltIs"] = primNoop;
+
 		addOtherPrims(primTable);
 	}
-	
-	private function addOtherPrims(primTable : Dictionary) : Void{
+
+	private function addOtherPrims(primTable : Map<String,Block->Dynamic>) : Void{
 		// other primitives
 		new Primitives(app, this).addPrimsTo(primTable);
 	}
-	
+
 	private function checkPrims() : Void{
 		var op : String;
 		var allOps : Array<Dynamic> = ["CALL", "GET_VAR", "NOOP"];
@@ -523,36 +544,36 @@ class Interpreter {
 			if (spec.length > 3) {
 				op = spec[3];
 				allOps.push(op);
-				if (Reflect.field(primTable, op) == null) 					trace("Unimplemented: " + op);
+				if (!primTable.exists(op))                     trace("Unimplemented: " + op);
 			}
 		}
-		for (op in Reflect.fields(primTable)){
-			if (Lambda.indexOf(allOps, op) < 0) 				trace("Not in specs: " + op);
+		for (op in primTable.keys()){
+			if (Lambda.indexOf(allOps, op) < 0)                 trace("Not in specs: " + op);
 		}
 	}
-	
-	public function primNoop(b : Block) : Void{
+
+	public function primNoop(b : Block) : Dynamic { return null;
 	}
-	
-	private function primForLoop(b : Block) : Void{
+
+	private function primForLoop(b : Block) : Dynamic {
 		var list : Array<Dynamic> = [];
 		var loopVar : Variable;
-		
+
 		if (activeThread.firstTime) {
-			if (!(Std.is(arg(b, 0), String))) 				return;
+			if (!(Std.is(arg(b, 0), String)))                 return null;
 			var listArg : Dynamic = arg(b, 1);
 			if (Std.is(listArg, Array)) {
-				list = try cast(listArg, Array<Dynamic>) catch(e:Dynamic) null;
+				list = cast(listArg, Array<Dynamic>);
 			}
 			if (Std.is(listArg, String)) {
 				var n : Float = Std.parseFloat(listArg);
-				if (!Math.isNaN(n)) 					listArg = n;
+				if (!Math.isNaN(n))                     listArg = n;
 			}
 			if ((Std.is(listArg, Float)) && !Math.isNaN(listArg)) {
-				var last : Int = as3hx.Compat.parseInt(listArg);
+				var last : Int = Std.parseInt(listArg);
 				if (last >= 1) {
-					list = new Array<Dynamic>(last - 1);
-					for (i in 0...last){list[i] = i + 1;
+					list = new Array<Dynamic>();
+					for (i in 0...last){list.push(i + 1);
 					}
 				}
 			}
@@ -561,7 +582,7 @@ class Interpreter {
 			activeThread.tmp = 0;
 			activeThread.firstTime = false;
 		}
-		
+
 		list = activeThread.args[0];
 		loopVar = activeThread.args[1];
 		if (activeThread.tmp < list.length) {
@@ -573,18 +594,20 @@ class Interpreter {
 			activeThread.tmp = 0;
 			activeThread.firstTime = true;
 		}
+		return null;
 	}
-	
-	private function primOldWarpSpeed(b : Block) : Void{
+
+	private function primOldWarpSpeed(b : Block) : Dynamic{
 		// Semi-support for old warp block: run substack at normal speed.
-		if (b.subStack1 == null) 			return;
+		if (b.subStack1 == null)             return null;
 		startCmdList(b.subStack1);
+		return null;
 	}
-	
-	private function primRepeat(b : Block) : Void{
+
+	private function primRepeat(b : Block) : Dynamic{
 		if (activeThread.firstTime) {
 			var repeatCount : Float = Math.max(0, Math.min(Math.round(numarg(b, 0)), 2147483647));  // clip to range: 0 to 2^31-1  
-			activeThread.tmp = repeatCount;
+			activeThread.tmp = Std.int(repeatCount);
 			activeThread.firstTime = false;
 		}
 		if (activeThread.tmp > 0) {
@@ -594,34 +617,37 @@ class Interpreter {
 		else {
 			activeThread.firstTime = true;
 		}
+		return null;
 	}
-	
-	private function primStop(b : Block) : Void{
+
+	private function primStop(b : Block) : Dynamic {
 		var type : String = arg(b, 0);
 		if (type == "all") {app.runtime.stopAll();yield = true;
 		}
-		if (type == "this script") 			primReturn(b);
-		if (type == "other scripts in sprite") 			stopThreadsFor(activeThread.target, true);
-		if (type == "other scripts in stage") 			stopThreadsFor(activeThread.target, true);
+		if (type == "this script")             primReturn(b);
+		if (type == "other scripts in sprite")             stopThreadsFor(activeThread.target, true);
+		if (type == "other scripts in stage")             stopThreadsFor(activeThread.target, true);
+		return null;
 	}
-	
-	private function primWait(b : Block) : Void{
+
+	private function primWait(b : Block) : Dynamic{
 		if (activeThread.firstTime) {
 			startTimer(numarg(b, 0));
 			redraw();
 		}
 		else checkTimer();
+		return null;
 	}
-	
+
 	// Broadcast and scene starting
-	
+
 	public function broadcast(msg : String, waitFlag : Bool) : Void{
 		var pair : Array<Dynamic>;
 		if (activeThread.firstTime) {
 			var receivers : Array<Dynamic> = [];
 			var newThreads : Array<Dynamic> = [];
 			msg = msg.toLowerCase();
-			var findReceivers : Function = function(stack : Block, target : ScratchObj) : Void{
+			var findReceivers : Block->ScratchObj->Void = function(stack : Block, target : ScratchObj) : Void{
 				if ((stack.op == "whenIReceive") && (stack.args[0].argValue.toLowerCase() == msg)) {
 					receivers.push([stack, target]);
 				}
@@ -629,12 +655,12 @@ class Interpreter {
 			app.runtime.allStacksAndOwnersDo(findReceivers);
 			// (re)start all receivers
 			for (pair in receivers)newThreads.push(restartThread(pair[0], pair[1]));
-			if (!waitFlag) 				return;
+			if (!waitFlag)                 return;
 			activeThread.tmpObj = newThreads;
 			activeThread.firstTime = false;
 		}
 		var done : Bool = true;
-		for (t/* AS3HX WARNING could not determine type for var: t exp: EField(EIdent(activeThread),tmpObj) type: null */ in activeThread.tmpObj){if (Lambda.indexOf(threads, t) >= 0) 				done = false;
+		for (t  in cast(activeThread.tmpObj, Array<Dynamic>)){if (Lambda.indexOf(threads, t) >= 0)                 done = false;
 		}
 		if (done) {
 			activeThread.tmpObj = null;
@@ -644,28 +670,28 @@ class Interpreter {
 			yield = true;
 		}
 	}
-	
+
 	public function startScene(sceneName : String, waitFlag : Bool) : Void{
 		var pair : Array<Dynamic>;
 		if (activeThread.firstTime) {
+			var receivers : Array<Dynamic> = [];
 			function findSceneHats(stack : Block, target : ScratchObj) : Void{
 				if ((stack.op == "whenSceneStarts") && (stack.args[0].argValue == sceneName)) {
 					receivers.push([stack, target]);
 				}
 			};
-			var receivers : Array<Dynamic> = [];
 			app.stagePane.showCostumeNamed(sceneName);
 			redraw();
 			app.runtime.allStacksAndOwnersDo(findSceneHats);
 			// (re)start all receivers
-			var newThreads : Array<Dynamic> = [];
+			var newThreads : Array<Thread> = [];
 			for (pair in receivers)newThreads.push(restartThread(pair[0], pair[1]));
-			if (!waitFlag) 				return;
+			if (!waitFlag)                 return;
 			activeThread.tmpObj = newThreads;
 			activeThread.firstTime = false;
 		}
 		var done : Bool = true;
-		for (t/* AS3HX WARNING could not determine type for var: t exp: EField(EIdent(activeThread),tmpObj) type: null */ in activeThread.tmpObj){if (Lambda.indexOf(threads, t) >= 0) 				done = false;
+		for (t/* AS3HX WARNING could not determine type for var: t exp: EField(EIdent(activeThread),tmpObj) type: null */ in cast(activeThread.tmpObj, Array<Dynamic>)){if (Lambda.indexOf(threads, t) >= 0)                 done = false;
 		}
 		if (done) {
 			activeThread.tmpObj = null;
@@ -675,15 +701,15 @@ class Interpreter {
 			yield = true;
 		}
 	}
-	
+
 	// Procedure call/return
-	
-	private function primCall(b : Block) : Void{
+
+	private function primCall(b : Block) : Dynamic{
 		// Call a procedure. Handle recursive calls and "warp" procedures.
 		// The activeThread.firstTime flag is used to mark the first call
 		// to a procedure running in warp mode. activeThread.firstTime is
 		// false for subsequent calls to warp mode procedures.
-		
+
 		// Lookup the procedure and cache for future use
 		var obj : ScratchObj = activeThread.target;
 		var spec : String = b.spec;
@@ -692,11 +718,11 @@ class Interpreter {
 			proc = obj.lookupProcedure(spec);
 			obj.procCache[spec] = proc;
 		}
-		if (proc == null) 			return;
-		
+		if (proc == null)             return null;
+
 		if (warpThread != null) {
 			activeThread.firstTime = false;
-			if ((currentMSecs - startTime) > warpMSecs) 				yield = true;
+			if ((currentMSecs - startTime) > warpMSecs)                 yield = true;
 		}
 		else {
 			if (proc.warpProcFlag) {
@@ -714,61 +740,65 @@ class Interpreter {
 		for (i in 0...argCount){argList.push(arg(b, i));
 		}
 		startCmdList(proc, false, argList);
+		return null;
 	}
-	
-	private function primReturn(b : Block) : Void{
+
+	private function primReturn(b : Block) : Dynamic{
 		// Return from the innermost procedure. If not in a procedure, stop the thread.
 		var didReturn : Bool = activeThread.returnFromProcedure();
 		if (!didReturn) {
 			activeThread.stop();
 			yield = true;
 		}
+		return null;
 	}
-	
+
 	// Variable Primitives
 	// Optimization: to avoid the cost of looking up the variable every time,
 	// a reference to the Variable object is cached in the target object.
-	
+
 	private function primVarGet(b : Block) : Dynamic{
+		if (activeThread == null)             return 0;
+
 		var v : Variable = activeThread.target.varCache[b.spec];
 		if (v == null) {
 			v = activeThread.target.varCache[b.spec] = activeThread.target.lookupOrCreateVar(b.spec);
-			if (v == null) 				return 0;
+			if (v == null)                 return 0;
 		}  // XXX: Do we need a get() for persistent variables here ?  
-		
+
 		return v.value;
 	}
-	
+
 	private function primVarSet(b : Block) : Variable{
 		var name : String = arg(b, 0);
 		var v : Variable = activeThread.target.varCache[name];
 		if (v == null) {
 			v = activeThread.target.varCache[name] = activeThread.target.lookupOrCreateVar(name);
-			if (v == null) 				return null;
+			if (v == null)                 return null;
 		}
 		var oldvalue : Dynamic = v.value;
 		v.value = arg(b, 1);
 		return v;
 	}
-	
+
 	private function primVarChange(b : Block) : Variable{
 		var name : String = arg(b, 0);
 		var v : Variable = activeThread.target.varCache[name];
 		if (v == null) {
 			v = activeThread.target.varCache[name] = activeThread.target.lookupOrCreateVar(name);
-			if (v == null) 				return null;
+			if (v == null)                 return null;
 		}
 		v.value = Std.parseFloat(v.value) + numarg(b, 1);
 		return v;
 	}
-	
+
 	private function primGetParam(b : Block) : Dynamic{
 		if (b.parameterIndex < 0) {
 			var proc : Block = b.topBlock();
-			if (proc.parameterNames) 				b.parameterIndex = proc.parameterNames.indexOf(b.spec);
-			if (b.parameterIndex < 0) 				return 0;
+			if (proc.parameterNames != null)                 b.parameterIndex = proc.parameterNames.indexOf(b.spec);
+			if (b.parameterIndex < 0)                 return 0;
 		}
-		if ((activeThread.args == null) || (b.parameterIndex >= activeThread.args.length)) 			return 0;
+		if ((activeThread.args == null) || (b.parameterIndex >= activeThread.args.length))             return 0;
 		return activeThread.args[b.parameterIndex];
 	}
 }

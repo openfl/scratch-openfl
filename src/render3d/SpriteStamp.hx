@@ -20,9 +20,10 @@
 package render3d;
 
 
-import flash.display.BitmapData;
+import openfl.display.BitmapData;
 
-class SpriteStamp extends BitmapData {
+class SpriteStamp extends BitmapData
+{
 	public var effects(get, set) : Dynamic;
 
 	private var fx : Dynamic;
@@ -31,10 +32,10 @@ class SpriteStamp extends BitmapData {
 		super(width, height, true, 0);
 		effects = fx;
 	}
-	
-	private function set_Effects(o : Dynamic) : Dynamic{
+
+	private function set_effects(o : Dynamic) : Dynamic{
 		fx = null;
-		
+
 		if (o != null) {
 			fx = { };
 			for (prop in Reflect.fields(o))
@@ -42,8 +43,8 @@ class SpriteStamp extends BitmapData {
 		}
 		return o;
 	}
-	
-	private function get_Effects() : Dynamic{
+
+	private function get_effects() : Dynamic{
 		return fx;
 	}
 }

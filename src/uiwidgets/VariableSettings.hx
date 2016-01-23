@@ -19,25 +19,25 @@
 
 package uiwidgets;
 
-//import uiwidgets.Graphics;
 
-import flash.display.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.text.*;
 import assets.Resources;
 import translation.Translator;
 
-class VariableSettings extends Sprite {
-	
+class VariableSettings extends Sprite
+{
+
 	public var isLocal : Bool;
-	
+
 	public var isList : Bool;
 	private var isStage : Bool;
-	
+
 	private var globalButton : IconButton;
 	private var globalLabel : TextField;
 	private var localButton : IconButton;
 	private var localLabel : TextField;
-	
+
 	public function new(isList : Bool, isStage : Bool)
 	{
 		super();
@@ -48,19 +48,19 @@ class VariableSettings extends Sprite {
 		fixLayout();
 		updateButtons();
 	}
-	
-	public static function strings() : Array<Dynamic>{
+
+	public static function strings() : Array<String>{
 		return ["For this sprite only", "For all sprites", "list", "variable"];
 	}
-	
+
 	private function addLabels() : Void{
 		addChild(localLabel = Resources.makeLabel(
 								Translator.map("For this sprite only"), CSS.normalTextFormat));
-		
+
 		addChild(globalLabel = Resources.makeLabel(
 								Translator.map("For all sprites"), CSS.normalTextFormat));
 	}
-	
+
 	private function addButtons() : Void{
 		function setLocal(b : IconButton) : Void{isLocal = true;updateButtons();
 		};
@@ -69,30 +69,30 @@ class VariableSettings extends Sprite {
 		addChild(localButton = new IconButton(setLocal, null));
 		addChild(globalButton = new IconButton(setGlobal, null));
 	}
-	
+
 	private function updateButtons() : Void{
 		localButton.setOn(isLocal);
 		localButton.setDisabled(false, 0.2);
 		localLabel.alpha = 1;
 		globalButton.setOn(!isLocal);
 	}
-	
+
 	private function fixLayout() : Void{
 		var nextX : Int = 0;
 		var baseY : Int = 10;
-		
+
 		globalButton.x = nextX;
 		globalButton.y = baseY + 3;
 		globalLabel.x = (nextX += 16);
 		globalLabel.y = baseY;
-		
-		nextX += globalLabel.textWidth + 20;
-		
+
+		nextX += Std.int(globalLabel.textWidth + 20);
+
 		localButton.x = nextX;
 		localButton.y = baseY + 3;
 		localLabel.x = (nextX += 16);
 		localLabel.y = baseY;
-		
+
 		nextX = 15;
 		if (isStage) {
 			localButton.visible = false;
@@ -101,11 +101,11 @@ class VariableSettings extends Sprite {
 			globalLabel.x = nextX + 16;
 		}
 	}
-	
+
 	private function drawLine() : Void{
 		var lineY : Int = 36;
-		var w : Int = getRect(this).width;
-		if (isStage) 			w += 10;
+		var w : Int = Std.int(getRect(this).width);
+		if (isStage)             w += 10;
 		var g : Graphics = graphics;
 		g.clear();
 		g.beginFill(0xD0D0D0);

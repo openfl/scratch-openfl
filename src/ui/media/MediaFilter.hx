@@ -22,34 +22,32 @@
 
 package ui.media;
 
-//import ui.media.Sprite;
-//import ui.media.TextField;
-//import ui.media.TextFormat;
 
-import flash.display.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.text.*;
 import assets.Resources;
 import translation.Translator;
-import flash.events.MouseEvent;
+import openfl.events.MouseEvent;
 
-class MediaFilter extends Sprite {
+class MediaFilter extends Sprite
+{
 	public var currentSelection(get, set) : String;
 
-	
+
 	private var titleFormat : TextFormat = new TextFormat(CSS.font, 15, CSS.buttonLabelOverColor, false);
 	private var selectorFormat : TextFormat = new TextFormat(CSS.font, 14, CSS.textColor);
-	
-	private var unselectedColor : Int = CSS.overColor;  // 0x909090;  
-	private var selectedColor : Int = CSS.textColor;
-	private var rolloverColor : Int = CSS.buttonLabelOverColor;
-	
+
+	private var unselectedColor : UInt = CSS.overColor;  // 0x909090;  
+	private var selectedColor : UInt = CSS.textColor;
+	private var rolloverColor : UInt = CSS.buttonLabelOverColor;
+
 	private var title : TextField;
-	private var selectorNames : Array<Dynamic> = [];  // strings representing tags/themes/categories  
-	private var selectors : Array<Dynamic> = [];  // TextFields (translated)  
+	private var selectorNames : Array<String> = [];  // strings representing tags/themes/categories  
+	private var selectors : Array<TextField> = [];  // TextFields (translated)  
 	private var selection : String = "";
-	private var whenChanged : Function;
-	
-	public function new(filterName : String, elements : Array<Dynamic>, whenChanged : Function = null)
+	private var whenChanged : Dynamic->Void;
+
+	public function new(filterName : String, elements : Array<Dynamic>, whenChanged : Dynamic->Void= null)
 	{
 		super();
 		addChild(title = Resources.makeLabel(Translator.map(filterName), titleFormat));
@@ -58,33 +56,33 @@ class MediaFilter extends Sprite {
 		select(0);  // select first selector by default  
 		fixLayout();
 	}
-	
-	private function set_CurrentSelection(s : String) : String{select(Lambda.indexOf(selectorNames, s));
+
+	private function set_currentSelection(s : String) : String{select(Lambda.indexOf(selectorNames, s));
 		return s;
 	}
-	private function get_CurrentSelection() : String{return selection;
+	private function get_currentSelection() : String{return selection;
 	}
-	
+
 	private function fixLayout() : Void{
 		title.x = title.y = 0;
-		var nextY : Int = title.height + 2;
+		var nextY : Int = Std.int(title.height + 2);
 		for (sel in selectors){
 			sel.x = 15;
 			sel.y = nextY;
-			nextY += sel.height;
+			nextY += Std.int(sel.height);
 		}
 	}
-	
+
 	private function addSelectors(selList : Array<Dynamic>) : Void{
 		for (selName in selList)addSelector(selName);
 	}
-	
+
 	private function addSelector(selName : String) : Void{
+		var sel : TextField = Resources.makeLabel(Translator.map(selName), selectorFormat);
 		function mouseDown(ignore : Dynamic) : Void{
 			select(Lambda.indexOf(selectorNames, selName));
-			if (whenChanged != null) 				whenChanged(sel.parent);
+			if (whenChanged != null)                 whenChanged(sel.parent);
 		};
-		var sel : TextField = Resources.makeLabel(Translator.map(selName), selectorFormat);
 		sel.addEventListener(MouseEvent.MOUSE_OVER, mouseOver);
 		sel.addEventListener(MouseEvent.MOUSE_OUT, mouseOver);
 		sel.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
@@ -92,14 +90,14 @@ class MediaFilter extends Sprite {
 		selectors.push(sel);
 		addChild(sel);
 	}
-	
+
 	private function mouseOver(evt : MouseEvent) : Void{
 		var sel : TextField = try cast(evt.target, TextField) catch(e:Dynamic) null;
 		if (sel.textColor != selectedColor) {
 			sel.textColor = ((evt.type == MouseEvent.MOUSE_OVER)) ? rolloverColor : unselectedColor;
 		}
 	}
-	
+
 	private function select(index : Int) : Void{
 		// Highlight the new selection and unlight all others.
 		selection = "";  // nothing selected  

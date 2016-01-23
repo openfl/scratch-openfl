@@ -25,185 +25,170 @@
 
 package ui.parts;
 
-//import ui.parts.Bitmap;
-//import ui.parts.EditableLabel;
-//import ui.parts.Graphics;
-//import ui.parts.IconButton;
-//import ui.parts.Matrix;
-//import ui.parts.MediaPane;
-//import ui.parts.Menu;
-//import ui.parts.Point;
-//import ui.parts.Scratch;
-//import ui.parts.ScratchObj;
-//import ui.parts.ScratchSound;
-//import ui.parts.ScrollFrame;
-//import ui.parts.Shape;
-//import ui.parts.Sprite;
-//import ui.parts.TextField;
-//import ui.parts.TextFormat;
-//import ui.parts.UIPart;
 
-import flash.display.*;
-import flash.events.KeyboardEvent;
-import flash.geom.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.KeyboardEvent;
+import openfl.geom.*;
+import openfl.text.*;
 import assets.Resources;
 import scratch.*;
-import sound.WAVFile;
-import soundedit.SoundEditor;
+//import sound.WAVFile;
+//import soundedit.SoundEditor;
 import translation.Translator;
 import ui.media.*;
 import uiwidgets.*;
 
-class SoundsPart extends UIPart {
-	
-	public var editor : SoundEditor;
+class SoundsPart extends UIPart
+{
+
+	//public var editor : SoundEditor;
 	public var currentIndex : Int;
-	
-	private inline static var columnWidth : Int = 106;
-	
+
+	private static inline var columnWidth : Int = 106;
+
 	private var shape : Shape;
 	private var listFrame : ScrollFrame;
 	private var nameField : EditableLabel;
 	private var undoButton : IconButton;
 	private var redoButton : IconButton;
-	
+
 	private var newSoundLabel : TextField;
 	private var libraryButton : IconButton;
 	private var importButton : IconButton;
 	private var recordButton : IconButton;
-	
+
 	public function new(app : Scratch)
 	{
 		super();
 		this.app = app;
 		addChild(shape = new Shape());
-		
-		addChild(newSoundLabel = makeLabel("", new TextFormat(CSS.font, 12, CSS.textColor, true)));
+
+		addChild(newSoundLabel = UIPart.makeLabel("", new TextFormat(CSS.font, 12, CSS.textColor, true)));
 		addNewSoundButtons();
-		
+
 		addListFrame();
 		addChild(nameField = new EditableLabel(nameChanged));
-		addChild(editor = new SoundEditor(app, this));
+		//addChild(editor = new SoundEditor(app, this));
 		addUndoButtons();
-		app.stage.addEventListener(KeyboardEvent.KEY_DOWN, editor.keyDown);
+		//app.stage.addEventListener(KeyboardEvent.KEY_DOWN, editor.keyDown);
 		updateTranslation();
 	}
-	
-	public static function strings() : Array<Dynamic>{
+
+	public static function strings() : Array<String>{
 		new SoundsPart(Scratch.app).showNewSoundMenu(Menu.dummyButton());
 		return [
 		"New sound:", "recording1", 
 		"Choose sound from library", "Record new sound", "Upload sound from file"];
 	}
-	
+
 	public function updateTranslation() : Void{
 		newSoundLabel.text = Translator.map("New sound:");
-		editor.updateTranslation();
-		SimpleTooltips.add(libraryButton, {
-					text : "Choose sound from library",
-					direction : "bottom",
+		//editor.updateTranslation();
+		SimpleTooltips.add(libraryButton, [
+					"text" => "Choose sound from library",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(recordButton, {
-					text : "Record new sound",
-					direction : "bottom",
+			]);
+		SimpleTooltips.add(recordButton, [
+					"text" => "Record new sound",
+					"direction" => "bottom",
 
-				});
-		SimpleTooltips.add(importButton, {
-					text : "Upload sound from file",
-					direction : "bottom",
+				]);
+		SimpleTooltips.add(importButton, [
+					"text" => "Upload sound from file",
+					"direction" => "bottom",
 
-				});
+				]);
 		fixlayout();
 	}
-	
+
 	public function selectSound(snd : ScratchSound) : Void{
 		var obj : ScratchObj = app.viewedObj();
-		if (obj == null) 			return;
-		if (obj.sounds.length == 0) 			return;
+		if (obj == null)             return;
+		if (obj.sounds.length == 0)             return;
 		currentIndex = 0;
 		for (i in 0...obj.sounds.length){
-							if ((try cast(obj.sounds[i], ScratchSound) catch(e:Dynamic) null) == snd) 								currentIndex = i;
-						}(try cast(listFrame.contents, MediaPane) catch(e:Dynamic) null).updateSelection();
+			if ((try cast(obj.sounds[i], ScratchSound) catch(e:Dynamic) null) == snd)                                 currentIndex = i;
+		}
+		cast(listFrame.contents, MediaPane).updateSelection();
 		refresh(false);
 	}
-	
+
 	public function refresh(refreshListContents : Bool = true) : Void{
 		if (refreshListContents) {
 			var contents : MediaPane = try cast(listFrame.contents, MediaPane) catch(e:Dynamic) null;
 			contents.refresh();
 		}
-		
+
 		nameField.setContents("");
 		var viewedObj : ScratchObj = app.viewedObj();
 		if (viewedObj.sounds.length < 1) {
 			nameField.visible = false;
-			editor.visible = false;
-			undoButton.visible = false;
-			redoButton.visible = false;
+			//editor.visible = false;
+			//undoButton.visible = false;
+			//redoButton.visible = false;
 			return;
 		}
 		else {
 			nameField.visible = true;
-			editor.visible = true;
-			undoButton.visible = true;
-			redoButton.visible = true;
+			//editor.visible = true;
+			//undoButton.visible = true;
+			//redoButton.visible = true;
 			refreshUndoButtons();
 		}
-		
-		editor.waveform.stopAll();
+
+		//editor.waveform.stopAll();
 		var snd : ScratchSound = viewedObj.sounds[currentIndex];
 		if (snd != null) {
 			nameField.setContents(snd.soundName);
-			editor.waveform.editSound(snd);
+			//editor.waveform.editSound(snd);
 		}
 	}
-	
+
 	public function setWidthHeight(w : Int, h : Int) : Void{
 		this.w = w;
 		this.h = h;
 		var g : Graphics = shape.graphics;
 		g.clear();
-		
+
 		g.lineStyle(0.5, CSS.borderColor, 1, true);
 		g.beginFill(CSS.tabColor);
 		g.drawRect(0, 0, w, h);
 		g.endFill();
-		
+
 		g.lineStyle(0.5, CSS.borderColor, 1, true);
 		g.beginFill(CSS.panelColor);
 		g.drawRect(columnWidth + 1, 5, w - columnWidth - 6, h - 10);
 		g.endFill();
-		
+
 		fixlayout();
 	}
-	
+
 	private function fixlayout() : Void{
 		newSoundLabel.x = 7;
 		newSoundLabel.y = 7;
-		
+
 		listFrame.x = 1;
 		listFrame.y = 58;
-		listFrame.setWidthHeight(columnWidth, h - listFrame.y);
-		
+		listFrame.setWidthHeight(columnWidth, Std.int(h - listFrame.y));
+
 		var contentsX : Int = columnWidth + 13;
 		var contentsW : Int = w - contentsX - 15;
-		
-		nameField.setWidth(Math.min(135, contentsW));
+
+		nameField.setWidth(Std.int(Math.min(135, contentsW)));
 		nameField.x = contentsX;
 		nameField.y = 15;
-		
+
 		// undo buttons
-		undoButton.x = nameField.x + nameField.width + 30;
-		redoButton.x = undoButton.right() + 8;
-		undoButton.y = redoButton.y = nameField.y - 2;
-		
-		editor.setWidthHeight(contentsW, 200);
-		editor.x = contentsX;
-		editor.y = 50;
+		//undoButton.x = nameField.x + nameField.width + 30;
+		//redoButton.x = undoButton.right() + 8;
+		//undoButton.y = redoButton.y = nameField.y - 2;
+
+		//editor.setWidthHeight(contentsW, 200);
+		//editor.x = contentsX;
+		//editor.y = 50;
 	}
-	
+
 	private function addNewSoundButtons() : Void{
 		var left : Int = 16;
 		var buttonY : Int = 31;
@@ -211,15 +196,15 @@ class SoundsPart extends UIPart {
 		addChild(recordButton = makeButton(recordSound, "record", left + 34, buttonY));
 		addChild(importButton = makeButton(soundFromComputer, "import", left + 61, buttonY - 1));
 	}
-	
-	private function makeButton(fcn : Dynamic, iconName : String, x : Int, y : Int) : IconButton{
+
+	private function makeButton(fcn : Dynamic->Void, iconName : String, x : Int, y : Int) : IconButton{
 		var b : IconButton = new IconButton(fcn, iconName);
 		b.isMomentary = true;
 		b.x = x;
 		b.y = y;
 		return b;
 	}
-	
+
 	private function addListFrame() : Void{
 		listFrame = new ScrollFrame();
 		listFrame.setContents(app.getMediaPane(app, "sounds"));
@@ -227,40 +212,40 @@ class SoundsPart extends UIPart {
 		listFrame.allowHorizontalScrollbar = false;
 		addChild(listFrame);
 	}
-	
+
 	// -----------------------------
 	// Sound Name
 	//------------------------------
-	
+
 	private function nameChanged() : Void{
-		currentIndex = Math.min(currentIndex, app.viewedObj().sounds.length - 1);
+		currentIndex = Std.int(Math.min(currentIndex, app.viewedObj().sounds.length - 1));
 		var current : ScratchSound = try cast(app.viewedObj().sounds[currentIndex], ScratchSound) catch(e:Dynamic) null;
 		app.runtime.renameSound(current, nameField.contents());
 		nameField.setContents(current.soundName);
-		(try cast(listFrame.contents, MediaPane) catch(e:Dynamic) null).refresh();
+		cast(listFrame.contents, MediaPane).refresh();
 	}
-	
+
 	// -----------------------------
 	// Undo/Redo
 	//------------------------------
-	
+
 	private function addUndoButtons() : Void{
-		addChild(undoButton = new IconButton(editor.waveform.undo, makeButtonImg("undo", true), makeButtonImg("undo", false)));
-		addChild(redoButton = new IconButton(editor.waveform.redo, makeButtonImg("redo", true), makeButtonImg("redo", false)));
-		undoButton.isMomentary = true;
-		redoButton.isMomentary = true;
+		//addChild(undoButton = new IconButton(editor.waveform.undo, makeButtonImg("undo", true), makeButtonImg("undo", false)));
+		//addChild(redoButton = new IconButton(editor.waveform.redo, makeButtonImg("redo", true), makeButtonImg("redo", false)));
+		//undoButton.isMomentary = true;
+		//redoButton.isMomentary = true;
 	}
-	
+
 	public function refreshUndoButtons() : Void{
-		undoButton.setDisabled(!editor.waveform.canUndo(), 0.5);
-		redoButton.setDisabled(!editor.waveform.canRedo(), 0.5);
+		//undoButton.setDisabled(!editor.waveform.canUndo(), 0.5);
+		//redoButton.setDisabled(!editor.waveform.canRedo(), 0.5);
 	}
-	
+
 	public static function makeButtonImg(iconName : String, isOn : Bool, buttonSize : Point = null) : Sprite{
 		var icon : Bitmap = Resources.createBmp(iconName + ((isOn) ? "On" : "Off"));
-		var buttonW : Int = Math.max(icon.width, (buttonSize != null) ? buttonSize.x : 24);
-		var buttonH : Int = Math.max(icon.height, (buttonSize != null) ? buttonSize.y : 24);
-		
+		var buttonW : Int = Std.int(Math.max(icon.width, (buttonSize != null) ? buttonSize.x : 24));
+		var buttonH : Int = Std.int(Math.max(icon.height, (buttonSize != null) ? buttonSize.y : 24));
+
 		var img : Sprite = new Sprite();
 		var g : Graphics = img.graphics;
 		g.clear();
@@ -275,17 +260,17 @@ class SoundsPart extends UIPart {
 		}
 		g.drawRoundRect(0, 0, buttonW, buttonH, 8);
 		g.endFill();
-		
+
 		icon.x = (buttonW - icon.width) / 2;
 		icon.y = (buttonH - icon.height) / 2;
 		img.addChild(icon);
 		return img;
 	}
-	
+
 	// -----------------------------
 	// Menu
 	//------------------------------
-	
+
 	private function showNewSoundMenu(b : IconButton) : Void{
 		var m : Menu = new Menu(null, "New Sound", 0xB0B0B0, 28);
 		m.minWidth = 90;
@@ -293,19 +278,19 @@ class SoundsPart extends UIPart {
 		m.addItem("Record", recordSound);
 		m.addItem("Import", soundFromComputer);
 		var p : Point = b.localToGlobal(new Point(0, 0));
-		m.showOnStage(stage, p.x - 1, p.y + b.height - 2);
+		m.showOnStage(stage, Std.int(p.x - 1), Std.int(p.y + b.height - 2));
 	}
-	
+
 	public function soundFromLibrary(b : Dynamic = null) : Void{
-		app.getMediaLibrary("sound", app.addSound).open();
+		app.getMediaLibrary("sound", function(param:Dynamic) app.addSound(param)).open();
 	}
-	
+
 	public function soundFromComputer(b : Dynamic = null) : Void{
-		app.getMediaLibrary("sound", app.addSound).importFromDisk();
+		app.getMediaLibrary("sound", function(param:Dynamic) app.addSound(param)).importFromDisk();
 	}
-	
+
 	public function recordSound(b : Dynamic = null) : Void{
 		var newName : String = app.viewedObj().unusedSoundName(Translator.map("recording1"));
-		app.addSound(new ScratchSound(newName, WAVFile.empty()));
+		//app.addSound(new ScratchSound(newName, WAVFile.empty()));
 	}
 }

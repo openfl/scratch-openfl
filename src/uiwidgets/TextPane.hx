@@ -20,19 +20,20 @@
 package uiwidgets;
 
 
-import flash.display.Sprite;
-import flash.events.Event;
-import flash.text.TextField;
-import flash.text.TextFieldType;
-import flash.text.TextFormat;
+import openfl.display.Sprite;
+import openfl.events.Event;
+import openfl.text.TextField;
+import openfl.text.TextFieldType;
+import openfl.text.TextFormat;
 
-class TextPane extends Sprite {
-	
+class TextPane extends Sprite
+{
+
 	private static var scrollbarWidth : Int = 10;
-	
+
 	public var textField : TextField;
 	public var scrollbar : Scrollbar;
-	
+
 	public function new()
 	{
 		super();
@@ -42,42 +43,42 @@ class TextPane extends Sprite {
 		addChild(scrollbar);
 		addEventListener(Event.ENTER_FRAME, updateScrollbar);
 	}
-	
+
 	public function setWidthHeight(w : Int, h : Int) : Void{
 		textField.width = w - scrollbar.width;
 		textField.height = h;
 		scrollbar.x = textField.width;
 		scrollbar.setWidthHeight(scrollbarWidth, h);
 	}
-	
+
 	public function append(s : String) : Void{
 		textField.appendText(s);
 		textField.scrollV = textField.maxScrollV - 1;
 		updateScrollbar(null);
 	}
-	
+
 	public function clear() : Void{
 		textField.text = "";
 		textField.scrollV = 0;
 		updateScrollbar(null);
 	}
-	
+
 	public function setText(s : String) : Void{
 		textField.text = s;
 		textField.scrollV = textField.maxScrollV - 1;
 		updateScrollbar(null);
 	}
-	
+
 	private function scrollTextField(scrollFraction : Float) : Void{
 		textField.scrollV = scrollFraction * textField.maxScrollV;
 	}
-	
+
 	private function updateScrollbar(evt : Event) : Void{
 		var scroll : Float = textField.scrollV / textField.maxScrollV;
 		var visible : Float = textField.height / textField.textHeight;
 		scrollbar.update(scroll, visible);
 	}
-	
+
 	private function addTextField() : Void{
 		textField = new TextField();
 		textField.background = true;

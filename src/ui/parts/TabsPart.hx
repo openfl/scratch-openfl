@@ -24,24 +24,18 @@
 
 package ui.parts;
 
-//import ui.parts.Graphics;
-//import ui.parts.Scratch;
-//import ui.parts.Sprite;
-//import ui.parts.TextField;
-//import ui.parts.TextFormat;
-//import ui.parts.UIPart;
-
-import flash.display.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.text.*;
 import translation.Translator;
 import uiwidgets.IconButton;
 
-class TabsPart extends UIPart {
-	
+class TabsPart extends UIPart
+{
+
 	private var scriptsTab : IconButton;
 	private var imagesTab : IconButton;
 	private var soundsTab : IconButton;
-	
+
 	public function new(app : Scratch)
 	{
 		super();
@@ -51,7 +45,7 @@ class TabsPart extends UIPart {
 		};
 		function selectSounds(b : IconButton) : Void{app.setTab("sounds");
 		};
-		
+
 		this.app = app;
 		scriptsTab = makeTab("Scripts", selectScripts);
 		imagesTab = makeTab("Images", selectImages);  // changed to 'Costumes' or 'Scenes' by refresh()  
@@ -61,26 +55,26 @@ class TabsPart extends UIPart {
 		addChild(soundsTab);
 		scriptsTab.turnOn();
 	}
-	
-	public static function strings() : Array<Dynamic>{
+
+	public static function strings() : Array<String>{
 		return ["Scripts", "Costumes", "Backdrops", "Sounds"];
 	}
-	
+
 	public function refresh() : Void{
 		var label : String = (((app.viewedObj() != null) && app.viewedObj().isStage)) ? "Backdrops" : "Costumes";
 		imagesTab.setImage(makeTabImg(label, true), makeTabImg(label, false));
 		fixLayout();
 	}
-	
+
 	public function selectTab(tabName : String) : Void{
 		scriptsTab.turnOff();
 		imagesTab.turnOff();
 		soundsTab.turnOff();
-		if (tabName == "scripts") 			scriptsTab.turnOn();
-		if (tabName == "images") 			imagesTab.turnOn();
-		if (tabName == "sounds") 			soundsTab.turnOn();
+		if (tabName == "scripts")             scriptsTab.turnOn();
+		if (tabName == "images")             imagesTab.turnOn();
+		if (tabName == "sounds")             soundsTab.turnOn();
 	}
-	
+
 	public function fixLayout() : Void{
 		scriptsTab.x = 0;
 		scriptsTab.y = 0;
@@ -88,20 +82,20 @@ class TabsPart extends UIPart {
 		imagesTab.y = 0;
 		soundsTab.x = imagesTab.x + imagesTab.width + 1;
 		soundsTab.y = 0;
-		this.w = soundsTab.x + soundsTab.width;
-		this.h = scriptsTab.height;
+		this.w = Std.int(soundsTab.x + soundsTab.width);
+		this.h = Std.int(scriptsTab.height);
 	}
-	
+
 	public function updateTranslation() : Void{
 		scriptsTab.setImage(makeTabImg("Scripts", true), makeTabImg("Scripts", false));
 		soundsTab.setImage(makeTabImg("Sounds", true), makeTabImg("Sounds", false));
 		refresh();
 	}
-	
-	private function makeTab(label : String, action : Dynamic) : IconButton{
+
+	private function makeTab(label : String, action : Dynamic->Void) : IconButton{
 		return new IconButton(action, makeTabImg(label, true), makeTabImg(label, false), true);
 	}
-	
+
 	private function makeTabImg(label : String, isSelected : Bool) : Sprite{
 		var img : Sprite = new Sprite();
 		var tf : TextField = new TextField();
@@ -112,13 +106,13 @@ class TabsPart extends UIPart {
 		tf.x = 10;
 		tf.y = 4;
 		img.addChild(tf);
-		
+
 		var g : Graphics = img.graphics;
-		var w : Int = tf.width + 20;
+		var w : Int = Std.int(tf.width + 20);
 		var h : Int = 28;
 		var r : Int = 9;
-		if (isSelected) 			drawTopBar(g, CSS.titleBarColors, getTopBarPath(w, h), w, h)
-		else drawSelected(g, [0xf2f2f2, 0xd1d2d3], getTopBarPath(w, h), w, h);
+		if (isSelected)             UIPart.drawTopBar(g, CSS.titleBarColors, UIPart.getTopBarPath(w, h), w, h);
+		else UIPart.drawSelected(g, [0xf2f2f2, 0xd1d2d3], UIPart.getTopBarPath(w, h), w, h);
 		return img;
 	}
 }

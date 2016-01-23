@@ -25,13 +25,13 @@
 package scratch;
 import blocks.BlockArg;
 
-import flash.display.*;
-import flash.geom.*;
-import flash.media.*;
-import flash.events.*;
-import flash.system.Capabilities;
-import flash.utils.ByteArray;
-import flash.net.FileReference;
+import openfl.display.*;
+import openfl.geom.*;
+import openfl.media.*;
+import openfl.events.*;
+import openfl.system.Capabilities;
+import openfl.utils.ByteArray;
+import openfl.net.FileReference;
 import blocks.Block;
 import filters.FilterPack;
 import translation.Translator;
@@ -39,13 +39,13 @@ import uiwidgets.Menu;
 import ui.media.MediaInfo;
 import util.*;
 import watchers.*;
-import by.blooddy.crypto.image.PNG24Encoder;
-import by.blooddy.crypto.image.PNGFilter;
-import by.blooddy.crypto.MD5;
+//import by.blooddy.crypto.image.PNG24Encoder;
+//import by.blooddy.crypto.image.PNGFilter;
+//import by.blooddy.crypto.MD5;
 
 class ScratchStage extends ScratchObj {
 
-	public var info:Dynamic = new Object();
+	public var info:Dynamic = {};
 	public var tempoBPM:Float = 60;
 
 	public var penActivity:Bool;
@@ -60,15 +60,16 @@ class ScratchStage extends ScratchObj {
 
 	// camera support
 	public var videoImage:Bitmap;
-	static private var camera:Camera;
+	//static private var camera:Camera;
 	private var video:Video;
 	private var videoAlpha:Float = 0.5;
 	private var flipVideo:Bool = true;
 
 	public function new() {
+		super();
 		objName = 'Stage';
 		isStage = true;
-		scrollRect = new Rectangle(0, 0, STAGEW, STAGEH); // clip drawing to my bounds
+		scrollRect = new Rectangle(0, 0, ScratchObj.STAGEW, ScratchObj.STAGEH); // clip drawing to my bounds
 		cacheAsBitmap = true; // clip damage reports to my bounds
 		filterPack = new FilterPack(this);
 
@@ -98,30 +99,32 @@ class ScratchStage extends ScratchObj {
 			if ((spr.objName == spriteName) && !spr.isClone) return spr;
 		}
 		var app:Scratch = Scratch.app;
-		if ((app != null) && Std.is (app.gh.carriedObj, ScratchSprite)) {
-			spr = ScratchSprite(app.gh.carriedObj);
+		if ((app != null) && Std.is(app.gh.carriedObj, ScratchSprite)) {
+			var spr:ScratchSprite = cast(app.gh.carriedObj, ScratchSprite);
 			if ((spr.objName == spriteName) && !spr.isClone) return spr;
 		}
 		return null;
 	}
 
-	public function spritesAndClonesNamed(spriteName:String):Array {
+	public function spritesAndClonesNamed(spriteName:String):Array<ScratchSprite> {
 		// Return all sprites and clones with the given name.
-		var result:Array = [];
+		var result:Array<ScratchSprite> = [];
 		for (i in 0...numChildren) {
 			var c:Dynamic = getChildAt(i);
-			if (Std.is (c, ScratchSprite) && (c.objName == spriteName)) result.push(c);
+			if (Std.is(c, ScratchSprite) && (c.objName == spriteName)) result.push(c);
 		}
-		var app:Scratch = cast (parent, Scratch);
+		var app:Scratch = null;
+		if (parent == Scratch.app.rootDisplayObject())
+			app = Scratch.app;
 		if (app != null) {
-			var spr:ScratchSprite = cast (app.gh.carriedObj, ScratchSprite);
+			var spr:ScratchSprite = cast(app.gh.carriedObj, ScratchSprite);
 			if (spr != null && (spr.objName == spriteName)) result.push(spr);
 		}
 		return result;
 	}
 
 	public function unusedSpriteName(baseName:String):String {
-		var existingNames:Array = ['_mouse_', '_stage_', '_edge_', '_myself_'];
+		var existingNames:Array<String> = ['_mouse_', '_stage_', '_edge_', '_myself_'];
 		for (s in sprites()) {
 			existingNames.push(s.objName.toLowerCase());
 		}
@@ -143,20 +146,20 @@ class ScratchStage extends ScratchObj {
 
 	private function initMedia():Void {
 		costumes.push(ScratchCostume.emptyBitmapCostume(Translator.map('backdrop1'), true));
-		sounds.push(new ScratchSound(Translator.map('pop'), new Pop()));
+		sounds.push(new ScratchSound(Translator.map('pop'), ScratchObj.makePop()));
 		sounds[0].prepareToSave();
 	}
 
 	private function addWhiteBG():Void {
 		bg = new Shape();
 		bg.graphics.beginFill(0xFFFFFF);
-		bg.graphics.drawRect(0, 0, STAGEW, STAGEH);
+		bg.graphics.drawRect(0, 0, ScratchObj.STAGEW, ScratchObj.STAGEH);
 		addChild(bg);
 	}
 
 	private function addPenLayer():Void {
 		newPenStrokes = new Shape();
-		var bm:BitmapData = new BitmapData(STAGEW, STAGEH, true, 0);
+		var bm:BitmapData = new BitmapData(ScratchObj.STAGEW, ScratchObj.STAGEH, true, 0);
 		penLayer = new Bitmap(bm);
 		addChild(penLayer);
 	}
@@ -164,31 +167,33 @@ class ScratchStage extends ScratchObj {
 	public function baseW():Float { return bg.width; }
 	public function baseH():Float { return bg.height; }
 
-	public function scratchMouseX():Int { return Math.max( -240, Math.min(mouseX - (STAGEW / 2), 240)); }
-	public function scratchMouseY():Int { return -Math.max( -180, Math.min(mouseY - (STAGEH / 2), 180)); }
+	public function scratchMouseX():Int { return Std.int(Math.max( -240, Math.min(mouseX - (ScratchObj.STAGEW / 2), 240))); }
+	public function scratchMouseY():Int { return Std.int(-Math.max( -180, Math.min(mouseY - (ScratchObj.STAGEH / 2), 180))); }
 
-	public override function allObjects():Array {
+	public override function allObjects():Array<ScratchObj> {
 		// Return an array of all sprites in this project plus the stage.
-		var result:Array = sprites();
+		var result:Array<ScratchObj> = [];
+		for (spr in sprites())
+			result.push(spr);
 		result.push(this);
 		return result;
 	}
 
-	public function sprites():Array {
+	public function sprites():Array<ScratchSprite> {
 		// Return an array of all sprites in this project.
-		var result:Array = [];
+		var result:Array<ScratchSprite> = [];
 		for (i in 0...numChildren) {
 			var o:Dynamic = getChildAt(i);
-			if (Std.is (o, ScratchSprite) && !o.isClone) result.push(o);
+			if (Std.is(o, ScratchSprite) && !o.isClone) result.push(cast(o,ScratchSprite));
 		}
 		return result;
 	}
 
 	public function deleteClones():Void {
-		var clones:Array = [];
+		var clones:Array<Dynamic> = [];
 		for (i in 0...numChildren) {
 			var o:Dynamic = getChildAt(i);
-			if (Std.is (o, ScratchSprite) && o.isClone) {
+			if (Std.is(o, ScratchSprite) && o.isClone) {
 				if (o.bubble && o.bubble.parent) o.bubble.parent.removeChild(o.bubble);
 				clones.push(o);
 			}
@@ -196,27 +201,31 @@ class ScratchStage extends ScratchObj {
 		for (c in clones) removeChild(c);
 	}
 
-	public function watchers():Array {
+	public function watchers():Array<Dynamic> {
 		// Return an array of all variable and lists on the stage, visible or not.
-		var result:Array = [];
+		var result:Array<Dynamic> = [];
 		var uiLayer:Sprite = getUILayer();
 		for (i in 0...uiLayer.numChildren) {
 			var o:Dynamic = uiLayer.getChildAt(i);
-			if (Std.is (o, Watcher) || Std.is (o, ListWatcher)) result.push(o);
+			if (Std.is(o, Watcher) || Std.is(o, ListWatcher)) result.push(o);
 		}
 		return result;
 	}
 
 	public function removeObsoleteWatchers():Void {
 		// Called after deleting a sprite.
-		var toDelete:Array = [];
+		var toDelete:Array<Dynamic> = [];
 		var uiLayer:Sprite = getUILayer();
 		for (i in 0...uiLayer.numChildren) {
-			var w:Watcher = cast (uiLayer.getChildAt(i), Watcher);
-			if (w != null && !w.target.isStage && (w.target.parent != this)) toDelete.push(w);
+			if (Std.is(uiLayer.getChildAt(i), Watcher)) {
+				var w:Watcher = cast(uiLayer.getChildAt(i), Watcher);
+				if (!w.target.isStage && (w.target.parent != this)) toDelete.push(w);
+			}
 
-			var lw:ListWatcher = cast (uiLayer.getChildAt(i), ListWatcher);
-			if (lw != null && !lw.target.isStage && (lw.target.parent != this)) toDelete.push(lw);
+			if (Std.is(uiLayer.getChildAt(i), ListWatcher)) {
+				var lw:ListWatcher = cast(uiLayer.getChildAt(i), ListWatcher);
+				if (!lw.target.isStage && (lw.target.parent != this)) toDelete.push(lw);
+			}
 		}
 		for (c in toDelete) uiLayer.removeChild(c);
 	}
@@ -230,11 +239,11 @@ class ScratchStage extends ScratchObj {
 	}
 
 	private function saveScreenshot():Void {
-		var bitmapData:BitmapData = new BitmapData(STAGEW, STAGEH, true, 0);
+		var bitmapData:BitmapData = new BitmapData(ScratchObj.STAGEW, ScratchObj.STAGEH, true, 0);
 		bitmapData.draw(this);
-		var pngData:ByteArray = PNG24Encoder.encode(bitmapData, PNGFilter.PAETH);
-		var file:FileReference = new FileReference();
-		file.save(pngData, 'stage.png');
+		//var pngData:ByteArray = PNG24Encoder.encode(bitmapData, PNGFilter.PAETH);
+		//var file:FileReference = new FileReference();
+		//file.save(pngData, 'stage.png');
 	}
 
 	/* Scrolling support */
@@ -244,24 +253,29 @@ class ScratchStage extends ScratchObj {
 
 	public function scrollAlign(s:String):Void {
 		var c:DisplayObject = currentCostume().displayObj();
-		var sceneW:Int = Math.max(c.width, STAGEW);
-		var sceneH:Int = Math.max(c.height, STAGEH);
+		var sceneW:Int = Std.int(Math.max(c.width, ScratchObj.STAGEW));
+		var sceneH:Int = Std.int(Math.max(c.height, ScratchObj.STAGEH));
 		switch (s) {
 		case 'top-left':
 			xScroll = 0;
-			yScroll = sceneH - STAGEH;
+			yScroll = sceneH - ScratchObj.STAGEH;
+			//break;
 		case 'top-right':
-			xScroll = sceneW - STAGEW;
-			yScroll = sceneH - STAGEH;
+			xScroll = sceneW - ScratchObj.STAGEW;
+			yScroll = sceneH - ScratchObj.STAGEH;
+			//break;
 		case 'middle':
-			xScroll = Math.floor((sceneW - STAGEW) / 2);
-			yScroll = Math.floor((sceneH - STAGEH) / 2);
+			xScroll = Math.floor((sceneW - ScratchObj.STAGEW) / 2);
+			yScroll = Math.floor((sceneH - ScratchObj.STAGEH) / 2);
+			//break;
 		case 'bottom-left':
 			xScroll = 0;
 			yScroll = 0;
+			//break;
 		case 'bottom-right':
-			xScroll = sceneW - STAGEW;
+			xScroll = sceneW - ScratchObj.STAGEW;
 			yScroll = 0;
+			//break;
 		}
 		updateImage();
 	}
@@ -270,18 +284,22 @@ class ScratchStage extends ScratchObj {
 	public function scrollUp(n:Float):Void { yScroll += n; updateImage(); }
 
 	public function getUILayer():Sprite {
-		#if allow3d
+		/*
+		SCRATCH::allow3d {
 			if(Scratch.app.isIn3D) return Scratch.app.render3D.getUIContainer();
-		#end
+		}
+		*/
 		return this;
 	}
 
 	override private function updateImage():Void {
 		super.updateImage();
-		#if allow3d
+		/*
+		SCRATCH::allow3d {
 			if (Scratch.app.isIn3D)
 				Scratch.app.render3D.getUIContainer().transform.matrix = transform.matrix.clone();
-		#end
+		}
+		*/
 
 		return; // scrolling background support is disabled; see note below
 
@@ -295,8 +313,8 @@ class ScratchStage extends ScratchObj {
 		while (img.numChildren > 0) img.removeChildAt(0);
 
 		var c:DisplayObject = currentCostume().displayObj();
-		var sceneW:Int = Math.max(c.width, STAGEW);
-		var sceneH:Int = Math.max(c.height, STAGEH);
+		var sceneW:Int = Std.int(Math.max(c.width, ScratchObj.STAGEW));
+		var sceneH:Int = Std.int(Math.max(c.height, ScratchObj.STAGEH));
 
 		// keep x and y scroll within range 0 .. sceneW/sceneH
 		xScroll = xScroll % sceneW;
@@ -304,20 +322,20 @@ class ScratchStage extends ScratchObj {
 		if (xScroll < 0) xScroll += sceneW;
 		if (yScroll < 0) yScroll += sceneH;
 
-		if ((xScroll == 0) && (yScroll == 0) && (c.width == STAGEW) && (c.height == STAGEH)) {
+		if ((xScroll == 0) && (yScroll == 0) && (c.width == ScratchObj.STAGEW) && (c.height == ScratchObj.STAGEH)) {
 			img.addChild(currentCostume().displayObj());
 			return;
 		}
 
 		var bm:BitmapData;
-		if (Std.is (c, BitmapData) && (c.width >= STAGEW) && (c.height >= STAGEH)) {
-			bm = cast c;
+		if (Std.is(c, BitmapData) && (c.width >= ScratchObj.STAGEW) && (c.height >= ScratchObj.STAGEH)) {
+			bm = cast(c, BitmapData);
 		} else {
 			// render SVG to a bitmap. also centers scenes smaller than the stage
 			var m:Matrix = null;
-			var insetX:Int = Math.max(0, (STAGEW - c.width) / 2);
-			var insetY:Int = Math.max(0, (STAGEH - c.height) / 2);
-			if (currentCostume().svgRoot) insetX = insetY = 0;
+			var insetX:Int = Std.int(Math.max(0, (ScratchObj.STAGEW - c.width) / 2));
+			var insetY:Int = Std.int(Math.max(0, (ScratchObj.STAGEH - c.height) / 2));
+			//if (currentCostume().svgRoot) insetX = insetY = 0;
 			if ((insetX > 0) || (insetY > 0)) {
 				m = new Matrix();
 				m.scale(c.scaleX, c.scaleY);
@@ -329,8 +347,8 @@ class ScratchStage extends ScratchObj {
 
 		var stageBM:BitmapData = bm;
 		if ((xScroll != 0) || (yScroll != 0)) {
-			var yBase:Int = STAGEH - sceneH;
-			stageBM = new BitmapData(STAGEW, STAGEH, false, 0x505050);
+			var yBase:Int = ScratchObj.STAGEH - sceneH;
+			stageBM = new BitmapData(ScratchObj.STAGEW, ScratchObj.STAGEH, false, 0x505050);
 			stageBM.copyPixels(bm, bm.rect, new Point(-xScroll, yBase + yScroll));
 			stageBM.copyPixels(bm, bm.rect, new Point(sceneW - xScroll, yBase + yScroll));
 			stageBM.copyPixels(bm, bm.rect, new Point(-xScroll, yBase + yScroll - sceneH));
@@ -354,9 +372,9 @@ class ScratchStage extends ScratchObj {
 			} else {
 				videoImage.bitmapData.draw(video);
 			}
-			#if allow3d
-			if (Scratch.app.isIn3D) Scratch.app.render3D.updateRender(videoImage);
-			#end
+			/*
+			SCRATCH::allow3d { if(Scratch.app.isIn3D) Scratch.app.render3D.updateRender(videoImage); }
+			*/
 		}
 		cachedBitmapIsCurrent = false;
 
@@ -365,8 +383,8 @@ class ScratchStage extends ScratchObj {
 		for (i in 0...uiContainer.numChildren) {
 			var c:DisplayObject = uiContainer.getChildAt(i);
 			if (c.visible == true) {
-				if (Std.is (c, Watcher)) cast (c, Watcher).step(runtime);
-				if (Std.is (c, ListWatcher)) cast (c, ListWatcher).step();
+				if (Std.is(c, Watcher)) cast(c, Watcher).step(runtime);
+				if (Std.is(c, ListWatcher)) cast(c, ListWatcher).step();
 			}
 		}
 	}
@@ -399,7 +417,8 @@ class ScratchStage extends ScratchObj {
 			s.visible = wasVisible;
 		}
 
-		#if allow3d
+		/*
+		if (SCRATCH::allow3d) {
 			if (Scratch.app.isIn3D) {
 				var bmd:BitmapData = getBitmapOfSprite(s, stampBounds);
 				if (!bmd) return;
@@ -417,19 +436,24 @@ class ScratchStage extends ScratchObj {
 			else {
 				stamp2d();
 			}
-		#else
+		}
+		else {
+		*/
 			stamp2d();
-		#end
+		/*	
+		}
+		*/
 	}
 
-	#if allow3d
+	/*
+	SCRATCH::allow3d
 	public function getBitmapOfSprite(s:ScratchSprite, bounds:Rectangle, for_carry:Bool = false):BitmapData {
 		var b:Rectangle = s.currentCostume().bitmap ? s.img.getChildAt(0).getBounds(s) : s.getVisibleBounds(s);
 		bounds.width = b.width; bounds.height = b.height; bounds.x = b.x; bounds.y = b.y;
 		if(!Scratch.app.render3D || s.width < 1 || s.height < 1) return null;
 
-		var ghost:Float = s.filterPack.getFilterSetting('ghost');
-		var oldBright:Float = s.filterPack.getFilterSetting('brightness');
+		var ghost:Number = s.filterPack.getFilterSetting('ghost');
+		var oldBright:Number = s.filterPack.getFilterSetting('brightness');
 		s.filterPack.setFilter('ghost', 0);
 		s.filterPack.setFilter('brightness', 0);
 		s.updateEffectsFor3D();
@@ -440,43 +464,46 @@ class ScratchStage extends ScratchObj {
 
 		return bmd;
 	}
-	#end
-
+*/
 	public function setVideoState(newState:String):Void {
-		if ('off' == newState) {
-			if (video) video.attachCamera(null); // turn off camera
-			if (videoImage && videoImage.parent) videoImage.parent.removeChild(videoImage);
-			video = null;
-			videoImage = null;
-			return;
-		}
-		Scratch.app.libraryPart.showVideoButton();
-		flipVideo = ('on' == newState); // 'on' means mirrored; 'on-flip' means unmirrored
-		if (camera == null) {
-			// Set up the camera only the first time it is used.
-			camera = Camera.getCamera();
-			if (!camera) return; // no camera available or access denied
-			camera.setMode(640, 480, 30);
-		}
-		if (video == null) {
-			video = new Video(480, 360);
-			video.attachCamera(camera);
-			videoImage = new Bitmap(new BitmapData(video.width, video.height, false));
-			videoImage.alpha = videoAlpha;
-			#if allow3d
-				updateSpriteEffects(videoImage, {'ghost': 100 * (1 - videoAlpha)});
-			#end
-			addChildAt(videoImage, getChildIndex(penLayer) + 1);
-		}
+		//if ('off' == newState) {
+			//if (video != null) video.attachCamera(null); // turn off camera
+			//if (videoImage != null && videoImage.parent != null) videoImage.parent.removeChild(videoImage);
+			//video = null;
+			//videoImage = null;
+			//return;
+		//}
+		//Scratch.app.libraryPart.showVideoButton();
+		//flipVideo = ('on' == newState); // 'on' means mirrored; 'on-flip' means unmirrored
+		//if (camera == null) {
+			//// Set up the camera only the first time it is used.
+			//camera = Camera.getCamera();
+			//if (camera == null) return; // no camera available or access denied
+			//camera.setMode(640, 480, 30);
+		//}
+		//if (video == null) {
+			//video = new Video(480, 360);
+			//video.attachCamera(camera);
+			//videoImage = new Bitmap(new BitmapData(Std.int(video.width), Std.int(video.height), false));
+			//videoImage.alpha = videoAlpha;
+			///*
+			//SCRATCH::allow3d {
+				//updateSpriteEffects(videoImage, {'ghost': 100 * (1 - videoAlpha)});
+			//}
+			//*/
+			//addChildAt(videoImage, getChildIndex(penLayer) + 1);
+		//}
 	}
 
 	public function setVideoTransparency(transparency:Float):Void {
 		videoAlpha = 1 - Math.max(0, Math.min(transparency / 100, 1));
-		if (videoImage) {
+		if (videoImage != null) {
 			videoImage.alpha = videoAlpha;
-			#if allow3d
+			/*
+			SCRATCH::allow3d {
 				updateSpriteEffects(videoImage, {'ghost': transparency});
-			#end
+			}
+			*/
 		}
 	}
 
@@ -489,9 +516,9 @@ class ScratchStage extends ScratchObj {
 		bm.fillRect(bm.rect, 0);
 		newPenStrokes.graphics.clear();
 		penActivity = false;
-		#if allow3d
-		if (Scratch.app.isIn3D) Scratch.app.render3D.updateRender(penLayer);
-		#end
+		/*
+		SCRATCH::allow3d { if(Scratch.app.isIn3D) Scratch.app.render3D.updateRender(penLayer); }
+		*/
 	}
 
 	public function commitPenStrokes():Void {
@@ -499,9 +526,9 @@ class ScratchStage extends ScratchObj {
 		penLayer.bitmapData.draw(newPenStrokes);
 		newPenStrokes.graphics.clear();
 		penActivity = false;
-		#if allow3d
-		if (Scratch.app.isIn3D) Scratch.app.render3D.updateRender(penLayer);
-		#end
+		/*
+		SCRATCH::allow3d { if(Scratch.app.isIn3D) Scratch.app.render3D.updateRender(penLayer); }
+		*/
 	}
 
 	private var cachedBM:BitmapData;
@@ -509,11 +536,11 @@ class ScratchStage extends ScratchObj {
 
 	private function updateCachedBitmap():Void {
 		if (cachedBitmapIsCurrent) return;
-		if (!cachedBM) cachedBM = new BitmapData(STAGEW, STAGEH, false);
+		if (cachedBM == null) cachedBM = new BitmapData(ScratchObj.STAGEW, ScratchObj.STAGEH, false);
 		cachedBM.fillRect(cachedBM.rect, 0xF0F080);
 		cachedBM.draw(img);
-		if (penLayer) cachedBM.draw(penLayer);
-		if (videoImage) cachedBM.draw(videoImage);
+		if (penLayer != null) cachedBM.draw(penLayer);
+		if (videoImage != null) cachedBM.draw(videoImage);
 		cachedBitmapIsCurrent = true;
 	}
 
@@ -524,7 +551,7 @@ class ScratchStage extends ScratchObj {
 		// a bitmap and return it.
 
 		var r:Rectangle = s.bounds();
-		var bm:BitmapData = new BitmapData(r.width, r.height, false);
+		var bm:BitmapData = new BitmapData(Std.int(r.width), Std.int(r.height), false);
 
 		if (!cachedBitmapIsCurrent) updateCachedBitmap();
 
@@ -533,17 +560,20 @@ class ScratchStage extends ScratchObj {
 		bm.draw(cachedBM, m);
 
 		for (i in 0...this.numChildren) {
-			var o:ScratchSprite = cast (this.getChildAt(i), ScratchSprite);
-			if (o != null && (o != s) && o.visible && o.bounds().intersects(r)) {
-				m.identity();
-				m.translate(o.img.x, o.img.y);
-				m.rotate((Math.PI * o.rotation) / 180);
-				m.scale(o.scaleX, o.scaleY);
-				m.translate(o.x - r.x, o.y - r.y);
-				m.tx = Math.floor(m.tx);
-				m.ty = Math.floor(m.ty);
-				var colorTransform:ColorTransform = (o.img.alpha == 1) ? null : new ColorTransform(1, 1, 1, o.img.alpha);
-				bm.draw(o.img, m, colorTransform);
+			if (Std.is(this.getChildAt(i), ScratchSprite))
+			{
+				var o:ScratchSprite = cast(this.getChildAt(i), ScratchSprite);
+				if ((o != s) && o.visible && o.bounds().intersects(r)) {
+					m.identity();
+					m.translate(o.img.x, o.img.y);
+					m.rotate((Math.PI * o.rotation) / 180);
+					m.scale(o.scaleX, o.scaleY);
+					m.translate(o.x - r.x, o.y - r.y);
+					m.tx = Math.floor(m.tx);
+					m.ty = Math.floor(m.ty);
+					var colorTransform:ColorTransform = (o.img.alpha == 1) ? null : new ColorTransform(1, 1, 1, o.img.alpha);
+					bm.draw(o.img, m, colorTransform);
+				}
 			}
 		}
 
@@ -552,28 +582,30 @@ class ScratchStage extends ScratchObj {
 //	private var testBM:Bitmap = new Bitmap();
 //	private var dumpPixels:Bool = true;
 
-	#if allow3d
-	public function updateSpriteEffects(spr:DisplayObject, effects:Dynamic):Void {
+/*
+	SCRATCH::allow3d
+	public function updateSpriteEffects(spr:DisplayObject, effects:Object):Void {
 		if(Scratch.app.isIn3D) {
 			Scratch.app.render3D.updateFilters(spr, effects);
 		}
 	}
-	#end
-
+*/
 	public function getBitmapWithoutSpriteFilteredByColor(s:ScratchSprite, c:Int):BitmapData {
 		commitPenStrokes(); // force any pen strokes to be rendered so they can be sensed
 
 		var bm1:BitmapData;
 		var mask:UInt = 0x00F8F8F0;
-		if(Scratch.app.isIn3D) {
-			#if allow3d
+		//if (Scratch.app.isIn3D) {
+			/*
+			SCRATCH::allow3d {
 				bm1 = Scratch.app.render3D.getOtherRenderedChildren(s, 1);
-			#end
-		}
-		else {
+			}
+			*/
+		//}
+		//else {
 			// OLD code here
 			bm1 = bitmapWithoutSprite(s);
-		}
+		//}
 
 		var bm2:BitmapData = new BitmapData(bm1.width, bm1.height, true, 0);
 		bm2.threshold(bm1, bm1.rect, bm1.rect.topLeft, '==', c, 0xFF000000, mask); // match only top five bits of each component
@@ -596,9 +628,9 @@ class ScratchStage extends ScratchObj {
 		return bm2;
 	}
 
-	private function getNumberAsHexString(number:UInt, minimumLength:UInt = 1, showHexDenotation:Bool = true):String {
+	private function getNumberAsHexString(number:UInt, minimumLength:Int = 1, showHexDenotation:Bool = true):String {
 		// The string that will be output at the end of the function.
-		var string:String = number.toString(16).toUpperCase();
+		var string:String = StringTools.hex(number).toUpperCase();
 
 		// While the minimumLength argument is higher than the length of the string, add a leading zero.
 		while (minimumLength > string.length) {
@@ -612,33 +644,40 @@ class ScratchStage extends ScratchObj {
 	}
 
 	public function updateRender(dispObj:DisplayObject, renderID:String = null, renderOpts:Dynamic = null):Void {
-		#if allow3d
+		/*
+		SCRATCH::allow3d {
 			if (Scratch.app.isIn3D) Scratch.app.render3D.updateRender(dispObj, renderID, renderOpts);
-		#end
+		}
+		*/
 	}
 
 	public function projectThumbnailPNG():ByteArray {
 		// Generate project thumbnail.
 		// Note: Do not save the video layer in the thumbnail for privacy reasons.
-		var bm:BitmapData = new BitmapData(STAGEW, STAGEH, false);
-		if (videoImage) videoImage.visible = false;
+		var bm:BitmapData = new BitmapData(ScratchObj.STAGEW, ScratchObj.STAGEH, false);
+		if (videoImage != null) videoImage.visible = false;
 
 		// Get a screenshot of the stage
-		#if allow3d
+		/*
+		if (SCRATCH::allow3d) {
 			if(Scratch.app.isIn3D) Scratch.app.render3D.getRender(bm);
 			else bm.draw(this);
-		#else
+		}
+		else {
+		*/
 			bm.draw(this);
-		#end
+			/*
+		}
+*/
 
-		if (videoImage) videoImage.visible = true;
-		return PNG24Encoder.encode(bm);
+		if (videoImage != null) videoImage.visible = true;
+		return null; // PNG24Encoder.encode(bm);
 	}
 
 	public function savePenLayer():Void {
 		penLayerID = -1;
-		penLayerPNG = PNG24Encoder.encode(penLayer.bitmapData, PNGFilter.PAETH);
-		penLayerMD5 = by.blooddy.crypto.MD5.hashBytes(penLayerPNG) + '.png';
+		penLayerPNG = null;// PNG24Encoder.encode(penLayer.bitmapData, PNGFilter.PAETH);
+		penLayerMD5 = null; // by.blooddy.crypto.MD5.hashBytes(penLayerPNG) + '.png';
 	}
 
 	public function clearPenLayer():Void {
@@ -649,7 +688,7 @@ class ScratchStage extends ScratchObj {
 	public function isEmpty():Bool {
 		// Return true if this project has no scripts, no variables, no lists,
 		// at most one sprite, and only the default costumes and sound media.
-		var defaultMedia:Array = [
+		var defaultMedia:Array<String> = [
 			'510da64cf172d53750dffd23fbf73563.png',
 			'b82f959ab7fa28a70b06c8162b7fef83.svg',
 			'df0e59dcdea889efae55eb77902edc1c.svg',
@@ -683,41 +722,42 @@ class ScratchStage extends ScratchObj {
 		info.videoOn = isVideoOn();
 		info.swfVersion = Scratch.versionString;
 
-		//delete info.loadInProgress;
-		info.loadInProgress = null;
+		info.loadInProgress = null;// 	delete info.loadInProgress;
 		if (Scratch.app.loadInProgress) info.loadInProgress = true; // log flag for debugging
 
 		if (this == Scratch.app.stagePane) {
 			// If this is the active stage pane, record the current extensions.
-			var extensionsToSave:Array = Scratch.app.extensionManager.extensionsToSave();
-			//if (extensionsToSave.length == 0) delete info.savedExtensions;
-			if (extensionsToSave.length == 0) info.savedExtensions = null;
-			else info.savedExtensions = extensionsToSave;
+			//var extensionsToSave:Array = Scratch.app.extensionManager.extensionsToSave();
+			info.savedExtensions = null; //delete info.savedExtensions;
+			//if (extensionsToSave.length == 0) info.savedExtensions = null; //delete info.savedExtensions;
+			//else info.savedExtensions = extensionsToSave;
 		}
 
-		//delete info.userAgent;
-		info.userAgent = null;
-		if (Scratch.app.jsEnabled) {
-			Scratch.app.externalCall('window.navigator.userAgent.toString', function(userAgent:String):Void {
-				if (userAgent != null) info.userAgent = userAgent;
-			});
+		info.userAgent = null; //delete info.userAgent;
+		if (Scratch.app.isOffline) {
+			info.userAgent = 'Scratch 2.0 Offline Editor';
 		}
+		//else if (Scratch.app.jsEnabled) {
+			//Scratch.app.externalCall('window.navigator.userAgent.toString', function(userAgent:String):Void {
+				//if (userAgent != null) info.userAgent = userAgent;
+			//});
+		//}
 	}
 
 	public function updateListWatchers():Void {
 		for (i in 0...numChildren) {
 			var c:DisplayObject = getChildAt(i);
-			if (Std.is (c, ListWatcher)) {
-				cast (c, ListWatcher).updateContents();
+			if (Std.is(c, ListWatcher)) {
+				cast(c,ListWatcher).updateContents();
 			}
 		}
 	}
 
 	public function scriptCount():Int {
-		var scriptCount:Int;
+		var scriptCount:Int = 0;
 		for (obj in allObjects()) {
 			for (b in obj.scripts) {
-				if (Std.is (b, Block) && b.isHat) scriptCount++;
+				if (Std.is(b, Block) && b.isHat) scriptCount++;
 			}
 		}
 		return scriptCount;
@@ -727,8 +767,8 @@ class ScratchStage extends ScratchObj {
 
 	/* Dropping */
 
-	public function handleDrop(obj:Dynamic):Bool {
-		if (Std.is (obj, ScratchSprite) || Std.is (obj, Watcher) || Std.is (obj, ListWatcher)) {
+	public function handleDrop(obj:Sprite):Bool {
+		if (Std.is(obj, ScratchSprite) || Std.is(obj, Watcher) || Std.is(obj, ListWatcher)) {
 			if (scaleX != 1) {
 				obj.scaleX = obj.scaleY = obj.scaleX / scaleX; // revert to original scale
 			}
@@ -737,14 +777,15 @@ class ScratchStage extends ScratchObj {
 			obj.y = p.y;
 			if (obj.parent != null) obj.parent.removeChild(obj); // force redisplay
 			addChild(obj);
-			if (Std.is (obj, ScratchSprite)) {
-				cast (obj, ScratchSprite).updateCostume();
-				obj.setScratchXY(p.x - 240, 180 - p.y);
-				Scratch.app.selectSprite(obj);
-				obj.setScratchXY(p.x - 240, 180 - p.y); // needed because selectSprite() moves sprite back if costumes tab is open
-				cast (obj, ScratchObj).applyFilters();
+			if (Std.is(obj, ScratchSprite)) {
+				var spr = cast(obj, ScratchSprite);
+				spr.updateCostume();
+				spr.setScratchXY(p.x - 240, 180 - p.y);
+				Scratch.app.selectSprite(spr);
+				spr.setScratchXY(p.x - 240, 180 - p.y); // needed because selectSprite() moves sprite back if costumes tab is open
+				spr.applyFilters();
 			}
-			if (!Std.is (obj, ScratchSprite) || Scratch.app.editMode) Scratch.app.setSaveNeeded();
+			if (!Std.is(obj, ScratchSprite) || Scratch.app.editMode) Scratch.app.setSaveNeeded();
 			return true;
 		}
 		Scratch.app.setSaveNeeded();
@@ -755,11 +796,12 @@ class ScratchStage extends ScratchObj {
 
 	public override function writeJSON(json:util.JSON):Void {
 		super.writeJSON(json);
-		var children:Array = [];
+		var children:Array<Dynamic> = [];
+		var c:DisplayObject;
 		for (i in 0...numChildren) {
-			var c:DisplayObject = getChildAt(i);
-			if ((Std.is (c, ScratchSprite) && !cast (c, ScratchSprite).isClone)
-				|| Std.is (c, Watcher) || Std.is (c, ListWatcher)) {
+			c = getChildAt(i);
+			if ((Std.is(c, ScratchSprite) && !cast(c,ScratchSprite).isClone)
+				|| Std.is(c, Watcher) || Std.is(c, ListWatcher)) {
 				children.push(c);
 			}
 		}
@@ -769,8 +811,8 @@ class ScratchStage extends ScratchObj {
 		if(uiLayer != this) {
 			for (i in 0...uiLayer.numChildren) {
 				c = uiLayer.getChildAt(i);
-				if ((Std.is (c, ScratchSprite) && !cast (c, ScratchSprite).isClone)
-						|| Std.is (c, Watcher) || Std.is (c, ListWatcher)) {
+				if ((Std.is(c, ScratchSprite) && !cast(c,ScratchSprite).isClone)
+						|| Std.is(c, Watcher) || Std.is(c, ListWatcher)) {
 					children.push(c);
 				}
 			}
@@ -784,11 +826,11 @@ class ScratchStage extends ScratchObj {
 		json.writeKeyValue('info', info);
 	}
 
-	public override function readJSON(jsonObj:Dynamic):Void {
-		var children:Array, i:Int, o:Dynamic;
+	public override function readJSONAndInstantiate(jsonObj : Dynamic, newStage : ScratchStage) : Void{
+		var children:Array<Dynamic>, i:Int, o:Dynamic;
 
 		// read stage fields
-		super.readJSON(jsonObj);
+		super.readJSONAndInstantiate(jsonObj, newStage);
 		penLayerMD5 = jsonObj.penLayerMD5;
 		tempoBPM = jsonObj.tempoBPM;
 		if (jsonObj.videoAlpha) videoAlpha = jsonObj.videoAlpha;
@@ -796,13 +838,13 @@ class ScratchStage extends ScratchObj {
 		info = jsonObj.info;
 
 		// instantiate sprites and record their names
-		var spriteNameMap:Dynamic = new Object();
+		var spriteNameMap:Map<String,ScratchObj> = new Map<String,ScratchObj>();
 		spriteNameMap[objName] = this; // record stage's name
 		for (i in 0...children.length) {
 			o = children[i];
-			if (o.objName != undefined) { // o is a sprite record
+			if (o.objName != null) { // o is a sprite record
 				var s:ScratchSprite = new ScratchSprite();
-				s.readJSON(o);
+				s.readJSONAndInstantiate(o, this);
 				spriteNameMap[s.objName] = s;
 				children[i] = s;
 			}
@@ -811,14 +853,14 @@ class ScratchStage extends ScratchObj {
 		// instantiate Watchers and add all children (sprites and watchers)
 		for (i in 0...children.length) {
 			o = children[i];
-			if (Std.is (o, ScratchSprite)) {
-				addChild(ScratchSprite(o));
-			} else if (o.sliderMin != undefined) { // o is a watcher record
+			if (Std.is(o, ScratchSprite)) {
+				addChild(cast(o,ScratchSprite));
+			} else if (o.sliderMin != null) { // o is a watcher record
 				o.target = spriteNameMap[o.target]; // update target before instantiating
 				if (o.target) {
 					if (o.cmd == "senseVideoMotion" && o.param && o.param.indexOf(',')) {
 						// fix old video motion/direction watchers
-						var args:Array = o.param.split(',');
+						var args:Array<String> = o.param.split(',');
 						if (args[1] == 'this sprite') continue;
 						o.param = args[0];
 					}
@@ -830,9 +872,9 @@ class ScratchStage extends ScratchObj {
 		}
 
 		// instantiate lists, variables, scripts, costumes, and sounds
-		for (scratchObj in allObjects()) {
-			scratchObj.instantiateFromJSON(this);
-		}
+		//for (scratchObj in allObjects()) {
+			//scratchObj.instantiateFromJSON(this);
+		//}
 	}
 
 	public override function getSummary():String {

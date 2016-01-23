@@ -19,24 +19,23 @@
 
 package watchers;
 
-import watchers.TextField;
-import watchers.TextFormat;
 
-import flash.display.Sprite;
-import flash.text.*;
+import openfl.display.Sprite;
+import openfl.text.*;
 import uiwidgets.ResizeableFrame;
 
-class WatcherReadout extends Sprite {
+class WatcherReadout extends Sprite
+{
 	public var contents(get, never) : String;
 
-	
+
 	private var smallFont : TextFormat = new TextFormat(CSS.font, 10, 0xFFFFFF, true);
 	private var largeFont : TextFormat = new TextFormat(CSS.font, 15, 0xFFFFFF, true);
-	
+
 	private var frame : ResizeableFrame;
 	private var tf : TextField;
 	private var isLarge : Bool;
-	
+
 	public function new()
 	{
 		super();
@@ -45,21 +44,21 @@ class WatcherReadout extends Sprite {
 		addTextField();
 		beLarge(false);
 	}
-	
+
 	public function getColor() : Int{return frame.getColor();
 	}
 	public function setColor(color : Int) : Void{frame.setColor(color);
 	}
-	
-	private function get_Contents() : String{return tf.text;
+
+	private function get_contents() : String{return tf.text;
 	}
-	
+
 	public function setContents(s : String) : Void{
-		if (s == tf.text) 			return  // no change  ;
+		if (s == tf.text)             return;  // no change  ;
 		tf.text = s;
 		fixLayout();
 	}
-	
+
 	public function beLarge(newValue : Bool) : Void{
 		isLarge = newValue;
 		var fmt : TextFormat = (isLarge) ? largeFont : smallFont;
@@ -68,21 +67,21 @@ class WatcherReadout extends Sprite {
 		tf.setTextFormat(fmt);  // force font change  
 		fixLayout();
 	}
-	
+
 	private function fixLayout() : Void{
 		var w : Int = (isLarge) ? 48 : 40;
 		var h : Int = (isLarge) ? 20 : 14;
 		var hPad : Int = (isLarge) ? 12 : 5;
-		w = Math.max(w, tf.textWidth + hPad);
+		w = Std.int(Math.max(w, tf.textWidth + hPad));
 		tf.width = w;
 		tf.height = h;
 		tf.y = (isLarge) ? 0 : -1;
-		if ((w != frame.w) || (h != frame.h)) 			frame.setWidthHeight(w, h);
+		if ((w != frame.w) || (h != frame.h))             frame.setWidthHeight(w, h);
 	}
-	
+
 	private function addTextField() : Void{
 		tf = new TextField();
-		tf.type = "dynamic";
+		tf.type = TextFieldType.DYNAMIC;
 		tf.selectable = false;
 		addChild(tf);
 	}

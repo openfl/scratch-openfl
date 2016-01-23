@@ -20,9 +20,10 @@
 package util;
 
 
-import flash.events.MouseEvent;
+import openfl.events.MouseEvent;
 
-interface DragClient {
+interface DragClient
+{
 
 	function dragBegin(evt : MouseEvent) : Void;
 	function dragMove(evt : MouseEvent) : Void;

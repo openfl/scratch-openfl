@@ -20,17 +20,18 @@
 package uiwidgets;
 
 
-import flash.display.Sprite;
+import openfl.display.Sprite;
 
-class ZoomWidget extends Sprite {
-	
+class ZoomWidget extends Sprite
+{
+
 	private var scriptsPane : ScriptsPane;
 	private var zoom : Int;
-	
+
 	private var smaller : IconButton;
 	private var normal : IconButton;
 	private var bigger : IconButton;
-	
+
 	public function new(scriptsPane : ScriptsPane)
 	{
 		super();
@@ -45,18 +46,18 @@ class ZoomWidget extends Sprite {
 		normal.isMomentary = true;
 		bigger.isMomentary = true;
 	}
-	
+
 	private function zoomOut(b : IconButton) : Void{changeZoomBy(-1);
 	}
 	private function noZoom(b : IconButton) : Void{zoom = 0;changeZoomBy(0);
 	}
 	private function zoomIn(b : IconButton) : Void{changeZoomBy(1);
 	}
-	
+
 	private function changeZoomBy(delta : Int) : Void{
 		var scaleFactors : Array<Dynamic> = [25, 50, 75, 100, 125, 150, 200];
 		zoom += delta;
-		zoom = Math.max(-3, Math.min(zoom, 3));
+		zoom = Std.int(Math.max(-3, Math.min(zoom, 3)));
 		smaller.setDisabled(zoom < -2, 0.5);
 		bigger.setDisabled(zoom > 2, 0.5);
 		scriptsPane.setScale(scaleFactors[3 + zoom] / 100);

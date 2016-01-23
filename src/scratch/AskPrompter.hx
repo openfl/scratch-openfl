@@ -19,32 +19,24 @@
 
 package scratch;
 
-import scratch.BevelFilter;
-import scratch.Bitmap;
-import scratch.KeyboardEvent;
-import scratch.MouseEvent;
-import scratch.Scratch;
-import scratch.Shape;
-import scratch.Sprite;
-import scratch.TextField;
-import scratch.TextFormat;
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.*;
+import openfl.text.*;
 import assets.Resources;
 
-class AskPrompter extends Sprite {
-	
-	private inline var fontSize : Int = 13;
-	private inline var outlineColor : Int = 0x4AADDE;
-	private inline var inputFieldColor : Int = 0xF2F2F2;
-	
+class AskPrompter extends Sprite
+{
+
+	private static inline var fontSize : Int = 13;
+	private static inline var outlineColor : Int = 0x4AADDE;
+	private static inline var inputFieldColor : Int = 0xF2F2F2;
+
 	private var app : Scratch;
 	private var input : TextField;
 	private var doneButton : Bitmap;
-	
+
 	public function new(promptString : String, app : Scratch)
 	{
 		super();
@@ -60,22 +52,22 @@ class AskPrompter extends Sprite {
 		addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 		addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 	}
-	
+
 	public function grabKeyboardFocus() : Void{
-		if (stage) 			stage.focus = input;
+		if (stage != null)             stage.focus = input;
 	}
-	
+
 	public function answer() : String{return input.text;
 	}
-	
+
 	private function mouseDown(evt : MouseEvent) : Void{
-		if (doneButton.hitTestPoint(evt.stageX, evt.stageY)) 			app.runtime.hideAskPrompt(this);
+		if (doneButton.hitTestPoint(evt.stageX, evt.stageY))             app.runtime.hideAskPrompt(this);
 	}
-	
+
 	private function keyDown(evt : KeyboardEvent) : Void{
-		if (evt.charCode == 13) 			app.runtime.hideAskPrompt(this);
+		if (evt.charCode == 13)             app.runtime.hideAskPrompt(this);
 	}
-	
+
 	private function addBackground(w : Int, h : Int) : Void{
 		var shape : Shape = new Shape();
 		shape.graphics.lineStyle(3, outlineColor, 1, true);
@@ -84,16 +76,16 @@ class AskPrompter extends Sprite {
 		shape.graphics.endFill();
 		addChild(shape);
 	}
-	
+
 	private function addDoneButton(w : Int, h : Int) : Void{
 		doneButton = Resources.createBmp("promptCheckButton");
 		doneButton.x = w - 26;
 		doneButton.y = h - 26;
 		addChild(doneButton);
 	}
-	
+
 	private function addPrompt(s : String) : Void{
-		if (s == "") 			return;
+		if (s == "")             return;
 		var tf : TextField = new TextField();
 		tf.defaultTextFormat = new TextFormat(CSS.font, fontSize - 1, 0, true);
 		tf.selectable = false;
@@ -104,7 +96,7 @@ class AskPrompter extends Sprite {
 		tf.y = 2;
 		addChild(tf);
 	}
-	
+
 	private function addInputField(h : Int) : Void{
 		input = new TextField();
 		input.defaultTextFormat = new TextFormat(CSS.font, fontSize, 0, false);
@@ -113,16 +105,17 @@ class AskPrompter extends Sprite {
 		input.backgroundColor = inputFieldColor;
 		input.width = 410;
 		input.height = 20;
-		
-		var f : BevelFilter = new BevelFilter();
-		f.angle = 225;
-		f.shadowAlpha = 0.6;
-		f.distance = 3;
-		f.strength = 0.4;
-		f.blurX = f.blurY = 0;
-		f.type = BitmapFilterType.OUTER;
-		input.filters = [f];
-		
+
+		//var f : BevelFilter = new BevelFilter();
+		//f.angle = 225;
+		//f.shadowAlpha = 0.6;
+		//f.distance = 3;
+		//f.strength = 0.4;
+		//f.blurX = f.blurY = 0;
+		//f.type = BitmapFilterType.OUTER;
+		//input.filters = [f];
+		input.filters = [];
+
 		input.x = 9;
 		input.y = h - (input.height + 5);
 		addChild(input);

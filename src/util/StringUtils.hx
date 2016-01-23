@@ -19,14 +19,14 @@
 package util;
 
 
-import flash.utils.Dictionary;
 
-class StringUtils {
+class StringUtils
+{
 	// format('My {animal} is named {name}.', {animal:'goat',name:'Eric'}) => 'My goat is named Eric.'
 	// Tokens not contained in the dictionary will not be modified.
-	public static function substitute(s : String, context : Dictionary) : String{
-		for (token in Reflect.fields(context)){
-			s = s.replace("{" + token + "}", Reflect.field(context, token));
+	public static function substitute(s : String, context : Map<String, String>) : String{
+		for (token in context.keys()){
+			s = StringTools.replace(s, "{" + token + "}", context[token]);
 		}
 		return s;
 	}

@@ -20,36 +20,39 @@
 package translation;
 
 
-import flash.events.Event;
-import flash.net.*;
-import flash.utils.ByteArray;
-import flash.utils.Dictionary;
 import blocks.Block;
 
-//import mx.utils.StringUtil;
+import openfl.events.Event;
+import openfl.net.*;
+import openfl.utils.ByteArray;
+
+import logging.LogLevel;
+
 
 import uiwidgets.Menu;
+
 import util.*;
 
-class Translator {
-	
+class Translator
+{
+
 	public static var languages : Array<Dynamic> = [];  // contains pairs: [<language code>, <utf8 language name>]  
 	public static var currentLang : String = "en";
-	
+
 	public static var rightToLeft : Bool;
 	public static var rightToLeftMath : Bool;  // true only for Arabic  
-	
+
 	private static var font12 : Array<Dynamic> = ["fa", "he", "ja", "ja_HIRA", "zh_CN"];
 	private static var font13 : Array<Dynamic> = ["ar"];
-	
-	private static var dictionary : Dynamic = { };
-	
+
+	private static var dictionary : Map<String, String> = new Map<String, String>();
+
 	public static function initializeLanguageList() : Void{
 		// Get a list of language names for the languages menu from the server.
 		function saveLanguageList(data : String) : Void{
-			if (data == null) 				return;
-			for (line/* AS3HX WARNING could not determine type for var: line exp: ECall(EField(EIdent(data),split),[EConst(CString(\n))]) type: null */ in data.split("\n")){
-				var fields : Array<Dynamic> = line.split(",");
+			if (data == null)                 return;
+			for (line in data.split("\n")){
+				var fields : Array<String> = line.split(",");
 				if (fields.length >= 2) {
 					languages.push([StringTools.trim(fields[0]), StringTools.trim(fields[1])]);
 				}
@@ -58,34 +61,34 @@ class Translator {
 		languages = [["en", "English"]];  // English is always the first entry  
 		Scratch.app.server.getLanguageList(saveLanguageList);
 	}
-	
+
 	public static function setLanguageValue(lang : String) : Void{
 		function gotPOFile(data : ByteArray) : Void{
 			if (data != null) {
 				dictionary = parsePOData(data);
+				setFontsFor(lang);  // also sets currentLang  
 				checkBlockTranslations();
-				setFontsFor(lang);
 			}
 			Scratch.app.translationChanged();
 		};
-		
-		dictionary = { };  // default to English (empty dictionary) if there's no .po file  
+
+		dictionary = new Map<String, String>();  // default to English (empty dictionary) if there's no .po file  
 		setFontsFor("en");
-		if ("en" == lang) 			Scratch.app.translationChanged()
+		if ("en" == lang)             Scratch.app.translationChanged()
 		// there is no .po file English
 		else Scratch.app.server.getPOFile(lang, gotPOFile);
 	}
-	
+
 	public static function setLanguage(lang : String) : Void{
 		if ("import translation file" == lang) {importTranslationFromFile();return;
 		}
 		if ("set font size" == lang) {fontSizeMenu();return;
 		}
-		
+
 		setLanguageValue(lang);
 		Scratch.app.server.setSelectedLang(lang);
 	}
-	
+
 	public static function importTranslationFromFile() : Void{
 		function fileLoaded(e : Event) : Void{
 			var file : FileReference = cast((e.target), FileReference);
@@ -99,10 +102,10 @@ class Translator {
 				Scratch.app.translationChanged();
 			}
 		};
-		
+
 		Scratch.loadSingleFile(fileLoaded);
 	}
-	
+
 	private static function fontSizeMenu() : Void{
 		function setFontSize(labelSize : Int) : Void{
 			var argSize : Int = Math.round(0.9 * labelSize);
@@ -115,49 +118,50 @@ class Translator {
 		}
 		m.showOnStage(Scratch.app.stage);
 	}
-	
+
 	private static function setFontsFor(lang : String) : Void{
 		// Set the rightToLeft flag and font sizes the given language.
-		
+
 		currentLang = lang;
-		
-		var rtlLanguages : Array<Dynamic> = ["ar", "fa", "he"];
+
+		var rtlLanguages : Array<String> = ["ar", "fa", "he"];
 		rightToLeft = Lambda.indexOf(rtlLanguages, lang) > -1;
 		rightToLeftMath = ("ar" == lang);
 		Block.setFonts(10, 9, true, 0);  // default font settings  
-		if (Lambda.indexOf(font12, lang) > -1) 			Block.setFonts(11, 10, false, 0);
-		if (Lambda.indexOf(font13, lang) > -1) 			Block.setFonts(13, 12, false, 0);
+		if (Lambda.indexOf(font12, lang) > -1)             Block.setFonts(11, 10, false, 0);
+		if (Lambda.indexOf(font13, lang) > -1)             Block.setFonts(13, 12, false, 0);
 	}
-	
-	public static function map(s : String, context : Dictionary = null) : String{
-		var result : Dynamic = Reflect.field(dictionary, s);
-		if ((result == null) || (result.length == 0)) 			result = s;
-		if (context != null) 			result = StringUtils.substitute(result, context);
+
+	public static function map(s : String, context : Map<String,String> = null) : String{
+		var result : String = null;
+		if (dictionary.exists(s)) result = dictionary[s];
+		if ((result == null) || (result.length == 0))             result = s;
+		if (context != null)             result = StringUtils.substitute(result, context);
 		return result;
 	}
-	
-	private static function parsePOData(bytes : ByteArray) : Dynamic{
+
+	private static function parsePOData(bytes : ByteArray) : Map<String, String>{
 		// Parse the given data in gettext .po file format.
 		skipBOM(bytes);
 		var lines : Array<Dynamic> = [];
 		while (bytes.bytesAvailable > 0){
 			var s : String = StringTools.trim(nextLine(bytes));
-			if ((s.length > 0) && (s.charAt(0) != "#")) 				lines.push(s);
+			if ((s.length > 0) && (s.charAt(0) != "#"))                 lines.push(s);
 		}
 		return makeDictionary(lines);
 	}
-	
+
 	private static function skipBOM(bytes : ByteArray) : Void{
 		// Some .po files begin with a three-byte UTF-8 Byte Order Mark (BOM).
 		// Skip this BOM if it exists, otherwise do nothing.
-		if (bytes.bytesAvailable < 3) 			return;
+		if (bytes.bytesAvailable < 3)             return;
 		var b1 : Int = bytes.readUnsignedByte();
 		var b2 : Int = bytes.readUnsignedByte();
 		var b3 : Int = bytes.readUnsignedByte();
-		if ((b1 == 0xEF) && (b2 == 0xBB) && (b3 == 0xBF)) 			return  // found BOM  ;
+		if ((b1 == 0xEF) && (b2 == 0xBB) && (b3 == 0xBF))             return;  // found BOM  ;
 		bytes.position = bytes.position - 3;
 	}
-	
+
 	private static function nextLine(bytes : ByteArray) : String{
 		// Read the next line from the given ByteArray. A line ends with CR, LF, or CR-LF.
 		var buf : ByteArray = new ByteArray();
@@ -165,25 +169,25 @@ class Translator {
 			var nextByte : Int = bytes.readUnsignedByte();
 			if (nextByte == 13) {  // CR  
 				// line could end in CR or CR-LF
-				if (bytes.readUnsignedByte() != 10) 					bytes.position--;  // try to read LF, but backup if not LF  ;
+				if (bytes.readUnsignedByte() != 10)                     bytes.position--;  // try to read LF, but backup if not LF  ;
 				break;
 			}
-			if (nextByte == 10) 				break;  // LF  ;
+			if (nextByte == 10)                 break;  // LF  ;
 			buf.writeByte(nextByte);
 		}
 		buf.position = 0;
 		return buf.readUTFBytes(buf.length);
 	}
-	
-	private static function makeDictionary(lines : Array<Dynamic>) : Dynamic{
+
+	private static function makeDictionary(lines : Array<Dynamic>) : Map<String, String>{
 		// Return a dictionary mapping original strings to their translations.
-		var dict : Dynamic = { };
+		var dict : Map<String, String> = new Map<String, String>();
 		var mode : String = "none";  // none, key, val  
 		var key : String = "";
 		var val : String = "";
 		for (line in lines){
 			if ((line.length >= 5) && (line.substring(0, 5).toLowerCase() == "msgid")) {
-				if (mode == "val") 					Reflect.setField(dict, key, val);  // recordPairIn(key, val, dict);  ;
+				if (mode == "val")                     dict[key] = val;  // recordPairIn(key, val, dict);  ;
 				mode = "key";
 				key = "";
 			}
@@ -191,62 +195,70 @@ class Translator {
 				mode = "val";
 				val = "";
 			}
-			if (mode == "key") 				key += extractQuotedString(line);
-			if (mode == "val") 				val += extractQuotedString(line);
+			if (mode == "key")                 key += extractQuotedString(line);
+			if (mode == "val")                 val += extractQuotedString(line);
 		}
-		if (mode == "val") 			Reflect.setField(dict, key, val);  // recordPairIn(key, val, dict);  ;
+		if (mode == "val")             dict[key] = val;  // recordPairIn(key, val, dict);  ;
 		// remove the empty-string metadata entry, if present.;
 		return dict;
 	}
-	
+
 	private static function extractQuotedString(s : String) : String{
 		// Remove leading and trailing whitespace characters.
 		var i : Int = s.indexOf("\"");  // find first double-quote  
-		if (i < 0) 			i = s.indexOf(" ");  // if no double-quote, start after first space  ;
+		if (i < 0)             i = s.indexOf(" ");  // if no double-quote, start after first space  ;
 		var result : String = "";
-		for (i in i + 1...s.length){
+		i = i + 1;
+		while (i < s.length) {
 			var ch : String = s.charAt(i);
 			if ((ch == "\\") && (i < (s.length - 1))) {
-				ch = s.charAt(++i);
-				if (ch == "n") 					ch = "\n";
-				if (ch == "r") 					ch = "\r";
-				if (ch == "t") 					ch = "\t";
+				i++;
+				ch = s.charAt(i);
+				if (ch == "n")                     ch = "\n";
+				if (ch == "r")                     ch = "\r";
+				if (ch == "t")                     ch = "\t";
 			}
-			if (ch == "\"") 				return result;  // closing double-quote  ;
+			if (ch == "\"")                 return result;  // closing double-quote  ;
 			result += ch;
+			i++;
 		}
 		return result;
 	}
-	
+
 	private static function checkBlockTranslations() : Void{
 		for (entry/* AS3HX WARNING could not determine type for var: entry exp: EField(EIdent(Specs),commands) type: null */ in Specs.commands)checkBlockSpec(entry[0]);
 		for (spec/* AS3HX WARNING could not determine type for var: spec exp: EField(EIdent(Specs),extensionSpecs) type: null */ in Specs.extensionSpecs)checkBlockSpec(spec);
 	}
-	
+
 	private static function checkBlockSpec(spec : String) : Void{
 		var translatedSpec : String = map(spec);
-		if (translatedSpec == spec) 			return  // not translated  ;
+		if (translatedSpec == spec)             return;  // not translated  ;
 		if (!argsMatch(extractArgs(spec), extractArgs(translatedSpec))) {
-			Scratch.app.log("Block argument mismatch:");
-			Scratch.app.log("    " + spec);
-			Scratch.app.log("    " + translatedSpec);
+			Scratch.app.log(
+					LogLevel.WARNING, "Block argument mismatch",
+					{
+						language : currentLang,
+						spec : spec,
+						translated : translatedSpec,
+
+					});
 			// remove broken entry from dictionary;
 		}
 	}
-	
+
 	private static function argsMatch(args1 : Array<Dynamic>, args2 : Array<Dynamic>) : Bool{
-		if (args1.length != args2.length) 			return false;
+		if (args1.length != args2.length)             return false;
 		for (i in 0...args1.length){
-			if (args1[i] != args2[i]) 				return false;
+			if (args1[i] != args2[i])                 return false;
 		}
 		return true;
 	}
-	
+
 	private static function extractArgs(spec : String) : Array<Dynamic>{
 		var result : Array<Dynamic> = [];
 		var tokens : Array<Dynamic> = ReadStream.tokenize(spec);
 		for (s in tokens){
-			if ((s.length > 1) && ((s.charAt(0) == "%") || (s.charAt(0) == "@"))) 				result.push(s);
+			if ((s.length > 1) && ((s.charAt(0) == "%") || (s.charAt(0) == "@")))                 result.push(s);
 		}
 		return result;
 	}

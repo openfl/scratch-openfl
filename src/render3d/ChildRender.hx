@@ -20,18 +20,19 @@
 package render3d;
 
 
-import flash.display.BitmapData;
-import flash.display.DisplayObject;
-import flash.geom.Point;
-import flash.geom.Rectangle;
+import openfl.display.BitmapData;
+import openfl.display.DisplayObject;
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
 
-class ChildRender extends BitmapData {
+class ChildRender extends BitmapData
+{
 	public var renderWidth(get, never) : Float;
 	public var renderHeight(get, never) : Float;
 
 	private var allowPartial : Bool = true;
-	private inline var maxSize : UInt = 1022;
-	private var halfSize : UInt = maxSize >> 1;
+	private inline var maxSize : Int = 1022;
+	private var halfSize : Int = maxSize >> 1;
 	private var orig_width : Float;
 	private var orig_height : Float;
 	private var orig_bounds : Rectangle;
@@ -46,25 +47,25 @@ class ChildRender extends BitmapData {
 		orig_height = h;
 		orig_bounds = b;
 		scale = 1;
-		
+
 		reset(dispObj, penLayer);
-		
+
 		super(Math.ceil(Math.min(w, maxSize)), Math.ceil(Math.min(h, maxSize)), true, 0);
 	}
-	
+
 	public function reset(dispObj : DisplayObject, penLayer : DisplayObject) : Void{
 		inner_x = inner_y = 0;
 		inner_w = inner_h = 1;
-		
+
 		if (!allowPartial) {
 			if (orig_width > maxSize || orig_height > maxSize) 
 				scale = maxSize / Math.max(orig_width, orig_height);
-			
+
 			return;
 		}  // Is it too large and needs to be partially rendered?  
-		
-		
-		
+
+
+
 		var bounds : Rectangle;
 		if (orig_width > maxSize || orig_height > maxSize) {
 			bounds = getVisibleBounds(dispObj, penLayer);
@@ -75,13 +76,13 @@ class ChildRender extends BitmapData {
 			}
 			if (bounds.right > orig_width) 
 				bounds.width += orig_width - bounds.right;
-			
+
 			inner_x = bounds.x / orig_width;
 			inner_w = maxSize / orig_width;
 		}
-		
+
 		if (orig_height > maxSize) {
-			if (bounds == null) 				bounds = getVisibleBounds(dispObj, penLayer);
+			if (bounds == null)                 bounds = getVisibleBounds(dispObj, penLayer);
 			bounds.inflate(0, halfSize - bounds.height / 2);
 			if (bounds.y < 0) {
 				bounds.height += bounds.y;
@@ -89,24 +90,24 @@ class ChildRender extends BitmapData {
 			}
 			if (bounds.bottom > orig_height) 
 				bounds.height += orig_height - bounds.bottom;
-			
+
 			inner_y = bounds.y / orig_height;
 			inner_h = maxSize / orig_height;
 		}
 	}
-	
+
 	public function isPartial() : Bool{
 		return allowPartial && (width < orig_width || height < orig_height);
 	}
-	
-	private function get_RenderWidth() : Float{
+
+	private function get_renderWidth() : Float{
 		return (width > (orig_width != 0) ? orig_width : width);
 	}
-	
-	private function get_RenderHeight() : Float{
+
+	private function get_renderHeight() : Float{
 		return (height > (orig_height != 0) ? orig_height : height);
 	}
-	
+
 	public function needsResize(w : Float, h : Float) : Bool{
 		if (width > orig_width && Math.ceil(w) > width) {
 			return true;
@@ -114,13 +115,13 @@ class ChildRender extends BitmapData {
 		if (height > orig_height && Math.ceil(h) > height) {
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	public function needsRender(dispObj : DisplayObject, w : Float, h : Float, penLayer : DisplayObject) : Bool{
-		if (inner_x == 0 && inner_y == 0 && inner_w == 1 && inner_h == 1) 			return false;
-		
+		if (inner_x == 0 && inner_y == 0 && inner_w == 1 && inner_h == 1)             return false;
+
 		var renderRect : Rectangle = new Rectangle(inner_x * w, inner_y * h, inner_w * w, inner_h * h);
 		renderRect.width += 0.001;
 		renderRect.height += 0.001;
@@ -128,7 +129,7 @@ class ChildRender extends BitmapData {
 		var containsStage : Bool = renderRect.containsRect(stageRect);
 		return !containsStage;
 	}
-	
+
 	private function getVisibleBounds(dispObj : DisplayObject, penLayer : DisplayObject) : Rectangle{
 		var visibleBounds : Rectangle = penLayer.getBounds(dispObj);
 		var tl : Point = orig_bounds.topLeft;
@@ -151,7 +152,7 @@ class ChildRender extends BitmapData {
 		visibleBounds.y *= dispObj.scaleY;
 		visibleBounds.width *= dispObj.scaleX;
 		visibleBounds.height *= dispObj.scaleY;
-		
+
 		return visibleBounds;
 	}
 }

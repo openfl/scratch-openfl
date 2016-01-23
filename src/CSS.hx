@@ -22,22 +22,22 @@
 //
 // Styles for Scratch Editor based on the Upstatement design.
 
-import TextFormat;
 
-import flash.text.*;
+import openfl.text.*;
 import assets.Resources;
 
-class CSS {
-	
+class CSS
+{
+
 	public static function topBarColor() : Int{return (Scratch.app.isExtensionDevMode) ? topBarColor_ScratchX : topBarColor_default;
 	}
 	public static function backgroundColor() : Int{return (Scratch.app.isExtensionDevMode) ? backgroundColor_ScratchX : backgroundColor_default;
 	}
-	
+
 	// ScratchX
 	public static inline var topBarColor_ScratchX : Int = 0x30485f;
 	public static inline var backgroundColor_ScratchX : Int = 0x3f5975;
-	
+
 	// Colors
 	public static inline var white : Int = 0xFFFFFF;
 	public static var backgroundColor_default : Int = white;
@@ -53,7 +53,7 @@ class CSS {
 	public static var onColor : Int = textColor;  // 0x4C4D4F  
 	public static inline var overColor : Int = 0x179FD7;
 	public static inline var arrowColor : Int = 0xA6A8AC;
-	
+
 	// Fonts
 	public static var font : String = Resources.chooseFont(["Arial", "Verdana", "DejaVu Sans"]);
 	public static inline var menuFontSize : Int = 12;
@@ -64,9 +64,9 @@ class CSS {
 	public static var thumbnailExtraInfoFormat : TextFormat = new TextFormat(font, 9, textColor);
 	public static var projectTitleFormat : TextFormat = new TextFormat(font, 13, textColor);
 	public static var projectInfoFormat : TextFormat = new TextFormat(font, 12, textColor);
-	
+
 	// Section title bars
-	public static var titleBarColors : Array<Dynamic> = [white, tabColor];
+	public static var titleBarColors : Array<UInt> = [white, tabColor];
 	public static inline var titleBarH : Int = 30;
 
 	public function new()

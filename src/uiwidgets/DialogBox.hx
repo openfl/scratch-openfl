@@ -19,51 +19,43 @@
 
 package uiwidgets;
 
-//import uiwidgets.DisplayObject;
-//import uiwidgets.Event;
-//import uiwidgets.Graphics;
-//import uiwidgets.IconButton;
-//import uiwidgets.KeyboardEvent;
-//import uiwidgets.Sprite;
-//import uiwidgets.Stage;
-//import uiwidgets.TextField;
-//import uiwidgets.TextFormat;
-//import uiwidgets.VariableTextField;
+import CSS;
 
-import flash.display.*;
-import flash.events.*;
-import flash.filters.DropShadowFilter;
-import flash.text.*;
-import flash.utils.Dictionary;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.filters.DropShadowFilter;
+import openfl.text.*;
 import translation.Translator;
 import ui.parts.UIPart;
 
-class DialogBox extends Sprite {
-	
-	private var fields : Dictionary = new Dictionary();
-	private var booleanFields : Dictionary = new Dictionary();
-	public var widget : DisplayObject;
+class DialogBox extends Sprite
+{
+
+	private var fields : Map<String,DisplayObject> = new Map<String,DisplayObject>();
+	private var booleanFields : Map<String, IconButton> = new Map<String, IconButton>();
+	public var widget : InteractiveObject;
 	private var w : Int;private var h : Int;
 	public var leftJustify : Bool;
-	
-	private var context : Dictionary;
+
+	private var context : Map<String, String>;
 	private var title : TextField;
-	private var buttons : Array<Dynamic> = [];
-	private var labelsAndFields : Array<Dynamic> = [];
-	private var booleanLabelsAndFields : Array<Dynamic> = [];
-	private var textLines : Array<Dynamic> = [];
+	private var buttons : Array<Button> = [];
+	private var labelsAndFields : Array<{label:TextField, field:TextField}> = [];
+	private var booleanLabelsAndFields : Array<{label:TextField, field:IconButton}> = [];
+	private var textLines : Array<TextField> = [];
 	private var maxLabelWidth : Int = 0;
 	private var maxFieldWidth : Int = 0;
-	private var heightPerField : Int = Math.max(makeLabel("foo").height, makeField(10).height) + 10;
+	private var heightPerField : Int;// = Std.int(Math.max(makeLabel("foo").height, makeField(10).height) + 10);
 	private inline static var spaceAfterText : Int = 18;
 	private inline static var blankLineSpace : Int = 7;
-	
-	private var acceptFunction : Dynamic;  // if not nil, called when menu interaction is accepted  
-	private var cancelFunction : Dynamic;  // if not nil, called when menu interaction is canceled  
-	
-	public function new(acceptFunction : Dynamic = null, cancelFunction : Dynamic = null)
+
+	private var acceptFunction : Dynamic->Void;  // if not nil, called when menu interaction is accepted  
+	private var cancelFunction : Dynamic->Void;  // if not nil, called when menu interaction is canceled  
+
+	public function new(acceptFunction : Dynamic->Void = null, cancelFunction : Dynamic -> Void = null)
 	{
 		super();
+		heightPerField = Std.int(Math.max(makeLabel("foo").height, makeField(10).height) + 10);
 		this.acceptFunction = acceptFunction;
 		this.cancelFunction = cancelFunction;
 		addFilters();
@@ -72,43 +64,44 @@ class DialogBox extends Sprite {
 		addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		addEventListener(FocusEvent.KEY_FOCUS_CHANGE, focusChange);
 	}
-	
-	public static function ask(question : String, defaultAnswer : String, stage : Stage = null, resultFunction : Dynamic = null, context : Dictionary = null) : Void{
-		function done() : Void{if (resultFunction != null) 				resultFunction(d.fields["answer"].text);
+
+	public static function ask(question : String, defaultAnswer : String, stage : Stage = null, resultFunction : String->Void = null, context : Map<String, String> = null) : Void {
+		var d : DialogBox = null;	
+		function done(param:Dynamic) : Void{if (resultFunction != null)                 resultFunction(cast(d.fields["answer"], TextField).text);
 		};
-		var d : DialogBox = new DialogBox(done);
+		d = new DialogBox(done);
 		d.addTitle(question);
 		d.addField("answer", 120, defaultAnswer, false);
 		d.addButton("OK", d.accept);
-		if (context != null) 			d.updateContext(context);
+		if (context != null)             d.updateContext(context);
 		d.showOnStage((stage != null) ? stage : Scratch.app.stage);
 	}
-	
-	public static function confirm(question : String, stage : Stage = null, okFunction : Dynamic = null, cancelFunction : Dynamic = null, context : Dictionary = null) : Void{
+
+	public static function confirm(question : String, stage : Stage = null, okFunction : Dynamic->Void = null, cancelFunction : Dynamic->Void= null, context : Map<String, String> = null) : Void{
 		var d : DialogBox = new DialogBox(okFunction, cancelFunction);
 		d.addTitle(question);
 		d.addAcceptCancelButtons("OK");
-		if (context != null) 			d.updateContext(context);
+		if (context != null)             d.updateContext(context);
 		d.showOnStage((stage != null) ? stage : Scratch.app.stage);
 	}
-	
-	public static function notify(title : String, msg : String, stage : Stage = null, leftJustify : Bool = false, okFunction : Dynamic = null, cancelFunction : Dynamic = null, context : Dictionary = null) : Void{
+
+	public static function notify(title : String, msg : String, stage : Stage = null, leftJustify : Bool = false, okFunction : Dynamic->Void= null, cancelFunction : Dynamic->Void= null, context : Map<String, String> = null) : Void{
 		var d : DialogBox = new DialogBox(okFunction, cancelFunction);
 		d.leftJustify = leftJustify;
 		d.addTitle(title);
 		d.addText(msg);
 		d.addButton("OK", d.accept);
-		if (context != null) 			d.updateContext(context);
+		if (context != null)             d.updateContext(context);
 		d.showOnStage((stage != null) ? stage : Scratch.app.stage);
 	}
-	
+
 	// Updates the context for variable substitution in the dialog's text, or sets it if there was none before.
 	// Make sure any text values in the context are already translated: they will not be translated here.
 	// Calling this will update the text of the dialog immediately.
-	public function updateContext(c : Dictionary) : Void{
-		if (context == null) 			context = new Dictionary();
-		for (key in Reflect.fields(c)){
-			Reflect.setField(context, key, Reflect.field(c, key));
+	public function updateContext(c : Map<String, String>) : Void{
+		if (context == null)             context = new Map<String, String>();
+		for (key in c.keys()){
+			context[key] = c[key];
 		}
 		for (i in 0...numChildren){
 			var f : VariableTextField = try cast(getChildAt(i), VariableTextField) catch(e:Dynamic) null;
@@ -117,51 +110,51 @@ class DialogBox extends Sprite {
 			}
 		}
 	}
-	
+
 	public function addTitle(s : String) : Void{
 		title = makeLabel(Translator.map(s), true);
 		addChild(title);
 	}
-	
+
 	public function addText(text : String) : Void{
-		for (s/* AS3HX WARNING could not determine type for var: s exp: ECall(EField(EIdent(text),split),[EConst(CString(\n))]) type: null */ in text.split("\n")){
+		for (s in text.split("\n")){
 			var line : TextField = makeLabel(Translator.map(s));
 			addChild(line);
 			textLines.push(line);
 		}
 	}
-	
-	public function addWidget(o : DisplayObject) : Void{
+
+	public function addWidget(o : InteractiveObject) : Void{
 		widget = o;
 		addChild(o);
 	}
-	
-	public function addField(fieldName : String, width : Int, defaultValue : Dynamic = null, showLabel : Bool = true) : Void{
+
+	public function addField(fieldName : String, width : Int, defaultValue : String = null, showLabel : Bool = true) : Void{
 		var l : TextField = null;
 		if (showLabel) {
 			l = makeLabel(Translator.map(fieldName) + ":");
 			addChild(l);
 		}
 		var f : TextField = makeField(width);
-		if (defaultValue != null) 			f.text = defaultValue;
+		if (defaultValue != null)             f.text = defaultValue;
 		addChild(f);
-		Reflect.setField(fields, fieldName, f);
-		labelsAndFields.push([l, f]);
+		fields[fieldName] = f;
+		labelsAndFields.push({label:l, field:f});
 	}
-	
+
 	public function addBoolean(fieldName : String, defaultValue : Bool = false, isRadioButton : Bool = false) : Void{
 		var l : TextField = makeLabel(Translator.map(fieldName) + ":");
 		addChild(l);
 		var f : IconButton = (isRadioButton) ? 
 		new IconButton(null, null, null, true) : 
 		new IconButton(null, getCheckMark(true), getCheckMark(false));
-		if (defaultValue) 			f.turnOn()
+		if (defaultValue)             f.turnOn()
 		else f.turnOff();
 		addChild(f);
-		Reflect.setField(booleanFields, fieldName, f);
-		booleanLabelsAndFields.push([l, f]);
+		booleanFields[fieldName] = f;
+		booleanLabelsAndFields.push({label:l, field:f});
 	}
-	
+
 	private function getCheckMark(b : Bool) : Sprite{
 		var spr : Sprite = new Sprite();
 		var g : Graphics = spr.graphics;
@@ -179,23 +172,23 @@ class DialogBox extends Sprite {
 		}
 		return spr;
 	}
-	
+
 	public function addAcceptCancelButtons(acceptLabel : String = null) : Void{
 		// Add a cancel button and an optional accept button with the given label.
-		if (acceptLabel != null) 			addButton(acceptLabel, accept);
+		if (acceptLabel != null)             addButton(acceptLabel, accept);
 		addButton("Cancel", cancel);
 	}
-	
-	public function addButton(label : String, action : Dynamic) : Void{
+
+	public function addButton(label : String, action : Void->Void) : Void{
 		function doAction() : Void{
 			remove();
-			if (action != null) 				action();
+			if (action != null)                 action();
 		};
 		var b : Button = new Button(Translator.map(label), doAction);
 		addChild(b);
 		buttons.push(b);
 	}
-	
+
 	public function showOnStage(stage : Stage, center : Bool = true) : Void{
 		fixLayout();
 		if (center) {
@@ -211,20 +204,20 @@ class DialogBox extends Sprite {
 		stage.addChild(this);
 		if (labelsAndFields.length > 0) {
 			// note: doesn't work when testing from FlexBuilder; works when deployed
-			stage.focus = labelsAndFields[0][1];
+			stage.focus = labelsAndFields[0].field;
 		}
 	}
-	
-	public static function findDialogBoxes(targetTitle : String, stage : Stage) : Array<Dynamic>{
+
+	public static function findDialogBoxes(targetTitle : String, stage : Stage) : Array<DialogBox>{
 		// Return an array of all dialogs on the stage with the given title.
 		// If the given title is null then return all dialogs.
-		var result : Array<Dynamic> = [];
-		if (targetTitle != null) 			targetTitle = Translator.map(targetTitle);
+		var result : Array<DialogBox> = [];
+		if (targetTitle != null)             targetTitle = Translator.map(targetTitle);
 		for (i in 0...stage.numChildren){
-			var d : DialogBox = try cast(stage.getChildAt(i), DialogBox) catch(e:Dynamic) null;
-			if (d != null) {
+			if (Std.is(stage.getChildAt(i), DialogBox)) {
+				var d : DialogBox = cast(stage.getChildAt(i), DialogBox);
 				if (targetTitle != null) {
-					if (d.title && (d.title.text == targetTitle)) 						result.push(d);
+					if (d.title != null && (d.title.text == targetTitle))                         result.push(d);
 				}
 				else {
 					result.push(d);
@@ -233,34 +226,34 @@ class DialogBox extends Sprite {
 		}
 		return result;
 	}
-	
+
 	public function accept() : Void{
-		if (acceptFunction != null) 			acceptFunction(this);
+		if (acceptFunction != null)             acceptFunction(this);
 		remove();
 	}
-	
+
 	public function cancel() : Void{
-		if (cancelFunction != null) 			cancelFunction(this);
+		if (cancelFunction != null)             cancelFunction(this);
 		remove();
 	}
-	
+
 	public function getField(fieldName : String) : Dynamic{
-		if (Reflect.field(fields, fieldName) != null) 			return Reflect.field(fields, fieldName).text;
-		if (Reflect.field(booleanFields, fieldName) != null) 			return Reflect.field(booleanFields, fieldName).isOn();
+		if (fields.exists(fieldName))             return fields[fieldName].text;
+		if (booleanFields.exists(fieldName))             return booleanFields[fieldName].isOn();
 		return null;
 	}
-	
+
 	public function setPasswordField(fieldName : String, flag : Bool = true) : Void{
-		var field : Dynamic = Reflect.field(fields, fieldName);
+		var field : Dynamic = fields[fieldName];
 		if (Std.is(field, TextField)) {
-			(try cast(field, TextField) catch(e:Dynamic) null).displayAsPassword = flag;
+			cast(field, TextField).displayAsPassword = flag;
 		}
 	}
-	
+
 	private function remove() : Void{
-		if (parent != null) 			parent.removeChild(this);
+		if (parent != null)             parent.removeChild(this);
 	}
-	
+
 	private function makeLabel(s : String, forTitle : Bool = false) : TextField{
 		var normalFormat : TextFormat = new TextFormat(CSS.font, 14, CSS.textColor);
 		var result : VariableTextField = new VariableTextField();
@@ -271,7 +264,7 @@ class DialogBox extends Sprite {
 		result.setTextFormat((forTitle) ? CSS.titleFormat : normalFormat);
 		return result;
 	}
-	
+
 	private function makeField(width : Int) : TextField{
 		var result : TextField = new TextField();
 		result.selectable = true;
@@ -281,29 +274,29 @@ class DialogBox extends Sprite {
 		result.defaultTextFormat = CSS.normalTextFormat;
 		result.width = width;
 		result.height = result.defaultTextFormat.size + 8;
-		
+
 		result.backgroundColor = 0xFFFFFF;
 		result.borderColor = CSS.borderColor;
-		
+
 		return result;
 	}
-	
+
 	public function fixLayout() : Void{
 		var label : TextField;
 		var i : Int;
 		var totalW : Int;
 		fixSize();
-		var fieldX : Int = maxLabelWidth + 17;
-		var fieldY : Int = 15;
+		var fieldX:Int = maxLabelWidth + 17;
+		var fieldY:Int = 15;
 		if (title != null) {
 			title.x = (w - title.width) / 2;
 			title.y = 5;
-			fieldY = title.y + title.height + 20;
-		}  // fields  
-		
+			fieldY = Std.int(title.y + title.height + 20);
+		}
+		// fields  
 		for (i in 0...labelsAndFields.length){
-			label = labelsAndFields[i][0];
-			var field : TextField = labelsAndFields[i][1];
+			label = labelsAndFields[i].label;
+			var field : TextField = labelsAndFields[i].field;
 			if (label != null) {
 				label.x = fieldX - 5 - label.width;
 				label.y = fieldY;
@@ -311,17 +304,18 @@ class DialogBox extends Sprite {
 			field.x = fieldX;
 			field.y = fieldY + 1;
 			fieldY += heightPerField;
-		}  // widget  
+		}
 		
+		// widget  
 		if (widget != null) {
 			widget.x = (width - widget.width) / 2;
 			widget.y = fieldY;  // (title != null) ? title.y + title.height + 10 : 10;  
-			fieldY = widget.y + widget.height + 15;
-		}  // boolean fields  
-		
+			fieldY = Std.int(widget.y + widget.height + 15);
+		}  
+		// boolean fields  
 		for (i in 0...booleanLabelsAndFields.length){
-			label = booleanLabelsAndFields[i][0];
-			var ib : IconButton = booleanLabelsAndFields[i][1];
+			label = booleanLabelsAndFields[i].label;
+			var ib : IconButton = booleanLabelsAndFields[i].field;
 			if (label != null) {
 				label.x = fieldX - 5 - label.width;
 				label.y = fieldY + 5;
@@ -330,81 +324,83 @@ class DialogBox extends Sprite {
 			ib.y = fieldY + 5;
 			fieldY += heightPerField;
 		}  // text lines  
-		
+
 		for (line in textLines){
 			line.x = (leftJustify) ? 15 : (w - line.width) / 2;
 			line.y = fieldY;
-			fieldY += line.height;
-			if (line.text.length == 0) 				fieldY += blankLineSpace;
+			fieldY += Std.int(line.height);
+			if (line.text.length == 0)                 fieldY += blankLineSpace;
 		}
-		if (textLines.length > 0) 			fieldY += spaceAfterText;  // buttons  ;
-		
+		if (textLines.length > 0)             fieldY += spaceAfterText;  // buttons  ;
+
 		if (buttons.length > 0) {
 			totalW = (buttons.length - 1) * 10;
-			for (i in 0...buttons.length){totalW += buttons[i].width;
+			for (i in 0...buttons.length){totalW += Std.int(buttons[i].width);
 			}
-			var buttonX : Int = (w - totalW) / 2;
-			var buttonY : Int = h - (buttons[0].height + 15);
+			var buttonX : Int = Std.int((w - totalW) / 2);
+			var buttonY : Int = Std.int(h - (buttons[0].height + 15));
 			for (i in 0...buttons.length){
 				buttons[i].x = buttonX;
 				buttons[i].y = buttonY;
-				buttonX += buttons[i].width + 10;
+				buttonX += Std.int(buttons[i].width + 10);
 			}
 		}
 	}
-	
+
 	private function fixSize() : Void{
 		var i : Int;
 		var totalW : Int;
 		w = h = 0;
 		// title
 		if (title != null) {
-			w = Math.max(w, title.width);
-			h += 10 + title.height;
+			w = Std.int(Math.max(w, title.width));
+			h += Std.int(10 + title.height);
 		}  // fields  
-		
+
 		maxLabelWidth = 0;
 		maxFieldWidth = 0;
 		for (i in 0...labelsAndFields.length){
-			var r : Array<Dynamic> = labelsAndFields[i];
-			if (r[0] != null) 				maxLabelWidth = Math.max(maxLabelWidth, r[0].width);
-			maxFieldWidth = Math.max(maxFieldWidth, r[1].width);
+			var r : {label:TextField,field:TextField};
+			r = labelsAndFields[i];
+			if (r.label != null)                 maxLabelWidth = Std.int(Math.max(maxLabelWidth, r.label.width));
+			maxFieldWidth = Std.int(Math.max(maxFieldWidth, r.field.width));
 			h += heightPerField;
 		}  // boolean fields  
-		
-		for (i in 0...booleanLabelsAndFields.length){
+
+		for (i in 0...booleanLabelsAndFields.length) {
+			var r:{label:TextField, field:IconButton};
 			r = booleanLabelsAndFields[i];
-			if (r[0] != null) 				maxLabelWidth = Math.max(maxLabelWidth, r[0].width);
-			maxFieldWidth = Math.max(maxFieldWidth, r[1].width);
+			if (r.label != null)                 maxLabelWidth = Std.int(Math.max(maxLabelWidth, r.label.width));
+			maxFieldWidth = Std.int(Math.max(maxFieldWidth, r.field.width));
 			h += heightPerField;
 		}
-		w = Math.max(w, maxLabelWidth + maxFieldWidth + 5);
+		w = Std.int(Math.max(w, maxLabelWidth + maxFieldWidth + 5));
 		// widget
 		if (widget != null) {
-			w = Math.max(w, widget.width);
-			h += 10 + widget.height;
+			w = Std.int(Math.max(w, widget.width));
+			h += Std.int(10 + widget.height);
 		}  // text lines  
-		
+
 		for (line in textLines){
-			w = Math.max(w, line.width);
-			h += line.height;
-			if (line.length == 0) 				h += blankLineSpace;
+			w = Std.int(Math.max(w, line.width));
+			h += Std.int(line.height);
+			if (line.length == 0)                 h += blankLineSpace;
 		}
-		if (textLines.length > 0) 			h += spaceAfterText;  // buttons  ;
-		
+		if (textLines.length > 0)             h += spaceAfterText;  // buttons  ;
+
 		totalW = 0;
-		for (i in 0...buttons.length){totalW += buttons[i].width + 10;
+		for (i in 0...buttons.length){totalW += Std.int(buttons[i].width + 10);
 		}
-		w = Math.max(w, totalW);
-		if (buttons.length > 0) 			h += buttons[0].height + 15;
-		if ((labelsAndFields.length > 0) || (booleanLabelsAndFields.length > 0)) 			h += 15;
+		w = Std.int(Math.max(w, totalW));
+		if (buttons.length > 0)             h += Std.int(buttons[0].height + 15);
+		if ((labelsAndFields.length > 0) || (booleanLabelsAndFields.length > 0))             h += 15;
 		w += 30;
 		h += 10;
 		drawBackground();
 	}
-	
+
 	private function drawBackground() : Void{
-		var titleBarColors : Array<Dynamic> = [0xE0E0E0, 0xD0D0D0];  // old: CSS.titleBarColors;  
+		var titleBarColors : Array<UInt> = [0xE0E0E0, 0xD0D0D0];  // old: CSS.titleBarColors;  
 		var borderColor : Int = 0xB0B0B0;  // old: CSS.borderColor;  
 		var g : Graphics = graphics;
 		g.clear();
@@ -413,38 +409,38 @@ class DialogBox extends Sprite {
 		g.beginFill(0xFFFFFF);
 		g.drawRect(0, CSS.titleBarH, w - 1, h - CSS.titleBarH - 1);
 	}
-	
+
 	private function addFilters() : Void{
 		var f : DropShadowFilter = new DropShadowFilter();
-		
+
 		f.blurX = f.blurY = 8;
 		f.distance = 5;
 		f.alpha = 0.75;
 		f.color = 0x333333;
 		filters = [f];
 	}
-	
+
 	/* Events */
-	
+
 	private function focusChange(evt : Event) : Void{
 		evt.preventDefault();
-		if (labelsAndFields.length == 0) 			return;
+		if (labelsAndFields.length == 0)             return;
 		var focusIndex : Int = -1;
 		for (i in 0...labelsAndFields.length){
-			if (stage.focus == labelsAndFields[i][1]) 				focusIndex = i;
+			if (stage.focus == labelsAndFields[i].field)                 focusIndex = i;
 		}
 		focusIndex++;
-		if (focusIndex >= labelsAndFields.length) 			focusIndex = 0;
-		stage.focus = labelsAndFields[focusIndex][1];
+		if (focusIndex >= labelsAndFields.length)             focusIndex = 0;
+		stage.focus = labelsAndFields[focusIndex].field;
 	}
-	
-	private function mouseDown(evt : MouseEvent) : Void{if (evt.target == this || evt.target == title) 			startDrag();
+
+	private function mouseDown(evt : MouseEvent) : Void{if (evt.target == this || evt.target == title)             startDrag();
 	}
 	private function mouseUp(evt : MouseEvent) : Void{stopDrag();
 	}
-	
+
 	private function keyDown(evt : KeyboardEvent) : Void{
-		if ((evt.keyCode == 10) || (evt.keyCode == 13)) 			accept();
-		if (evt.keyCode == 27) 			cancel();
+		if ((evt.keyCode == 10) || (evt.keyCode == 13))             accept();
+		if (evt.keyCode == 27)             cancel();
 	}
 }

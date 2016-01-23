@@ -25,33 +25,33 @@
 
 package uiwidgets;
 
-import uiwidgets.Graphics;
 
-import flash.display.*;
-import flash.events.*;
-import flash.geom.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.geom.*;
 import util.DragClient;
 
-class Slider extends Sprite implements DragClient {
+class Slider extends Sprite implements DragClient
+{
 	public var min(get, set) : Float;
 	public var max(get, set) : Float;
 	public var value(get, set) : Float;
 
-	
+
 	public var slotColor : Int = 0xBBBDBF;
 	public var slotColor2 : Int = -1;  // if >= 0, fill with linear gradient from slotColor to slotColor2  
-	
+
 	private var slot : Shape;
 	private var knob : Shape;
 	private var positionFraction : Float = 0;  // range: 0-1  
-	
+
 	private var isVertical : Bool;
 	private var dragOffset : Int;
-	private var scrollFunction : Function;
+	private var scrollFunction : Dynamic->Void;
 	private var minValue : Float;
 	private var maxValue : Float;
-	
-	public function new(w : Int, h : Int, scrollFunction : Function = null)
+
+	public function new(w : Int, h : Int, scrollFunction : Dynamic->Void = null)
 	{
 		super();
 		this.scrollFunction = scrollFunction;
@@ -63,22 +63,22 @@ class Slider extends Sprite implements DragClient {
 		moveKnob();
 		addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 	}
-	
-	private function get_Min() : Float{return minValue;
+
+	private function get_min() : Float{return minValue;
 	}
-	private function set_Min(n : Float) : Float{minValue = n;
+	private function set_min(n : Float) : Float{minValue = n;
 		return n;
 	}
-	
-	private function get_Max() : Float{return maxValue;
+
+	private function get_max() : Float{return maxValue;
 	}
-	private function set_Max(n : Float) : Float{maxValue = n;
+	private function set_max(n : Float) : Float{maxValue = n;
 		return n;
 	}
-	
-	private function get_Value() : Float{return positionFraction * (maxValue - minValue) + minValue;
+
+	private function get_value() : Float{return positionFraction * (maxValue - minValue) + minValue;
 	}
-	private function set_Value(n : Float) : Float{
+	private function set_value(n : Float) : Float{
 		// Update the slider value (0-1).
 		var newFraction : Float = Math.max(0, Math.min((n - minValue) / (maxValue - minValue), 1));
 		if (newFraction != positionFraction) {
@@ -87,13 +87,13 @@ class Slider extends Sprite implements DragClient {
 		}
 		return n;
 	}
-	
+
 	public function setWidthHeight(w : Int, h : Int) : Void{
 		isVertical = h > w;
 		drawSlot(w, h);
 		drawKnob(w, h);
 	}
-	
+
 	private function drawSlot(w : Int, h : Int) : Void{
 		var slotRadius : Int = 9;
 		var g : Graphics = slot.graphics;
@@ -109,7 +109,7 @@ class Slider extends Sprite implements DragClient {
 		g.drawRoundRect(0, 0, w, h, slotRadius, slotRadius);
 		g.endFill();
 	}
-	
+
 	private function drawKnob(w : Int, h : Int) : Void{
 		var knobOutline : Int = 0x707070;
 		var knobFill : Int = 0xEBEBEB;
@@ -123,7 +123,7 @@ class Slider extends Sprite implements DragClient {
 		g.drawRoundRect(0.5, 0.5, knobW, knobH, knobRadius, knobRadius);
 		g.endFill();
 	}
-	
+
 	private function moveKnob() : Void{
 		if (isVertical) {
 			knob.x = -4;
@@ -134,11 +134,11 @@ class Slider extends Sprite implements DragClient {
 			knob.y = -4;
 		}
 	}
-	
+
 	private function mouseDown(evt : MouseEvent) : Void{
 		Scratch.app.gh.setDragClient(this, evt);
 	}
-	
+
 	public function dragBegin(evt : MouseEvent) : Void{
 		var sliderOrigin : Point = knob.localToGlobal(new Point(0, 0));
 		if (isVertical) {
@@ -151,7 +151,7 @@ class Slider extends Sprite implements DragClient {
 		}
 		dragMove(evt);
 	}
-	
+
 	public function dragMove(evt : MouseEvent) : Void{
 		var range : Int;
 		var frac : Float;
@@ -166,9 +166,9 @@ class Slider extends Sprite implements DragClient {
 		}
 		positionFraction = Math.max(0, Math.min(positionFraction, 1));
 		moveKnob();
-		if (scrollFunction != null) 			scrollFunction(this.value);
+		if (scrollFunction != null)             scrollFunction(this.value);
 	}
-	
+
 	public function dragEnd(evt : MouseEvent) : Void{
 		dispatchEvent(new Event(Event.COMPLETE));
 	}

@@ -25,28 +25,21 @@
 
 package scratch;
 
-//import scratch.DisplayObject;
-//import scratch.ListWatcher;
-//import scratch.Scratch;
-//import scratch.ScratchCostume;
-//import scratch.ScratchSound;
-//import scratch.ScratchStage;
-//import scratch.Sprite;
-//import scratch.Variable;
-
 import blocks.*;
 
 import filters.FilterPack;
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.geom.ColorTransform;
-import flash.utils.*;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.geom.ColorTransform;
+import openfl.utils.*;
 
 import interpreter.*;
 
-//import scratch.ScratchComment;
-//import scratch.ScratchSprite;
+import openfl.Assets;
+
+import scratch.ScratchComment;
+import scratch.ScratchSprite;
 
 import translation.Translator;
 
@@ -54,135 +47,137 @@ import util.*;
 
 import watchers.*;
 
-class ScratchObj extends Sprite {
-	
-	@:meta(Embed(source="../assets/pop.wav",mimeType="application/octet-stream"))
-private static var Pop : Class<Dynamic>;
-	
+class ScratchObj extends Sprite
+{
+	private static function makePop() : ByteArray { return Assets.getBytes("pop"); }
+
+	//@:meta(Embed(source="../assets/pop.wav",mimeType="application/octet-stream"))
+//private static var Pop : Class<Dynamic>;
+
 	public static inline var STAGEW : Int = 480;
 	public static inline var STAGEH : Int = 360;
-	
+
 	public var objName : String = "no name";
 	public var isStage : Bool = false;
-	public var variables : Array<Dynamic> = [];
-	public var lists : Array<Dynamic> = [];
-	public var scripts : Array<Dynamic> = [];
-	public var scriptComments : Array<Dynamic> = [];
-	public var sounds : Array<Dynamic> = [];
-	public var costumes : Array<Dynamic> = [];
+	public var variables : Array<Variable> = [];
+	public var lists : Array<ListWatcher> = [];
+	public var scripts : Array<Block> = [];
+	public var scriptComments : Array<ScratchComment> = [];
+	public var sounds : Array<ScratchSound> = [];
+	public var costumes : Array<ScratchCostume> = [];
 	public var currentCostumeIndex : Float;
 	public var volume : Float = 100;
 	public var instrument : Int = 0;
 	public var filterPack : FilterPack;
 	public var isClone : Bool;
-	
+
 	public var img : Sprite;  // holds a bitmap or svg object, after applying image filters, scale, and rotation  
 	private var lastCostume : ScratchCostume;
-	
+
 	// Caches used by the interpreter:
-	public var listCache : Dynamic = { };
-	public var procCache : Dynamic = { };
-	public var varCache : Dynamic = { };
-	
+	public var listCache : Map <String, ListWatcher> = new Map<String,ListWatcher>();
+	public var procCache : Map <String, Block> = new Map<String,Block>();
+	public var varCache : Map<String,Variable> = new Map<String,Variable>();
+
 	public function clearCaches() : Void{
 		// Clear the list, procedure, and variable caches for this object.
-		listCache = { };
-		procCache = { };
-		varCache = { };
+		listCache = new Map<String,ListWatcher>();
+		procCache = new Map<String,Block>();
+		varCache = new Map<String,Variable>();
 	}
-	
-	public function allObjects() : Array<Dynamic>{return [this];
+
+	public function allObjects() : Array<ScratchObj>{return [this];
 	}
-	
+
 	public function deleteCostume(c : ScratchCostume) : Void{
-		if (costumes.length < 2) 			return  // a sprite must have at least one costume  ;
+		if (costumes.length < 2)             return;  // a sprite must have at least one costume  ;
 		var i : Int = Lambda.indexOf(costumes, c);
-		if (i < 0) 			return;
+		if (i < 0)             return;
 		costumes.splice(i, 1);
-		if (currentCostumeIndex >= i) 			showCostume(currentCostumeIndex - 1);
-		if (Scratch.app) 			Scratch.app.setSaveNeeded();
+		if (currentCostumeIndex >= i)             showCostume(currentCostumeIndex - 1);
+		if (Scratch.app != null)             Scratch.app.setSaveNeeded();
 	}
-	
+
 	public function deleteSound(snd : ScratchSound) : Void{
 		var i : Int = Lambda.indexOf(sounds, snd);
-		if (i < 0) 			return;
+		if (i < 0)             return;
 		sounds.splice(i, 1);
-		if (Scratch.app) 			Scratch.app.setSaveNeeded();
+		if (Scratch.app != null)             Scratch.app.setSaveNeeded();
 	}
-	
+
 	public function showCostumeNamed(n : String) : Void{
 		var i : Int = indexOfCostumeNamed(n);
-		if (i >= 0) 			showCostume(i);
+		if (i >= 0)             showCostume(i);
 	}
-	
+
 	public function indexOfCostumeNamed(n : String) : Int{
 		for (i in 0...costumes.length){
-			if (cast((costumes[i]), ScratchCostume).costumeName == n) 				return i;
+			if (cast((costumes[i]), ScratchCostume).costumeName == n)                 return i;
 		}
 		return -1;
 	}
-	
+
 	public function showCostume(costumeIndex : Float) : Void{
-		if (isNaNOrInfinity(costumeIndex)) 			costumeIndex = 0;
+		if (isNaNOrInfinity(costumeIndex))             costumeIndex = 0;
 		currentCostumeIndex = costumeIndex % costumes.length;
-		if (currentCostumeIndex < 0) 			currentCostumeIndex += costumes.length;
+		if (currentCostumeIndex < 0)             currentCostumeIndex += costumes.length;
 		var c : ScratchCostume = currentCostume();
-		if (c == lastCostume) 			return  // optimization: already showing that costume  ;
+		if (c == lastCostume)             return;  // optimization: already showing that costume  ;
 		lastCostume = (c.isBitmap()) ? c : null;  // cache only bitmap costumes for now  
-		
+
 		updateImage();
 	}
-	
+
 	public function updateCostume() : Void{updateImage();
 	}
-	
+
 	public function currentCostume() : ScratchCostume{
 		return costumes[Math.round(currentCostumeIndex) % costumes.length];
 	}
-	
+
 	public function costumeNumber() : Int{
 		// One-based costume number as seen by user (currentCostumeIndex is 0-based)
-		return currentCostumeIndex + 1;
+		return Std.int(currentCostumeIndex + 1);
 	}
-	
+
 	public function unusedCostumeName(baseName : String = "") : String{
 		// Create a unique costume name by appending a number if necessary.
-		if (baseName == "") 			baseName = Translator.map((isStage) ? "backdrop1" : "costume1");
+		if (baseName == "")             baseName = Translator.map((isStage) ? "backdrop1" : "costume1");
 		var existingNames : Array<Dynamic> = [];
 		for (c in costumes){
 			existingNames.push(c.costumeName.toLowerCase());
 		}
 		var lcBaseName : String = baseName.toLowerCase();
-		if (Lambda.indexOf(existingNames, lcBaseName) < 0) 			return baseName;  // basename is not already used  ;
+		if (Lambda.indexOf(existingNames, lcBaseName) < 0)             return baseName;  // basename is not already used  ;
 		lcBaseName = withoutTrailingDigits(lcBaseName);
 		var i : Int = 2;
 		while (Lambda.indexOf(existingNames, lcBaseName + i) >= 0){i++;
 		}  // find an unused name  
 		return withoutTrailingDigits(baseName) + i;
 	}
-	
+
 	public function unusedSoundName(baseName : String = "") : String{
 		// Create a unique sound name by appending a number if necessary.
-		if (baseName == "") 			baseName = "sound";
+		if (baseName == "")             baseName = "sound";
 		var existingNames : Array<Dynamic> = [];
 		for (snd in sounds){
 			existingNames.push(snd.soundName.toLowerCase());
 		}
 		var lcBaseName : String = baseName.toLowerCase();
-		if (Lambda.indexOf(existingNames, lcBaseName) < 0) 			return baseName;  // basename is not already used  ;
+		if (Lambda.indexOf(existingNames, lcBaseName) < 0)             return baseName;  // basename is not already used  ;
 		lcBaseName = withoutTrailingDigits(lcBaseName);
 		var i : Int = 2;
 		while (Lambda.indexOf(existingNames, lcBaseName + i) >= 0){i++;
 		}  // find an unused name  
 		return withoutTrailingDigits(baseName) + i;
 	}
-	
+
 	private function withoutTrailingDigits(s : String) : String{
 		var i : Int = s.length - 1;
 		while ((i >= 0) && ("0123456789".indexOf(s.charAt(i)) > -1))i--;
 		return s.substring(0, i + 1);
 	}
-	
+
 	private function updateImage() : Void{
 		var currChild : DisplayObject = (img.numChildren == (1) ? img.getChildAt(0) : null);
 		var currDispObj : DisplayObject = currentCostume().displayObj();
@@ -195,43 +190,43 @@ private static var Pop : Class<Dynamic>;
 		adjustForRotationCenter();
 		updateRenderDetails(0);
 	}
-	
-	private function updateRenderDetails(reason : UInt) : Void{
-		/* AS3HX WARNING namespace modifier SCRATCH::allow3d */{
-			if (Std.is(this, ScratchStage) || Std.is(this, ScratchSprite) || (parent && Std.is(parent, ScratchStage))) {
-				var renderOpts : Dynamic = { };
-				var costume : ScratchCostume = currentCostume();
-				
-				// 0 - costume change, 1 - rotation style change
-				if (reason == 0) {
-					if (costume != null && costume.baseLayerID == ScratchCostume.WasEdited) 
-						costume.prepareToSave();
-					
-					var id : String = ((costume != null) ? costume.baseLayerMD5 : null);
-					if (id == null) 						id = objName + ((costume != null) ? costume.costumeName : "_" + currentCostumeIndex)
-					else if (costume != null && costume.textLayerMD5) 						id += costume.textLayerMD5;
-					
-					renderOpts.bitmap = (costume && (costume.bitmap) ? costume.bitmap : null);
-				}  // TODO: Clip original bitmap to match visible bounds?  
-				
-				
-				
-				if (reason == 1) 
-					renderOpts.costumeFlipped = (Std.is(this, (ScratchSprite) ? (try cast(this, ScratchSprite) catch(e:Dynamic) null).isCostumeFlipped() : false));
-				
-				if (reason == 0) {
-					if (Std.is(this, ScratchSprite)) {
-						renderOpts.bounds = (try cast(this, ScratchSprite) catch(e:Dynamic) null).getVisibleBounds(this);
-						renderOpts.raw_bounds = getBounds(this);
-					}
-					else 
-					renderOpts.bounds = getBounds(this);
-				}
-				if (Scratch.app.isIn3D) 					Scratch.app.render3D.updateRender((Std.is(this, (ScratchStage) ? img : this)), id, renderOpts);
-			}
-		}
+
+	private function updateRenderDetails(reason : Int) : Void{
+		///* AS3HX WARNING namespace modifier SCRATCH::allow3d */{
+			//if (Std.is(this, ScratchStage) || Std.is(this, ScratchSprite) || (parent != null&& Std.is(parent, ScratchStage))) {
+				//var renderOpts : Dynamic = { };
+				//var costume : ScratchCostume = currentCostume();
+				//
+				//// 0 - costume change, 1 - rotation style change
+				//if (reason == 0) {
+					//if (costume != null && costume.baseLayerID == ScratchCostume.WasEdited) 
+						//costume.prepareToSave();
+					//
+					//var id : String = ((costume != null) ? costume.baseLayerMD5 : null);
+					//if (id == null)                         id = objName + ((costume != null) ? costume.costumeName : "_" + currentCostumeIndex)
+					//else if (costume != null && costume.textLayerMD5 != null)                         id += costume.textLayerMD5;
+					//
+					//renderOpts.bitmap = (costume != null && (costume.bitmap != null) ? costume.bitmap : null);
+				//}  // TODO: Clip original bitmap to match visible bounds?  
+				//
+				//
+				//
+				//if (reason == 1) 
+					//renderOpts.costumeFlipped = (Std.is(this, ScratchSprite) ? cast(this, ScratchSprite).isCostumeFlipped() : false);
+				//
+				//if (reason == 0) {
+					//if (Std.is(this, ScratchSprite)) {
+						//renderOpts.bounds = cast(this, ScratchSprite).getVisibleBounds(this);
+						//renderOpts.raw_bounds = getBounds(this);
+					//}
+					//else 
+					//renderOpts.bounds = getBounds(this);
+				//}
+				////if (Scratch.app.isIn3D)                     Scratch.app.render3D.updateRender((Std.is(this, (ScratchStage) ? img : this)), id, renderOpts);
+			//}
+		//}
 	}
-	
+
 	private function adjustForRotationCenter() : Void{
 		// Adjust the offset of img relative to it's parent. If this object is a
 		// ScratchSprite, then img is adjusted based on the costume's rotation center.
@@ -252,18 +247,18 @@ private static var Pop : Class<Dynamic>;
 			costumeObj.scaleX = 1 / c.bitmapResolution;  // don't flip  
 			img.x = -c.rotationCenterX / c.bitmapResolution;
 			img.y = -c.rotationCenterY / c.bitmapResolution;
-			if ((try cast(this, ScratchSprite) catch(e:Dynamic) null).isCostumeFlipped()) {
+			if (cast(this, ScratchSprite).isCostumeFlipped()) {
 				costumeObj.scaleX = -1 / c.bitmapResolution;  // flip  
 				img.x = -img.x;
 			}
 		}
 	}
-	
+
 	public function clearCachedBitmap() : Void{
 		// Does nothing here, but overridden in ScratchSprite
-		
+
 	}
-	
+
 	private static var cTrans : ColorTransform = new ColorTransform();
 	public function applyFilters(forDragging : Bool = false) : Void{
 		img.filters = filterPack.buildFilters(forDragging);
@@ -279,56 +274,56 @@ private static var Pop : Class<Dynamic>;
 			updateEffectsFor3D();
 		}
 	}
-	
+
 	public function updateEffectsFor3D() : Void{
-		/* AS3HX WARNING namespace modifier SCRATCH::allow3d */{
-			if ((parent && Std.is(parent, ScratchStage)) || Std.is(this, ScratchStage)) {
-				if (Std.is(parent, ScratchStage)) 
-					(try cast(parent, ScratchStage) catch(e:Dynamic) null).updateSpriteEffects(this, filterPack.getAllSettings())
-				else {
-					(try cast(this, ScratchStage) catch(e:Dynamic) null).updateSpriteEffects(img, filterPack.getAllSettings());
-				}
-			}
-		}
+		///* AS3HX WARNING namespace modifier SCRATCH::allow3d */{
+			//if ((parent != null && Std.is(parent, ScratchStage)) || Std.is(this, ScratchStage)) {
+				//if (Std.is(parent, ScratchStage)) 
+					//(try cast(parent, ScratchStage) catch(e:Dynamic) null).updateSpriteEffects(this, filterPack.getAllSettings())
+				//else {
+					//(try cast(this, ScratchStage) catch(e:Dynamic) null).updateSpriteEffects(img, filterPack.getAllSettings());
+				//}
+			//}
+		//}
 	}
-	
+
 	private function shapeChangedByFilter() : Bool{
 		var filters : Dynamic = filterPack.getAllSettings();
 		return (Reflect.field(filters, "fisheye") != 0 || Reflect.field(filters, "whirl") != 0 || Reflect.field(filters, "mosaic") != 0);
 	}
-	
+
 	public static var clearColorTrans : ColorTransform = new ColorTransform();
 	public function clearFilters() : Void{
 		filterPack.resetAllFilters();
 		img.filters = [];
 		img.transform.colorTransform = clearColorTrans;
 		clearCachedBitmap();
-		
-		/* AS3HX WARNING namespace modifier SCRATCH::allow3d */{
-			if (parent && Std.is(parent, ScratchStage)) {
-				(try cast(parent, ScratchStage) catch(e:Dynamic) null).updateSpriteEffects(this, null);
-			}
-		}
+
+		///* AS3HX WARNING namespace modifier SCRATCH::allow3d */{
+			//if (parent != null && Std.is(parent, ScratchStage)) {
+				//(try cast(parent, ScratchStage) catch(e:Dynamic) null).updateSpriteEffects(this, null);
+			//}
+		//}
 	}
-	
+
 	public function setMedia(media : Array<Dynamic>, currentCostume : ScratchCostume) : Void{
-		var newCostumes : Array<Dynamic> = [];
+		var newCostumes : Array<ScratchCostume> = [];
 		sounds = [];
 		for (m in media){
-			if (Std.is(m, ScratchSound)) 				sounds.push(m);
-			if (Std.is(m, ScratchCostume)) 				newCostumes.push(m);
+			if (Std.is(m, ScratchSound))                 sounds.push(m);
+			if (Std.is(m, ScratchCostume))                 newCostumes.push(m);
 		}
-		if (newCostumes.length > 0) 			costumes = newCostumes;
+		if (newCostumes.length > 0)             costumes = newCostumes;
 		var i : Int = Lambda.indexOf(costumes, currentCostume);
 		currentCostumeIndex = ((i < 0)) ? 0 : i;
 		showCostume(i);
 	}
-	
+
 	public function defaultArgsFor(op : String, specDefaults : Array<Dynamic>) : Array<Dynamic>{
 		// Return an array of default parameter values for the given operation (primitive name).
 		// For most ops, this will simply return the array of default arg values from the command spec.
 		var sprites : Array<Dynamic>;
-		
+
 		if ((["broadcast:", "doBroadcastAndWait", "whenIReceive"].indexOf(op)) > -1) {
 			var msgs : Array<Dynamic> = Scratch.app.runtime.collectBroadcasts();
 			return ((msgs.length > 0)) ? [msgs[0]] : ["message1"];
@@ -340,7 +335,7 @@ private static var Pop : Class<Dynamic>;
 			return ((sounds.length > 0)) ? [sounds[sounds.length - 1].soundName] : [""];
 		}
 		if ("createCloneOf" == op) {
-			if (!isStage) 				return ["_myself_"];
+			if (!isStage)                 return ["_myself_"];
 			sprites = Scratch.app.stagePane.sprites();
 			return ((sprites.length > 0)) ? [sprites[sprites.length - 1].objName] : [""];
 		}
@@ -348,123 +343,123 @@ private static var Pop : Class<Dynamic>;
 			sprites = Scratch.app.stagePane.sprites();
 			return ((sprites.length > 0)) ? ["x position", sprites[sprites.length - 1].objName] : ["volume", "_stage_"];
 		}
-		
-		if ("setVar:to:" == op) 			return [defaultVarName(), 0];
-		if ("changeVar:by:" == op) 			return [defaultVarName(), 1];
-		if ("showVariable:" == op) 			return [defaultVarName()];
-		if ("hideVariable:" == op) 			return [defaultVarName()];
-		
-		if ("append:toList:" == op) 			return ["thing", defaultListName()];
-		if ("deleteLine:ofList:" == op) 			return [1, defaultListName()];
-		if ("insert:at:ofList:" == op) 			return ["thing", 1, defaultListName()];
-		if ("setLine:ofList:to:" == op) 			return [1, defaultListName(), "thing"];
-		if ("getLine:ofList:" == op) 			return [1, defaultListName()];
-		if ("lineCountOfList:" == op) 			return [defaultListName()];
-		if ("list:contains:" == op) 			return [defaultListName(), "thing"];
-		if ("showList:" == op) 			return [defaultListName()];
-		if ("hideList:" == op) 			return [defaultListName()];
-		
+
+		if ("setVar:to:" == op)             return [defaultVarName(), 0];
+		if ("changeVar:by:" == op)             return [defaultVarName(), 1];
+		if ("showVariable:" == op)             return [defaultVarName()];
+		if ("hideVariable:" == op)             return [defaultVarName()];
+
+		if ("append:toList:" == op)             return ["thing", defaultListName()];
+		if ("deleteLine:ofList:" == op)             return [1, defaultListName()];
+		if ("insert:at:ofList:" == op)             return ["thing", 1, defaultListName()];
+		if ("setLine:ofList:to:" == op)             return [1, defaultListName(), "thing"];
+		if ("getLine:ofList:" == op)             return [1, defaultListName()];
+		if ("lineCountOfList:" == op)             return [defaultListName()];
+		if ("list:contains:" == op)             return [defaultListName(), "thing"];
+		if ("showList:" == op)             return [defaultListName()];
+		if ("hideList:" == op)             return [defaultListName()];
+
 		return specDefaults;
 	}
-	
+
 	public function defaultVarName() : String{
-		if (variables.length > 0) 			return variables[variables.length - 1].name;  // local var  ;
+		if (variables.length > 0)             return variables[variables.length - 1].name;  // local var  ;
 		return (isStage) ? "" : Scratch.app.stagePane.defaultVarName();
 	}
-	
+
 	public function defaultListName() : String{
-		if (lists.length > 0) 			return lists[lists.length - 1].listName;  // local list  ;
+		if (lists.length > 0)             return lists[lists.length - 1].listName;  // local list  ;
 		return (isStage) ? "" : Scratch.app.stagePane.defaultListName();
 	}
-	
+
 	/* Scripts */
-	
-	public function allBlocks() : Array<Dynamic>{
-		var result : Array<Dynamic> = [];
-		for (script in scripts){
+
+	public function allBlocks() : Array<Block>{
+		var result : Array<Block> = [];
+		for (script in scripts) {
 			script.allBlocksDo(function(b : Block) : Void{result.push(b);
 					});
 		}
 		return result;
 	}
-	
+
 	/* Sounds */
-	
+
 	public function findSound(arg : Dynamic) : ScratchSound{
 		// Return a sound describe by arg, which can be a string (sound name),
 		// a number (sound index), or a string representing a number (sound index).
-		if (sounds.length == 0) 			return null;
-		if (as3hx.Compat.typeof((arg)) == "number") {
+		if (sounds.length == 0)             return null;
+		if (Std.is(arg, Float) || Std.is(arg, Int)) {
 			var i : Int = Math.round(arg - 1) % sounds.length;
-			if (i < 0) 				i += sounds.length;  // ensure positive  ;
+			if (i < 0)                 i += sounds.length;  // ensure positive  ;
 			return sounds[i];
 		}
-		else if (as3hx.Compat.typeof((arg)) == "string") {
+		else if (Std.is(arg, String)) {
 			for (snd in sounds){
-				if (snd.soundName == arg) 					return snd;  // arg matches a sound name  ;
+				if (snd.soundName == arg)                     return snd;  // arg matches a sound name  ;
 			}  // try converting string arg to a number  
-			
+
 			var n : Float = Std.parseFloat(arg);
-			if (Math.isNaN(n)) 				return null;
+			if (Math.isNaN(n))                 return null;
 			return findSound(n);
 		}
 		return null;
 	}
-	
+
 	public function setVolume(vol : Float) : Void{
 		volume = Math.max(0, Math.min(vol, 100));
 	}
-	
+
 	public function setInstrument(instr : Float) : Void{
-		instrument = Math.max(1, Math.min(Math.round(instr), 128));
+		instrument = Std.int(Math.max(1, Math.min(Math.round(instr), 128)));
 	}
-	
+
 	/* Procedures */
-	
-	public function procedureDefinitions() : Array<Dynamic>{
-		var result : Array<Dynamic> = [];
+
+	public function procedureDefinitions() : Array<Block>{
+		var result : Array<Block> = [];
 		for (i in 0...scripts.length){
 			var b : Block = try cast(scripts[i], Block) catch(e:Dynamic) null;
-			if (b != null && (b.op == Specs.PROCEDURE_DEF)) 				result.push(b);
+			if (b != null && (b.op == Specs.PROCEDURE_DEF))                 result.push(b);
 		}
 		return result;
 	}
-	
+
 	public function lookupProcedure(procName : String) : Block{
 		for (i in 0...scripts.length){
 			var b : Block = try cast(scripts[i], Block) catch(e:Dynamic) null;
-			if (b != null && (b.op == Specs.PROCEDURE_DEF) && (b.spec == procName)) 				return b;
+			if (b != null && (b.op == Specs.PROCEDURE_DEF) && (b.spec == procName))                 return b;
 		}
 		return null;
 	}
-	
+
 	/* Variables */
-	
-	public function varNames() : Array<Dynamic>{
-		var varList : Array<Dynamic> = [];
+
+	public function varNames() : Array<String>{
+		var varList : Array<String> = [];
 		for (v in variables)varList.push(v.name);
 		return varList;
 	}
-	
+
 	public function setVarTo(varName : String, value : Dynamic) : Void{
 		var v : Variable = lookupOrCreateVar(varName);
 		v.value = value;
 		Scratch.app.runtime.updateVariable(v);
 	}
-	
+
 	public function ownsVar(varName : String) : Bool{
 		// Return true if this object owns a variable of the given name.
 		for (v in variables){
-			if (v.name == varName) 				return true;
+			if (v.name == varName)                 return true;
 		}
 		return false;
 	}
-	
+
 	public function hasName(varName : String) : Bool{
 		var p : ScratchObj = try cast(parent, ScratchObj) catch(e:Dynamic) null;
-		return ownsVar(varName) || ownsList(varName) || p && (p.ownsVar(varName) || p.ownsList(varName));
+		return ownsVar(varName) || ownsList(varName) || p != null && (p.ownsVar(varName) || p.ownsList(varName));
 	}
-	
+
 	public function lookupOrCreateVar(varName : String) : Variable{
 		// Lookup and return a variable. If lookup fails, create the variable in this object.
 		var v : Variable = lookupVar(varName);
@@ -475,22 +470,22 @@ private static var Pop : Class<Dynamic>;
 		}
 		return v;
 	}
-	
+
 	public function lookupVar(varName : String) : Variable{
 		// Look for variable first in sprite (local), then stage (global).
 		// Return null if not found.
 		var v : Variable;
 		for (v in variables){
-			if (v.name == varName) 				return v;
+			if (v.name == varName)                 return v;
 		}
-		for (v/* AS3HX WARNING could not determine type for var: v exp: EField(EField(EField(EIdent(Scratch),app),stagePane),variables) type: null */ in Scratch.app.stagePane.variables){
-			if (v.name == varName) 				return v;
+		for (v in Scratch.app.stagePane.variables){
+			if (v.name == varName)                 return v;
 		}
 		return null;
 	}
-	
+
 	public function deleteVar(varToDelete : String) : Void{
-		var newVars : Array<Dynamic> = [];
+		var newVars : Array<Variable> = [];
 		for (v in variables){
 			if (v.name == varToDelete) {
 				if ((v.watcher != null) && (v.watcher.parent != null)) {
@@ -502,23 +497,23 @@ private static var Pop : Class<Dynamic>;
 		}
 		variables = newVars;
 	}
-	
+
 	/* Lists */
-	
-	public function listNames() : Array<Dynamic>{
-		var result : Array<Dynamic> = [];
+
+	public function listNames() : Array<String>{
+		var result : Array<String> = [];
 		for (list in lists)result.push(list.listName);
 		return result;
 	}
-	
+
 	public function ownsList(listName : String) : Bool{
 		// Return true if this object owns a list of the given name.
 		for (w in lists){
-			if (w.listName == listName) 				return true;
+			if (w.listName == listName)                 return true;
 		}
 		return false;
 	}
-	
+
 	public function lookupOrCreateList(listName : String) : ListWatcher{
 		// Look and return a list. If lookup fails, create the list in this object.
 		var list : ListWatcher = lookupList(listName);
@@ -529,25 +524,25 @@ private static var Pop : Class<Dynamic>;
 		}
 		return list;
 	}
-	
+
 	public function lookupList(listName : String) : ListWatcher{
 		// Look for list first in this sprite (local), then stage (global).
 		// Return null if not found.
 		var list : ListWatcher;
 		for (list in lists){
-			if (list.listName == listName) 				return list;
+			if (list.listName == listName)                 return list;
 		}
-		for (list/* AS3HX WARNING could not determine type for var: list exp: EField(EField(EField(EIdent(Scratch),app),stagePane),lists) type: null */ in Scratch.app.stagePane.lists){
-			if (list.listName == listName) 				return list;
+		for (list in Scratch.app.stagePane.lists){
+			if (list.listName == listName)                 return list;
 		}
 		return null;
 	}
-	
+
 	public function deleteList(listName : String) : Void{
-		var newLists : Array<Dynamic> = [];
+		var newLists : Array<ListWatcher> = [];
 		for (w in lists){
 			if (w.listName == listName) {
-				if (w.parent) 					w.parent.removeChild(w);
+				if (w.parent != null)                     w.parent.removeChild(w);
 			}
 			else {
 				newLists.push(w);
@@ -555,19 +550,19 @@ private static var Pop : Class<Dynamic>;
 		}
 		lists = newLists;
 	}
-	
+
 	/* Events */
-	
-	private inline static var DOUBLE_CLICK_MSECS : Int = 300;
-	private var lastClickTime : UInt;
-	
-	public function click(evt : MouseEvent) : Void{
-		var app : Scratch = try cast(root, Scratch) catch(e:Dynamic) null;
-		if (app == null) 			return;
-		var now : UInt = Math.round(haxe.Timer.stamp() * 1000);
+
+	private static inline var DOUBLE_CLICK_MSECS : Int = 300;
+	private var lastClickTime : Int;
+
+	public function click(evt : MouseEvent) : Void {
+		if (root != Scratch.app.rootDisplayObject()) return;
+		var app : Scratch = Scratch.app;
+		var now : Int = Math.round(haxe.Timer.stamp() * 1000);
 		app.runtime.startClickedHats(this);
 		if ((now - lastClickTime) < DOUBLE_CLICK_MSECS) {
-			if (isStage || cast((this), ScratchSprite).isClone) 				return;
+			if (isStage || cast((this), ScratchSprite).isClone)                 return;
 			app.selectSprite(this);
 			lastClickTime = 0;
 		}
@@ -575,18 +570,18 @@ private static var Pop : Class<Dynamic>;
 			lastClickTime = now;
 		}
 	}
-	
+
 	/* Translation */
-	
+
 	public function updateScriptsAfterTranslation() : Void{
 		// Update the scripts of this object after switching languages.
-		var newScripts : Array<Dynamic> = [];
+		var newScripts : Array<Block> = [];
 		for (b in scripts){
 			var newStack : Block = BlockIO.arrayToStack(BlockIO.stackToArray(b), isStage);
 			newStack.x = b.x;
 			newStack.y = b.y;
 			newScripts.push(newStack);
-			if (b.parent) {  // stack in the scripts pane; replace it  
+			if (b.parent != null) {  // stack in the scripts pane; replace it  
 				b.parent.addChild(newStack);
 				b.parent.removeChild(b);
 			}
@@ -597,9 +592,9 @@ private static var Pop : Class<Dynamic>;
 			c.updateBlockRef(blockList);
 		}
 	}
-	
+
 	/* Saving */
-	
+
 	public function writeJSON(json : util.JSON) : Void{
 		var allScripts : Array<Dynamic> = [];
 		for (b in scripts){
@@ -610,101 +605,167 @@ private static var Pop : Class<Dynamic>;
 			allComments.push(c.toArray());
 		}
 		json.writeKeyValue("objName", objName);
-		if (variables.length > 0) 			json.writeKeyValue("variables", variables);
-		if (lists.length > 0) 			json.writeKeyValue("lists", lists);
-		if (scripts.length > 0) 			json.writeKeyValue("scripts", allScripts);
-		if (scriptComments.length > 0) 			json.writeKeyValue("scriptComments", allComments);
-		if (sounds.length > 0) 			json.writeKeyValue("sounds", sounds);
+		if (variables.length > 0)             json.writeKeyValue("variables", variables);
+		if (lists.length > 0)             json.writeKeyValue("lists", lists);
+		if (scripts.length > 0)             json.writeKeyValue("scripts", allScripts);
+		if (scriptComments.length > 0)             json.writeKeyValue("scriptComments", allComments);
+		if (sounds.length > 0)             json.writeKeyValue("sounds", sounds);
 		json.writeKeyValue("costumes", costumes);
 		json.writeKeyValue("currentCostumeIndex", currentCostumeIndex);
 	}
-	
-	public function readJSON(jsonObj : Dynamic) : Void{
+
+	//public function readJSON(jsonObj : Dynamic) : Void{
+		//objName = jsonObj.objName;
+		//variables = jsonObj.variables != null ?  jsonObj.variables: [];
+		//for (i in 0...variables.length){
+			//var varObj : Dynamic = variables[i];
+			//variables[i] = Scratch.app.runtime.makeVariable(varObj);
+		//}
+		//lists = jsonObj.lists != null ? jsonObj.lists : [];
+		//scripts = jsonObj.scripts != null ? jsonObj.scripts: [];
+		//scriptComments = jsonObj.scriptComments != null ? jsonObj.scriptComments: [];
+		//sounds = jsonObj.sounds != null ? jsonObj.sounds: [];
+		//costumes = jsonObj.costumes != null ? jsonObj.costumes: [];
+		//currentCostumeIndex = jsonObj.currentCostumeIndex;
+		//if (isNaNOrInfinity(currentCostumeIndex))             currentCostumeIndex = 0;
+	//}
+
+	public function readJSONAndInstantiate(jsonObj : Dynamic, newStage : ScratchStage) : Void{
 		objName = jsonObj.objName;
-		variables = jsonObj.variables || [];
-		for (i in 0...variables.length){
-			var varObj : Dynamic = variables[i];
+		var jsonVariables = jsonObj.variables != null ?  jsonObj.variables: [];
+		variables = Compat.newArray(jsonVariables.length, null);
+		for (i in 0...jsonVariables.length){
+			var varObj : Dynamic = jsonVariables[i];
 			variables[i] = Scratch.app.runtime.makeVariable(varObj);
 		}
-		lists = jsonObj.lists || [];
-		scripts = jsonObj.scripts || [];
-		scriptComments = jsonObj.scriptComments || [];
-		sounds = jsonObj.sounds || [];
-		costumes = jsonObj.costumes || [];
+		var jsonLists = jsonObj.lists != null ? jsonObj.lists : [];
+		var jsonScripts = jsonObj.scripts != null ? jsonObj.scripts: [];
+		var jsonScriptComments = jsonObj.scriptComments != null ? jsonObj.scriptComments: [];
+		var jsonSounds = jsonObj.sounds != null ? jsonObj.sounds: [];
+		var jsonCostumes = jsonObj.costumes != null ? jsonObj.costumes: [];
 		currentCostumeIndex = jsonObj.currentCostumeIndex;
-		if (isNaNOrInfinity(currentCostumeIndex)) 			currentCostumeIndex = 0;
-	}
-	
-	private function isNaNOrInfinity(n : Float) : Bool{
-		if (n != n) 			return true;  // NaN  ;
-		if (n == Float.POSITIVE_INFINITY) 			return true;
-		if (n == Float.NEGATIVE_INFINITY) 			return true;
-		return false;
-	}
-	
-	public function instantiateFromJSON(newStage : ScratchStage) : Void{
-		var i : Int;
-		var jsonObj : Dynamic;
+		if (isNaNOrInfinity(currentCostumeIndex))             currentCostumeIndex = 0;
 		
 		// lists
-		for (i in 0...lists.length){
-			jsonObj = lists[i];
+		lists = Compat.newArray(jsonLists.length, null);
+		for (i in 0...jsonLists.length){
+			var jsonObj = jsonLists[i];
 			var newList : ListWatcher = new ListWatcher();
 			newList.readJSON(jsonObj);
 			newList.target = this;
 			newStage.addChild(newList);
 			newList.updateTitleAndContents();
 			lists[i] = newList;
-		}  // scripts  
+		}  
 		
-		
-		
-		for (i in 0...scripts.length){
+		// scripts  
+		scripts = Compat.newArray(jsonScripts.length, null);
+		for (i in 0...jsonScripts.length){
 			// entries are of the form: [x y stack]
-			var entry : Array<Dynamic> = scripts[i];
+			var entry : Array<Dynamic> = jsonScripts[i];
 			var b : Block = BlockIO.arrayToStack(entry[2], isStage);
 			b.x = entry[0];
 			b.y = entry[1];
 			scripts[i] = b;
-		}  // script comments  
-		
-		
-		
-		for (i in 0...scriptComments.length){
-			scriptComments[i] = ScratchComment.fromArray(scriptComments[i]);
-		}  // sounds  
-		
-		
-		
-		for (i in 0...sounds.length){
-			jsonObj = sounds[i];
+		}  
+
+
+		// script comments  
+		scriptComments = Compat.newArray(jsonScriptComments.length, null);
+		for (i in 0...jsonScriptComments.length){
+			scriptComments[i] = ScratchComment.fromArray(jsonScriptComments[i]);
+		}  
+
+
+		// sounds  
+		sounds = Compat.newArray(jsonSounds.length, null);
+		for (i in 0...jsonSounds.length){
+			jsonObj = jsonSounds[i];
 			sounds[i] = new ScratchSound("json temp", null);
 			sounds[i].readJSON(jsonObj);
-		}  // costumes  
-		
-		
-		
-		for (i in 0...costumes.length){
-			jsonObj = costumes[i];
-			costumes[i] = new ScratchCostume("json temp", null);
+		}  
+
+
+		// costumes  
+		costumes = Compat.newArray(jsonCostumes.length, null);
+		for (i in 0...jsonCostumes.length){
+			jsonObj = jsonCostumes[i];
+			costumes[i] = ScratchCostume.newEmptyCostume("json temp");
 			costumes[i].readJSON(jsonObj);
 		}
+
 	}
-	
+
+	private function isNaNOrInfinity(n : Float) : Bool{
+		if (n != n)             return true;  // NaN  ;
+		if (n == Math.POSITIVE_INFINITY)             return true;
+		if (n == Math.NEGATIVE_INFINITY)             return true;
+		return false;
+	}
+
+	//public function instantiateFromJSON(newStage : ScratchStage) : Void{
+		//var i : Int;
+		//var jsonObj : Dynamic;
+//
+		//// lists
+		//for (i in 0...lists.length){
+			//jsonObj = lists[i];
+			//var newList : ListWatcher = new ListWatcher();
+			//newList.readJSON(jsonObj);
+			//newList.target = this;
+			//newStage.addChild(newList);
+			//newList.updateTitleAndContents();
+			//lists[i] = newList;
+		//}  // scripts  
+//
+//
+//
+		//for (i in 0...scripts.length){
+			//// entries are of the form: [x y stack]
+			//var entry : Array<Dynamic> = scripts[i];
+			//var b : Block = BlockIO.arrayToStack(entry[2], isStage);
+			//b.x = entry[0];
+			//b.y = entry[1];
+			//scripts[i] = b;
+		//}  // script comments  
+//
+//
+//
+		//for (i in 0...scriptComments.length){
+			//scriptComments[i] = ScratchComment.fromArray(scriptComments[i]);
+		//}  // sounds  
+//
+//
+//
+		//for (i in 0...sounds.length){
+			//jsonObj = sounds[i];
+			//sounds[i] = new ScratchSound("json temp", null);
+			//sounds[i].readJSON(jsonObj);
+		//}  // costumes  
+//
+//
+//
+		//for (i in 0...costumes.length){
+			//jsonObj = costumes[i];
+			//costumes[i] = ScratchCostume.newEmptyCostume("json temp");
+			//costumes[i].readJSON(jsonObj);
+		//}
+	//}
+//
 	public function getSummary() : String{
 		var s : Array<Dynamic> = [];
 		s.push(h1(objName));
-		if (variables.length) {
+		if (variables.length != 0) {
 			s.push(h2(Translator.map("Variables")));
 			for (v in variables){
 				s.push("- " + v.name + " = " + v.value);
 			}
 			s.push("");
 		}
-		if (lists.length) {
+		if (lists.length != 0) {
 			s.push(h2(Translator.map("Lists")));
 			for (list in lists){
-				s.push("- " + list.listName + ((list.contents.length) ? ":" : ""));
+				s.push("- " + list.listName + ((list.contents.length != 0) ? ":" : ""));
 				for (item/* AS3HX WARNING could not determine type for var: item exp: EField(EIdent(list),contents) type: null */ in list.contents){
 					s.push("    - " + item);
 				}
@@ -716,14 +777,14 @@ private static var Pop : Class<Dynamic>;
 			s.push("- " + costume.costumeName);
 		}
 		s.push("");
-		if (sounds.length) {
+		if (sounds.length != 0) {
 			s.push(h2(Translator.map("Sounds")));
 			for (sound in sounds){
 				s.push("- " + sound.soundName);
 			}
 			s.push("");
 		}
-		if (scripts.length) {
+		if (scripts.length != 0) {
 			s.push(h2(Translator.map("Scripts")));
 			for (script in scripts){
 				s.push(script.getSummary());
@@ -732,9 +793,11 @@ private static var Pop : Class<Dynamic>;
 		}
 		return s.join("\n");
 	}
-	
-	private static function h1(s : String, ch : String = "=") : String{
-		return s + "\n" + new Array<Dynamic>(s.length + 1).join(ch) + "\n";
+
+	private static function h1(s : String, ch : String = "=") : String {
+		var underline = "";
+		for (i in 0...s.length) underline += ch;
+		return s + "\n" + underline + "\n";
 	}
 	private static function h2(s : String) : String{
 		return h1(s, "-");
@@ -745,3 +808,5 @@ private static var Pop : Class<Dynamic>;
 		super();
 	}
 }
+
+//@:file("assets/pop.wav") class Pop extends ByteArray { }

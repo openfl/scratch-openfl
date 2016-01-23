@@ -19,62 +19,57 @@
 
 package ui;
 
-//import ui.Bitmap;
-//import ui.BitmapData;
-//import ui.Button;
-//import ui.DialogBox;
-//import ui.Sprite;
-//import ui.Video;
 
-import flash.display.*;
-import flash.media.*;
+import openfl.display.*;
+import openfl.media.*;
 import translation.Translator;
 import uiwidgets.*;
 
-class CameraDialog extends DialogBox {
-	
-	private var saveFunc : Dynamic;
+class CameraDialog extends DialogBox
+{
+
+	private var saveFunc : BitmapData->Void;
 	private var picture : Bitmap;
-	private var video : Video;
-	
-	public static function strings() : Array<Dynamic>{
+	//private var video : Video;
+
+	public static function strings() : Array<String>{
 		return ["Camera", "Save", "Close"];
 	}
-	
-	public function new(saveFunc : Dynamic)
+
+	public function new(saveFunc : BitmapData->Void)
 	{
 		super();
 		this.saveFunc = saveFunc;
-		
+
 		addTitle(Translator.map("Camera"));
-		
+
 		var container : Sprite = new Sprite();
 		addWidget(container);
-		
+
 		picture = new Bitmap();
 		picture.bitmapData = new BitmapData(320, 240, true);
 		picture.visible = false;
 		container.addChild(picture);
-		
-		video = new Video(320, 240);
-		video.smoothing = true;
-		video.attachCamera(Camera.getCamera());
-		container.addChild(video);
-		
+
+		//video = new Video(320, 240);
+		//video.smoothing = true;
+		//video.attachCamera(Camera.getCamera());
+		//container.addChild(video);
+
 		var b : Button;
 		addChild(b = new Button(Translator.map("Save"), savePicture));
 		buttons.push(b);
 		addChild(b = new Button(Translator.map("Close"), closeDialog));
 		buttons.push(b);
 	}
-	
+
 	private function savePicture() : Void{
-		picture.bitmapData.draw(video);
-		if (saveFunc != null) 			(saveFunc(picture.bitmapData.clone()));
+		//picture.bitmapData.draw(video);
+		if (saveFunc != null)             (saveFunc(picture.bitmapData.clone()));
 	}
-	
+
 	public function closeDialog() : Void{
-		if (video != null) 			video.attachCamera(null);
-		if (parent) 			parent.removeChild(this);
+		//if (video != null)             video.attachCamera(null);
+		if (parent != null)             parent.removeChild(this);
 	}
 }

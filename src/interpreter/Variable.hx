@@ -27,19 +27,20 @@ package interpreter;
 
 import util.JSON;
 
-class Variable {
-	
+class Variable
+{
+
 	public var name : String;
 	public var value : Dynamic;
 	public var watcher : Dynamic;
 	public var isPersistent : Bool;
-	
+
 	public function new(vName : String, initialValue : Dynamic)
 	{
 		name = vName;
 		value = initialValue;
 	}
-	
+
 	public function writeJSON(json : util.JSON) : Void{
 		json.writeKeyValue("name", name);
 		json.writeKeyValue("value", value);

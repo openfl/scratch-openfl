@@ -1,0 +1,18 @@
+[
+{
+	"name": "Dog", 
+	"md5": "dogsprite.json", 
+	"type": "sprite", 
+	"tags": ["animals", "bitmap"], 
+	"__info_comments": "[scriptCount, costumeCount, soundCount]",
+	"info": [0, 1, 1]
+},
+{
+	"name": "Blue Ellipse", 
+	"md5": "blueellipsesprite.json", 
+	"type": "sprite", 
+	"tags": ["animals", "vector"], 
+	"info": [0, 1, 0]
+},
+
+]

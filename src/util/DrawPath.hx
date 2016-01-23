@@ -20,17 +20,19 @@
 package util;
 
 
-import flash.display.Graphics;
+import openfl.display.Graphics;
 
-class DrawPath {
-	
+class DrawPath
+{
+
 	public static function drawPath(path : Array<Dynamic>, g : Graphics) : Void{
 		var startx : Float = 0;
 		var starty : Float = 0;
 		var pathx : Float = 0;
 		var pathy : Float = 0;
 		for (item in path){
-			switch (item[0].toLowerCase()) {
+			switch (item[0].toLowerCase())
+			{
 				case "m":
 					startx = item[1];
 					starty = item[2];

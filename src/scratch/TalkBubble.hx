@@ -19,19 +19,15 @@
 
 package scratch;
 
-//import scratch.Graphics;
-//import scratch.Shape;
-//import scratch.Sprite;
-//import scratch.TextField;
-//import scratch.TextFormat;
 
-import flash.display.*;
-import flash.text.*;
+import openfl.display.*;
+import openfl.text.*;
 
-class TalkBubble extends Sprite {
-	
+class TalkBubble extends Sprite
+{
+
 	public var pointsLeft : Bool;
-	
+
 	private var type : String;  // 'say' or 'think'  
 	private var style : String;  // 'say' or 'ask' or 'result'  
 	private var shape : Shape;
@@ -49,7 +45,7 @@ class TalkBubble extends Sprite {
 	private var pDrop : Int = 17;
 	private var pDropX : Int = 8;
 	private var lineWidth : Float = 3;
-	
+
 	public function new(s : String, type : String, style : String, source : Dynamic)
 	{
 		super();
@@ -77,51 +73,51 @@ class TalkBubble extends Sprite {
 		addChild(text);
 		setText(s);
 	}
-	
+
 	public function setDirection(dir : String) : Void{
 		// set direction of balloon tail to 'left' or 'right'
 		// and redraw balloon if necessary
 		var newValue : Bool = (dir == "left");
-		if (pointsLeft == newValue) 			return;
+		if (pointsLeft == newValue)             return;
 		pointsLeft = newValue;
-		setWidthHeight(text.width + padding * 2, text.height + padding * 2);
+		setWidthHeight(Std.int(text.width + padding * 2), Std.int(text.height + padding * 2));
 	}
-	
+
 	public function getText() : String{return text.text;
 	}
-	
+
 	public function getSource() : Dynamic{return source;
 	}
-	
+
 	private function setText(s : String) : Void{
 		var desiredWidth : Int = 135;
 		text.width = desiredWidth + 100;  // wider than desiredWidth  
 		text.text = s;
 		text.width = Math.max(minWidth, Math.min(text.textWidth + 8, desiredWidth));  // fix word wrap  
-		setWidthHeight(text.width + padding * 2, text.height + padding * 2);
+		setWidthHeight(Std.int(text.width + padding * 2), Std.int(text.height + padding * 2));
 	}
-	
+
 	private function setWidthHeight(w : Int, h : Int) : Void{
 		var g : Graphics = shape.graphics;
 		g.clear();
 		g.beginFill(0xFFFFFF);
 		g.lineStyle(lineWidth, outlineColor, 1, true);
-		if (type == "think") 			drawThink(w, h)
+		if (type == "think")             drawThink(w, h)
 		else drawTalk(w, h);
 	}
-	
+
 	private function makeText() : TextField{
 		var result : TextField = new TextField();
 		result.autoSize = TextFieldAutoSize.LEFT;
 		result.defaultTextFormat = style == ("result") ? resultFormat : textFormat;
 		result.selectable = false;  // not selectable  
-		result.type = "dynamic";  // not editable  
+		result.type = TextFieldType.DYNAMIC;  // not editable  
 		result.wordWrap = true;
 		result.x = padding;
 		result.y = padding;
 		return result;
 	}
-	
+
 	private function drawTalk(w : Int, h : Int) : Void{
 		var insetW : Int = w - radius;
 		var insetH : Int = h - radius;
@@ -146,7 +142,7 @@ class TalkBubble extends Sprite {
 		line(0, radius);
 		arc(radius, 0);
 	}
-	
+
 	private function drawThink(w : Int, h : Int) : Void{
 		var insetW : Int = w - radius;
 		var insetH : Int = h - radius;
@@ -170,27 +166,27 @@ class TalkBubble extends Sprite {
 			ellipse(w - 12, h + 15, 6, 4, 1);
 		}
 	}
-	
+
 	private function startAt(x : Int, y : Int) : Void{
 		shape.graphics.moveTo(x, y);
 		lastXY = [x, y];
 	}
-	
+
 	private function line(x : Int, y : Int) : Void{
 		shape.graphics.lineTo(x, y);
 		lastXY = [x, y];
 	}
-	
+
 	private function ellipse(x : Int, y : Int, w : Int, h : Int, lineW : Int) : Void{
 		shape.graphics.lineStyle(lineW, outlineColor);
 		shape.graphics.drawEllipse(x, y, w, h);
 	}
-	
+
 	private function arc(x : Int, y : Int) : Void{
 		// Draw a curve between two points. Compute control point by following an orthogonal vector
 		// from the midpoint of the L between p1 and p2 scaled by roundness * dist(p1, p2).
 		// If concave is true, invert the curvature.
-		
+
 		var roundness : Float = 0.42;  // approximates a quarter-circle  
 		var midX : Float = (lastXY[0] + x) / 2.0;
 		var midY : Float = (lastXY[1] + y) / 2.0;

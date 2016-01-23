@@ -26,11 +26,12 @@
 //		b. add a primitive for the new command to the interpreter
 
 
-import flash.display.Bitmap;
+import openfl.display.Bitmap;
 import assets.Resources;
 
-class Specs {
-	
+class Specs
+{
+
 	public static inline var GET_VAR : String = "readVariable";
 	public static inline var SET_VAR : String = "setVar:to:";
 	public static inline var CHANGE_VAR : String = "changeVar:by:";
@@ -38,7 +39,7 @@ class Specs {
 	public static inline var CALL : String = "call";
 	public static inline var PROCEDURE_DEF : String = "procDef";
 	public static inline var GET_PARAM : String = "getParam";
-	
+
 	public static inline var motionCategory : Int = 1;
 	public static inline var looksCategory : Int = 2;
 	public static inline var eventsCategory : Int = 5;
@@ -48,16 +49,16 @@ class Specs {
 	public static inline var myBlocksCategory : Int = 10;
 	public static inline var listCategory : Int = 12;
 	public static inline var extensionsCategory : Int = 20;
-	
+
 	public static var variableColor : Int = 0xEE7D16;  // Scratch 1.4: 0xF3761D  
 	public static var listColor : Int = 0xCC5B22;  // Scratch 1.4: 0xD94D11  
 	public static var procedureColor : Int = 0x632D99;  // 0x531E99;  
 	public static var parameterColor : Int = 0x5947B1;
 	public static var extensionsColor : Int = 0x4B4A60;  // 0x72228C; // 0x672D79;  
-	
+
 	private static inline var undefinedColor : Int = 0xD42828;
-	
-	public static var categories : Array<Dynamic> = [
+
+	public static var categories : Array<Array<Dynamic>> = [
 		// id   category name	color
 		[0, "undefined", 0xD42828], 
 		[1, "Motion", 0x4a6cd4], 
@@ -73,42 +74,42 @@ class Specs {
 		[11, "Parameter", parameterColor], 
 		[12, "List", listColor], 
 		[20, "Extension", extensionsColor]];
-	
+
 	public static function blockColor(categoryID : Int) : Int{
-		if (categoryID > 100) 			categoryID -= 100;
+		if (categoryID > 100)             categoryID -= 100;
 		for (entry in categories){
-			if (entry[0] == categoryID) 				return entry[2];
+			if (entry[0] == categoryID)                 return entry[2];
 		}
 		return undefinedColor;
 	}
-	
+
 	public static function entryForCategory(categoryName : String) : Array<Dynamic>{
 		for (entry in categories){
-			if (entry[1] == categoryName) 				return entry;
+			if (entry[1] == categoryName)                 return entry;
 		}
 		return [1, categoryName, 0xFF0000];
 	}
-	
+
 	public static function nameForCategory(categoryID : Int) : String{
-		if (categoryID > 100) 			categoryID -= 100;
+		if (categoryID > 100)             categoryID -= 100;
 		for (entry in categories){
-			if (entry[0] == categoryID) 				return entry[1];
+			if (entry[0] == categoryID)                 return entry[1];
 		}
 		return "Unknown";
 	}
-	
-	public static function IconNamed(name : String) : Dynamic{
+
+	public static function IconNamed(name : String) : Bitmap{
 		// Block icons are 2x resolution to look better when scaled.
-		var icon : Bitmap;
-		if (name == "greenFlag") 			icon = Resources.createBmp("flagIcon");
-		if (name == "stop") 			icon = Resources.createBmp("stopIcon");
-		if (name == "turnLeft") 			icon = Resources.createBmp("turnLeftIcon");
-		if (name == "turnRight") 			icon = Resources.createBmp("turnRightIcon");
-		if (icon != null) 			icon.scaleX = icon.scaleY = 0.5;
+		var icon : Bitmap = null;
+		if (name == "greenFlag")             icon = Resources.createBmp("flagIcon");
+		if (name == "stop")             icon = Resources.createBmp("stopIcon");
+		if (name == "turnLeft")             icon = Resources.createBmp("turnLeftIcon");
+		if (name == "turnRight")             icon = Resources.createBmp("turnRightIcon");
+		if (icon != null)             icon.scaleX = icon.scaleY = 0.5;
 		return icon;
 	}
-	
-	public static var commands : Array<Dynamic> = [
+
+	public static var commands : Array<Array<Dynamic>> = [
 		// block specification					type, cat, opcode			default args (optional)
 		// motion
 		["move %n steps", " ", 1, "forward:", 10], 
@@ -134,7 +135,7 @@ class Specs {
 		["x position", "r", 1, "xpos"], 
 		["y position", "r", 1, "ypos"], 
 		["direction", "r", 1, "heading"], 
-		
+
 		// looks
 		["say %s for %n secs", " ", 2, "say:duration:elapsed:from:", "Hello!", 2], 
 		["say %s", " ", 2, "say:", "Hello!"], 
@@ -161,7 +162,7 @@ class Specs {
 		["costume #", "r", 2, "costumeIndex"], 
 		["backdrop name", "r", 2, "sceneName"], 
 		["size", "r", 2, "scale"], 
-		
+
 		// stage looks
 		["switch backdrop to %m.backdrop", " ", 102, "startScene", "backdrop1"], 
 		["switch backdrop to %m.backdrop and wait", " ", 102, "startSceneAndWait", "backdrop1"], 
@@ -173,7 +174,7 @@ class Specs {
 		["-"], 
 		["backdrop name", "r", 102, "sceneName"], 
 		["backdrop #", "r", 102, "backgroundIndex"], 
-		
+
 		// sound
 		["play sound %m.sound", " ", 3, "playSound:", "pop"], 
 		["play sound %m.sound until done", " ", 3, "doPlaySoundAndWait", "pop"], 
@@ -184,7 +185,7 @@ class Specs {
 		["-"], 
 		["play note %d.note for %n beats", " ", 3, "noteOn:duration:elapsed:from:", 60, 0.5], 
 		["set instrument to %d.instrument", " ", 3, "instrument:", 1], 
-		
+
 		["-"], 
 		["change volume by %n", " ", 3, "changeVolumeBy:", -10], 
 		["set volume to %n%", " ", 3, "setVolumeTo:", 100], 
@@ -193,7 +194,7 @@ class Specs {
 		["change tempo by %n", " ", 3, "changeTempoBy:", 20], 
 		["set tempo to %n bpm", " ", 3, "setTempoTo:", 60], 
 		["tempo", "r", 3, "tempo"], 
-		
+
 		// pen
 		["clear", " ", 4, "clearPenTrails"], 
 		["-"], 
@@ -212,10 +213,10 @@ class Specs {
 		["change pen size by %n", " ", 4, "changePenSizeBy:", 1], 
 		["set pen size to %n", " ", 4, "penSize:", 1], 
 		["-"], 
-		
+
 		// stage pen
 		["clear", " ", 104, "clearPenTrails"], 
-		
+
 		// triggers
 		["when @greenFlag clicked", "h", 5, "whenGreenFlag"], 
 		["when %m.key key pressed", "h", 5, "whenKeyPressed", "space"], 
@@ -227,7 +228,7 @@ class Specs {
 		["when I receive %m.broadcast", "h", 5, "whenIReceive", ""], 
 		["broadcast %m.broadcast", " ", 5, "broadcast:", ""], 
 		["broadcast %m.broadcast and wait", " ", 5, "doBroadcastAndWait", ""], 
-		
+
 		// control - sprite
 		["wait %n secs", " ", 6, "wait:elapsed:from:", 1], 
 		["-"], 
@@ -245,7 +246,7 @@ class Specs {
 		["create clone of %m.spriteOnly", " ", 6, "createCloneOf"], 
 		["delete this clone", "f", 6, "deleteClone"], 
 		["-"], 
-		
+
 		// control - stage
 		["wait %n secs", " ", 106, "wait:elapsed:from:", 1], 
 		["-"], 
@@ -260,7 +261,7 @@ class Specs {
 		["stop %m.stop", "f", 106, "stopScripts", "all"], 
 		["-"], 
 		["create clone of %m.spriteOnly", " ", 106, "createCloneOf"], 
-		
+
 		// sensing
 		["touching %m.touching?", "b", 7, "touching:", ""], 
 		["touching color %c?", "b", 7, "touchingColor:"], 
@@ -289,7 +290,7 @@ class Specs {
 		["current %m.timeAndDate", "r", 7, "timeAndDate", "minute"], 
 		["days since 2000", "r", 7, "timestamp"], 
 		["username", "r", 7, "getUserName"], 
-		
+
 		// stage sensing
 		["ask %s and wait", " ", 107, "doAsk", "What's your name?"], 
 		["answer", "r", 107, "answer"], 
@@ -313,7 +314,7 @@ class Specs {
 		["current %m.timeAndDate", "r", 107, "timeAndDate", "minute"], 
 		["days since 2000", "r", 107, "timestamp"], 
 		["username", "r", 107, "getUserName"], 
-		
+
 		// operators
 		["%n + %n", "r", 8, "+", "", ""], 
 		["%n - %n", "r", 8, "-", "", ""], 
@@ -338,13 +339,13 @@ class Specs {
 		["round %n", "r", 8, "rounded", ""], 
 		["-"], 
 		["%m.mathOp of %n", "r", 8, "computeFunction:of:", "sqrt", 9], 
-		
+
 		// variables
 		["set %m.var to %s", " ", 9, SET_VAR], 
 		["change %m.var by %n", " ", 9, CHANGE_VAR], 
 		["show variable %m.var", " ", 9, "showVariable:"], 
 		["hide variable %m.var", " ", 9, "hideVariable:"], 
-		
+
 		// lists
 		["add %s to %m.list", " ", 12, "append:toList:"], 
 		["-"], 
@@ -358,12 +359,12 @@ class Specs {
 		["-"], 
 		["show list %m.list", " ", 12, "showList:"], 
 		["hide list %m.list", " ", 12, "hideList:"], 
-		
+
 		// obsolete blocks from Scratch 1.4 that may be used in older projects
 		["play drum %n for %n beats", " ", 98, "drum:duration:elapsed:from:", 1, 0.25],   // Scratch 1.4 MIDI drum  
 		["set instrument to %n", " ", 98, "midiInstrument:", 1], 
 		["loud?", "b", 98, "isLoud"], 
-		
+
 		// obsolete blocks from Scratch 1.4 that are converted to new forms (so should never appear):
 		["abs %n", "r", 98, "abs"], 
 		["sqrt %n", "r", 98, "sqrt"], 
@@ -372,7 +373,7 @@ class Specs {
 		["switch to background %m.costume", " ", 98, "showBackground:", "backdrop1"], 
 		["next background", " ", 98, "nextBackground"], 
 		["forever if %b", "cf", 98, "doForeverIf"], 
-		
+
 		// testing and experimental control prims
 		["noop", "r", 99, "COUNT"], 
 		["counter", "r", 99, "COUNT"], 
@@ -381,19 +382,19 @@ class Specs {
 		["for each %m.varName in %s", "c", 99, "doForLoop", "v", 10], 
 		["while %b", "c", 99, "doWhile"], 
 		["all at once", "c", 99, "warpSpeed"], 
-		
+
 		// stage motion (scrolling)
 		["scroll right %n", " ", 99, "scrollRight", 10], 
 		["scroll up %n", " ", 99, "scrollUp", 10], 
 		["align scene %m.scrollAlign", " ", 99, "scrollAlign", "bottom-left"], 
 		["x scroll", "r", 99, "xScroll"], 
 		["y scroll", "r", 99, "yScroll"], 
-		
+
 		// other obsolete blocks from alpha/beta
 		["hide all sprites", " ", 99, "hideAll"], 
 		["user id", "r", 99, "getUserId"]];
-	
-	public static var extensionSpecs : Array<Dynamic> = ["when %m.booleanSensor", "when %m.sensor %m.lessMore %n", "sensor %m.booleanSensor?", "%m.sensor sensor value", "turn %m.motor on for %n secs", "turn %m.motor on", "turn %m.motor off", "set %m.motor power to %n", "set %m.motor2 direction to %m.motorDirection", "when distance %m.lessMore %n", "when tilt %m.eNe %n", "distance", "tilt"];
+
+	public static var extensionSpecs : Array<String> = ["when %m.booleanSensor", "when %m.sensor %m.lessMore %n", "sensor %m.booleanSensor?", "%m.sensor sensor value", "turn %m.motor on for %n secs", "turn %m.motor on", "turn %m.motor off", "set %m.motor power to %n", "set %m.motor2 direction to %m.motorDirection", "when distance %m.lessMore %n", "when tilt %m.eNe %n", "distance", "tilt"];
 
 	public function new()
 	{

@@ -25,160 +25,149 @@
 
 package ui.media;
 
-import ui.media.Bitmap;
-import ui.media.BitmapData;
-import ui.media.DisplayObject;
-import ui.media.Graphics;
-import ui.media.IconButton;
-import ui.media.MediaLibrary;
-import ui.media.Scratch;
-import ui.media.ScratchCostume;
-import ui.media.ScrollFrameContents;
-import ui.media.Shape;
-import ui.media.Sprite;
-import ui.media.TextField;
-import ui.media.TextFormat;
 
-import flash.display.*;
-import flash.events.MouseEvent;
-import flash.net.URLLoader;
-import flash.text.*;
-import flash.utils.ByteArray;
+import openfl.display.*;
+import openfl.events.MouseEvent;
+import openfl.net.URLLoader;
+import openfl.text.*;
+import openfl.utils.ByteArray;
 import assets.Resources;
 import scratch.*;
-import sound.ScratchSoundPlayer;
-import sound.mp3.MP3SoundPlayer;
-import svgutils.SVGImporter;
+//import sound.ScratchSoundPlayer;
+//import sound.mp3.MP3SoundPlayer;
+//import svgutils.SVGImporter;
 import translation.Translator;
 import uiwidgets.*;
 import util.*;
 
-class MediaLibraryItem extends Sprite {
-	
+class MediaLibraryItem extends Sprite
+{
+
 	public var dbObj : Dynamic;
 	public var isSound : Bool;
-	
+
 	public var frameWidth : Int;
 	public var frameHeight : Int;
 	private var thumbnailWidth : Int;
 	private var thumbnailHeight : Int;
-	
+
 	private var labelFormat : TextFormat = new TextFormat(CSS.font, 14, CSS.textColor);
 	private var infoFormat : TextFormat = new TextFormat(CSS.font, 10, CSS.textColor);
-	
-	private static var spriteCache : Dynamic = { };  // maps md5 -> JSON for sprites  
+
+	private static var spriteCache : Map<String, String> = new Map<String, String>();  // maps md5 -> JSON for sprites  
 	private static var thumbnailCache : Dynamic = { };
-	
+
 	private var frame : Shape;  // visible when selected  
 	private var thumbnail : Bitmap;
 	private var label : DisplayObject;
 	private var info : TextField;
 	private var playButton : IconButton;
-	
+
 	private var sndData : ByteArray;
-	private var sndPlayer : ScratchSoundPlayer;
-	
-	private var loaders : Array<Dynamic> = [];  // list of URLLoaders for stopLoading()  
-	
+	//private var sndPlayer : ScratchSoundPlayer;
+
+	private var loaders : Array<URLLoader> = [];  // list of URLLoaders for stopLoading()  
+
 	public function new(dbObject : Dynamic = null)
 	{
 		super();
 		this.dbObj = dbObject;
-		if (dbObj.seconds) 			isSound = true;
-		
+		if (dbObj.seconds)             isSound = true;
+
 		frameWidth = (isSound) ? 115 : 140;
 		frameHeight = (isSound) ? 95 : 140;
 		thumbnailWidth = (isSound) ? 68 : 120;
 		thumbnailHeight = (isSound) ? 51 : 90;
-		
+
 		addFrame();
 		addThumbnail();
 		addLabel();
 		addInfo();
 		unhighlight();
-		if (isSound) 			addPlayButton();
+		if (isSound)             addPlayButton();
 	}
-	
-	public static function strings() : Array<Dynamic>{return ["Costumes:", "Scripts:"];
+
+	public static function strings() : Array<String>{return ["Costumes:", "Scripts:"];
 	}
-	
+
 	// -----------------------------
 	// Thumbnail
 	//------------------------------
-	
-	public function loadThumbnail(done : Function) : Void{
+
+	public function loadThumbnail(done : Void->Void) : Void{
 		var ext : String = fileType(dbObj.md5);
-		if (["gif", "png", "jpg", "jpeg", "svg"].indexOf(ext) > -1) 			setImageThumbnail(dbObj.md5, done)
-		else if (ext == "json") 			setSpriteThumbnail(done);
+		if (["gif", "png", "jpg", "jpeg", "svg"].indexOf(ext) > -1)             setImageThumbnail(dbObj.md5, done)
+		else if (ext == "json")             setSpriteThumbnail(done);
 	}
-	
+
 	public function stopLoading() : Void{
-		var app : Scratch = try cast(root, Scratch) catch(e:Dynamic) null;
-		for (loader in loaders)if (loader != null) 			loader.close();
+		//var app : Scratch = try cast(root, Scratch) catch(e:Dynamic) null;
+		for (loader in loaders)if (loader != null)             loader.close();
 		loaders = [];
 	}
-	
+
 	private function fileType(s : String) : String{
-		if (s == null) 			return "";
+		if (s == null)             return "";
 		var i : Int = s.lastIndexOf(".");
 		return ((i < 0)) ? "" : s.substring(i + 1);
 	}
-	
+
 	// all paths must call done() even on failure!
-	private function setImageThumbnail(md5 : String, done : Function, spriteMD5 : String = null) : Void{
+	private function setImageThumbnail(md5 : String, done : Void->Void, spriteMD5 : String = null) : Void{
 		var forStage : Bool = (dbObj.width == 480);  // if width is 480, format thumbnail for stage  
-		var importer : SVGImporter;
-		function gotSVGData(data : ByteArray) : Void{
-			if (data != null) {
-				importer = new SVGImporter(cast((data), XML));
-				importer.loadAllImages(svgImagesLoaded);
-			}
-			else {
-				done();
-			}
-		};
-		function svgImagesLoaded() : Void{
-			var c : ScratchCostume = new ScratchCostume("", null);
-			c.setSVGRoot(importer.root, false);
-			setThumbnail(c.thumbnail(thumbnailWidth, thumbnailHeight, forStage));
-			done();
-		};
+		//var importer : SVGImporter;
+		//function gotSVGData(data : ByteArray) : Void{
+			//if (data != null) {
+				//importer = new SVGImporter(cast((data), XML));
+				//importer.loadAllImages(svgImagesLoaded);
+			//}
+			//else {
+				//done();
+			//}
+		//};
+		//function svgImagesLoaded() : Void{
+			//var c : ScratchCostume = ScratchCostume.newEmptyCostume("");
+			//c.setSVGRoot(importer.root, false);
+			//setThumbnail(c.thumbnail(thumbnailWidth, thumbnailHeight, forStage));
+			//done();
+		//};
 		function setThumbnail(bm : BitmapData) : Void{
 			if (bm != null) {
 				Reflect.setField(thumbnailCache, md5, bm);
-				if (spriteMD5 != null) 					Reflect.setField(thumbnailCache, spriteMD5, bm);
+				if (spriteMD5 != null)                     Reflect.setField(thumbnailCache, spriteMD5, bm);
 				setThumbnailBM(bm);
 			}
 			done();
 		}  // first, check the thumbnail cache  ;
-		
+
 		var cachedBM : BitmapData = Reflect.field(thumbnailCache, md5);
 		if (cachedBM != null) {setThumbnailBM(cachedBM);done();return;
 		}  // if not in the thumbnail cache, fetch/compute it  
-		
-		
-		
-		if (fileType(md5) == "svg") 			loaders.push(Scratch.app.server.getAsset(md5, gotSVGData))
+
+
+
+		//if (fileType(md5) == "svg")             loaders.push(Scratch.app.server.getAsset(md5, gotSVGData))
 		else loaders.push(Scratch.app.server.getThumbnail(md5, thumbnailWidth, thumbnailHeight, setThumbnail));
 	}
-	
+
 	// all paths must call done() even on failure!
-	private function setSpriteThumbnail(done : Function) : Void{
-		function gotJSONData(data : String) : Void{
-			var md5 : String;
+	private function setSpriteThumbnail(done : Void->Void) : Void{
+		var spriteMD5 : String = dbObj.md5;
+		function gotJSONData(data : String) : Void {
+			var md5 : String = null;
 			if (data != null) {
 				var sprObj : Dynamic = util.JSON.parse(data);
-				Reflect.setField(spriteCache, spriteMD5, data);
+				spriteCache[spriteMD5] = data;
 				dbObj.scriptCount = ((Std.is(sprObj.scripts, Array))) ? sprObj.scripts.length : 0;
 				dbObj.costumeCount = ((Std.is(sprObj.costumes, Array))) ? sprObj.costumes.length : 0;
 				dbObj.soundCount = ((Std.is(sprObj.sounds, Array))) ? sprObj.sounds.length : 0;
-				if (dbObj.scriptCount > 0) 					setInfo(Translator.map("Scripts:") + " " + dbObj.scriptCount)
-				else if (dbObj.costumeCount > 1) 					setInfo(Translator.map("Costumes:") + " " + dbObj.costumeCount)
+				if (dbObj.scriptCount > 0)                     setInfo(Translator.map("Scripts:") + " " + dbObj.scriptCount)
+				else if (dbObj.costumeCount > 1)                     setInfo(Translator.map("Costumes:") + " " + dbObj.costumeCount)
 				else setInfo("");
 				if ((Std.is(sprObj.costumes, Array)) && (Std.is(sprObj.currentCostumeIndex, Float))) {
 					var cList : Array<Dynamic> = sprObj.costumes;
 					var cObj : Dynamic = cList[Math.round(sprObj.currentCostumeIndex) % cList.length];
-					if (cObj != null) 						md5 = cObj.baseLayerMD5;
+					if (cObj != null)                         md5 = cObj.baseLayerMD5;
 				}
 			}
 			if (md5 != null) {
@@ -188,30 +177,37 @@ class MediaLibraryItem extends Sprite {
 				done();
 			}
 		}  // first, check the thumbnail cache  ;
-		
-		var spriteMD5 : String = dbObj.md5;
+		function gotRawJSONData(rawData : ByteArray) : Void {
+			var data : String = null;
+			if (rawData != null)
+				data = rawData.readUTFBytes(rawData.length);
+			gotJSONData(data);
+		}
+
 		var cachedBM : BitmapData = Reflect.field(thumbnailCache, spriteMD5);
 		if (cachedBM != null) {setThumbnailBM(cachedBM);done();return;
 		}
-		
-		if (Reflect.field(spriteCache, spriteMD5)) 			gotJSONData(Reflect.field(spriteCache, spriteMD5))
-		else loaders.push(Scratch.app.server.getAsset(spriteMD5, gotJSONData));
+
+		if (spriteCache.exists(spriteMD5))             
+			gotJSONData(spriteCache[spriteMD5]);
+		else 
+			loaders.push(Scratch.app.server.getAsset(spriteMD5, gotRawJSONData));
 	}
-	
+
 	private function setThumbnailBM(bm : BitmapData) : Void{
 		thumbnail.bitmapData = bm;
 		thumbnail.x = (frameWidth - thumbnail.width) / 2;
 	}
-	
+
 	private function setInfo(s : String) : Void{
 		info.text = s;
 		info.x = Math.max(0, (frameWidth - info.textWidth) / 2);
 	}
-	
+
 	// -----------------------------
 	// Parts
 	//------------------------------
-	
+
 	private function addFrame() : Void{
 		frame = new Shape();
 		var g : Graphics = frame.graphics;
@@ -221,7 +217,7 @@ class MediaLibraryItem extends Sprite {
 		g.endFill();
 		addChild(frame);
 	}
-	
+
 	private function addThumbnail() : Void{
 		if (isSound) {
 			thumbnail = Resources.createBmp("speakerOff");
@@ -236,7 +232,7 @@ class MediaLibraryItem extends Sprite {
 		}
 		addChild(thumbnail);
 	}
-	
+
 	private function addLabel() : Void{
 		var objName : String = (dbObj.name) ? dbObj.name : "";
 		var tf : TextField = Resources.makeLabel(objName, labelFormat);
@@ -245,121 +241,121 @@ class MediaLibraryItem extends Sprite {
 		label.y = frameHeight - 32;
 		addChild(label);
 	}
-	
+
 	private function addInfo() : Void{
 		info = Resources.makeLabel("", infoFormat);
 		info.x = Math.max(0, (frameWidth - info.textWidth) / 2);
 		info.y = frameHeight - 17;
 		addChild(info);
 	}
-	
+
 	private function addPlayButton() : Void{
 		playButton = new IconButton(toggleSoundPlay, "play");
 		playButton.x = 75;
 		playButton.y = 28;
 		addChild(playButton);
 	}
-	
+
 	private function setText(tf : TextField, s : String) : Void{
 		// Set the text of the given TextField, truncating if necessary.
-		var desiredWidth : Int = frame.width - 6;
+		var desiredWidth : Int = Std.int(frame.width - 6);
 		tf.text = s;
 		while ((tf.textWidth > desiredWidth) && (s.length > 0)){
 			s = s.substring(0, s.length - 1);
 			tf.text = s + "\u2026";
 		}
 	}
-	
+
 	// -----------------------------
 	// User interaction
 	//------------------------------
-	
+
 	public function click(evt : MouseEvent) : Void{
-		if (!evt.shiftKey) 			unhighlightAll();
+		if (!evt.shiftKey)             unhighlightAll();
 		toggleHighlight();
 	}
-	
+
 	public function doubleClick(evt : MouseEvent) : Void{
-		if (!evt.shiftKey) 			unhighlightAll();
+		if (!evt.shiftKey)             unhighlightAll();
 		highlight();
 		var lib : MediaLibrary = try cast(parent.parent.parent, MediaLibrary) catch(e:Dynamic) null;
-		if (lib != null) 			lib.addSelected();
+		if (lib != null)             lib.addSelected();
 	}
-	
+
 	// -----------------------------
 	// Highlighting
 	//------------------------------
-	
+
 	public function isHighlighted() : Bool{return frame.alpha == 1;
 	}
-	private function toggleHighlight() : Void{if (frame.alpha == 1) 			unhighlight()
+	private function toggleHighlight() : Void{if (frame.alpha == 1)             unhighlight()
 		else highlight();
 	}
-	
+
 	private function highlight() : Void{
 		if (frame.alpha != 1) {
 			frame.alpha = 1;
 			info.visible = true;
 		}
 	}
-	
+
 	private function unhighlight() : Void{
 		if (frame.alpha != 0) {
 			frame.alpha = 0;
 			info.visible = false;
 		}
 	}
-	
+
 	private function unhighlightAll() : Void{
 		var contents : ScrollFrameContents = try cast(parent, ScrollFrameContents) catch(e:Dynamic) null;
 		if (contents != null) {
 			for (i in 0...contents.numChildren){
 				var item : MediaLibraryItem = try cast(contents.getChildAt(i), MediaLibraryItem) catch(e:Dynamic) null;
-				if (item != null) 					item.unhighlight();
+				if (item != null)                     item.unhighlight();
 			}
 		}
 	}
-	
+
 	// -----------------------------
 	// Play Sound
 	//------------------------------
-	
+
 	private function toggleSoundPlay(b : IconButton) : Void{
-		if (sndPlayer != null) 			stopPlayingSound(null)
-		else startPlayingSound();
+		//if (sndPlayer != null)             stopPlayingSound(null)
+		//else startPlayingSound();
 	}
-	
+
 	private function stopPlayingSound(ignore : Dynamic) : Void{
-		if (sndPlayer != null) 			sndPlayer.stopPlaying();
-		sndPlayer = null;
-		playButton.turnOff();
+		//if (sndPlayer != null)             sndPlayer.stopPlaying();
+		//sndPlayer = null;
+		//playButton.turnOff();
 	}
-	
+
 	private function startPlayingSound() : Void{
-		if (sndData != null) {
-			if (ScratchSound.isWAV(sndData)) {
-				sndPlayer = new ScratchSoundPlayer(sndData);
-			}
-			else {
-				sndPlayer = new MP3SoundPlayer(sndData);
-			}
-		}
-		if (sndPlayer != null) {
-			sndPlayer.startPlaying(stopPlayingSound);
-			playButton.turnOn();
-		}
-		else {
-			downloadAndPlay();
-		}
+		//if (sndData != null) {
+			//if (ScratchSound.isWAV(sndData)) {
+				//sndPlayer = new ScratchSoundPlayer(sndData);
+			//}
+			//else {
+				//sndPlayer = new MP3SoundPlayer(sndData);
+			//}
+		//}
+		//if (sndPlayer != null) {
+			//sndPlayer.startPlaying(stopPlayingSound);
+			//playButton.turnOn();
+		//}
+		//else {
+			//downloadAndPlay();
+		//}
 	}
-	
+
 	private function downloadAndPlay() : Void{
-		// Download and play a library sound.
-		function gotSoundData(wavData : ByteArray) : Void{
-			if (wavData == null) 				return;
-			sndData = wavData;
-			startPlayingSound();
-		};
-		Scratch.app.server.getAsset(dbObj.md5, gotSoundData);
+		//// Download and play a library sound.
+		//function gotSoundData(wavData : ByteArray) : Void{
+			//if (wavData == null)                 return;
+			//sndData = wavData;
+			//startPlayingSound();
+		//};
+		//Scratch.app.server.getAsset(dbObj.md5, gotSoundData);
 	}
 }

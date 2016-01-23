@@ -24,69 +24,65 @@
 
 package primitives;
 
-import primitives.NotePlayer;
-import primitives.Scratch;
-import primitives.ScratchSound;
-import primitives.ScratchSoundPlayer;
-import primitives.Thread;
 
 import blocks.Block;
-import flash.utils.Dictionary;
 import interpreter.*;
 import scratch.*;
 import sound.*;
 
-class SoundPrims {
-	
+class SoundPrims
+{
+
 	private var app : Scratch;
 	private var interp : Interpreter;
-	
+
 	public function new(app : Scratch, interpreter : Interpreter)
 	{
 		this.app = app;
 		this.interp = interpreter;
 	}
-	
-	public function addPrimsTo(primTable : Dictionary) : Void{
-		Reflect.setField(primTable, "playSound:", primPlaySound);
-		Reflect.setField(primTable, "doPlaySoundAndWait", primPlaySoundUntilDone);
-		Reflect.setField(primTable, "stopAllSounds", function(b : Dynamic) : Dynamic{ScratchSoundPlayer.stopAllSounds();
-		});
-		
-		Reflect.setField(primTable, "drum:duration:elapsed:from:", primPlayDrum);  // Scratch 1.4 drum numbers  
-		Reflect.setField(primTable, "playDrum", primPlayDrum);
-		Reflect.setField(primTable, "rest:elapsed:from:", primPlayRest);
-		
-		Reflect.setField(primTable, "noteOn:duration:elapsed:from:", primPlayNote);
-		Reflect.setField(primTable, "midiInstrument:", primSetInstrument);  // Scratch 1.4 instrument numbers  
-		Reflect.setField(primTable, "instrument:", primSetInstrument);
-		
-		Reflect.setField(primTable, "changeVolumeBy:", primChangeVolume);
-		Reflect.setField(primTable, "setVolumeTo:", primSetVolume);
-		Reflect.setField(primTable, "volume", primVolume);
-		
-		Reflect.setField(primTable, "changeTempoBy:", function(b : Dynamic) : Dynamic{
-			app.stagePane.setTempo(app.stagePane.tempoBPM + interp.numarg(b, 0));
-			interp.redraw();
-		});
-		Reflect.setField(primTable, "setTempoTo:", function(b : Dynamic) : Dynamic{
-			app.stagePane.setTempo(interp.numarg(b, 0));
-			interp.redraw();
-		});
-		Reflect.setField(primTable, "tempo", function(b : Dynamic) : Dynamic{return app.stagePane.tempoBPM;
-		});
+
+	public function addPrimsTo(primTable : Map<String, Block->Dynamic>) : Void{
+		//primTable[ "playSound:"] = primPlaySound;
+		//primTable[ "doPlaySoundAndWait"] = primPlaySoundUntilDone;
+		//primTable[ "stopAllSounds"] = function(b : Dynamic) : Dynamic{ScratchSoundPlayer.stopAllSounds();
+		//};
+//
+		//primTable[ "drum:duration:elapsed:from:"] = primPlayDrum;  // Scratch 1.4 drum numbers  
+		//primTable[ "playDrum"] = primPlayDrum;
+		//primTable[ "rest:elapsed:from:"] = primPlayRest;
+//
+		//primTable[ "noteOn:duration:elapsed:from:"] = primPlayNote;
+		//primTable[ "midiInstrument:"] = primSetInstrument;  // Scratch 1.4 instrument numbers  
+		//primTable[ "instrument:"] = primSetInstrument;
+//
+		//primTable[ "changeVolumeBy:"] = primChangeVolume;
+		//primTable[ "setVolumeTo:"] = primSetVolume;
+		//primTable[ "volume"] = primVolume;
+//
+		//primTable[ "changeTempoBy:"] = function(b : Dynamic) : Dynamic{
+			//app.stagePane.setTempo(app.stagePane.tempoBPM + interp.numarg(b, 0));
+			//interp.redraw();
+		//};
+		//primTable[ "setTempoTo:"] = function(b : Dynamic) : Dynamic{
+			//app.stagePane.setTempo(interp.numarg(b, 0));
+			//interp.redraw();
+		//};
+		//primTable[ "tempo"] = function(b : Dynamic) : Dynamic{return app.stagePane.tempoBPM;
+		//};
 	}
-	
+
+	/*
 	private function primPlaySound(b : Block) : Void{
 		var snd : ScratchSound = interp.targetObj().findSound(interp.arg(b, 0));
-		if (snd != null) 			playSound(snd, interp.targetObj());
+		if (snd != null)             playSound(snd, interp.targetObj());
 	}
-	
+
 	private function primPlaySoundUntilDone(b : Block) : Void{
 		var activeThread : Thread = interp.activeThread;
 		if (activeThread.firstTime) {
 			var snd : ScratchSound = interp.targetObj().findSound(interp.arg(b, 0));
-			if (snd == null) 				return;
+			if (snd == null)                 return;
 			activeThread.tmpObj = playSound(snd, interp.targetObj());
 			activeThread.firstTime = false;
 		}
@@ -99,10 +95,10 @@ class SoundPrims {
 			interp.doYield();
 		}
 	}
-	
+
 	private function primPlayNote(b : Block) : Void{
 		var s : ScratchObj = interp.targetObj();
-		if (s == null) 			return;
+		if (s == null)             return;
 		if (interp.activeThread.firstTime) {
 			var key : Float = interp.numarg(b, 0);
 			var secs : Float = beatsToSeconds(interp.numarg(b, 1));
@@ -113,10 +109,10 @@ class SoundPrims {
 			interp.checkTimer();
 		}
 	}
-	
+
 	private function primPlayDrum(b : Block) : Void{
 		var s : ScratchObj = interp.targetObj();
-		if (s == null) 			return;
+		if (s == null)             return;
 		if (interp.activeThread.firstTime) {
 			var drum : Int = Math.round(interp.numarg(b, 0));
 			var isMIDI : Bool = (b.op == "drum:duration:elapsed:from:");
@@ -128,35 +124,35 @@ class SoundPrims {
 			interp.checkTimer();
 		}
 	}
-	
+
 	private function playSound(s : ScratchSound, client : ScratchObj) : ScratchSoundPlayer{
 		var player : ScratchSoundPlayer = s.sndplayer();
 		player.client = client;
 		player.startPlaying();
 		return player;
 	}
-	
+
 	private function playDrum(drum : Int, isMIDI : Bool, secs : Float, client : ScratchObj) : ScratchSoundPlayer{
 		var player : NotePlayer = SoundBank.getDrumPlayer(drum, isMIDI, secs);
-		if (player == null) 			return null;
+		if (player == null)             return null;
 		player.client = client;
 		player.setDuration(secs);
 		player.startPlaying();
 		return player;
 	}
-	
+
 	private function playNote(instrument : Int, midiKey : Float, secs : Float, client : ScratchObj) : ScratchSoundPlayer{
 		var player : NotePlayer = SoundBank.getNotePlayer(instrument, midiKey);
-		if (player == null) 			return null;
+		if (player == null)             return null;
 		player.client = client;
 		player.setNoteAndDuration(midiKey, secs);
 		player.startPlaying();
 		return player;
 	}
-	
+
 	private function primPlayRest(b : Block) : Void{
 		var s : ScratchObj = interp.targetObj();
-		if (s == null) 			return;
+		if (s == null)             return;
 		if (interp.activeThread.firstTime) {
 			var secs : Float = beatsToSeconds(interp.numarg(b, 0));
 			interp.startTimer(secs);
@@ -165,11 +161,11 @@ class SoundPrims {
 			interp.checkTimer();
 		}
 	}
-	
+
 	private function beatsToSeconds(beats : Float) : Float{
 		return (beats * 60) / app.stagePane.tempoBPM;
 	}
-	
+
 	private function primSetInstrument(b : Block) : Void{
 		// Set Scratch 2.0 instrument.
 		var instr : Int = interp.numarg(b, 0) - 1;
@@ -178,9 +174,9 @@ class SoundPrims {
 			instr = instrumentMap[instr] - 1;
 		}
 		instr = Math.max(0, Math.min(instr, SoundBank.instrumentNames.length - 1));
-		if (interp.targetObj()) 			interp.targetObj().instrument = instr;
+		if (interp.targetObj())             interp.targetObj().instrument = instr;
 	}
-	
+
 	private function primChangeVolume(b : Block) : Void{
 		var s : ScratchObj = interp.targetObj();
 		if (s != null) {
@@ -188,7 +184,7 @@ class SoundPrims {
 			interp.redraw();
 		}
 	}
-	
+
 	private function primSetVolume(b : Block) : Void{
 		var s : ScratchObj = interp.targetObj();
 		if (s != null) {
@@ -196,12 +192,12 @@ class SoundPrims {
 			interp.redraw();
 		}
 	}
-	
+
 	private function primVolume(b : Block) : Float{
 		var s : ScratchObj = interp.targetObj();
 		return ((s != null)) ? s.volume : 0;
 	}
-	
+
 	// Map from a Scratch 1.4 (i.e. MIDI) instrument number to the closest Scratch 2.0 equivalent.
 	private var instrumentMap : Array<Dynamic> = [
 		// Acoustic Grand, Bright Acoustic, Electric Grand, Honky-Tonk
@@ -268,4 +264,5 @@ class SoundPrims {
 		21, 21, 21, 21, 
 		// Telephone Ring, Helicopter, Applause, Gunshot
 		21, 21, 21, 21];
+		*/
 }

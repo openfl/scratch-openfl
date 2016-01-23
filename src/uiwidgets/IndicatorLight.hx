@@ -24,38 +24,37 @@
 
 package uiwidgets;
 
-//import uiwidgets.Graphics;
-//import uiwidgets.Sprite;
 
-import flash.display.*;
-//import uiwidgets.SimpleTooltips;
+import openfl.display.*;
+import uiwidgets.SimpleTooltips;
 
-class IndicatorLight extends Sprite {
-	
+class IndicatorLight extends Sprite
+{
+
 	public var target : Dynamic;
-	
+
 	private var color : Int;
 	private var msg : String = "";
-	
+
 	public function new(target : Dynamic = null)
 	{
 		super();
 		this.target = target;
 		redraw();
 	}
-	
+
 	public function setColorAndMsg(color : Int, msg : String) : Void{
-		if ((color == this.color) && (msg == this.msg)) 			return  // no change  ;
+		if ((color == this.color) && (msg == this.msg))             return;  // no change  ;
 		this.color = color;
 		this.msg = msg;
-		SimpleTooltips.add(this, {
-					text : msg,
-					direction : "bottom",
+		SimpleTooltips.add(this, [
+					"text" => msg,
+					"direction" => "bottom",
 
-				});
+				]);
 		redraw();
 	}
-	
+
 	private function redraw() : Void{
 		var borderColor : Int = 0x505050;
 		var g : Graphics = graphics;

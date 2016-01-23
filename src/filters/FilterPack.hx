@@ -26,89 +26,92 @@
 
 package filters;
 
-//import filters.FisheyeKernel;
-//import filters.HSVKernel;
-//import filters.MosaicKernel;
-//import filters.PixelateKernel;
-//import filters.ScratchObj;
-//import filters.Shader;
-//import filters.ShaderFilter;
-//import filters.WhirlKernel;
+/*
+import filters.FisheyeKernel;
+import filters.HSVKernel;
+import filters.MosaicKernel;
+import filters.PixelateKernel;
+import filters.ScratchObj;
+import filters.Shader;
+import filters.ShaderFilter;
+import filters.WhirlKernel;
+*/
 
-import flash.display.*;
-import flash.filters.*;
-import flash.geom.ColorTransform;
-import flash.system.Capabilities;
+import openfl.display.*;
+import openfl.filters.*;
+import openfl.geom.ColorTransform;
+import openfl.system.Capabilities;
 import scratch.*;
 import util.*;
 
-class FilterPack {
-	public static var filterNames : Array<Dynamic> = [
+class FilterPack
+{
+	public static var filterNames : Array <String> = [
 		"color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost"];
-	
+
 	public var targetObj : ScratchObj;
 	private var filterDict : Dynamic;
-	
+/*    
 	@:meta(Embed(source="kernels/fisheye.pbj",mimeType="application/octet-stream"))
 
 	private var FisheyeKernel : Class<Dynamic>;
 	private var fisheyeShader : Shader = new Shader(Type.createInstance(FisheyeKernel, []));
-	
+
 	@:meta(Embed(source="kernels/hsv.pbj",mimeType="application/octet-stream"))
 
 	private var HSVKernel : Class<Dynamic>;
 	private var hsvShader : Shader = new Shader(Type.createInstance(HSVKernel, []));
-	
+
 	@:meta(Embed(source="kernels/mosaic.pbj",mimeType="application/octet-stream"))
 
 	private var MosaicKernel : Class<Dynamic>;
 	private var mosaicShader : Shader = new Shader(Type.createInstance(MosaicKernel, []));
-	
+
 	@:meta(Embed(source="kernels/pixelate.pbj",mimeType="application/octet-stream"))
 
 	private var PixelateKernel : Class<Dynamic>;
 	private var pixelateShader : Shader = new Shader(Type.createInstance(PixelateKernel, []));
-	
+
 	@:meta(Embed(source="kernels/whirl.pbj",mimeType="application/octet-stream"))
 
 	private var WhirlKernel : Class<Dynamic>;
 	private var whirlShader : Shader = new Shader(Type.createInstance(WhirlKernel, []));
-	
+*/    
 	public function new(targetObj : ScratchObj)
 	{
 		this.targetObj = targetObj;
-		this.filterDict = new Dynamic();
+		this.filterDict = {};
 		resetAllFilters();
 	}
-	
+
 	public function getAllSettings() : Dynamic{
 		return filterDict;
 	}
-	
+
 	public function resetAllFilters() : Void{
 		for (i in 0...filterNames.length){
 			Reflect.setField(filterDict, Std.string(filterNames[i]), 0);
 		}
 	}
-	
+
 	public function getFilterSetting(filterName : String) : Float{
 		var v : Dynamic = Reflect.field(filterDict, filterName);
-		if (!(Std.is(v, Float))) 			return 0;
+		if (!(Std.is(v, Float)))             return 0;
 		return v;
 	}
-	
+
 	public function setFilter(filterName : String, newValue : Float) : Bool{
-		if (newValue != newValue) 			return false;
-		if (filterName == "brightness") 			newValue = Math.max(-100, Math.min(newValue, 100));
-		if (filterName == "color") 			newValue = newValue % 200;
-		if (filterName == "ghost") 			newValue = Math.max(0, Math.min(newValue, 100));
-		
+		if (newValue != newValue)             return false;
+		if (filterName == "brightness")             newValue = Math.max(-100, Math.min(newValue, 100));
+		if (filterName == "color")             newValue = newValue % 200;
+		if (filterName == "ghost")             newValue = Math.max(0, Math.min(newValue, 100));
+
 		var oldValue : Float = Reflect.field(filterDict, filterName);
 		Reflect.setField(filterDict, filterName, newValue);
-		
+
 		return (newValue != oldValue);
 	}
-	
+
 	public function duplicateFor(target : ScratchObj) : FilterPack{
 		var result : FilterPack = new FilterPack(target);
 		for (i in 0...filterNames.length){
@@ -117,19 +120,19 @@ class FilterPack {
 		}
 		return result;
 	}
-	
-	private static var emptyArray : Array<Dynamic> = [];
-	private var newFilters : Array<Dynamic> = [];
-	public function buildFilters(force : Bool = false) : Array<Dynamic>{
+
+	private static var emptyArray : Array<openfl.filters.BitmapFilter> = [];
+	private var newFilters : Array<openfl.filters.BitmapFilter> = [];
+	public function buildFilters(force : Bool = false) : Array<openfl.filters.BitmapFilter>{
 		// disable filters not running on x86 because PixelBender is really slow
-		if ((Scratch.app.isIn3D || Capabilities.cpuArchitecture != "x86") && !force) 			return emptyArray;
-		
+		if ((Scratch.app.isIn3D || Capabilities.cpuArchitecture != "x86") && !force)             return emptyArray;
+
 		var scale : Float = (targetObj.isStage) ? 1 : Scratch.app.stagePane.scaleX;
 		var srcWidth : Float = targetObj.width * scale;
 		var srcHeight : Float = targetObj.height * scale;
 		var n : Float;
-		newFilters.length = 0;
-		
+		newFilters = [];
+		/*
 		if (Reflect.field(filterDict, "whirl") != 0) {
 			// range: -infinity..infinity
 			var radians : Float = (Math.PI * Reflect.field(filterDict, "whirl")) / 180;
@@ -159,7 +162,7 @@ class FilterPack {
 		if (Reflect.field(filterDict, "pixelate") != 0) {
 			// range of absolute value: 0..(10 * min(w, h))
 			n = (Math.abs(Reflect.field(filterDict, "pixelate")) / 10) + 1;
-			if (targetObj == Scratch.app.stagePane) 				n *= Scratch.app.stagePane.scaleX;
+			if (targetObj == Scratch.app.stagePane)                 n *= Scratch.app.stagePane.scaleX;
 			n = Math.min(n, Math.min(srcWidth, srcHeight));
 			pixelateShader.data.pixelSize.value = [n];
 			newFilters.push(new ShaderFilter(pixelateShader));
@@ -177,12 +180,13 @@ class FilterPack {
 			//			n = Math.max(-100, Math.min(filterDict["brightness"], 100));
 			//			hsvShader.data.brightnessShift.value = [n];
 			hsvShader.data.brightnessShift.value = [0];
-			
+
 			// hue range: -infinity..infinity
 			n = ((360.0 * Reflect.field(filterDict, "color")) / 200.0) % 360.0;
 			hsvShader.data.hueShift.value = [n];
 			newFilters.push(new ShaderFilter(hsvShader));
 		}
+		*/
 		return newFilters;
 	}
 }

@@ -23,44 +23,49 @@
 // This is the top-level application.
 
 package;
-
-import flash.errors.Error;
-
 import blocks.*;
-import flash.net.FileFilter;
+import haxe.io.Bytes;
+import js.html.FileReader;
+import js.html.InputElement;
+import js.Browser;
 
-import com.adobe.utils.StringUtil;
+//import com.adobe.utils.StringUtil;
 
-import extensions.ExtensionDevManager;
-import extensions.ExtensionManager;
+//import extensions.ExtensionDevManager;
+//import extensions.ExtensionManager;
 
-import flash.display.*;
-import flash.events.*;
-import flash.external.ExternalInterface;
-import flash.geom.Point;
-import flash.geom.Rectangle;
-import flash.net.FileReference;
-import flash.net.FileReferenceList;
-import flash.net.LocalConnection;
-import flash.net.URLLoader;
-import flash.net.URLLoaderDataFormat;
-import flash.net.URLRequest;
-import flash.net.URLVariables;
-import flash.system.*;
-import flash.text.*;
-import flash.utils.*;
+import openfl.Lib;
+import openfl.errors.Error;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.external.ExternalInterface;
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
+import openfl.net.FileFilter;
+import openfl.net.FileReference;
+import openfl.net.FileReferenceList;
+//import openfl.net.LocalConnection;
+import openfl.net.URLLoader;
+import openfl.net.URLLoaderDataFormat;
+import openfl.net.URLRequest;
+import openfl.system.*;
+import openfl.text.*;
+import openfl.utils.*;
 
 import interpreter.*;
 
+import logging.Log;
+import logging.LogEntry;
+import logging.LogLevel;
+
 import mx.utils.URLUtil;
 
-#if allow3d
-import render3d.DisplayObjectContainerIn3D;
-#end
+//import render3d.DisplayObjectContainerIn3D;
 
 import scratch.*;
+import scratch.PaletteBuilder;
 
-import svgeditor.tools.SVGTool;
+//import svgeditor.tools.SVGTool;
 
 import translation.*;
 
@@ -74,9 +79,9 @@ import util.*;
 
 import watchers.ListWatcher;
 
-class Scratch extends Sprite {
+class Scratch /*extends Sprite*/ {
 	// Version
-	public static inline var versionString:String = 'v439.1';
+	public static inline var versionString/*:String*/ = 'v440.1';
 	public static var app:Scratch; // static reference to the app, used for debugging
 
 	// Display modes
@@ -86,9 +91,7 @@ class Scratch extends Sprite {
 	public var isSmallPlayer:Bool; // true when displaying as a scaled-down player (e.g. in search results)
 	public var stageIsContracted:Bool; // true when the stage is half size to give more space on small screens
 	public var isIn3D:Bool;
-	#if allow3d
-	public var render3D:DisplayObjectContainerIn3D;
-	#end
+//	public var render3D:DisplayObjectContainerIn3D;
 	public var isArmCPU:Bool;
 	public var jsEnabled:Bool = false; // true when the SWF can talk to the webpage
 	public var ignoreResize:Bool = false; // If true, temporarily ignore resize events.
@@ -98,8 +101,8 @@ class Scratch extends Sprite {
 	// Runtime
 	public var runtime:ScratchRuntime;
 	public var interp:Interpreter;
-	public var extensionManager:ExtensionManager;
-	public var server:Server;
+	//public var extensionManager:ExtensionManager;
+	public var server:IServer;
 	public var gh:GestureHandler;
 	public var projectID:String = '';
 	public var projectOwner:String = '';
@@ -133,26 +136,51 @@ class Scratch extends Sprite {
 	private var scriptsPart:ScriptsPart;
 	public var imagesPart:ImagesPart;
 	public var soundsPart:SoundsPart;
-	public inline static var tipsBarClosedWidth:Int = 17;
+	public static inline var tipsBarClosedWidth = 17;
+
+	public var logger:Log = new Log(16);
 
 	public function new() {
-		SVGTool.setStage(stage);
-		loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
+		//super();
+		//SVGTool.setStage(stage);
+		openfl.Lib.current.root.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		app = this;
 
 		// This one must finish before most other queries can start, so do it separately
 		determineJSAccess();
 	}
 
+	// Certain Sprite variables don't seem to be configured properly when using Haxe, so I'll
+	// simply pretend to be a Sprite variable instead (requiring me to supply all the needed variables
+	// in another way)
+	public var stage(get, never):Stage;
+	public function get_stage() return openfl.Lib.current.root.stage;
+	public var loaderInfo(get, never):LoaderInfo;
+	public function get_loaderInfo() return openfl.Lib.current.root.loaderInfo;
+	public var scaleX(get, never) :Float;
+	public function get_scaleX() return openfl.Lib.current.root.scaleX;
+	public var scaleY(get, never) :Float;
+	public function get_scaleY() return openfl.Lib.current.root.scaleY;
+	public var mouseX(get, never) :Float;
+	public function get_mouseX() return openfl.Lib.current.root.mouseX;
+	public var mouseY(get, never) :Float;
+	public function get_mouseY() return openfl.Lib.current.root.mouseY;
+	public var numChildren(get, never) :Int;
+	public function get_numChildren() return openfl.Lib.current.numChildren;
+	public function getChildAt(index : Int) : DisplayObject { return Lib.current.getChildAt(index); }
+	public function addChild(child : DisplayObject) : DisplayObject { return openfl.Lib.current.addChild(child); }
+	public function addChildAt(child : DisplayObject, index : Int) : DisplayObject { return Lib.current.addChildAt(child, index); }
+	public function rootDisplayObject() : DisplayObject { return openfl.Lib.current.root; }
+
 	private function determineJSAccess():Void {
-		if (externalInterfaceAvailable()) {
-			try {
-				externalCall('function(){return true;}', jsAccessDetermined);
-				return; // wait for callback
-			}
-			catch (e:Error) {
-			}
-		}
+		//if (externalInterfaceAvailable()) {
+			//try {
+				//externalCall('function(){return true;}', jsAccessDetermined);
+				//return; // wait for callback
+			//}
+			//catch (e:Error) {
+			//}
+		//}
 		jsAccessDetermined(false);
 	}
 
@@ -162,19 +190,24 @@ class Scratch extends Sprite {
 	}
 
 	private function initialize():Void {
-		isOffline = !URLUtil.isHttpURL(loaderInfo.url);
-		hostProtocol = URLUtil.getProtocol(loaderInfo.url);
+		isOffline = true; // !URLUtil.isHttpURL(openfl.Lib.current.root.loaderInfo.url);
+		hostProtocol = URLUtil.getProtocol(openfl.Lib.current.root.loaderInfo.url);
 
-		isExtensionDevMode = (loaderInfo.parameters['extensionDevMode'] == 'true');
-		isMicroworld = (loaderInfo.parameters['microworldMode'] == 'true');
+		isExtensionDevMode = false; // (loaderInfo.parameters['extensionDevMode'] == 'true');
+		isMicroworld = false; //  (loaderInfo.parameters['microworldMode'] == 'true');
 
 		checkFlashVersion();
 		initServer();
 
+		
 		stage.align = StageAlign.TOP_LEFT;
 		stage.scaleMode = StageScaleMode.NO_SCALE;
 		stage.frameRate = 30;
-		stage['color'] = CSS.backgroundColor(); // this setter doesn't exist on Air 2.6, so silently does nothing.
+
+		//if (stage.hasOwnProperty('color')) {
+			//// Stage doesn't have a color property on Air 2.6, and Linux throws if you try to set it anyway.
+			//stage['color'] = CSS.backgroundColor();
+		//}
 
 		Block.setFonts(10, 9, true, 0); // default font sizes
 		Block.MenuHandlerFunction = BlockMenus.BlockMenuHandler;
@@ -182,7 +215,7 @@ class Scratch extends Sprite {
 		app = this;
 
 		stagePane = getScratchStage();
-		gh = new GestureHandler(this, (loaderInfo.parameters['inIE'] == 'true'));
+		gh = new GestureHandler(this, false); // (loaderInfo.parameters['inIE'] == 'true'));
 		initInterpreter();
 		initRuntime();
 		initExtensionManager();
@@ -199,7 +232,7 @@ class Scratch extends Sprite {
 		stage.addEventListener(MouseEvent.MOUSE_UP, gh.mouseUp);
 		stage.addEventListener(MouseEvent.MOUSE_WHEEL, gh.mouseWheel);
 		stage.addEventListener('rightClick', gh.rightMouseClick);
-		stage.addEventListener(KeyboardEvent.KEY_DOWN, function(evt:KeyboardEvent):Void {
+		stage.addEventListener(KeyboardEvent.KEY_DOWN, function(evt:KeyboardEvent): Void {
 			if (!evt.shiftKey && evt.charCode == 27) gh.escKeyDown();
 			else runtime.keyDown(evt);
 		});
@@ -231,70 +264,71 @@ class Scratch extends Sprite {
 	private function setupExternalInterface(oldWebsitePlayer:Bool):Void {
 		if (!jsEnabled) return;
 
-		addExternalCallback('ASloadExtension', extensionManager.loadRawExtension);
-		addExternalCallback('ASextensionCallDone', extensionManager.callCompleted);
-		addExternalCallback('ASextensionReporterDone', extensionManager.reporterCompleted);
-		addExternalCallback('AScreateNewProject', createNewProjectScratchX);
+		//addExternalCallback('ASloadExtension', extensionManager.loadRawExtension);
+		//addExternalCallback('ASextensionCallDone', extensionManager.callCompleted);
+		//addExternalCallback('ASextensionReporterDone', extensionManager.reporterCompleted);
+		//addExternalCallback('AScreateNewProject', createNewProjectScratchX);
 
-		if (isExtensionDevMode) {
-			addExternalCallback('ASloadGithubURL', loadGithubURL);
-			addExternalCallback('ASloadBase64SBX', loadBase64SBX);
-			addExternalCallback('ASsetModalOverlay', setModalOverlay);
-		}
+		//if (isExtensionDevMode) {
+			//addExternalCallback('ASloadGithubURL', loadGithubURL);
+			//addExternalCallback('ASloadBase64SBX', loadBase64SBX);
+			//addExternalCallback('ASsetModalOverlay', setModalOverlay);
+		//}
 	}
 
 	private function jsEditorReady():Void {
-		if (jsEnabled) {
-			externalCall('JSeditorReady', function (success:Bool):Void {
-				if (!success) jsThrowError('Calling JSeditorReady() failed.');
-			});
-		}
+		//if (jsEnabled) {
+			//externalCall('JSeditorReady', function (success:Bool):Void {
+				//if (!success) jsThrowError('Calling JSeditorReady() failed.');
+			//});
+		//}
 	}
 
-	private function loadSingleGithubURL(url:String):Void {
-		url = StringUtil.trim(unescape(url));
-
-		function handleComplete(e:Event):Void {
-			runtime.installProjectFromData(sbxLoader.data);
-			if (StringUtil.trim(projectName()).length == 0) {
-				var newProjectName:String = url;
-				var index:Int = newProjectName.indexOf('?');
-				if (index > 0) newProjectName = newProjectName.slice(0, index);
-				index = newProjectName.lastIndexOf('/');
-				if (index > 0) newProjectName = newProjectName.substr(index + 1);
-				index = newProjectName.lastIndexOf('.sbx');
-				if (index > 0) newProjectName = newProjectName.slice(0, index);
-				setProjectName(newProjectName);
-			}
-		}
-
-		function handleError(e:ErrorEvent):Void {
-			jsThrowError('Failed to load SBX: ' + e.toString());
-		}
-
-		var fileExtension:String = url.substr(url.lastIndexOf('.')).toLowerCase();
-		if (fileExtension == '.js') {
-			externalCall('ScratchExtensions.loadExternalJS', null, url);
-			return;
-		}
-
-		// Otherwise assume it's a project (SB2, SBX, etc.)
-		loadInProgress = true;
-		var request:URLRequest = new URLRequest(url);
-		var sbxLoader:URLLoader = new URLLoader(request);
-		sbxLoader.dataFormat = URLLoaderDataFormat.BINARY;
-		sbxLoader.addEventListener(Event.COMPLETE, handleComplete);
-		sbxLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, handleError);
-		sbxLoader.addEventListener(IOErrorEvent.IO_ERROR, handleError);
-		sbxLoader.load(request);
-	}
+	//private function loadSingleGithubURL(url:String):Void {
+		//url = StringTools.trim(unescape(url));
+//
+		//function handleComplete(e:Event):Void {
+			//runtime.installProjectFromData(sbxLoader.data);
+			//if (StringTools.trim(projectName()).length == 0) {
+				//var newProjectName:String = url;
+				//var index = Std.int(newProjectName.indexOf('?'));
+				//if (index > 0) newProjectName = newProjectName.slice(0, index);
+				//index = newProjectName.lastIndexOf('/');
+				//if (index > 0) newProjectName = newProjectName.substr(index + 1);
+				//index = newProjectName.lastIndexOf('.sbx');
+				//if (index > 0) newProjectName = newProjectName.slice(0, index);
+				//setProjectName(newProjectName);
+			//}
+		//}
+//
+		//function handleError(e:ErrorEvent):Void {
+			//jsThrowError('Failed to load SBX: ' + e.toString());
+		//}
+//
+		//var fileExtension:String = url.substr(url.lastIndexOf('.')).toLowerCase();
+		//if (fileExtension == '.js') {
+			//externalCall('ScratchExtensions.loadExternalJS', null, url);
+			//return;
+		//}
+//
+		//// Otherwise assume it's a project (SB2, SBX, etc.)
+		//loadInProgress = true;
+		//var request:URLRequest = new URLRequest(url);
+		//var sbxLoader:URLLoader = new URLLoader(request);
+		//sbxLoader.dataFormat = URLLoaderDataFormat.BINARY;
+		//sbxLoader.addEventListener(Event.COMPLETE, handleComplete);
+		//sbxLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, handleError);
+		//sbxLoader.addEventListener(IOErrorEvent.IO_ERROR, handleError);
+		//sbxLoader.load(request);
+	//}
 
 	private var pendingExtensionURLs:Array<Dynamic>;
-	private function loadGithubURL(urlOrArray:Dynamic):Void {
+	/*
+	private function loadGithubURL(urlOrArray:*):Void {
 		if (!isExtensionDevMode) return;
 
 		var url:String;
-		var urlArray:Array<Dynamic> = cast (urlOrArray, Array<Dynamic>);
+		var urlArray:Array = urlOrArray as Array;
 		if (urlArray) {
 			var urlCount:Int = urlArray.length;
 			var extensionURLs:Array = [];
@@ -302,7 +336,7 @@ class Scratch extends Sprite {
 			var index:Int;
 
 			// Filter URLs: allow at most one project file, and wait until it loads before loading extensions.
-			for (index in 0...urlCount) {
+			for (index = 0; index < urlCount; ++index) {
 				url = StringUtil.trim(unescape(urlArray[index]));
 				if (StringUtil.endsWith(url.toLowerCase(), '.js')) {
 					extensionURLs.push(url);
@@ -321,19 +355,19 @@ class Scratch extends Sprite {
 			}
 			else {
 				urlCount = extensionURLs.length;
-				for (index in 0...urlCount) {
+				for (index = 0; index < urlCount; ++index) {
 					loadSingleGithubURL(extensionURLs[index]);
 				}
 				externalCall('JSshowWarning');
 			}
 		}
 		else {
-			url = cast (urlOrArray, String);
+			url = urlOrArray as String;
 			loadSingleGithubURL(url);
 			externalCall('JSshowWarning');
 		}
 	}
-
+*/
 	private function loadBase64SBX(base64:String):Void {
 		var sbxData:ByteArray = Base64Encoder.decode(base64);
 		app.setProjectName('');
@@ -361,12 +395,12 @@ class Scratch extends Sprite {
 	}
 
 	private function initExtensionManager():Void {
-		if (isExtensionDevMode) {
-			extensionManager = new ExtensionDevManager(this);
-		}
-		else {
-			extensionManager = new ExtensionManager(this);
-		}
+		//if (isExtensionDevMode) {
+			//extensionManager = new ExtensionDevManager(this);
+		//}
+		//else {
+			//extensionManager = new ExtensionManager(this);
+		//}
 	}
 
 	private function initServer():Void {
@@ -390,7 +424,7 @@ class Scratch extends Sprite {
 		return isOffline || isExtensionDevMode;
 	}
 
-	public function getMediaLibrary(type:String, whenDone:Function):MediaLibrary {
+	public function getMediaLibrary(type:String, whenDone:Dynamic->Void):MediaLibrary {
 		return new MediaLibrary(this, type, whenDone);
 	}
 
@@ -408,23 +442,28 @@ class Scratch extends Sprite {
 
 	private function uncaughtErrorHandler(event:UncaughtErrorEvent):Void {
 		if (Std.is (event.error, Error)) {
-			var error:Error = cast event.error;
+			var error:Error = cast(event.error, Error);
 			logException(error);
 		}
-		else if (Std.is (event.error, ErrorEvent)) {
-			var errorEvent:ErrorEvent = cast event.error;
-			logMessage(errorEvent.toString());
+		else if (Std.is(event.error, ErrorEvent)) {
+			var errorEvent:ErrorEvent = cast(event.error, ErrorEvent);
+			log(LogLevel.ERROR, errorEvent.toString());
 		}
 	}
 
-	public function log(s:String):Void {
-		trace(s);
+	// All other log...() methods funnel to this one
+	public function log(severity:String, messageKey:String, extraData:Object = null):LogEntry {
+		return logger.log(severity, messageKey, extraData);
 	}
 
+	// Log an Error object generated by an exception
 	public function logException(e:Error):Void {
+		log(LogLevel.ERROR, e.toString());
 	}
 
-	public function logMessage(msg:String, extra_data:Dynamic = null):Void {
+	// Shorthand for log(LogLevel.ERROR, ...)
+	public function logMessage(msg:String, extra_data:Object = null):Void {
+		log(LogLevel.ERROR, msg, extra_data);
 	}
 
 	public function loadProjectFailed():Void {
@@ -434,15 +473,16 @@ class Scratch extends Sprite {
 	public function jsThrowError(s:String):Void {
 		// Throw the given string as an error in the browser. Errors on the production site are logged.
 		var errorString:String = 'SWF Error: ' + s;
-		log(errorString);
-		if (jsEnabled) {
-			externalCall('JSthrowError', null, errorString);
-		}
+		log(LogLevel.ERROR, errorString);
+		//if (jsEnabled) {
+			//externalCall('JSthrowError', null, errorString);
+		//}
 	}
 
 	private function checkFlashVersion():Void {
-		#if allow3d
-			if (Capabilities.playerType != "Desktop" || Capabilities.version.indexOf('IOS') == 0) {
+		/*
+		SCRATCH::allow3d {
+			if (Capabilities.playerType != "Desktop" || Capabilities.version.indexOf('IOS') === 0) {
 				var versionString:String = Capabilities.version.substr(Capabilities.version.indexOf(' ') + 1);
 				var versionParts:Array = versionString.split(',');
 				var majorVersion:Int = parseInt(versionParts[0]);
@@ -453,20 +493,21 @@ class Scratch extends Sprite {
 					return;
 				}
 			}
-		#end
-
-		render3D = null;
+		}
+*/
+		//render3D = null;
 	}
 
-	#if allow3d
-	private function handleRenderCallback(enabled:Bool):Void {
+	/*
+	SCRATCH::allow3d
+	protected function handleRenderCallback(enabled:Bool):Void {
 		if (!enabled) {
 			go2D();
 			render3D = null;
 		}
 		else {
-			for (i in 0...stagePane.numChildren) {
-				var spr:ScratchSprite = cast stagePane.getChildAt(i);
+			for (var i:Int = 0; i < stagePane.numChildren; ++i) {
+				var spr:ScratchSprite = (stagePane.getChildAt(i) as ScratchSprite);
 				if (spr) {
 					spr.clearCachedBitmap();
 					spr.updateCostume();
@@ -478,24 +519,27 @@ class Scratch extends Sprite {
 			stagePane.applyFilters();
 		}
 	}
-	#end
-
+*/
 	public function clearCachedBitmaps():Void {
 		for (i in 0...stagePane.numChildren) {
-			var spr:ScratchSprite = cast stagePane.getChildAt(i);
-			if (spr) spr.clearCachedBitmap();
+			var child = stagePane.getChildAt(i);
+			if (Std.is(child, ScratchSprite))
+			{
+				var spr:ScratchSprite = cast(child, ScratchSprite);
+				spr.clearCachedBitmap();
+			}
 		}
 		stagePane.clearCachedBitmap();
 
 		// unsupported technique that seems to force garbage collection
-		try {
-			new LocalConnection().connect('foo');
-			new LocalConnection().connect('foo');
-		} catch (e:Error) {
-		}
+		//try {
+			//new LocalConnection().connect('foo');
+			//new LocalConnection().connect('foo');
+		//} catch (e:Error) {
+		//}
 	}
-
-	#if allow3d
+/*
+	SCRATCH::allow3d
 	public function go3D():Void {
 		if (!render3D || isIn3D) return;
 
@@ -506,6 +550,7 @@ class Scratch extends Sprite {
 		isIn3D = true;
 	}
 
+	SCRATCH::allow3d
 	public function go2D():Void {
 		if (!render3D || !isIn3D) return;
 
@@ -514,8 +559,8 @@ class Scratch extends Sprite {
 		render3D.setStage(null, null);
 		stagePart.addChildAt(stagePane, i);
 		isIn3D = false;
-		for (i in 0...stagePane.numChildren) {
-			var spr:ScratchSprite = cast stagePane.getChildAt(i);
+		for (i = 0; i < stagePane.numChildren; ++i) {
+			var spr:ScratchSprite = (stagePane.getChildAt(i) as ScratchSprite);
 			if (spr) {
 				spr.clearCachedBitmap();
 				spr.updateCostume();
@@ -526,17 +571,16 @@ class Scratch extends Sprite {
 		stagePane.updateCostume();
 		stagePane.applyFilters();
 	}
-	#end
-
+*/
 	private var debugRect:Shape;
 
 	public function showDebugRect(r:Rectangle):Void {
 		// Used during debugging...
 		var p:Point = stagePane.localToGlobal(new Point(0, 0));
-		if (!debugRect) debugRect = new Shape();
+		if (debugRect == null) debugRect = new Shape();
 		var g:Graphics = debugRect.graphics;
 		g.clear();
-		if (r) {
+		if (r != null) {
 			g.lineStyle(2, 0xFFFF00);
 			g.drawRect(p.x + r.x, p.y + r.y, r.width, r.height);
 			addChild(debugRect);
@@ -566,7 +610,7 @@ class Scratch extends Sprite {
 		return stagePart.projectName();
 	}
 
-	public function highlightSprites(sprites:Array<Sprite>):Void {
+	public function highlightSprites(sprites:Array<Dynamic>):Void {
 		libraryPart.highlight(sprites);
 	}
 
@@ -592,20 +636,19 @@ class Scratch extends Sprite {
 	}
 
 	public function tabsRight():Int {
-		return tabsPart.x + tabsPart.w;
+		return Std.int(tabsPart.x + tabsPart.w);
 	}
 
 	public function enableEditorTools(flag:Bool):Void {
-		imagesPart.editor.enableTools(flag);
+		//imagesPart.editor.enableTools(flag);
 	}
-	
-	public var usesUserNameBlock (get, set):Bool;
-	
-	private function get_usesUserNameBlock():Bool {
+
+	public var usesUserNameBlock (get, set): Bool;
+	public function get_usesUserNameBlock():Bool {
 		return _usesUserNameBlock;
 	}
 
-	private function set_usesUserNameBlock(value:Bool):Bool {
+	public function set_usesUserNameBlock(value:Bool):Bool {
 		_usesUserNameBlock = value;
 		stagePart.refresh();
 		return value;
@@ -619,8 +662,8 @@ class Scratch extends Sprite {
 	}
 
 	public function setProjectName(s:String):Void {
-		if (s.slice(-3) == '.sb') s = s.slice(0, -3);
-		if (s.slice(-4) == '.sb2') s = s.slice(0, -4);
+		if (s.substr(-3) == '.sb') s = s.substr(0, s.length-3);
+		if (s.substr(-4) == '.sb2') s = s.substr(0, s.length-4);
 		stagePart.setProjectName(s);
 	}
 
@@ -631,12 +674,12 @@ class Scratch extends Sprite {
 			wasEditing = editMode;
 			if (wasEditing) {
 				setEditMode(false);
-				if (jsEnabled) externalCall('tip_bar_api.hide');
+				//if (jsEnabled) externalCall('tip_bar_api.hide');
 			}
 		} else {
 			if (wasEditing) {
 				setEditMode(true);
-				if (jsEnabled) externalCall('tip_bar_api.show');
+				//if (jsEnabled) externalCall('tip_bar_api.show');
 			}
 		}
 		if (isOffline) {
@@ -644,11 +687,13 @@ class Scratch extends Sprite {
 		}
 		for (o in stagePane.allObjects()) o.applyFilters();
 
-		if (lp) fixLoadProgressLayout();
+		if (lp != null) fixLoadProgressLayout();
 		stagePane.updateCostume();
-		#if allow3d
+/*
+		SCRATCH::allow3d {
 			if (isIn3D) render3D.onStageResize();
-		#end
+		}
+*/		
 	}
 
 	private function keyDown(evt:KeyboardEvent):Void {
@@ -665,9 +710,11 @@ class Scratch extends Sprite {
 //		}
 		// Handle ctrl-m and toggle 2d/3d mode
 		else if (evt.ctrlKey && evt.charCode == 109) {
-			#if allow3d
+			/*
+			SCRATCH::allow3d {
 				isIn3D ? go2D() : go3D();
-			#end
+			}
+			*/
 			evt.preventDefault();
 			evt.stopImmediatePropagation();
 		}
@@ -695,13 +742,18 @@ class Scratch extends Sprite {
 			o.updateScriptsAfterTranslation();
 		}
 
-		if (jsEnabled && isExtensionDevMode) {
-			if (pendingExtensionURLs) {
-				loadGithubURL(pendingExtensionURLs);
-				pendingExtensionURLs = null;
-			}
-			externalCall('JSprojectLoaded');
-		}
+		//if (jsEnabled && isExtensionDevMode) {
+			//if (pendingExtensionURLs) {
+				//loadGithubURL(pendingExtensionURLs);
+				//pendingExtensionURLs = null;
+			//}
+			//externalCall('JSprojectLoaded');
+		//}
+	}
+
+	public function resetPlugin():Void {
+		//if (jsEnabled)
+			//externalCall('ScratchExtensions.resetPlugin');
 	}
 
 	private function step(e:Event):Void {
@@ -728,8 +780,8 @@ class Scratch extends Sprite {
 	}
 
 	public function selectSprite(obj:ScratchObj):Void {
-		if (isShowing(imagesPart)) imagesPart.editor.shutdown();
-		if (isShowing(soundsPart)) soundsPart.editor.shutdown();
+		//if (isShowing(imagesPart)) imagesPart.editor.shutdown();
+		//if (isShowing(soundsPart)) soundsPart.editor.shutdown();
 		viewedObject = obj;
 		libraryPart.refresh();
 		tabsPart.refresh();
@@ -748,8 +800,8 @@ class Scratch extends Sprite {
 	}
 
 	public function setTab(tabName:String):Void {
-		if (isShowing(imagesPart)) imagesPart.editor.shutdown();
-		if (isShowing(soundsPart)) soundsPart.editor.shutdown();
+		//if (isShowing(imagesPart)) imagesPart.editor.shutdown();
+		//if (isShowing(soundsPart)) soundsPart.editor.shutdown();
 		hide(scriptsPart);
 		hide(imagesPart);
 		hide(soundsPart);
@@ -760,7 +812,7 @@ class Scratch extends Sprite {
 		} else if (tabName == 'sounds') {
 			soundsPart.refresh();
 			show(soundsPart);
-		} else if (tabName && (tabName.length > 0)) {
+		} else if (tabName != null && (tabName.length > 0)) {
 			tabName = 'scripts';
 			scriptsPart.updatePalette();
 			scriptsPane.viewScriptsFor(viewedObject);
@@ -845,7 +897,7 @@ class Scratch extends Sprite {
 	}
 
 	private function hide(obj:DisplayObject):Void {
-		if (obj.parent) obj.parent.removeChild(obj);
+		if (obj.parent != null) obj.parent.removeChild(obj);
 	}
 
 	private function show(obj:DisplayObject):Void {
@@ -893,21 +945,21 @@ class Scratch extends Sprite {
 		} else {
 			drawBG();
 			var pad:Int = (w > 550) ? 16 : 0; // add padding for full-screen mode
-			var scale:Number = Math.min((w - extraW - pad) / 480, (h - extraH - pad) / 360);
+			var scale:Float = Math.min((w - extraW - pad) / 480, (h - extraH - pad) / 360);
 			scale = Math.max(0.01, scale);
 			var scaledW:Int = Math.floor((scale * 480) / 4) * 4; // round down to a multiple of 4
 			scale = scaledW / 480;
-			var playerW:Number = (scale * 480) + extraW;
-			var playerH:Number = (scale * 360) + extraH;
-			stagePart.setWidthHeight(playerW, playerH, scale);
-			stagePart.x = int((w - playerW) / 2);
-			stagePart.y = int((h - playerH) / 2);
+			var playerW:Float = (scale * 480) + extraW;
+			var playerH:Float = (scale * 360) + extraH;
+			stagePart.setWidthHeight(Std.int(playerW), Std.int(playerH), scale);
+			stagePart.x = Std.int((w - playerW) / 2);
+			stagePart.y = Std.int((h - playerH) / 2);
 			fixLoadProgressLayout();
 			return;
 		}
 		libraryPart.x = stagePart.x;
 		libraryPart.y = stagePart.bottom() + 18;
-		libraryPart.setWidthHeight(stagePart.w, h - libraryPart.y);
+		libraryPart.setWidthHeight(Std.int(stagePart.w), Std.int(h - libraryPart.y));
 
 		tabsPart.x = stagePart.right() + 5;
 		if (!isMicroworld) {
@@ -918,10 +970,10 @@ class Scratch extends Sprite {
 			tabsPart.visible = false;
 
 		// the content area shows the part associated with the currently selected tab:
-		var contentY:Int = tabsPart.y + 27;
+		var contentY:Int = Std.int(tabsPart.y + 27);
 		if (!isMicroworld)
 			w -= tipsWidth();
-		updateContentArea(tabsPart.x, contentY, w - tabsPart.x - 6, h - contentY - 5, h);
+		updateContentArea(Std.int(tabsPart.x), Std.int(contentY), Std.int(w - tabsPart.x - 6), Std.int(h - contentY - 5), Std.int(h));
 	}
 
 	private function updateContentArea(contentX:Int, contentY:Int, contentW:Int, contentH:Int, fullH:Int):Void {
@@ -931,15 +983,16 @@ class Scratch extends Sprite {
 		soundsPart.setWidthHeight(contentW, contentH);
 		scriptsPart.setWidthHeight(contentW, contentH);
 
-		if (mediaLibrary) mediaLibrary.setWidthHeight(topBarPart.w, fullH);
-		if (frameRateGraph) {
+		if (mediaLibrary != null) mediaLibrary.setWidthHeight(topBarPart.w, fullH);
+		if (frameRateGraph != null) {
 			frameRateGraph.y = stage.stageHeight - frameRateGraphH;
 			addChild(frameRateGraph); // put in front
 		}
-
-		#if allow3d
+/*
+		SCRATCH::allow3d {
 			if (isIn3D) render3D.onStageResize();
-		#end
+		}
+*/		
 	}
 
 	private function drawBG():Void {
@@ -952,7 +1005,7 @@ class Scratch extends Sprite {
 	private var modalOverlay:Sprite;
 
 	public function setModalOverlay(enableOverlay:Bool):Void {
-		var currentlyEnabled:Bool = !!modalOverlay;
+		var currentlyEnabled:Bool = (modalOverlay != null);
 		if (enableOverlay != currentlyEnabled) {
 			if (enableOverlay) {
 				function eatEvent(event:MouseEvent):Void {
@@ -965,13 +1018,15 @@ class Scratch extends Sprite {
 				modalOverlay.graphics.drawRect(0, 0, stage.width, stage.height);
 				modalOverlay.addEventListener(MouseEvent.CLICK, eatEvent);
 				modalOverlay.addEventListener(MouseEvent.MOUSE_DOWN, eatEvent);
-				#if allow3d // TODO: use a better flag or rename this one
+/*				
+				if (SCRATCH::allow3d) { // TODO: use a better flag or rename this one
 					// These events are only available in flash 11.2 and above.
 					modalOverlay.addEventListener(MouseEvent.RIGHT_CLICK, eatEvent);
 					modalOverlay.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, eatEvent);
 					modalOverlay.addEventListener(MouseEvent.MIDDLE_CLICK, eatEvent);
 					modalOverlay.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, eatEvent);
-				#end
+				}
+*/				
 				stage.addChild(modalOverlay);
 			}
 			else {
@@ -982,9 +1037,9 @@ class Scratch extends Sprite {
 	}
 
 	public function logoButtonPressed(b:IconButton):Void {
-		if (isExtensionDevMode) {
-			externalCall('showPage', null, 'home');
-		}
+		//if (isExtensionDevMode) {
+			//externalCall('showPage', null, 'home');
+		//}
 	}
 
 	// -----------------------------
@@ -999,8 +1054,8 @@ class Scratch extends Sprite {
 		}
 		var uiLayer:Sprite = app.stagePane.getUILayer();
 		for (i in 0...uiLayer.numChildren) {
-			var lw:ListWatcher = cast uiLayer.getChildAt(i);
-			if (lw) lw.updateTranslation();
+			if (Std.is(uiLayer.getChildAt(i), ListWatcher))
+				cast(uiLayer.getChildAt(i), ListWatcher).updateTranslation();
 		}
 		topBarPart.updateTranslation();
 		stagePart.updateTranslation();
@@ -1040,22 +1095,22 @@ class Scratch extends Sprite {
 			m.addLine();
 			m.addItem('Save Project Summary', saveSummary);
 		}
-		if (b.lastEvent.shiftKey && jsEnabled) {
-			m.addLine();
-			m.addItem('Import experimental extension', function ():Void {
-				function loadJSExtension(dialog:DialogBox):Void {
-					var url:String = dialog.getField('URL').replace(~/^\s+|\s+$/g, '');
-					if (url.length == 0) return;
-					externalCall('ScratchExtensions.loadExternalJS', null, url);
-				}
-
-				var d:DialogBox = new DialogBox(loadJSExtension);
-				d.addTitle('Load Javascript Scratch Extension');
-				d.addField('URL', 120);
-				d.addAcceptCancelButtons('Load');
-				d.showOnStage(app.stage);
-			});
-		}
+		//if (b.lastEvent.shiftKey && jsEnabled) {
+			//m.addLine();
+			//m.addItem('Import experimental extension', function ():Void {
+				//function loadJSExtension(dialog:DialogBox):Void {
+					//var url:String = dialog.getField('URL').replace(~/^\s+|\s+$/g, '');
+					//if (url.length == 0) return;
+					//externalCall('ScratchExtensions.loadExternalJS', null, url);
+				//}
+//
+				//var d:DialogBox = new DialogBox(loadJSExtension);
+				//d.addTitle('Load Javascript Scratch Extension');
+				//d.addField('URL', 120);
+				//d.addAcceptCancelButtons('Load');
+				//d.showOnStage(app.stage);
+			//});
+		//}
 	}
 
 	public function showEditMenu(b:Dynamic):Void {
@@ -1094,7 +1149,7 @@ class Scratch extends Sprite {
 				'\n\nPlease do not distribute!', stage);
 	}
 
-	private function createNewProjectAndThen(callback:Function = null):Void {
+	private function createNewProjectAndThen(callback:Void->Void = null):Void {
 		function clearProject():Void {
 			startNewProject('', '');
 			setProjectName('Untitled');
@@ -1110,13 +1165,14 @@ class Scratch extends Sprite {
 		createNewProjectAndThen();
 	}
 
-	private function createNewProjectScratchX(jsCallback:Array<Dynamic>):Void {
-		createNewProjectAndThen(function():Void {
-			externalCallArray(jsCallback);
-		});
-	}
+	//private function createNewProjectScratchX(jsCallback:Array<Dynamic>):Void {
+		//createNewProjectAndThen(function():Void {
+			//externalCallArray(jsCallback);
+		//});
+	//}
 
-	private function saveProjectAndThen(postSaveAction:Dynamic = null):Void {
+	private function saveProjectAndThen(postSaveAction:Void->Void = null):Void {
+		var d:DialogBox = new DialogBox();
 		// Give the user a chance to save their project, if needed, then call postSaveAction.
 		function doNothing():Void {
 		}
@@ -1140,7 +1196,6 @@ class Scratch extends Sprite {
 			postSaveAction();
 			return;
 		}
-		var d:DialogBox = new DialogBox();
 		d.addTitle('Save project?');
 		d.addButton('Save', save);
 		d.addButton('Don\'t save', proceedWithoutSaving);
@@ -1148,18 +1203,9 @@ class Scratch extends Sprite {
 		d.showOnStage(stage);
 	}
 
-	public function exportProjectToFile(fromJS:Bool = false, saveCallback:Function = null):Void {
-		function squeakSoundsConverted():Void {
-			scriptsPane.saveScripts(false);
-			var projectType:String = extensionManager.hasExperimentalExtensions() ? '.sbx' : '.sb2';
-			var defaultName:String = StringUtil.trim(projectName());
-			defaultName = ((defaultName.length > 0) ? defaultName : 'project') + projectType;
-			var zipData:ByteArray = projIO.encodeProjectAsZipFile(stagePane);
-			var file:FileReference = new FileReference();
-			file.addEventListener(Event.COMPLETE, fileSaved);
-			file.save(zipData, fixFileName(defaultName));
-		}
-
+	public function exportProjectToFile(fromJS:Bool = false, saveCallback:Void->Void = null):Void {
+		if (loadInProgress) return;
+		var projIO:ProjectIO = new ProjectIO(this);
 		function fileSaved(e:Event):Void {
 			if (!fromJS) setProjectName(e.target.name);
 			if (isExtensionDevMode) {
@@ -1168,15 +1214,24 @@ class Scratch extends Sprite {
 			}
 			if (saveCallback != null) saveCallback();
 		}
+		function squeakSoundsConverted():Void {
+			scriptsPane.saveScripts(false);
+			var projectType:String = /*extensionManager.hasExperimentalExtensions() ? '.sbx' : */'.sb2';
+			var defaultName:String = StringTools.trim(projectName());
+			defaultName = ((defaultName.length > 0) ? defaultName : 'project') + projectType;
+			var zipData:ByteArray = projIO.encodeProjectAsZipFile(stagePane);
+			var file:FileReference = new FileReference();
+			file.addEventListener(Event.COMPLETE, fileSaved);
+			file.save(zipData, fixFileName(defaultName));
+		}
 
-		if (loadInProgress) return;
-		var projIO:ProjectIO = new ProjectIO(this);
+
 		projIO.convertSqueakSounds(stagePane, squeakSoundsConverted);
 	}
 
 	public static function fixFileName(s:String):String {
 		// Replace illegal characters in the given string with dashes.
-		var illegal:String = '\\/:Dynamic?"<>|%';
+		var illegal:String = '\\/:*?"<>|%';
 		var result:String = '';
 		for (i in 0...s.length) {
 			var ch:String = s.charAt(i);
@@ -1187,7 +1242,7 @@ class Scratch extends Sprite {
 	}
 
 	public function saveSummary():Void {
-		var name:String = (projectName() || "project") + ".txt";
+		var name:String = (projectName() != null ? projectName() : "project") + ".txt";
 		var file:FileReference = new FileReference();
 		file.save(stagePane.getSummary(), fixFileName(name));
 	}
@@ -1204,10 +1259,10 @@ class Scratch extends Sprite {
 	public function handleTool(tool:String, evt:MouseEvent):Void {
 	}
 
-	public function showBubble(text:String, x:Null<Float> = null, y:Null<Float> = null, width:Float = 0):Void {
+	public function showBubble(text:String, x:Dynamic = null, y:Dynamic = null, width:Float = 0):Void {
 		if (x == null) x = stage.mouseX;
 		if (y == null) y = stage.mouseY;
-		gh.showBubble(text, x, y, width);
+		gh.showBubble(text, cast(x, Float), cast(y, Float), width);
 	}
 
 	// -----------------------------
@@ -1231,7 +1286,7 @@ class Scratch extends Sprite {
 			m.addItem(entry[1], entry[0]);
 		}
 		var p:Point = b.localToGlobal(new Point(0, 0));
-		m.showOnStage(stage, b.x, topBarPart.bottom() - 1);
+		m.showOnStage(stage, Std.int(b.x), Std.int(topBarPart.bottom() - 1));
 	}
 
 	public function startNewProject(newOwner:String, newID:String):Void {
@@ -1257,9 +1312,9 @@ class Scratch extends Sprite {
 
 	private function clearSaveNeeded():Void {
 		// Clear saveNeeded flag and update the status string.
-		var twoDigits = function (n:Int):String {
+		function twoDigits(n:Int):String {
 			return ((n < 10) ? '0' : '') + n;
-		};
+		}
 
 		saveNeeded = false;
 		wasEdited = true;
@@ -1282,17 +1337,17 @@ class Scratch extends Sprite {
 	}
 
 	private function revertToOriginalProject():Void {
-		function preDoRevert():Void {
+		function preDoRevert(param:Dynamic):Void {
 			revertUndo = new ProjectIO(Scratch.app).encodeProjectAsZipFile(stagePane);
 			doRevert();
 		}
 
-		if (!originalProj) return;
+		if (originalProj == null) return;
 		DialogBox.confirm('Throw away all changes since opening this project?', stage, preDoRevert);
 	}
 
 	private function undoRevert():Void {
-		if (!revertUndo) return;
+		if (revertUndo == null) return;
 		runtime.installProjectFromData(revertUndo, false);
 		revertUndo = null;
 	}
@@ -1310,15 +1365,15 @@ class Scratch extends Sprite {
 	}
 
 	public function addNewSprite(spr:ScratchSprite, showImages:Bool = false, atMouse:Bool = false):Void {
-		var c:ScratchCostume, byteCount:Int;
+		var c:ScratchCostume, byteCount:Int = 0;
 		for (c in spr.costumes) {
-			if (!c.baseLayerData) c.prepareToSave();
+			if (c.baseLayerData == null) c.prepareToSave();
 			byteCount += c.baseLayerData.length;
 		}
 		if (!okayToAdd(byteCount)) return; // not enough room
 		spr.objName = stagePane.unusedSpriteName(spr.objName);
 		spr.indexInLibrary = 1000000; // add at end of library
-		spr.setScratchXY(int(200 * Math.random() - 100), int(100 * Math.random() - 50));
+		spr.setScratchXY(Std.int(200 * Math.random() - 100), Std.int(100 * Math.random() - 50));
 		if (atMouse) spr.setScratchXY(stagePane.scratchMouseX(), stagePane.scratchMouseY());
 		stagePane.addChild(spr);
 		spr.updateCostume();
@@ -1332,8 +1387,8 @@ class Scratch extends Sprite {
 	}
 
 	public function addSound(snd:ScratchSound, targetObj:ScratchObj = null):Void {
-		if (snd.soundData && !okayToAdd(snd.soundData.length)) return; // not enough room
-		if (!targetObj) targetObj = viewedObj();
+		if (snd.soundData != null && !okayToAdd(snd.soundData.length)) return; // not enough room
+		if (targetObj == null) targetObj = viewedObj();
 		snd.soundName = targetObj.unusedSoundName(snd.soundName);
 		targetObj.sounds.push(snd);
 		setSaveNeeded(true);
@@ -1344,9 +1399,9 @@ class Scratch extends Sprite {
 	}
 
 	public function addCostume(c:ScratchCostume, targetObj:ScratchObj = null):Void {
-		if (!c.baseLayerData) c.prepareToSave();
+		if (c.baseLayerData == null) c.prepareToSave();
 		if (!okayToAdd(c.baseLayerData.length)) return; // not enough room
-		if (!targetObj) targetObj = viewedObj();
+		if (targetObj == null) targetObj = viewedObj();
 		c.costumeName = targetObj.unusedCostumeName(c.costumeName);
 		targetObj.costumes.push(c);
 		targetObj.showCostumeNamed(c.costumeName);
@@ -1361,13 +1416,15 @@ class Scratch extends Sprite {
 		var assetByteCount:Int = newAssetBytes;
 		for (obj in stagePane.allObjects()) {
 			for (c in obj.costumes) {
-				if (!c.baseLayerData) c.prepareToSave();
-				assetByteCount += c.baseLayerData.length;
+				if (c.baseLayerData == null) 
+					c.prepareToSave();
+				else
+					assetByteCount += Std.int(c.baseLayerData.length);
 			}
 			for (snd in obj.sounds) assetByteCount += snd.soundData.length;
 		}
 		if (assetByteCount > assetByteLimit) {
-			var overBy:Int = Math.max(1, (assetByteCount - assetByteLimit) / 1024);
+			var overBy:Int = Std.int(Math.max(1, (assetByteCount - assetByteLimit) / 1024));
 			DialogBox.notify(
 					'Sorry!',
 					'Adding that media asset would put this project over the size limit by ' + overBy + ' KB\n' +
@@ -1383,18 +1440,18 @@ class Scratch extends Sprite {
 	//------------------------------
 
 	public function flashSprite(spr:ScratchSprite):Void {
-		function doFade(alpha:Number):Void {
+		var box:Shape = new Shape();
+		function doFade(alpha:Float):Void {
 			box.alpha = alpha;
 		}
 
 		function deleteBox():Void {
-			if (box.parent) {
+			if (box.parent != null) {
 				box.parent.removeChild(box);
 			}
 		}
 
-		var r:Rectangle = spr.getVisibleBounds(this);
-		var box:Shape = new Shape();
+		var r:Rectangle = spr.getVisibleBounds(rootDisplayObject());
 		box.graphics.lineStyle(3, CSS.overColor, 1, true);
 		box.graphics.beginFill(0x808080);
 		box.graphics.drawRoundRect(0, 0, r.width, r.height, 12, 12);
@@ -1417,17 +1474,17 @@ class Scratch extends Sprite {
 	}
 
 	public function removeLoadProgressBox():Void {
-		if (lp && lp.parent) lp.parent.removeChild(lp);
+		if (lp != null && lp.parent != null) lp.parent.removeChild(lp);
 		lp = null;
 	}
 
 	private function fixLoadProgressLayout():Void {
-		if (!lp) return;
+		if (lp == null) return;
 		var p:Point = stagePane.localToGlobal(new Point(0, 0));
 		lp.scaleX = stagePane.scaleX;
 		lp.scaleY = stagePane.scaleY;
-		lp.x = int(p.x + ((stagePane.width - lp.width) / 2));
-		lp.y = int(p.y + ((stagePane.height - lp.height) / 2));
+		lp.x = Std.int(p.x + ((stagePane.width - lp.width) / 2));
+		lp.y = Std.int(p.y + ((stagePane.height - lp.height) / 2));
 	}
 
 	// -----------------------------
@@ -1452,11 +1509,11 @@ class Scratch extends Sprite {
 
 	private function updateFrameRate(e:Event):Void {
 		frameCount++;
-		if (!frameRateReadout) return;
-		var now:Int = getTimer();
+		if (frameRateReadout == null) return;
+		var now:Int = Lib.getTimer();
 		var msecs:Int = now - firstFrameTime;
 		if (msecs > 500) {
-			var fps:Number = Math.round((1000 * frameCount) / msecs);
+			var fps:Float = Math.round((1000 * frameCount) / msecs);
 			frameRateReadout.text = fps + ' fps (' + Math.round(msecs / frameCount) + ' msecs)';
 			firstFrameTime = now;
 			frameCount = 0;
@@ -1464,7 +1521,7 @@ class Scratch extends Sprite {
 	}
 
 	// TODO: Remove / no longer used
-	private inline static var frameRateGraphH:Int = 150;
+	private static inline var frameRateGraphH:Int = 150;
 	private var frameRateGraph:Shape;
 	private var nextFrameRateX:Int;
 	private var lastFrameTime:Int;
@@ -1485,7 +1542,7 @@ class Scratch extends Sprite {
 	}
 
 	private function updateFrameRateGraph(evt:Dynamic):Void {
-		var now:Int = getTimer();
+		var now:Int = Lib.getTimer();
 		var msecs:Int = now - lastFrameTime;
 		lastFrameTime = now;
 		var c:Int = 0x505050;
@@ -1495,7 +1552,7 @@ class Scratch extends Sprite {
 		if (nextFrameRateX > stage.stageWidth) clearFrameRateGraph();
 		var g:Graphics = frameRateGraph.graphics;
 		g.beginFill(c);
-		var barH:Int = Math.min(frameRateGraphH, msecs / 2);
+		var barH:Int = Std.int(Math.min(frameRateGraphH, msecs / 2));
 		g.drawRect(nextFrameRateX, frameRateGraphH - barH, 1, barH);
 		nextFrameRateX++;
 	}
@@ -1504,7 +1561,7 @@ class Scratch extends Sprite {
 	// Camera Dialog
 	//------------------------------
 
-	public function openCameraDialog(savePhoto:Function):Void {
+	public function openCameraDialog(savePhoto:BitmapData->Void):Void {
 		closeCameraDialog();
 		cameraDialog = new CameraDialog(savePhoto);
 		cameraDialog.fixLayout();
@@ -1514,7 +1571,7 @@ class Scratch extends Sprite {
 	}
 
 	public function closeCameraDialog():Void {
-		if (cameraDialog) {
+		if (cameraDialog != null) {
 			cameraDialog.closeDialog();
 			cameraDialog = null;
 		}
@@ -1525,49 +1582,73 @@ class Scratch extends Sprite {
 		return new MediaInfo(obj, owningObj);
 	}
 
-	static public function loadSingleFile(fileLoaded:Function, filter:FileFilter = null):Void {
+	static public function loadSingleFile(fileLoaded:Dynamic -> Void, filter:FileFilter = null):Void {
+		
+		// HTML5-specific file opening code (just for testing)
+		var div = js.Browser.document.createElement("div");
+		div.innerHTML = '<input style="display: none" class="fileinput" type="file">';
+		var input = cast(div.querySelector('input'), InputElement);
+		input.addEventListener("change", function(evt:js.html.Event) {
+			var filereader = new FileReader();
+			var fileName = input.files.item(0).name;
+			filereader.onload = function(evt:Event) {
+				var bytes = Bytes.ofData(filereader.result);
+				var data:ByteArray = ByteArray.fromBytes(bytes);
+				function doInstall(ignore:Dynamic = null):Void {
+					app.runtime.installProjectFromFile(fileName, data);
+				}
+				if (app.stagePane.isEmpty()) doInstall();
+				else DialogBox.confirm('Replace contents of the current project?', app.stage, doInstall);
+			};
+			filereader.readAsArrayBuffer(input.files.item(0));
+		});
+		input.click();
+		
+		/*
+		var fileList:FileReferenceList = new FileReferenceList();
 		function fileSelected(event:Event):Void {
 			if (fileList.fileList.length > 0) {
-				var file:FileReference = FileReference(fileList.fileList[0]);
+				var file:FileReference = fileList.fileList[0];
 				file.addEventListener(Event.COMPLETE, fileLoaded);
 				file.load();
 			}
 		}
 
-		var fileList:FileReferenceList = new FileReferenceList();
 		fileList.addEventListener(Event.SELECT, fileSelected);
 		try {
 			// Ignore the exception that happens when you call browse() with the file browser open
 			fileList.browse(filter != null ? [filter] : null);
 		} catch (e:Dynamic) {
 		}
+		*/
 	}
 
 	// -----------------------------
 	// External Interface abstraction
 	//------------------------------
 
-	public function externalInterfaceAvailable():Bool {
-		return ExternalInterface.available;
-	}
-
-	macro public function externalCall(functionName:String, returnValueCallback:Dynamic = null, args:Array<Expr>):Void {
-		args.unshift(functionName);
-		var retVal:Dynamic = ExternalInterface.call.apply(ExternalInterface, args);
-		if (returnValueCallback != null) {
-			returnValueCallback(retVal);
-		}
-	}
-
-	public function addExternalCallback(functionName:String, closure:Dynamic):Void {
-		ExternalInterface.addCallback(functionName, closure);
-	}
-
-	// jsCallbackArray is: [functionName, arg1, arg2...] where args are optional.
-	// TODO: rewrite all versions of externalCall in terms of this
-	public function externalCallArray(jsCallbackArray:Array<Dynamic>, returnValueCallback:Function = null):Void {
-		var args:Array = jsCallbackArray.concat(); // clone
-		args.splice(1, 0, returnValueCallback);
-		externalCall.apply(this, args);
-	}
+	//public function externalInterfaceAvailable():Bool {
+		//return ExternalInterface.available;
+	//}
+//
+	//public function externalCall(functionName:String, returnValueCallback:Function = null, args:Array<Dynamic>):Void {
+		//args.unshift(functionName);
+		//var retVal:Dynamic = ExternalInterface.call.apply(ExternalInterface, args);
+		//if (returnValueCallback != null) {
+			//returnValueCallback(retVal);
+		//}
+	//}
+//
+	//public function addExternalCallback(functionName:String, closure:Function):Void {
+		//ExternalInterface.addCallback(functionName, closure);
+	//}
+//
+	//// jsCallbackArray is: [functionName, arg1, arg2...] where args are optional.
+	//// TODO: rewrite all versions of externalCall in terms of this
+	//public function externalCallArray(jsCallbackArray:Array<Dynamic>, returnValueCallback:Dynamic->Void = null):Void {
+		//var args:Array<Dynamic> = jsCallbackArray.concat(); // clone
+		//args.splice(1, 0, returnValueCallback);
+		//externalCall.apply(this, args);
+	//}
 }
+

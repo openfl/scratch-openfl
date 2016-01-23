@@ -18,47 +18,48 @@
  */
 
 package ui.media;
-import flash.display.*;
-import flash.events.*;
-import flash.media.Sound;
-import flash.net.*;
-import flash.text.*;
-import flash.utils.*;
+import openfl.display.*;
+import openfl.events.*;
+import openfl.media.Sound;
+import openfl.net.*;
+import openfl.text.*;
+import openfl.utils.*;
 import assets.Resources;
-import extensions.ScratchExtension;
+//import extensions.ScratchExtension;
 import scratch.*;
-import sound.mp3.MP3Loader;
+//import sound.mp3.MP3Loader;
 import translation.Translator;
 import uiwidgets.*;
 import util.*;
+//import openfl.xml.XML;
 
 class MediaLibrary extends Sprite {
 
-	private inline static var titleFormat:TextFormat = new TextFormat(CSS.font, 24, 0x444143);
+	private static var titleFormat:TextFormat = new TextFormat(CSS.font, 24, 0x444143);
 
-	private static inline var backdropCategories:Array<String> = [
+	private static var backdropCategories:Array<String> = [
 		'All', 'Indoors', 'Outdoors', 'Other'];
-	private static inline var costumeCategories:Array<String> = [
+	private static var costumeCategories:Array<String> = [
 		'All', 'Animals', 'Fantasy', 'Letters', 'People', 'Things', 'Transportation'];
-	private static inline var extensionCategories:Array<String> = [
+	private static var extensionCategories:Array<String> = [
 		'All', 'Hardware'];
-	private static inline var soundCategories:Array<String> = [
+	private static var soundCategories:Array<String> = [
 		'All', 'Animal', 'Effects', 'Electronic', 'Human', 'Instruments',
 		'Music Loops', 'Percussion', 'Vocals'];
 
-	private static inline var backdropThemes:Array<String> = [
+	private static var backdropThemes:Array<String> = [
 		'Castle', 'City', 'Flying', 'Holiday', 'Music and Dance', 'Nature', 'Space', 'Sports', 'Underwater'];
-	private static inline var costumeThemes:Array<String> = [
+	private static var costumeThemes:Array<String> = [
 		'Castle', 'City', 'Flying', 'Holiday', 'Music and Dance', 'Space', 'Sports', 'Underwater', 'Walking'];
 
-	private static inline var imageTypes:Array<String> = ['All', 'Bitmap', 'Vector'];
+	private static var imageTypes:Array<String> = ['All', 'Bitmap', 'Vector'];
 
-	private static inline var spriteFeatures:Array<String> = ['All', 'Scripts', 'Costumes > 1', 'Sounds'];
+	private static var spriteFeatures:Array<String> = ['All', 'Scripts', 'Costumes > 1', 'Sounds'];
 
 	private var app:Scratch;
 	private var assetType:String;
-	private var whenDone:Function;
-	private var allItems:Array<Dynamic> = [];
+	private var whenDone:Dynamic->Void;
+	private var allItems:Array<MediaLibraryItem> = [];
 
 	private var title:TextField;
 	private var outerFrame:Shape;
@@ -75,9 +76,10 @@ class MediaLibrary extends Sprite {
 	private var okayButton:Button;
 	private var cancelButton:Button;
 
-	private static var libraryCache:Dynamic = {}; // cache of all mediaLibrary entries
+	private static var libraryCache:Map<String, Array<Dynamic>> = new Map<String, Array<Dynamic>>(); // cache of all mediaLibrary entries
 
-	public function new(app:Scratch, type:String, whenDone:Function) {
+	public function new(app:Scratch, type:String, whenDone:Dynamic->Void) {
+		super();
 		this.app = app;
 		this.assetType = type;
 		this.whenDone = whenDone;
@@ -120,7 +122,7 @@ class MediaLibrary extends Sprite {
 	}
 
 	public function importFromDisk():Void {
-		if (parent) close();
+		if (parent != null) close();
 		if (assetType == 'sound') importSoundsFromDisk();
 		else importImagesOrSpritesFromDisk();
 	}
@@ -155,30 +157,30 @@ class MediaLibrary extends Sprite {
 
 		innerFrame.x = title.x + title.textWidth + 25;
 		innerFrame.y = inset + 35;
-		drawInnerFrame(w - (innerFrame.x + inset + rightInset), h - (innerFrame.y + inset + cancelButton.height + 20));
+		drawInnerFrame(Std.int(w - (innerFrame.x + inset + rightInset)), Std.int(h - (innerFrame.y + inset + cancelButton.height + 20)));
 
 		resultsFrame.x = innerFrame.x + 5;
 		resultsFrame.y = innerFrame.y + 5;
-		resultsFrame.setWidthHeight(innerFrame.width - 10, innerFrame.height - 10);
+		resultsFrame.setWidthHeight(Std.int(innerFrame.width - 10), Std.int(innerFrame.height - 10));
 
-		var nextX:Int = title.x + 3;
+		var nextX:Int = Std.int(title.x + 3);
 		var nextY:Int = inset + 60;
 		var spaceBetweenFilteres:Int = 12;
 
 		categoryFilter.x = nextX;
 		categoryFilter.y = nextY;
-		nextY += categoryFilter.height + spaceBetweenFilteres;
+		nextY += Std.int(categoryFilter.height + spaceBetweenFilteres);
 
 		if (themeFilter.visible) {
 			themeFilter.x = nextX;
 			themeFilter.y = nextY;
-			nextY += themeFilter.height + spaceBetweenFilteres;
+			nextY += Std.int(themeFilter.height + spaceBetweenFilteres);
 		}
 
 		if (imageTypeFilter.visible) {
 			imageTypeFilter.x = nextX;
 			imageTypeFilter.y = nextY;
-			nextY += imageTypeFilter.height + spaceBetweenFilteres;
+			nextY += Std.int(imageTypeFilter.height + spaceBetweenFilteres);
 		}
 
 		if (spriteFeaturesFilter.visible) {
@@ -190,7 +192,7 @@ class MediaLibrary extends Sprite {
 
 	private function drawBackground(w:Int, h:Int):Void {
 		var bgColor:Int = 0;
-		var bgAlpha:Number = 0.6;
+		var bgAlpha:Float = 0.6;
 		var g:Graphics = this.graphics;
 		g.clear();
 		g.beginFill(bgColor, bgAlpha);
@@ -225,7 +227,7 @@ class MediaLibrary extends Sprite {
 	}
 
 	private function addFilters():Void {
-		var categories:Array = [];
+		var categories:Array<String> = [];
 		if ('backdrop' == assetType) categories = backdropCategories;
 		if ('costume' == assetType) categories = costumeCategories;
 		if ('extension' == assetType) categories = extensionCategories;
@@ -276,7 +278,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	private function addButtons():Void {
 		addChild(closeButton = new IconButton(close, 'close'));
 		addChild(okayButton = new Button(Translator.map('OK'), addSelected));
-		addChild(cancelButton = new Button(Translator.map('Cancel'), close));
+		addChild(cancelButton = new Button(Translator.map('Cancel'), function() { close(null);} ));
 	}
 
 	// -----------------------------
@@ -284,18 +286,12 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	//------------------------------
 
 	private function viewLibrary():Void {
-		function gotLibraryData(data:ByteArray):Void {
-			if (!data) return; // failure
-			var s:String = data.readUTFBytes(data.length);
-			libraryCache[assetType] = cast (util.JSON.parse(stripComments(s)), Array);
-			collectEntries();
-		}
 		function collectEntries():Void {
 			allItems = [];
 			for (entry in libraryCache[assetType]) {
 				if (entry.type == assetType) {
-					if (Std.is (entry.tags, Array)) entry.category = entry.tags[0];
-					var info:Array = cast (entry.info, Array);
+					if (Std.is(entry.tags, Array)) entry.category = entry.tags[0];
+					var info:Array<Dynamic> = cast(entry.info, Array<Dynamic>);
 					if (info != null) {
 						if (entry.type == 'backdrop') {
 							entry.width = info[0];
@@ -316,28 +312,35 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 			showFilteredItems();
 			startLoadingThumbnails();
 		}
+		function gotLibraryData(data:ByteArray):Void {
+			if (data == null) return; // failure
+			var s:String = data.readUTFBytes(data.length);
+			libraryCache[assetType] = cast(util.JSON.parse(stripComments(s)), Array<Dynamic>);
+			collectEntries();
+		}
 		if ('extension' == assetType) {
 			addScratchExtensions();
 			return;
 		}
-		if (!libraryCache[assetType]) app.server.getMediaLibrary(assetType, gotLibraryData);
+		if (libraryCache[assetType] == null) app.server.getMediaLibrary(assetType, gotLibraryData);
 		else collectEntries();
 	}
 
 
 	private function addScratchExtensions():Void {
-		var extList:Array = [
-			ScratchExtension.PicoBoard(),
-			ScratchExtension.WeDo()];
+		//var extList:Array = [
+//			ScratchExtension.PicoBoard(),
+//			ScratchExtension.WeDo()
+		//];
 		allItems = [];
-		for (ext in extList) {
-			allItems.push(new MediaLibraryItem({
-				extension: ext,
-				name: ext.name,
-				md5: ext.thumbnailMD5,
-				tags: ext.tags
-			}));
-		}
+		//for (ext in extList) {
+			//allItems.push(new MediaLibraryItem({
+				//extension: ext,
+				//name: ext.name,
+				//md5: ext.thumbnailMD5,
+				//tags: ext.tags
+			//}));
+		//}
 		showFilteredItems();
 		startLoadingThumbnails();
 	}
@@ -358,10 +361,10 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		var tag:String = '';
 		if (categoryFilter.currentSelection != '') tag = categoryFilter.currentSelection;
 		if (themeFilter.currentSelection != '') tag = themeFilter.currentSelection;
-		tag = tag.replace(new RegExp(' ', 'g'), '-'); // e.g., change 'Music and Dance' -> 'Music-and-Dance'
+		tag = new EReg(' ', 'g').replace(tag, '-'); // e.g., change 'Music and Dance' -> 'Music-and-Dance'
 		tag = tag.toLowerCase();
 		var showAll:Bool = ('all' == tag);
-		var filtered:Array = [];
+		var filtered:Array<MediaLibraryItem> = [];
 		for (item in allItems) {
 			if ((showAll || (item.dbObj.tags.indexOf(tag) > -1)) && hasSelectedFeatures(item.dbObj)) {
 				filtered.push(item);
@@ -371,7 +374,7 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		appendItems(filtered);
 	}
 
-	private function hasSelectedFeatures(item:Dynamic):Bool {
+	private function hasSelectedFeatures(item:Object):Bool {
 		var imageType:String = imageTypeFilter.currentSelection;
 		if (imageTypeFilter.visible && (imageType != 'All')) {
 			if (imageType == 'Vector') {
@@ -389,17 +392,21 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		return true;
 	}
 
-	private function appendItems(items:Array<Dynamic>):Void {
+	private function appendItems(items:Array<MediaLibraryItem>):Void {
 		if (items.length == 0) return;
-		var itemWidth:Int = cast (items[0], MediaLibraryItem).frameWidth + 6;
-		var totalWidth:Int = resultsFrame.width - 15;
-		var columnCount:Int = totalWidth / itemWidth;
-		var extra:Int = (totalWidth - (columnCount * itemWidth)) / columnCount; // extra space per column
+		var itemWidth:Int = items[0].frameWidth + 6;
+		var totalWidth:Int = Std.int(resultsFrame.width - 15);
+		var columnCount:Int = Std.int(totalWidth / itemWidth);
+		var extra:Int = Std.int((totalWidth - (columnCount * itemWidth)) / columnCount); // extra space per column
 
 		var colNum:Int = 0;
 		var nextX:Int = 2;
 		var nextY:Int = 2;
-		for (item in items) {
+		var item: MediaLibraryItem = null;
+		var it: Iterator<MediaLibraryItem> = items.iterator();
+		while (it.hasNext())
+		{
+			item = it.next();
 			item.x = nextX;
 			item.y = nextY;
 			resultsPane.addChild(item);
@@ -419,13 +426,13 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		var io:ProjectIO = new ProjectIO(app);
 		close();
 		for (i in 0...resultsPane.numChildren) {
-			var item:MediaLibraryItem = cast (resultsPane.getChildAt(i), MediaLibraryItem);
+			var item:MediaLibraryItem = cast(resultsPane.getChildAt(i), MediaLibraryItem);
 			if (item != null && item.isHighlighted()) {
 				var md5AndExt:String = item.dbObj.md5;
-				var obj:Dynamic = null;
+				var obj:Object = null;
 				if (assetType == 'extension') {
 					whenDone(item.dbObj.extension);
-				} else if (md5AndExt.slice(-5) == '.json') {
+				} else if (md5AndExt.substr(-5) == '.json') {
 					io.fetchSprite(md5AndExt, whenDone);
 				} else if (assetType == 'sound') {
 					io.fetchSound(md5AndExt, item.dbObj.name, whenDone);
@@ -456,24 +463,24 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	//------------------------------
 
 	private function startLoadingThumbnails():Void {
+		var next:Int = 0;
+		var inProgress:Int = 0;
+		function loadDone():Void { inProgress--; }
 		function loadSomeThumbnails():Void {
 			var count:Int = 10 - inProgress;
 			while ((next < allItems.length) && (count-- > 0)) {
 				inProgress++;
 				allItems[next++].loadThumbnail(loadDone);
 			}
-			if ((next < allItems.length) || inProgress) setTimeout(loadSomeThumbnails, 40);
+			if ((next < allItems.length) || inProgress != 0) haxe.Timer.delay(loadSomeThumbnails, 40);
 		}
-		function loadDone():Void { inProgress--; }
 
-		var next:Int = 0;
-		var inProgress:Int = 0;
 		loadSomeThumbnails();
 	}
 
 	private function stopLoadingThumbnails():Void {
 		for (i in 0...resultsPane.numChildren) {
-			var item:MediaLibraryItem = cast (resultsPane.getChildAt(i), MediaLibraryItem);
+			var item:MediaLibraryItem = cast(resultsPane.getChildAt(i), MediaLibraryItem);
 			if (item != null) item.stopLoading();
 		}
 	}
@@ -483,19 +490,19 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	//------------------------------
 
 	private function importImagesOrSpritesFromDisk():Void {
+		var costumeOrSprite:Dynamic;
+		var files:FileReferenceList = new FileReferenceList();
+		function fileLoaded(e:Event):Void {
+			var fRef:FileReference = cast(e.target, FileReference);
+			if (fRef != null) convertAndUploadImageOrSprite(fRef.name, fRef.data);
+		}
 		function fileSelected(e:Event):Void {
 			for (j in 0...files.fileList.length) {
-				var file:FileReference = FileReference(files.fileList[j]);
+				var file:FileReference = files.fileList[j];
 				file.addEventListener(Event.COMPLETE, fileLoaded);
 				file.load();
 			}
 		}
-		function fileLoaded(e:Event):Void {
-			var fRef:FileReference = cast (e.target, FileReference);
-			if (fRef != null) convertAndUploadImageOrSprite(fRef.name, fRef.data);
-		}
-		var costumeOrSprite:Dynamic;
-		var files:FileReferenceList = new FileReferenceList();
 		files.addEventListener(Event.SELECT, fileSelected);
 		try {
 			// Ignore the exception that happens when you call browse() with the file browser open
@@ -503,31 +510,28 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		} catch(e:Dynamic) {}
 	}
 
-	private function uploadCostume(costume:ScratchCostume, whenDone:Function):Void {
+	private function uploadCostume(costume:ScratchCostume, whenDone:Void->Void):Void {
 		whenDone();
 	}
 
-	private function uploadSprite(sprite:ScratchSprite, whenDone:Function):Void {
+	private function uploadSprite(sprite:ScratchSprite, whenDone:Void->Void):Void {
 		whenDone();
 	}
 
 	private function convertAndUploadImageOrSprite(fName:String, data:ByteArray):Void {
+		var costumeOrSprite:Dynamic = null;
+		function uploadComplete():Void {
+			app.removeLoadProgressBox();
+			whenDone(costumeOrSprite);
+		}
 		function imageDecoded(e:Event):Void {
 			var bm:BitmapData = ScratchCostume.scaleForScratch(e.target.content.bitmapData);
-			costumeOrSprite = new ScratchCostume(fName, bm);
+			costumeOrSprite = ScratchCostume.fromBitmapData(fName, bm);
 			uploadCostume(costumeOrSprite, uploadComplete);
 		}
 		function spriteDecoded(s:ScratchSprite):Void {
 			costumeOrSprite = s;
 			uploadSprite(s, uploadComplete);
-		}
-		function imagesDecoded():Void {
-			sprite.updateScriptsAfterTranslation();
-			spriteDecoded(sprite);
-		}
-		function uploadComplete():Void {
-			app.removeLoadProgressBox();
-			whenDone(costumeOrSprite);
 		}
 		function decodeError():Void {
 			DialogBox.notify('Error decoding image', 'Sorry, Scratch was unable to load the image '+fName+'.', Scratch.app.stage);
@@ -535,12 +539,11 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		function spriteError():Void {
 			DialogBox.notify('Error decoding sprite', 'Sorry, Scratch was unable to load the sprite '+fName+'.', Scratch.app.stage);
 		}
-		var costumeOrSprite:Dynamic;
 		var fExt:String = '';
 		var i:Int = fName.lastIndexOf('.');
 		if (i > 0) {
-			fExt = fName.slice(i).toLowerCase();
-			fName = fName.slice(0, i);
+			fExt = fName.substring(i).toLowerCase();
+			fName = fName.substring(0, i);
 		}
 
 		if ((fExt == '.png') || (fExt == '.jpg') || (fExt == '.jpeg')) {
@@ -552,106 +555,110 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 			} catch(e:Dynamic) {
 				decodeError();
 			}
-		} else if (fExt == '.gif') {
-			try {
-				importGIF(fName, data);
-			} catch(e:Dynamic) {
-				decodeError();
-			}
-		} else if (ScratchCostume.isSVGData(data)) {
-			data = svgAddGroupIfNeeded(data); // wrap group around imported elements
-			costumeOrSprite = new ScratchCostume(fName, null);
-			costumeOrSprite.setSVGData(data, true);
-			uploadCostume(cast (costumeOrSprite, ScratchCostume), uploadComplete);
+		//} else if (fExt == '.gif') {
+			//try {
+				//importGIF(fName, data);
+			//} catch(e:Dynamic) {
+				//decodeError();
+			//}
+		//} else if (ScratchCostume.isSVGData(data)) {
+			//data = svgAddGroupIfNeeded(data); // wrap group around imported elements
+			//costumeOrSprite = ScratchCostume.newEmptyCostume(fName);
+			//costumeOrSprite.setSVGData(data, true);
+			//uploadCostume(cast(costumeOrSprite, ScratchCostume), uploadComplete);
 		} else {
 			data.position = 0;
-			if (data.readUTFBytes(4) != 'ObjS') {
-				data.position = 0;
-				new ProjectIO(app).decodeSpriteFromZipFile(data, spriteDecoded, spriteError);
-			} else {
-				var info:Dynamic;
-				var objTable:Array = null;
+			if (data.bytesAvailable > 4 && data.readUTFBytes(4) == 'ObjS') {
+				var info:Object = null;
+				var objTable:Array<Dynamic> = null;
 				data.position = 0;
 				var reader:ObjReader = new ObjReader(data);
-				try { info = reader.readInfo(); } catch (e:Error) { data.position = 0; }
-				try { objTable = reader.readObjTable(); } catch (e:Error) { }
+				try { info = reader.readInfo(); } catch (e:openfl.errors.Error) { data.position = 0; }
+				try { objTable = reader.readObjTable(); } catch (e:openfl.errors.Error) { }
 				if (objTable == null) {
 					spriteError();
 					return;
 				}
 				var newProject:ScratchStage = new OldProjectReader().extractProject(objTable);
-				var sprite:ScratchSprite = newProject.numChildren > 3 ? cast (newProject.getChildAt(3), ScratchSprite) : null;
+				var sprite:ScratchSprite = newProject.numChildren > 3 ? cast(newProject.getChildAt(3), ScratchSprite) : null;
 				if (sprite == null) {
 					spriteError();
 					return;
 				}
+				function imagesDecoded():Void {
+					sprite.updateScriptsAfterTranslation();
+					spriteDecoded(sprite);
+				}
 				new ProjectIO(app).decodeAllImages(newProject.allObjects(), imagesDecoded, spriteError);
+			} else {
+				data.position = 0;
+				new ProjectIO(app).decodeSpriteFromZipFile(data, spriteDecoded, spriteError);
 			}
 		}
 	}
 
-	private function importGIF(fName:String, data:ByteArray):Void {
-		var gifReader:GIFDecoder = new GIFDecoder();
-		gifReader.read(data);
-		if (gifReader.frames.length == 0) return; // bad GIF (error; no images)
-		var newCostumes:Array = [];
-		for (i in 0...gifReader.frames.length) {
-			newCostumes.push(new ScratchCostume(fName + '-' + i, gifReader.frames[i]));
-		}
+	//private function importGIF(fName:String, data:ByteArray):Void {
+		//var gifReader:GIFDecoder = new GIFDecoder();
+		//gifReader.read(data);
+		//if (gifReader.frames.length == 0) return; // bad GIF (error; no images)
+		//var newCostumes:Array<Dynamic> = [];
+		//for (i in 0...gifReader.frames.length) {
+			//newCostumes.push(ScratchCostume.fromBitmapData(fName + '-' + i, gifReader.frames[i]));
+		//}
+//
+		//gifImported(newCostumes);
+	//}
+//
+	//private function gifImported(newCostumes:Array<Dynamic>):Void {
+		//whenDone(newCostumes);
+	//}
 
-		gifImported(newCostumes);
-	}
-
-	private function gifImported(newCostumes:Array<Dynamic>):Void {
-		whenDone(newCostumes);
-	}
-
-	private function svgAddGroupIfNeeded(svgData:ByteArray):ByteArray {
-		var xml:XML = XML(svgData);
-		if (!svgNeedsGroup(xml)) return svgData;
-
-		var groupNode:XML = new XML('<g></g>');
-		for (el in xml.elements()) {
-			if (el.localName() != 'defs') {
-				//delete xml.children()[el.childIndex()];
-				groupNode.appendChild(el); // move all non-def elements into group
-			}
-		}
-		xml.appendChild(groupNode);
-
-		// fix for an apparent bug in Flash XML parser (changes 'xml' namespace to 'aaa')
-		for (k in xml.attributes()) {
-			//if (k.localName() == 'space') delete xml.@[k.name()];
-		}
-		//xml.@['xml:space'] = 'preserve';
-
-		var newSVG:XML = xml;
-		var data: ByteArray = new ByteArray();
-		data.writeUTFBytes(newSVG.toXMLString());
-		return data;
-	}
-
-	private function svgNeedsGroup(xml:XML):Bool {
-		// Return true if the given SVG contains more than one non-defs element.
-		var nonDefsCount:Int;
-		for (el in xml.elements()) {
-			if (el.localName() != 'defs') nonDefsCount++;
-		}
-		return nonDefsCount > 1;
-	}
+	//private function svgAddGroupIfNeeded(svgData:ByteArray):ByteArray {
+		//var xml:XML = XML(svgData);
+		//if (!svgNeedsGroup(xml)) return svgData;
+//
+		//var groupNode:XML = new XML('<g></g>');
+		//for (el in xml.elements()) {
+			//if (el.localName() != 'defs') {
+////				delete xml.children()[el.childIndex()];
+				//groupNode.appendChild(el); // move all non-def elements into group
+			//}
+		//}
+		//xml.appendChild(groupNode);
+//
+		//// fix for an apparent bug in Flash XML parser (changes 'xml' namespace to 'aaa')
+		//for (k in xml.attributes()) {
+////			if (k.localName() == 'space') delete xml.@[k.name()];
+		//}
+////		xml.@['xml:space'] = 'preserve';
+//
+		//var newSVG:XML = xml;
+		//var data: ByteArray = new ByteArray();
+		//data.writeUTFBytes(newSVG.toXMLString());
+		//return data;
+	//}
+//
+	//private function svgNeedsGroup(xml:XML):Bool {
+		//// Return true if the given SVG contains more than one non-defs element.
+		//var nonDefsCount:Int;
+		//for (el in xml.elements()) {
+			//if (el.localName() != 'defs') nonDefsCount++;
+		//}
+		//return nonDefsCount > 1;
+	//}
 
 	private function importSoundsFromDisk():Void {
+		var files:FileReferenceList = new FileReferenceList();
+		function fileLoaded(e:Event):Void {
+			convertAndUploadSound(cast(e.target, FileReference).name, cast(e.target, FileReference).data);
+		}
 		function fileSelected(e:Event):Void {
 			for (j in 0...files.fileList.length) {
-				var file:FileReference = FileReference(files.fileList[j]);
+				var file:FileReference = files.fileList[j];
 				file.addEventListener(Event.COMPLETE, fileLoaded);
 				file.load();
 			}
 		}
-		function fileLoaded(e:Event):Void {
-			convertAndUploadSound(FileReference(e.target).name, FileReference(e.target).data);
-		}
-		var files:FileReferenceList = new FileReferenceList();
 		files.addEventListener(Event.SELECT, fileSelected);
 		try {
 			// Ignore the exception that happens when you call browse() with the file browser open
@@ -659,8 +666,8 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 		} catch(e:Dynamic) {}
 	}
 
-	private function startSoundUpload(sndToUpload:ScratchSound, origName:String, whenDone:Function):Void {
-		if(!sndToUpload) {
+	private function startSoundUpload(sndToUpload:ScratchSound, origName:String, whenDone:Void->Void):Void {
+		if(sndToUpload == null) {
 			DialogBox.notify(
 					'Sorry!',
 					'The sound file '+origName+' is not recognized by Scratch.  Please use MP3 or WAV sound files.',
@@ -671,26 +678,27 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 	}
 
 	private function convertAndUploadSound(sndName:String, data:ByteArray):Void {
+		var snd:ScratchSound = null;
 		function uploadComplete():Void {
 			app.removeLoadProgressBox();
 			whenDone(snd);
 		}
-		var snd:ScratchSound;
 		var origName:String = sndName;
 		var i:Int = sndName.lastIndexOf('.');
-		if (i > 0) sndName = sndName.slice(0, i); // remove extension
+		if (i > 0) sndName = sndName.substring(0, i); // remove extension
 
 		app.addLoadProgressBox('Importing sound...');
 		try {
 			snd = new ScratchSound(sndName, data); // try reading the data as a WAV file
-		} catch (e:Error) { }
+		} catch (e:openfl.errors.Error) { }
 
-		if (snd && snd.sampleCount > 0) { // WAV data
+		if (snd != null && snd.sampleCount > 0) { // WAV data
 			startSoundUpload(snd, origName, uploadComplete);
 		} else { // try to read data as an MP3 file
-			if (app.lp) app.lp.setTitle('Converting mp3 file...');
+			if (app.lp != null ) app.lp.setTitle('Converting mp3 file...');
 			var sound:Sound;
-			#if allow3d
+			/*
+			SCRATCH::allow3d {
 				sound = new Sound();
 				try {
 					data.position = 0;
@@ -704,15 +712,16 @@ spriteFeaturesFilter.visible = false; // disable features filter for now
 					trace(e);
 					uploadComplete();
 				}
-			#end
+			}
+			*/
 
-			if (!sound)
-				setTimeout(function():Void {
-					MP3Loader.convertToScratchSound(sndName, data, function(s:ScratchSound):Void {
-						snd = s;
-						startSoundUpload(s, origName, uploadComplete);
-					});
-				}, 1);
+			//if (sound == null)
+				//haxe.Timer.delay(function():Void {
+					//MP3Loader.convertToScratchSound(sndName, data, function(s:ScratchSound):Void {
+						//snd = s;
+						//startSoundUpload(s, origName, uploadComplete);
+					//});
+				//}, 1);
 		}
 	}
 

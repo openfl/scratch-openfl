@@ -24,14 +24,13 @@
 
 package blocks;
 
-//import blocks.Graphics;
-//import blocks.Shape;
 
-import flash.display.*;
-import flash.filters.*;
+import openfl.display.*;
+import openfl.filters.*;
 
-class BlockShape extends Shape {
-	
+class BlockShape extends Shape
+{
+
 	// Shapes
 	public static inline var RectShape : Int = 1;
 	public static inline var BooleanShape : Int = 2;
@@ -46,33 +45,33 @@ class BlockShape extends Shape {
 	public static inline var FinalLoopShape : Int = 10;
 	// E-shaped blocks
 	public static inline var IfElseShape : Int = 11;
-	
+
 	// Geometry
 	public static inline var NotchDepth : Int = 3;
 	public static inline var EmptySubstackH : Int = 12;
 	public static inline var SubstackInset : Int = 15;
-	
-	private inline var CornerInset : Int = 3;
-	private inline var InnerCornerInset : Int = 2;
-	private inline var BottomBarH : Int = 16;  // height of the bottom bar of a C or E block  
-	private inline var DividerH : Int = 18;  // height of the divider bar in an E block  
-	private inline var NotchL1 : Int = 13;
-	private var NotchL2 : Int = NotchL1 + NotchDepth;
-	private var NotchR1 : Int = NotchL2 + 8;
-	private var NotchR2 : Int = NotchR1 + NotchDepth;
-	
+
+	private static inline var CornerInset : Int = 3;
+	private static inline var InnerCornerInset : Int = 2;
+	private static inline var BottomBarH : Int = 16;  // height of the bottom bar of a C or E block  
+	private static inline var DividerH : Int = 18;  // height of the divider bar in an E block  
+	private static inline var NotchL1 : Int = 13;
+	private static inline var NotchL2 : Int = NotchL1 + NotchDepth;
+	private static inline var NotchR1 : Int = NotchL1 + NotchDepth + 8;
+	private static inline var NotchR2 : Int = NotchL1 + NotchDepth + 8 + NotchDepth;
+
 	// Variables
-	public var color : UInt;
+	public var color : Int;
 	public var hasLoopArrow : Bool;
-	
+
 	private var shape : Int;
 	private var w : Int;
 	private var topH : Int;
 	private var substack1H : Int = EmptySubstackH;
 	private var substack2H : Int = EmptySubstackH;
-	private var drawFunction : Function = drawRectShape;
+	private var drawFunction : Graphics->Void;
 	private var redrawNeeded : Bool = true;
-	
+
 	public function new(shape : Int = 1, color : Int = 0xFFFFFF)
 	{
 		super();
@@ -81,25 +80,25 @@ class BlockShape extends Shape {
 		setShape(shape);
 		filters = blockShapeFilters();
 	}
-	
+
 	public function setWidthAndTopHeight(newW : Int, newTopH : Int, doRedraw : Bool = false) : Void{
 		// Set the width and 'top' height of this block. For normal command
 		// and reporter blocks, the top height is the height of the block.
 		// For C and E shaped blocks (conditionals and loops), the top height
 		// is the height of the top bar, which contains block labels and arguments.
-		if ((newW == w) && (newTopH == topH)) 			return;
+		if ((newW == w) && (newTopH == topH))             return;
 		w = newW;
 		topH = newTopH;
 		redrawNeeded = true;
-		if (doRedraw) 			redraw();
+		if (doRedraw)             redraw();
 	}
-	
+
 	public function setWidth(newW : Int) : Void{
-		if (newW == w) 			return;
+		if (newW == w)             return;
 		w = newW;
 		redrawNeeded = true;
 	}
-	
+
 	public function copyFeedbackShapeFrom(b : Dynamic, reporterFlag : Bool, isInsertion : Bool = false, targetHeight : Int = 0) : Void{
 		// Set my shape from b, which is a Block or BlockArg.
 		var s : BlockShape = b.base;
@@ -116,47 +115,47 @@ class BlockShape extends Shape {
 				topH = 6;
 			}
 			else {
-				if (!canHaveSubstack1() && !b.isHat) 					topH = b.height;  // normal command block (not hat, C, or E)  ;
-				if (targetHeight != 0) 					substack1H = targetHeight - NotchDepth;  // wrapping a C or E block  ;
+				if (!canHaveSubstack1() && !b.isHat)                     topH = b.height;  // normal command block (not hat, C, or E)  ;
+				if (targetHeight != 0)                     substack1H = targetHeight - NotchDepth;  // wrapping a C or E block  ;
 			}
 		}
 		filters = dropFeedbackFilters(reporterFlag);
 		redrawNeeded = true;
 		redraw();
 	}
-	
+
 	public function setColor(color : Int) : Void{this.color = color;redrawNeeded = true;
 	}
-	
+
 	public function nextBlockY() : Int{
-		if (ProcHatShape == shape) 			return topH;
-		return height - NotchDepth;
+		if (ProcHatShape == shape)             return topH;
+		return Std.int(height - NotchDepth);
 	}
-	
+
 	public function setSubstack1Height(h : Int) : Void{
-		h = Math.max(h, EmptySubstackH);
+		h = Std.int(Math.max(h, EmptySubstackH));
 		if (h != substack1H) {substack1H = h;redrawNeeded = true;
 		}
 	}
-	
+
 	public function setSubstack2Height(h : Int) : Void{
-		h = Math.max(h, EmptySubstackH);
+		h = Std.int(Math.max(h, EmptySubstackH));
 		if (h != substack2H) {substack2H = h;redrawNeeded = true;
 		}
 	}
-	
+
 	public function canHaveSubstack1() : Bool{return shape >= LoopShape;
 	}
 	public function canHaveSubstack2() : Bool{return shape == IfElseShape;
 	}
-	
+
 	public function substack1y() : Int{return topH;
 	}
 	public function substack2y() : Int{return topH + substack1H + DividerH - NotchDepth;
 	}
-	
+
 	public function redraw() : Void{
-		if (!redrawNeeded) 			return;
+		if (!redrawNeeded)             return;
 		var g : Graphics = this.graphics;
 		g.clear();
 		g.beginFill(color);
@@ -164,17 +163,18 @@ class BlockShape extends Shape {
 		g.endFill();
 		redrawNeeded = false;
 	}
-	
-	private function blockShapeFilters() : Array<Dynamic>{
+
+	private function blockShapeFilters() : Array<BitmapFilter>{
 		// filters for command and reporter Block outlines
-		var f : BevelFilter = new BevelFilter(1);
-		f.blurX = f.blurY = 3;
-		f.highlightAlpha = 0.3;
-		f.shadowAlpha = 0.6;
-		return [f];
+		//var f : BevelFilter = new BevelFilter(1);
+		//f.blurX = f.blurY = 3;
+		//f.highlightAlpha = 0.3;
+		//f.shadowAlpha = 0.6;
+		//return [f];
+		return [];
 	}
-	
-	private function dropFeedbackFilters(forReporter : Bool) : Array<Dynamic>{
+
+	private function dropFeedbackFilters(forReporter : Bool) : Array<BitmapFilter>{
 		// filters for command/reporter block drop feedback
 		var f : GlowFilter;
 		if (forReporter) {
@@ -192,10 +192,11 @@ class BlockShape extends Shape {
 		f.knockout = true;
 		return [f];
 	}
-	
+
 	private function setShape(shape : Int) : Void{
 		this.shape = shape;
-		switch (shape) {
+		switch (shape)
+		{
 			case RectShape:drawFunction = drawRectShape;
 			case BooleanShape:drawFunction = drawBooleanShape;
 			case NumberShape:drawFunction = drawNumberShape;
@@ -207,12 +208,12 @@ class BlockShape extends Shape {
 			case ProcHatShape:drawFunction = drawProcHatShape;
 		}
 	}
-	
+
 	private function drawRectShape(g : Graphics) : Void{g.drawRect(0, 0, w, topH);
 	}
-	
+
 	private function drawBooleanShape(g : Graphics) : Void{
-		var centerY : Int = topH / 2;
+		var centerY : Int = Std.int(topH / 2);
 		g.moveTo(centerY, topH);
 		g.lineTo(0, centerY);
 		g.lineTo(centerY, 0);
@@ -220,9 +221,9 @@ class BlockShape extends Shape {
 		g.lineTo(w, centerY);
 		g.lineTo(w - centerY, topH);
 	}
-	
+
 	private function drawNumberShape(g : Graphics) : Void{
-		var centerY : Int = topH / 2;
+		var centerY : Int = Std.int(topH / 2);
 		g.moveTo(centerY, topH);
 		curve(centerY, topH, 0, centerY);
 		curve(0, centerY, centerY, 0);
@@ -230,12 +231,12 @@ class BlockShape extends Shape {
 		curve(w - centerY, 0, w, centerY);
 		curve(w, centerY, w - centerY, topH);
 	}
-	
+
 	private function drawCmdShape(g : Graphics) : Void{
 		drawTop(g);
 		drawRightAndBottom(g, topH, (shape != FinalCmdShape));
 	}
-	
+
 	private function drawCmdOutlineShape(g : Graphics) : Void{
 		g.endFill();  // do not fill  
 		g.lineStyle(2, 0xFFFFFF, 0.2);
@@ -243,7 +244,7 @@ class BlockShape extends Shape {
 		drawRightAndBottom(g, topH, (shape != FinalCmdShape));
 		g.lineTo(0, CornerInset);
 	}
-	
+
 	private function drawTop(g : Graphics) : Void{
 		g.moveTo(0, CornerInset);
 		g.lineTo(CornerInset, 0);
@@ -254,7 +255,7 @@ class BlockShape extends Shape {
 		g.lineTo(w - CornerInset, 0);
 		g.lineTo(w, CornerInset);
 	}
-	
+
 	private function drawRightAndBottom(g : Graphics, bottomY : Int, hasNotch : Bool, inset : Int = 0) : Void{
 		g.lineTo(w, bottomY - CornerInset);
 		g.lineTo(w - CornerInset, bottomY);
@@ -273,7 +274,7 @@ class BlockShape extends Shape {
 			g.lineTo(0, bottomY - CornerInset);
 		}
 	}
-	
+
 	private function drawHatShape(g : Graphics) : Void{
 		g.moveTo(0, 12);
 		curve(0, 12, 40, 0, 0.15);
@@ -282,7 +283,7 @@ class BlockShape extends Shape {
 		g.lineTo(w, 10 + CornerInset);
 		drawRightAndBottom(g, topH, true);
 	}
-	
+
 	private function drawProcHatShape(g : Graphics) : Void{
 		var trimColor : Int = 0x8E2EC2;  // 0xcf4ad9;  
 		var archRoundness : Float = Math.min(0.2, 35 / w);
@@ -298,16 +299,16 @@ class BlockShape extends Shape {
 		curve(w, 16, 0, 16, -archRoundness);
 		curve(0, 16, -1, 13, 0.6);
 	}
-	
+
 	private function drawLoopShape(g : Graphics) : Void{
 		var h1 : Int = topH + substack1H - NotchDepth;
 		drawTop(g);
 		drawRightAndBottom(g, topH, true, SubstackInset);
 		drawArm(g, h1);
 		drawRightAndBottom(g, h1 + BottomBarH, (shape == LoopShape));
-		if (hasLoopArrow) 			drawLoopArrow(g, h1 + BottomBarH);
+		if (hasLoopArrow)             drawLoopArrow(g, h1 + BottomBarH);
 	}
-	
+
 	private function drawLoopArrow(g : Graphics, h : Int) : Void{
 		// Draw the arrow on loop blocks.
 		var arrow : Array<Dynamic> = [
@@ -320,7 +321,7 @@ class BlockShape extends Shape {
 		drawPath(g, w - 16, h - 4, arrow);  // white arrow  
 		g.endFill();
 	}
-	
+
 	private function drawPath(g : Graphics, startX : Float, startY : Float, deltas : Array<Dynamic>) : Void{
 		// Starting at startX, startY, draw a sequence of lines following the given position deltas.
 		var nextX : Float = startX;
@@ -330,7 +331,7 @@ class BlockShape extends Shape {
 			g.lineTo(nextX += d[0], nextY += d[1]);
 		}
 	}
-	
+
 	private function drawIfElseShape(g : Graphics) : Void{
 		var h1 : Int = topH + substack1H - NotchDepth;
 		var h2 : Int = h1 + DividerH + substack2H - NotchDepth;
@@ -341,19 +342,19 @@ class BlockShape extends Shape {
 		drawArm(g, h2);
 		drawRightAndBottom(g, h2 + BottomBarH, true);
 	}
-	
+
 	private function drawArm(g : Graphics, armTop : Int) : Void{
 		g.lineTo(SubstackInset, armTop - InnerCornerInset);
 		g.lineTo(SubstackInset + InnerCornerInset, armTop);
 		g.lineTo(w - CornerInset, armTop);
 		g.lineTo(w, armTop + CornerInset);
 	}
-	
+
 	private function curve(p1x : Int, p1y : Int, p2x : Int, p2y : Int, roundness : Float = 0.42) : Void{
 		// Compute the Bezier control point by following an orthogonal vector from the midpoint
 		// of the line between p1 and p2 scaled by roundness * dist(p1, p2). The default roundness
 		// approximates a circular arc. Negative roundness gives a concave curve.
-		
+
 		var midX : Float = (p1x + p2x) / 2.0;
 		var midY : Float = (p1y + p2y) / 2.0;
 		var cx : Float = midX + (roundness * (p2y - p1y));
