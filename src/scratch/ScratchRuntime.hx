@@ -1056,13 +1056,17 @@ class ScratchRuntime {
 			var i:Int;
 			if(data.isList)
 				for (i in 0...uiLayer.numChildren) {
-					var listW:ListWatcher = cast(uiLayer.getChildAt(i), ListWatcher);
-					if (listW != null && (listW.listName == varName) && listW.visible) return true;
+					if(Std.is(uiLayer.getChildAt(i), ListWatcher)) {
+					    var listW:ListWatcher = cast(uiLayer.getChildAt(i), ListWatcher);
+					    if (listW != null && (listW.listName == varName) && listW.visible) return true;
+					}
 				}
 			else
 				for (i in 0...uiLayer.numChildren) {
-					var varW:Watcher = cast(uiLayer.getChildAt(i), Watcher);
-					if (varW != null && varW.isVarWatcherFor(targetObj, varName) && varW.visible) return true;
+					if(Std.is(uiLayer.getChildAt(i), Watcher)) {
+					    var varW:Watcher = cast(uiLayer.getChildAt(i), Watcher);
+					    if (varW != null && varW.isVarWatcherFor(targetObj, varName) && varW.visible) return true;
+					}
 				}
 		}
 		if ('reporter' == data.type) {
