@@ -238,7 +238,7 @@ class DialogBox extends Sprite
 	}
 
 	public function getField(fieldName : String) : Dynamic{
-		if (fields.exists(fieldName))             return fields[fieldName].text;
+		if (fields.exists(fieldName))             return fields[fieldName].__textEngine.text;
 		if (booleanFields.exists(fieldName))             return booleanFields[fieldName].isOn();
 		return null;
 	}
